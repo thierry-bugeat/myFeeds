@@ -1,0 +1,131 @@
+/* https://www.mozilla.org/en-US/styleguide/products/firefox-os/typeface/ */
+
+html, body {
+    margin: 0;
+    box-sizing: border-box;
+}
+
+html {
+    width: 100%;
+    height: 100%;
+    background-color: var(--fxos-ivory);
+    font-size: 62.5%;
+}
+
+body {
+    width: 100%;
+    height: inherit;
+    overflow: hidden;
+}
+
+section[role="region"] {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+#content img{
+    display: block;
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+#feeds-entries-container{
+    position: absolute;
+    width: calc(100%);
+    height: calc(100% - 9.5rem);
+    top: 5rem;
+    background: var(--fxos-ivory);
+}
+#feeds-entries{
+    width:90%;
+    margin:0px auto;
+    margin-bottom: 4%;
+}
+
+.entrie, .entrie-small{
+    padding:4%;
+    width:92%;
+    margin-top:4%;
+    background-color:#FFFFFF;
+}
+
+.entrie-title {
+    font-size: 2.3rem;
+}
+
+.entrie-title > a {
+    display: block;
+    text-decoration:none;
+    color: black;
+}
+
+.entrie-date {
+    font-size: 1.4rem;
+    color:#c4c4c4;
+}
+
+.entrie > .entrie-image {
+    max-width: 100%;
+}
+
+.entrie-contentSnippet{
+    font-size: 1.9rem;
+}
+
+.entrie-more{
+    text-align: center;
+}
+
+.entrie-more > a {
+    display: inline-block;
+}
+
+/* Entry small */
+
+.entrie-small > .entrie-image {
+    max-width: 35%;
+    float:right;
+}
+
+.entrie-small > .entrie-title {
+    font-size: 1.5rem;
+}
+
+.entrie-small > .entrie-title:after {
+    content: " ";
+    display: block;
+    height: 0;
+    clear: both;
+    overflow: hidden;
+    visibility: hidden;
+}
+
+/* Main Entrie */
+
+#main-entry-container{
+    width:100%;
+    height:100%;
+    margin:0px auto;
+    position: fixed;
+    top:0%;
+    left:100%;
+    background: var(--fxos-ivory);
+    z-index:10;
+    box-sizing: border-box;
+    padding-bottom: 4.5rem;
+}
+
+#main-entry-container > #main-entry{
+    box-sizing: border-box;
+    padding:4%;
+    width:100%;
+    height:100%;
+    background-color:#FFFFFF;
+    overflow-x:hidden;
+    overflow-y:auto;
+}
+
+#content * {
+    max-width: 100%;
+}
+

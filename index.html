@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>my Weekly Feeds</title>
+    <link rel="icon" type="image/png" href="images/icon-128.png">
+    <meta name="viewport" content="width=device-width"> 
+    <link href="style/colors.css" type="text/css" rel="stylesheet">
+    <link href="style/fonts.css" type="text/css" rel="stylesheet">
+    <link href="style/header.css" type="text/css" rel="stylesheet">
+    <link href="style/toolbar.css" type="text/css" rel="stylesheet">
+    <link href="style/browser.css" type="text/css" rel="stylesheet">
+    <link href="style/feeds-list.css" type="text/css" rel="stylesheet">
+    <link href="style/style.css" type="text/css" rel="stylesheet">
+    <link href="style/util.css" type="text/css" rel="stylesheet">
+</head>
+
+<body>
+
+    <section role="region">
+        <header class="fixed">
+            <button><span class="icon icon-menu">menu</span></button>
+            <menu type="toolbar">
+                <button><span class="icon icon-edit">edit</span></button>
+                <button><span class="icon icon-add">add</span></button>
+            </menu>
+            <h1>my Weekly Feeds <em id="em">50</em></h1>
+        </header>
+    </section>
+    
+    <div id="feeds-toolbar" class="toolbar">
+        <a href="javascript:loadFeeds();"><img id="sync" src="images/sync.white.svg"/></a>
+        <a href='javascript:openWindow("feeds-list-container");'><img id="menu" src="images/menu.white.svg"/></a>
+        <a onclick='document.getElementById("feeds-entries-container").scrollTop = 0;'><img id="menu" src="images/topup.white.svg"/></a>
+        <img id="sync" src="images/sync.white.svg" onclick="javascript:loadFile();"/>
+        <img id="sync" src="images/sync.white.svg" onclick="javascript:saveFeed();"/>
+    </div>
+    
+    <div id="main-entry-container">
+        <div id="main-entry">
+            <div id="browser"><iframe src="" sandbox="" mozbrowser remote></iframe></div>
+            <p id="content" class="entrie-contentSnippet"></p>
+        </div>
+        <div id="main-entry-toolbar" class="toolbar"><a href='javascript:closeWindow("main-entry-container");'><img src="images/close.white.svg"/></a></div>
+    </div>
+    
+    <div id="feeds-list-container">
+        <div id="feeds-list"></div>
+        <div id="feeds-list-toolbar" class="toolbar"><a href='javascript:closeWindow("feeds-list-container");'><img src="images/close.white.svg"/></a></div>
+    </div>
+    
+    <div id="feeds-entries-container" class="scrollable header fixed">
+        <div id="feeds-entries"></div>
+    </div>
+    
+</body>
+
+<!-- script type="text/javascript" src="https://www.google.com/jsapi"></script-->
+<script type="text/javascript" src="api/google/feed/jsapi"></script>
+<script type="text/javascript" src="libs/underscore-min.js"></script>
+<script type="text/javascript" src="scripts/main.js"></script>
+
+</html>

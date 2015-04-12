@@ -1,0 +1,22 @@
+#feeds-list-container{
+    width:100%;
+    height:100%;
+    margin:0px auto;
+    position: fixed;
+    top:0%;
+    left:100%;
+    background: var(--fxos-ivory);
+    z-index:10;
+    box-sizing: border-box;
+    padding-bottom: 4.5rem;
+}
+
+#feeds-list {
+    width:100%;
+    height:100%;
+    margin:0px auto;
+    background: var(--fxos-ivory);
+    z-index:99;
+    box-sizing: border-box;
+    padding-bottom: 4.5rem;
+}

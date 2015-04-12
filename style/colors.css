@@ -1,0 +1,20 @@
+/* 
+ * Firefox OS Color Palette
+ * 
+ * Documentation  : https://www.mozilla.org/en-US/styleguide/products/firefox-os/color/ 
+ * Usage examples : http://www.w3.org/TR/css-variables/
+ * 
+ * */
+
+:root {
+    --fxos-blue: #00AACC;
+    --fxos-orange: #FF4E00;
+    --fxos-brick: #CD6723;
+    --fxos-red: #B90000;
+    --fxos-green: #5F9B0A;
+    --fxos-black: #000000;
+    --fxos-warm-grey: #333333;
+    --fxos-grey: #2C393B;
+    --fxos-light-grey: #F4F4F4;
+    --fxos-ivory: #EAEAE7;
+}

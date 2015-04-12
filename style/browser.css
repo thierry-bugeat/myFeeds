@@ -1,0 +1,18 @@
+#browser {
+    position: absolute;
+    width: calc(100%);
+    height: calc(100% - 9.5rem);
+    top: 5rem;
+    left:0;
+    background: var(--fxos-ivory);
+}
+
+#browser > iframe{
+    border: 0px solid red;
+    box-sizing: border-box;
+    width: 100%;
+    height: calc(100%) !important;
+    padding:4%;
+    overflow-x:hidden;
+    overflow-y:auto;
+}

@@ -1,0 +1,23 @@
+{
+    "name": "my Weekly Feeds",
+    "description": "RSS feed reader",
+    "launch_path": "/index.html",
+    "icons": {
+        "60": "/images/icon-60.png",
+        "128": "/images/icon-128.png"
+    },
+    "developer": {
+        "name": "Thierry Bugeat",
+        "url": "http://www.bugeat.com"
+    },
+    "permissions": {
+        "desktop-notification": {
+            "description": "Needed for creating system notifications."
+        },
+        "device-storage:apps":      { "access": "readwrite" },
+        "device-storage:sdcard":    { "access": "readwrite" },
+        "webapps-manage": {},
+        "systemXHR": {},
+        "browser": {}
+    }
+}
