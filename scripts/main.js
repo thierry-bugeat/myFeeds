@@ -142,6 +142,7 @@
                 
                 if (_diff < params.entries.maxLengthForSmallEntries) {
                     //_htmlEntries = _htmlEntries + '<div class="entrie-small" onclick="javascript:entryFade(this); mainEntryOpenInBrowser(\'' + _entrie.link + '\');" >';
+                    _htmlEntries = _htmlEntries + '<div class="entrie-small">';
                     _htmlEntries = _htmlEntries + _imageUrl;
                     _htmlEntries = _htmlEntries + '<div class="entrie-title">' + _entrie.title + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-date">' + _date + '</div>';
@@ -153,6 +154,7 @@
                 
                 else {
                     //_htmlEntries = _htmlEntries + '<div class="entrie" onclick="javascript:entryFade(this); mainEntryOpen(' + i + ');" >';
+                    _htmlEntries = _htmlEntries + '<div class="entrie">';
                     _htmlEntries = _htmlEntries + '<div class="entrie-title">' + _entrie.title + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-date">' + _date + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-date">' + _entrie.feed_link + '</div>';

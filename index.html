@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width"> 
     <link href="style/colors.css" type="text/css" rel="stylesheet">
     <link href="style/fonts.css" type="text/css" rel="stylesheet">
+    <link href="style/gaia-icons.css" type="text/css" rel="stylesheet">
     <link href="style/header.css" type="text/css" rel="stylesheet">
     <link href="style/toolbar.css" type="text/css" rel="stylesheet">
     <link href="style/browser.css" type="text/css" rel="stylesheet">
@@ -19,10 +20,9 @@
 
     <section role="region">
         <header class="fixed">
-            <button><span class="icon icon-menu">menu</span></button>
+            <button id="menu"><span data-icon="menu"></span></button>
             <menu type="toolbar">
-                <button><span class="icon icon-edit">edit</span></button>
-                <button><span class="icon icon-add">add</span></button>
+                <button><span data-icon="add"></span></button>
             </menu>
             <h1>my Feeds</h1>
         </header>
@@ -30,7 +30,6 @@
     
     <div id="feeds-toolbar" class="toolbar">
         <a id="sync"><img src="images/sync.white.svg"/></a>
-        <a id="menu"><img src="images/menu.white.svg"/></a>
         <a id="topup"><img src="images/topup.white.svg"/></a>
         <a id="load">load</a>
         <a id="save">save</a>
