@@ -4,34 +4,34 @@
     // APIs List            : https://developer.mozilla.org/fr/Apps/Reference/Firefox_OS_device_APIs
     // Device Storage API   : https://developer.mozilla.org/en-US/docs/Web/API/Device_Storage_API
     // Browser API          : https://developer.mozilla.org/fr/docs/WebAPI/Browser
+    // CSP                  : https://developer.mozilla.org/fr/Apps/PSC
     // <iframe> : https://developer.mozilla.org/fr/docs/Web/HTML/Element/iframe
+    
+    // A voir : http://imikado.developpez.com/tutoriels/firefoxOS/ma-premier-application/
     
     var _myTimestamp = Math.floor(Date.now() / 1000);
     
     var myFeeds = [
-        {"url": "http://www.gameblog.fr/rss.php",               "format": "" },
-        {"url": "http://linuxfr.org/news.atom",                 "format": "" },
-        {"url": "http://carlchenet.wordpress.com/feed/",        "format": "" },
-        {"url": "http://le-libriste.fr/feed/",                  "format": "" },
-        {"url": "http://www.nextinpact.com/rss/news.xml",       "format": "" },
-        {"url": "http://www.minimachines.net/feed/",            "format": "" },
-        {"url": "http://www.planet-libre.org/rss10.php",        "format": "" },
-        {"url": "http://www.webupd8.org/feeds/posts/default",   "format": "" },
-        {"url": "http://feeds.feedburner.com/frandroid",        "format": "" },
-        {"url": "http://planet.gnome.org/atom.xml",             "format": "" },
-        {"url": "http://raphaelhertzog.fr/feed/",               "format": "" },
-        {"url": "http://www.dadall.info/blog/feed.php?rss",     "format": "" }
+        {"url": "http://www.gameblog.fr/rss.php",               "num": 20 },
+        {"url": "http://linuxfr.org/news.atom",                 "num": 20 },
+        {"url": "http://carlchenet.wordpress.com/feed/",        "num": 20 },
+        {"url": "http://le-libriste.fr/feed/",                  "num": 20 },
+        {"url": "http://www.nextinpact.com/rss/news.xml",       "num": 20 },
+        {"url": "http://www.minimachines.net/feed/",            "num": 20 },
+        {"url": "http://www.planet-libre.org/rss10.php",        "num": 20 },
+        {"url": "http://www.webupd8.org/feeds/posts/default",   "num": 20 },
+        {"url": "http://feeds.feedburner.com/frandroid",        "num": 20 },
+        {"url": "http://planet.gnome.org/atom.xml",             "num": 20 },
+        {"url": "http://raphaelhertzog.fr/feed/",               "num": 20 },
+        {"url": "http://www.dadall.info/blog/feed.php?rss",     "num": 20 }
     ];
     
-    /*var myFeeds = [
-        {"url": "http://www.gameblog.fr/rss.php",               "format": "" },
-        {"url": "http://feeds.feedburner.com/frandroid",        "format": "" }
-    ];*/
+    //addFeedsFromMyOnlineAccounts();
     
     var params = {
         "entries": {
             "maxLengthForSmallEntries": "400", // Max number of characters to display an entry as small entry
-            "numberOfEntriesToLoadPerFeed": "20", // Default 4
+            "numberOfEntriesToLoadPerFeed": "2", // Default 4
             "dontDisplayEntriesOlderThan": "8" // In days
         }
     };
@@ -44,113 +44,47 @@
     var main_entry              = document.getElementById("main-entry");
     var browser                 = document.getElementById("browser");
     
+    var sync                    = document.getElementById("sync");
+    var menu                    = document.getElementById("menu");
+    var topup                   = document.getElementById("topup");
+    
+    var load                    = document.getElementById("load");
+    var save                    = document.getElementById("save");
+    
+    // DOM clicks :
+    
+    sync.onclick            = function(event) { loadFeeds(); }
+    menu.onclick            = function(event) { openWindow("feeds-list-container"); }
+    topup.onclick           = function(event) { document.getElementById("feeds-entries-container").scrollTop = 0; }
+    closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container"); }
+    closeFeedsList.onclick  = function(event) { closeWindow("feeds-list-container"); }
+    
+    load.onclick            = function(event) { loadFile(); }
+    save.onclick            = function(event) { saveFeed(); }
+    
+    // ---
+    
     browser.addEventListener('mozbrowsererror', function (event) {
         console.dir("Erreur de chargement : " + event.detail);
     });
     
-    // Google Feed API : 
-    // https://developers.google.com/feed/
-    // https://developers.google.com/feed/v1/reference
-    
-    google.load("feeds", "1"); // Load Google Ajax Feed API (version 1)
-    
     function loadFeeds() {
-
-        //console.dir('loadFeeds()');
         
-        syncRotation();
+        //syncRotation();
         
         echo("feeds-list", "Loading...", "");
         echo("feeds-entries", "Loading...", "");
         
-        var _myFeed = {};
-        var _unsortedEntries = [];
-        var _unsortedFeeds = [];
-        var _sortedFeeds = [];
-        var _nbFeeds = myFeeds.length;
-        var _nbFeedsLoaded = 0;
-        
-        // Load each feed one by one
-        
-        for (var i = 0; i < myFeeds.length; i++) {
-
-            _myFeed = myFeeds[i];
-
-            var gf = new google.feeds.Feed(_myFeed.url);
-            
-            gf.setNumEntries(params.entries.numberOfEntriesToLoadPerFeed); // Load N entries per feed.
-            
-            gf.load(function (data) {
-                
-                if (data.status.code == 200) {
-                    
-                    _nbFeedsLoaded = _nbFeedsLoaded + 1;
-                    //console.log(_nbFeedsLoaded + " / " + _nbFeeds);
-                    
-                    // Push all entries of feed in array "_unsortedEntries"
-                    
-                    for (var entryId in data.feed.entries) {
-                        
-                        var _entry = data.feed.entries[entryId];
-                        _entry['feed_link'] = data.feed.link;
-                        
-                        _unsortedEntries.push(_entry);
-                    }
-                
-                    // Sort feeds list by "title"
-                    
-                    //_sortedFeeds = [];
-                    
-                    var _tmp = new Object();
-                    
-                    _tmp.title      = data.feed.title;
-                    _tmp.nbEntries  = data.feed.entries.length;
-                    
-                    _unsortedFeeds.push(_tmp);
-                    //_unsortedFeeds.sort();
-                    
-                    _sortedFeeds = _.sortBy(_unsortedFeeds, 'title');
-                    
-                    
-                    // Display feeds list
-                    
-                    var _htmlFeeds = "";
-                    
-                    for (var id in _sortedFeeds) {
-                        _htmlFeeds = _htmlFeeds + "<li>" + _sortedFeeds[id].title + "<em>" + _sortedFeeds[id].nbEntries + "</em></li>";
-                    }
-
-                    echo("feeds-list", _htmlFeeds, "");
-                    
-                    // Display all entries list 
-                    // if all feeds were loaded
-                    
-                    if (_nbFeedsLoaded == _nbFeeds) {
-                        dspEntries(_unsortedEntries);
-                    }
-                    
-                    //saveFeed("feed-"+id+".txt", data);
-                } else {
-                    console.log('ERROR: Cannot read feed ' + _myFeed.url);
-                    _nbFeedsLoaded = _nbFeedsLoaded + 1;
-                    
-                    // Display all entries list 
-                    // if all feeds were loaded
-                    
-                    if (_nbFeedsLoaded == _nbFeeds) {
-                        //sleep(3000);
-                        dspEntries(_unsortedEntries);
-                    }
-                }
-            });
-        }
+        //        gf.setFeeds(myFeeds);
+        //gf.setNum(params.entries.numberOfEntriesToLoadPerFeed); // Load "num" entries per feed.
+        gf.loadFeeds();
         
     }
     
     function dspEntries(_unsortedEntries) {
         
         console.log("dspEntries()");
-        //console.log(_unsortedEntries);
+        console.log(_unsortedEntries);
         
         // Add "_myTimestamp" for each entry :
         
@@ -207,7 +141,7 @@
                 // (1) Content too short so no link to open entry.
                 
                 if (_diff < params.entries.maxLengthForSmallEntries) {
-                    _htmlEntries = _htmlEntries + '<div class="entrie-small" onclick="javascript:entryFade(this); mainEntryOpenInBrowser(\'' + _entrie.link + '\');" >';
+                    //_htmlEntries = _htmlEntries + '<div class="entrie-small" onclick="javascript:entryFade(this); mainEntryOpenInBrowser(\'' + _entrie.link + '\');" >';
                     _htmlEntries = _htmlEntries + _imageUrl;
                     _htmlEntries = _htmlEntries + '<div class="entrie-title">' + _entrie.title + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-date">' + _date + '</div>';
@@ -218,7 +152,7 @@
                 // (2) Else
                 
                 else {
-                    _htmlEntries = _htmlEntries + '<div class="entrie" onclick="javascript:entryFade(this); mainEntryOpen(' + i + ');" >';
+                    //_htmlEntries = _htmlEntries + '<div class="entrie" onclick="javascript:entryFade(this); mainEntryOpen(' + i + ');" >';
                     _htmlEntries = _htmlEntries + '<div class="entrie-title">' + _entrie.title + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-date">' + _date + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-date">' + _entrie.feed_link + '</div>';
@@ -323,10 +257,19 @@
         main_entry_container.style.cssText = "transform: translateX(-100%); -webkit-transition-duration: 1s; transition-duration: 1s;";
     }
     
-    function echo(divId, msg, append) {
+    /**
+     * Output one html string in div element
+     * 
+     * param string divId    : Div id element
+     * param string msg      : Html string to write
+     * param string placement: "append", "prepend", ""
+     * */
+    function echo(divId, msg, placement) {
         var _out = document.getElementById(divId);
         
-        if (Boolean(append)) {
+        if (placement == 'prepend') {
+            _out.innerHTML = msg + _out.innerHTML;
+        } else if (Boolean(placement)) {
             _out.innerHTML = _out.innerHTML + msg;
         } else {
             _out.innerHTML = msg;
@@ -371,11 +314,44 @@
             }
         }
     }
+    
+    // ======================
+    // --- Ready to start ---
+    // ======================
+    
+    window.onload = function () {
+        
+        // Events :
+    
+        document.body.addEventListener('GoogleFeed.load.done', function(event){
 
-    function onGoogleReady() {
+            console.log(event);
+            
+            // Add feed entries to array "unsortedEntries"
+            
+                gf.addEntries(event.detail.responseData.feed.entries);
 
-        loadFeeds();
+            // Check if all feeds were loaded
+            
+                var _nbFeeds = event.detail.responseData._myParams.nbFeeds;
+            
+                console.log(gf.getNbFeedsLoaded() + ' / ' + _nbFeeds );
+                var _nbFeedsLoaded = gf.getNbFeedsLoaded();
+                gf.setNbFeedsLoaded(++_nbFeedsLoaded);
 
-    }
+                if (++_nbFeedsLoaded == _nbFeeds) {
+                    console.log('*** ALL FEEDS LOADED *** :D');
+                    dspEntries(gf.getEntries());
+                }
+            
+            // ---
+            
+        }, true);
+    
+        // Main :
+        
+        gf.setFeeds(myFeeds);
+        gf.setNum(params.entries.numberOfEntriesToLoadPerFeed); // Load "num" entries per feed.
+        gf.loadFeeds();
 
-    google.setOnLoadCallback(onGoogleReady); // Wait Google loading is complete.
+    };
