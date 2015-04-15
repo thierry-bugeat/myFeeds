@@ -31,6 +31,7 @@ section[role="region"] {
 
 #feeds-entries-container{
     position: absolute;
+    display:block;
     width: calc(100%);
     height: calc(100% - 9.5rem);
     top: 5rem;

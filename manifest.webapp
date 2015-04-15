@@ -1,5 +1,5 @@
 {
-    "name": "my Weekly Feeds",
+    "name": "my Feeds",
     "description": "RSS feed reader",
     "launch_path": "/index.html",
     "icons": {
@@ -10,14 +10,17 @@
         "name": "Thierry Bugeat",
         "url": "http://www.bugeat.com"
     },
+    "type": "privileged",
+    "csp": "default-src *; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'",
     "permissions": {
         "desktop-notification": {
             "description": "Needed for creating system notifications."
         },
-        "device-storage:apps":      { "access": "readwrite" },
-        "device-storage:sdcard":    { "access": "readwrite" },
-        "webapps-manage": {},
-        "systemXHR": {},
-        "browser": {}
+        "browser": {
+            "description": "Needed for displaying external website in app."
+        },
+        "systemXHR": {
+            "description": "request cross domain."
+        }
     }
 }
