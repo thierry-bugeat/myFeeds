@@ -53,6 +53,7 @@ GoogleFeed.prototype.addEntries = function(entries) {
 GoogleFeed.prototype.loadFeeds  = function() {
     
     this.nbFeedsLoaded = 0;
+    this.unsortedEntries = [];
     
     var _params = {"nbFeeds": this.myFeeds.length};
     

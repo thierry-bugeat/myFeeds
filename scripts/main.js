@@ -33,7 +33,7 @@
     var params = {
         "entries": {
             "maxLengthForSmallEntries": "400", // Max number of characters to display an entry as small entry
-            "numberOfEntriesToLoadPerFeed": "2", // Default 4
+            "numberOfEntriesToLoadPerFeed": "20", // Default 4
             "dontDisplayEntriesOlderThan": "8" // In days
         }
     };
@@ -53,9 +53,6 @@
     var load                    = document.getElementById("load");
     var save                    = document.getElementById("save");
     
-    //var entry_small             = document.getElementsByClassName(".entry-small");
-    //var feeds_entries           = document.getElementById("feeds-entries");
-    
     // DOM clicks :
     
     sync.onclick            = function(event) { loadFeeds(); }
@@ -67,21 +64,6 @@
     load.onclick            = function(event) { loadFile(); }
     save.onclick            = function(event) { saveFeed(); }
     
-    //entry_small.onclick     = function(event) { console.log(event.target.innerHTML); }          
-    //feeds_entries.onclick   = function(event) { console.log(event.target); }
-    
-    //var es = document.querySelector(".entry-small");
-    //es.onclick = function () { console.log('oooooooooooo');}
-    
-    /*document.body.onclick = function(event) {
-        var el = event.target;
-        if (el.className.substr(0,11) == "entry-small") {
-            console.log("div small entry clicked");
-            console.log(this.hasAttribute("entry-id"));
-            console.log(this.getAttribute("entry-id"));
-        }
-    };*/
-    
     // ---
     
     browser.addEventListener('mozbrowsererror', function (event) {
@@ -89,14 +71,10 @@
     });
     
     function loadFeeds() {
-        
-        //syncRotation();
-        
-        echo("feeds-list", "Loading...", "");
+
+        echo("feeds-list", "Loading...", "prepend");
         echo("feeds-entries", "Loading...", "");
         
-        //        gf.setFeeds(myFeeds);
-        //gf.setNum(params.entries.numberOfEntriesToLoadPerFeed); // Load "num" entries per feed.
         gf.loadFeeds();
         
     }
@@ -166,7 +144,6 @@
                 // (1) Content too short so no link to open entry.
                 
                 if (_diff < params.entries.maxLengthForSmallEntries) {
-                    //_htmlEntries = _htmlEntries + '<div class="entry-small" onclick="javascript:entryFade(this); mainEntryOpenInBrowser(\'' + _entrie.link + '\');" >';
                     _htmlEntries = _htmlEntries + '<div class="entry-small" entry_link="' + _entrie.link + '">';
                     _htmlEntries = _htmlEntries + _imageUrl;
                     _htmlEntries = _htmlEntries + '<div class="entry-small-title">' + _entrie.title + '</div>';
@@ -178,8 +155,7 @@
                 // (2) Else
                 
                 else {
-                    //_htmlEntries = _htmlEntries + '<div class="entrie" onclick="javascript:entryFade(this); mainEntryOpen(' + i + ');" >';
-                    _htmlEntries = _htmlEntries + '<div class="entrie">';
+                    _htmlEntries = _htmlEntries + '<div class="entrie" i="' + i + '" >';
                     _htmlEntries = _htmlEntries + '<div class="entrie-title">' + _entrie.title + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-date">' + _date + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-date">' + _entrie.feed_link + '</div>';
@@ -197,13 +173,25 @@
         
         echo("feeds-entries", _htmlEntries, "");
         
-        // Events
+        // ==================
+        // --- Add Events ---
+        // ==================
         
-        $( ".entry-small" ).on( "click", function() {
-            console.log( 'OK' + $( this ).text() );
-            console.log(this.hasAttribute("entry_link"));
-            mainEntryOpenInBrowser(this.getAttribute("entry_link"));
-        });
+        // onclick Small Entries : 
+        
+        var _small_entries = document.querySelectorAll(".entry-small");
+        
+        for (var i = 0; i < _small_entries.length; i++) {
+            _small_entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("entry_link")); }
+        }
+
+        // onclick Entries :
+        
+        var _entries = document.querySelectorAll(".entrie");
+        
+        for (var i = 0; i < _entries.length; i++) {
+            _entries[i].onclick = function() { entryFade(this); mainEntryOpen(this.getAttribute("i")); }
+        }
 
     }
     
@@ -364,8 +352,6 @@
             // Check if all feeds were loaded
             
                 var _nbFeeds = event.detail.responseData._myParams.nbFeeds;
-            
-                console.log(gf.getNbFeedsLoaded() + ' / ' + _nbFeeds );
                 var _nbFeedsLoaded = gf.getNbFeedsLoaded();
                 gf.setNbFeedsLoaded(++_nbFeedsLoaded);
 
@@ -377,25 +363,6 @@
             // ---
             
         }, true);
-        
-
-        
-        $(document).ready(function() {
-            console.log( "ready!" );
-            
-            /*$( ".entry-small" ).on( "click", function() {
-                console.log( 'OK' + $( this ).text() );
-            });
-            
-            $("entry-small").on("click", function(){
-                $(this).css("background-color", "pink");
-            });*/
-            
-            /*$(".entry-small").bind("click", function(){
-                console.log("The paragraMMMMph was clicked.");
-            });*/
-        
-        });
     
         // ============
         // --- Main ---
