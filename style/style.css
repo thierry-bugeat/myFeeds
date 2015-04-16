@@ -43,7 +43,7 @@ section[role="region"] {
     margin-bottom: 4%;
 }
 
-.entrie, .entrie-small{
+.entrie, .entry-small{
     padding:4%;
     width:92%;
     margin-top:4%;
@@ -83,16 +83,16 @@ section[role="region"] {
 
 /* Entry small */
 
-.entrie-small > .entrie-image {
+.entry-small > .entry-small-image {
     max-width: 35%;
     float:right;
 }
 
-.entrie-small > .entrie-title {
+.entry-small > .entry-small-title {
     font-size: 1.5rem;
 }
 
-.entrie-small > .entrie-title:after {
+.entry-small > .entry-small-title:after {
     content: " ";
     display: block;
     height: 0;
