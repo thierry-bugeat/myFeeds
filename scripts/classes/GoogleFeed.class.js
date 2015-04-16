@@ -21,6 +21,7 @@ var GoogleFeed = function() {
     this.myFeeds = [];
     this.sortedEntries = [];
     this.unsortedEntries = [];
+    this.unsortedFeeds = [];
     this.nbFeedsLoaded = 0;
 
     _GoogleFeed = this;
@@ -33,10 +34,18 @@ var GoogleFeed = function() {
 GoogleFeed.prototype.getVersion         = function()        { return this.gf.version;       }
 GoogleFeed.prototype.getOuput           = function()        { return this.gf.output;        }
 GoogleFeed.prototype.getNum             = function()        { return this.gf.num;           }
-GoogleFeed.prototype.getEntries         = function()        { return this.unsortedEntries;  }
+GoogleFeed.prototype.getEntries         = function()        { this._sortEntries(); return this.sortedEntries;    }
 GoogleFeed.prototype.getNbFeedsLoaded   = function()        { return this.nbFeedsLoaded;    }
 
 GoogleFeed.prototype._setUrl            = function(q)       { this.gf.q = q;                }
+GoogleFeed.prototype._sortEntries       = function() {
+    
+    // Sort entries by "_myTimestamp" 
+    // using library "underscore.js"
+    // http://documentcloud.github.io/underscore/
+        
+    this.sortedEntries = (_.sortBy(this.unsortedEntries, '_myTimestamp')).reverse();
+}
 GoogleFeed.prototype.setNum             = function(num)     { this.gf.num = num;            }
 GoogleFeed.prototype.setFeeds           = function(myFeeds) { this.myFeeds = myFeeds;       }
 GoogleFeed.prototype.setNbFeedsLoaded   = function()        { this.nbFeedsLoaded++;         }
@@ -54,6 +63,7 @@ GoogleFeed.prototype.loadFeeds  = function() {
     
     this.nbFeedsLoaded = 0;
     this.unsortedEntries = [];
+    this.unsortedFeeds = [];
     
     var _params = {"nbFeeds": this.myFeeds.length};
     
@@ -79,8 +89,8 @@ GoogleFeed.prototype.loadFeeds  = function() {
 
 GoogleFeed.prototype.get = function (url, myParams) 
 {
-    console.log(url);
-    console.log(params);
+    //console.log(url);
+    //console.log(params);
     return new Promise(function(resolve, reject) {
         
         var xhr = new XMLHttpRequest({ mozSystem: true });

@@ -130,3 +130,14 @@ section[role="region"] {
     max-width: 100%;
 }
 
+/* Loader */
+
+#loading {
+    width:0%;
+    height:0.5rem;
+    display:block;
+    position:absolute;
+    top:5rem;
+    background-color: var(--fxos-blue);
+    z-index:100;
+}

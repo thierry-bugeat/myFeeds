@@ -45,6 +45,7 @@
     var main_entry_container    = document.getElementById("main-entry-container");
     var main_entry              = document.getElementById("main-entry");
     var browser                 = document.getElementById("browser");
+    var loading                 = document.getElementById("loading");
     
     var sync                    = document.getElementById("sync");
     var menu                    = document.getElementById("menu");
@@ -71,36 +72,33 @@
     });
     
     function loadFeeds() {
-
-        echo("feeds-list", "Loading...", "prepend");
-        echo("feeds-entries", "Loading...", "");
+        
+        //document.body.dispatchEvent(new CustomEvent('loadFeeds.start', {"detail": ""}));
+        
+        echo("feeds-list", "Loading...", "");
         
         gf.loadFeeds();
         
     }
     
-    function dspEntries(_unsortedEntries) {
+    function _loading(percentage) {
+        if (percentage == 100) {
+            loading.style.cssText = "width: 0%";
+        } else {
+            loading.style.cssText = "width: " + percentage + "%";
+        }
+    }
+    
+    function dspEntries(entries) {
         
         console.log("dspEntries()");
-        console.log(_unsortedEntries);
+        console.log(sortedEntries);
         
-        // Add "_myTimestamp" for each entry :
+        sortedEntries = entries;
         
-        for (var i = 0; i < _unsortedEntries.length; i++) {
-            var _publishedDate = new Date(_unsortedEntries[i].publishedDate);
-            _unsortedEntries[i]._myTimestamp = Math.round(_publishedDate.getTime()/1000);
-        }
-        
-        // Sort entries by "_myTimestamp" 
-        // using library "underscore.js"
-        // http://documentcloud.github.io/underscore/
-        
-        sortedEntries = _.sortBy(_unsortedEntries, '_myTimestamp');
-        //sortedEntries = _.sortBy(_unsortedEntries, 'title'); // Works fine
-
-        sortedEntries.reverse();
-        
-        // Display entries
+        // =======================
+        // --- Display entries ---
+        // =======================
                     
         var _htmlEntries = "";
 
@@ -340,24 +338,40 @@
         // ==============
         // --- Events ---
         // ==============
+        
+        /*document.body.addEventListener('loadFeeds.start', function(event){
+            console.log('loadFeeds.start');
+            loading(0);
+        }, true);
+        
+        document.body.addEventListener('loadFeeds.end', function(event){
+            console.log('loadFeeds.end');
+            //loading(100);
+        }, true);*/
     
         document.body.addEventListener('GoogleFeed.load.done', function(event){
 
-            console.log(event);
-            
             // Add feed entries to array "unsortedEntries"
             
                 gf.addEntries(event.detail.responseData.feed.entries);
 
             // Check if all feeds were loaded
             
-                var _nbFeeds = event.detail.responseData._myParams.nbFeeds;
+                var _nbFeedsToLoad = event.detail.responseData._myParams.nbFeeds;
                 var _nbFeedsLoaded = gf.getNbFeedsLoaded();
                 gf.setNbFeedsLoaded(++_nbFeedsLoaded);
+                
+                // Percentage of loading ?
+                
+                _loading(Math.round((100 * _nbFeedsLoaded) / _nbFeedsToLoad));
+                
+                // ---
 
-                if (++_nbFeedsLoaded == _nbFeeds) {
+                if (++_nbFeedsLoaded == _nbFeedsToLoad) {
                     console.log('*** ALL FEEDS LOADED *** :D');
+                    //document.body.dispatchEvent(new CustomEvent('loadFeeds.end', {"detail": ""}));
                     dspEntries(gf.getEntries());
+                    _loading(100); echo("loading", "", "");
                 }
             
             // ---
