@@ -39,6 +39,7 @@
     };
     
     var sortedEntries = [];
+    var sortedFeeds = [];
     
     // DOM elements :
     
@@ -56,11 +57,11 @@
     
     // DOM clicks :
     
-    sync.onclick            = function(event) { loadFeeds(); }
-    menu.onclick            = function(event) { openWindow("feeds-list-container"); }
+    sync.onclick            = function(event) { _onclick(this, 'disable'); loadFeeds(); }
+    menu.onclick            = function(event) { openWindow("feeds-list-container", "left"); }
     topup.onclick           = function(event) { document.getElementById("feeds-entries-container").scrollTop = 0; }
-    closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container"); }
-    closeFeedsList.onclick  = function(event) { closeWindow("feeds-list-container"); }
+    closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container", "right"); }
+    closeFeedsList.onclick  = function(event) { closeWindow("feeds-list-container", "left"); }
     
     load.onclick            = function(event) { loadFile(); }
     save.onclick            = function(event) { saveFeed(); }
@@ -87,6 +88,53 @@
         } else {
             loading.style.cssText = "width: " + percentage + "%";
         }
+    }
+    
+    /**
+     *
+     * https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events
+     * */
+    function _onclick(_this, pointerEvents) {
+        console.log(_this);
+        
+        if (pointerEvents == 'enable') {
+            _this.style.cssText = "opacity: 1";
+            _this.style.pointerEvents = 'auto';
+        } else {
+            _this.style.cssText = "opacity: 0.3";
+            _this.style.pointerEvents = 'none';
+        }
+    }
+    
+    function dspFeeds(feeds) {
+        
+        var _htmlFeeds = "";
+        
+        // --- NAV start ---
+        
+        //_htmlFeeds = _htmlFeeds + '<nav>';
+        
+        // ==========================
+        // --- Display feeds list ---
+        // ==========================
+        
+        _htmlFeeds = _htmlFeeds + '<h2>Feeds list</h2>';
+        _htmlFeeds = _htmlFeeds + '<ul>';
+
+        for (var i = 0; i < feeds.length; i++) {
+            var _feed = feeds[i];
+            _htmlFeeds = _htmlFeeds + '<li><a href="#"><p>' + _feed.title + ' <em>(' + _feed._myNbEntries + ')</em></p><p><time datetime="17:43">' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
+        }
+        
+        _htmlFeeds = _htmlFeeds + '</ul>';
+        
+        // --- NAV end ---
+        
+        //_htmlFeeds = _htmlFeeds + '</nav>';
+        
+        // --- Display ---
+        
+        echo("feeds-list", _htmlFeeds, "");
     }
     
     function dspEntries(entries) {
@@ -121,20 +169,10 @@
                 
                 // 1st image extraction
                 
-                var _imageUrl   = '';
-                var _regex      = /<img[^>]+src="(http:\/\/[^">]+)/g
-                var _results    = _regex.exec(_entrie.content);
-                
-                if (_results !== null) {
-                    var _imageUrl = _results[1];
-                    
-                    if (Boolean(_imageUrl)) { 
-                        if (_diff < params.entries.maxLengthForSmallEntries) {
-                            _imageUrl = '<img class="entry-small-image" src="' + _imageUrl + '"/>';
-                        } else {
-                            _imageUrl = '<img class="entrie-image" src="' + _imageUrl + '"/>'; 
-                        }
-                    }
+                if (_diff < params.entries.maxLengthForSmallEntries) {
+                    _imageUrl = '<img class="entry-small-image" src="' + _entrie._myFirstImageUrl + '"/>';
+                } else {
+                    _imageUrl = '<img class="entrie-image" src="' + _entrie._myFirstImageUrl + '"/>'; 
                 }
                 
                 // Entry composition
@@ -146,7 +184,7 @@
                     _htmlEntries = _htmlEntries + _imageUrl;
                     _htmlEntries = _htmlEntries + '<div class="entry-small-title">' + _entrie.title + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entry-small-date">' + _date + '</div>';
-                    _htmlEntries = _htmlEntries + '<div class="entry-small-date">' + _entrie.link + '</div>';
+                    //_htmlEntries = _htmlEntries + '<div class="entry-small-date">' + _entrie.link + '</div>';
                     _htmlEntries = _htmlEntries + "</div>";
                 }
                 
@@ -154,9 +192,9 @@
                 
                 else {
                     _htmlEntries = _htmlEntries + '<div class="entrie" i="' + i + '" >';
+                    _htmlEntries = _htmlEntries + '<div class="entrie-feed-title">' + _entrie.author + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-title">' + _entrie.title + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-date">' + _date + '</div>';
-                    _htmlEntries = _htmlEntries + '<div class="entrie-date">' + _entrie.feed_link + '</div>';
                     _htmlEntries = _htmlEntries + _imageUrl;
                     _htmlEntries = _htmlEntries + '<p class="entrie-contentSnippet">' + _entrie.contentSnippet + '</p>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-more"><a><img src="images/more.svg"/></a></div>';
@@ -312,21 +350,40 @@
 
     }
     
-    function openWindow(divId) {
+    /**
+     * Open window from left or right
+     * @param string divId Div identifiant
+     * @param string placement "left", "right" Initial window placement.
+     * */
+    function openWindow(divId, placement) {
         document.body.style.cssText = "overflow: hidden;"; // Disable scroll in entries list.
         
         var _window = document.getElementById(divId);
         
         _window.scrollTop = 0;
-        _window.style.cssText = "transform: translateX(-100%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
+        
+        if (placement == "left") {
+            _window.style.cssText = "transform: translateX(100%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
+        } else {
+            _window.style.cssText = "transform: translateX(-100%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
+        }
     }
     
-    function closeWindow(divId) {
+    /**
+     * Close window from left or right
+     * @param string divId Div identifiant
+     * @param string placement "left", "right" Initial window placement.
+     * */
+    function closeWindow(divId, placement) {
         document.body.style.cssText = "overflow: auto;"; // Re-enable scroll in entries list.
         
         var _window = document.getElementById(divId);
         
-        _window.style.cssText = "transform: translateX(100%); -webkit-transition-duration: 1s; transition-duration: 1s;";
+        if (placement == "left") {
+            _window.style.cssText = "transform: translateX(0%); -webkit-transition-duration: 1s; transition-duration: 1s;";
+        } else {
+            _window.style.cssText = "transform: translateX(100%); -webkit-transition-duration: 1s; transition-duration: 1s;";
+        }
     }
     
     // ======================
@@ -338,23 +395,14 @@
         // ==============
         // --- Events ---
         // ==============
-        
-        /*document.body.addEventListener('loadFeeds.start', function(event){
-            console.log('loadFeeds.start');
-            loading(0);
-        }, true);
-        
-        document.body.addEventListener('loadFeeds.end', function(event){
-            console.log('loadFeeds.end');
-            //loading(100);
-        }, true);*/
     
         document.body.addEventListener('GoogleFeed.load.done', function(event){
 
             // Add feed entries to array "unsortedEntries"
-            
-                gf.addEntries(event.detail.responseData.feed.entries);
 
+                gf.addEntries(event.detail.responseData.feed.entries);
+                gf.addFeed(event.detail.responseData.feed);
+            
             // Check if all feeds were loaded
             
                 var _nbFeedsToLoad = event.detail.responseData._myParams.nbFeeds;
@@ -371,7 +419,37 @@
                     console.log('*** ALL FEEDS LOADED *** :D');
                     //document.body.dispatchEvent(new CustomEvent('loadFeeds.end', {"detail": ""}));
                     dspEntries(gf.getEntries());
+                    dspFeeds(gf.getFeeds());
                     _loading(100); echo("loading", "", "");
+                    _onclick(sync, 'enable');
+                }
+            
+            // ---
+            
+        }, true);
+        
+        document.body.addEventListener('GoogleFeed.load.error', function(event){
+            
+            // Check if all feeds were loaded
+            
+                console.error(event);
+                
+                var _nbFeedsToLoad = event.detail._myParams.nbFeeds; // different de "done"
+                var _nbFeedsLoaded = gf.getNbFeedsLoaded();
+                gf.setNbFeedsLoaded(++_nbFeedsLoaded);
+                
+                // Percentage of loading ?
+                
+                _loading(Math.round((100 * _nbFeedsLoaded) / _nbFeedsToLoad));
+                
+                // ---
+
+                if (++_nbFeedsLoaded == _nbFeedsToLoad) {
+                    console.log('*** ALL FEEDS LOADED *** :D');
+                    dspEntries(gf.getEntries());
+                    dspFeeds(gf.getFeeds());
+                    _loading(100); echo("loading", "", "");
+                    _onclick(sync, 'enable');
                 }
             
             // ---
