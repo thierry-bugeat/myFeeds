@@ -83,7 +83,7 @@
     }
     
     function _loading(percentage) {
-        if (percentage == 100) {
+        if (percentage >= 100) {
             loading.style.cssText = "width: 0%";
         } else {
             loading.style.cssText = "width: " + percentage + "%";
