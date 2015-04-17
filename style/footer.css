@@ -1,0 +1,58 @@
+
+section[role="myFooter"] {
+    width: 100%;
+    height: 4.5rem;
+    margin:0;
+    position: relative;
+    z-index:1;
+}
+
+section[role="myFooter"] > header:first-child {
+    background-color: var(--fxos-grey);
+    z-index:10;
+    padding:0;
+    height:5rem;
+    border:medium none;
+}
+
+section[role="myFooter"] > header:first-child button {
+    color: var(--fxos-white);
+}
+
+section[role="myFooter"] > header:first-child a, 
+section[role="myFooter"] > header:first-child button {
+    color: var(--fxos-white);
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    overflow: hidden;
+    float: left;
+    min-width: 20%;
+    width: auto;
+    height: 4.5rem;
+    border: medium none;
+    background: transparent none repeat scroll 0% 0%;
+    padding: 0px 1rem;
+    margin: 0px;
+    font-weight: 400;
+    font-size: 1.5rem;
+    line-height: 4.5rem;
+    border-radius: 0px;
+    text-decoration: none;
+    text-align: center;
+    text-shadow: none;
+    font-style: italic;
+}
+
+section[role="myFooter"] > header:first-child a:active,
+section[role="myFooter"] > header:first-child button:active {
+    color: var(--fxos-blue);
+}
+
+/* --- Section option(s) --- */
+
+section[role="myFooter"]._fixed{
+    top: auto;
+    bottom: 0;
+    position: fixed;
+}
