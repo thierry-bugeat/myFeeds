@@ -197,7 +197,7 @@
                     _htmlEntries = _htmlEntries + '<div class="entrie-date">' + _date + '</div>';
                     _htmlEntries = _htmlEntries + _imageUrl;
                     _htmlEntries = _htmlEntries + '<p class="entrie-contentSnippet">' + _entrie.contentSnippet + '</p>';
-                    _htmlEntries = _htmlEntries + '<div class="entrie-more"><a><img src="images/more.svg"/></a></div>';
+                    _htmlEntries = _htmlEntries + '<div class="entrie-more"><button id="more"><span data-icon="more"></span></button></div>';
                     _htmlEntries = _htmlEntries + "</div>";
                 }
             
