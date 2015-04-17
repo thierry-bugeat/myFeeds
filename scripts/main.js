@@ -34,7 +34,7 @@
         "entries": {
             "maxLengthForSmallEntries": "400", // Max number of characters to display an entry as small entry
             "numberOfEntriesToLoadPerFeed": "20", // Default 4
-            "dontDisplayEntriesOlderThan": "8" // In days
+            "dontDisplayEntriesOlderThan": "7" // In days
         }
     };
     
