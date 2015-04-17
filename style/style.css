@@ -30,11 +30,9 @@ section[role="region"] {
 }
 
 #feeds-entries-container{
-    position: absolute;
     display:block;
     width: calc(100%);
     height: calc(100% - 9.5rem);
-    top: 5rem;
     background: var(--fxos-ivory);
 }
 #feeds-entries{
@@ -140,4 +138,20 @@ section[role="region"] {
     top:5rem;
     background-color: var(--fxos-blue);
     z-index:100;
+}
+
+/* --- */
+
+.scrollable {
+    overflow: auto;
+    height: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    position: relative;
+}
+
+.scrollable.header {
+    height: calc(100% - 5rem);
+    top: 5rem;
 }

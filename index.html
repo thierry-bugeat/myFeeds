@@ -9,33 +9,43 @@
     <link href="style/fonts.css" type="text/css" rel="stylesheet">
     <link href="style/gaia-icons.css" type="text/css" rel="stylesheet">
     <link href="style/header.css" type="text/css" rel="stylesheet">
+    <link href="style/footer.css" type="text/css" rel="stylesheet">
     <link href="style/toolbar.css" type="text/css" rel="stylesheet">
     <link href="style/browser.css" type="text/css" rel="stylesheet">
     <link href="style/feeds-list.css" type="text/css" rel="stylesheet">
+    <link href="style/sidebar-params.css" type="text/css" rel="stylesheet">
     <link href="style/style.css" type="text/css" rel="stylesheet">
-    <link href="style/util.css" type="text/css" rel="stylesheet">
 </head>
 
 <body>
 
-    <section role="region">
-        <header class="fixed">
+    <div id="loading"></div>
+    
+    <!-- Main screen -->
+
+    <section role="myHeader">
+        <header>
             <button id="menu"><span data-icon="menu"></span></button>
-            <menu type="toolbar">
-                <button><span data-icon="add"></span></button>
-            </menu>
+            <button id="add"><span data-icon="add"></span></button>
             <h1>my Feeds</h1>
         </header>
     </section>
     
-    <div id="loading"></div>
-    
-    <div id="feeds-toolbar" class="toolbar">
-        <a id="sync"><img src="images/sync.white.svg"/></a>
-        <a id="topup"><img src="images/topup.white.svg"/></a>
-        <a id="load">load</a>
-        <a id="save">save</a>
+    <div id="feeds-entries-container" class="scrollable">
+        <div id="feeds-entries"></div>
     </div>
+    
+    <section role="myFooter" class="">
+        <header>
+            <button id="sync"><span data-icon="sync"></span></button>
+            <button id="topup"><span data-icon="topup"></span></button>
+            <a id="load">load</a>
+            <a id="save">save</a>
+            <button id="settings"><span data-icon="settings"></span></button>
+        </header>
+    </section>
+    
+    <!-- One news screen -->
     
     <div id="main-entry-container">
         <div id="main-entry">
@@ -45,14 +55,17 @@
         <div id="main-entry-toolbar" class="toolbar"><a id="closeMainEntry"><img src="images/close.white.svg"/></a></div>
     </div>
     
-    <div id="feeds-list-container">
-        <div id="feeds-list"></div>
+    <!-- Params screen -->
+         
+    <section role="region" data-type="sidebar" id="feeds-list-container">
+        <section role="myHeader">
+            <header class="mySystemHeader">
+                <h1>my Subscriptions</h1>
+            </header>
+        </section>
+        <div id="feeds-list" class="scrollable"></div>
         <div id="feeds-list-toolbar" class="toolbar"><a id="closeFeedsList"><img src="images/close.white.svg"/></a></div>
-    </div>
-    
-    <div id="feeds-entries-container" class="scrollable header fixed">
-        <div id="feeds-entries"></div>
-    </div>
+    </section>
     
 </body>
 
@@ -63,8 +76,6 @@
 <script type="text/javascript" src="scripts/classes/GoogleFeed.class.js"></script>
 <script type="text/javascript" src="scripts/classes.js"></script>
 
-<!-- script type="text/javascript" src="https://www.google.com/jsapi"></script-->
-<!-- script type="text/javascript" src="api/google/feed/jsapi"></script -->
 <script type="text/javascript" src="scripts/jquery-1.9.0.js"></script>
 <script type="text/javascript" src="libs/underscore-min.js"></script>
 <script type="text/javascript" src="scripts/main.js"></script>

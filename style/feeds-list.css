@@ -1,22 +1,102 @@
+/* 
+ * Firefox OS Lists
+ * 
+ * Documentation  : https://www.mozilla.org/en-US/styleguide/products/firefox-os/lists/
+ * Usage examples : http://www.w3.org/TR/css-variables/
+ * 
+ * */
+ 
 #feeds-list-container{
     width:100%;
     height:100%;
     margin:0px auto;
     position: fixed;
     top:0%;
-    left:100%;
-    background: var(--fxos-ivory);
+    left:-100%;
     z-index:10;
     box-sizing: border-box;
-    padding-bottom: 4.5rem;
 }
 
 #feeds-list {
-    width:100%;
-    height:100%;
-    margin:0px auto;
-    background: var(--fxos-ivory);
-    z-index:99;
+    background-color: var(--fxos-black);
+    border: 0px solid red;
     box-sizing: border-box;
-    padding-bottom: 4.5rem;
+    width: 100%;
+    height: calc(100% - 9.5rem) !important;
+    margin-bottom: 4.5rem;
+    overflow-x:hidden;
+    overflow-y:auto;
+}
+
+#feeds-list > h2 {
+    color: var(--fxos-orange);
+    overflow: auto;
+    padding: 0 1.5rem;
+    list-style: none outside none;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+#feeds-list > h3 {
+    overflow: auto;
+    padding: 0 1.5rem;
+    list-style: none outside none;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+#feeds-list > ul {
+    overflow: auto;
+    padding: 0 1.5rem;
+    list-style: none outside none;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+#feeds-list > ul > li {
+    width: 100%;
+    height: 6rem;
+    box-sizing: border-box;
+    border-bottom: solid 0.1rem var(--fxos-grey);
+    color: #333;
+    margin: 0;  
+    display: block;
+    position: relative;
+}
+ 
+#feeds-list > ul > li:last-child {
+    border: none;
+}
+
+#feeds-list > ul > li > a {
+    text-decoration: none;
+    color: var(--fxos-ivory);
+    display: block;
+    height: 6rem;
+    position: relative;
+    border: none; 
+    outline: none;
+}
+
+#feeds-list > ul > li p {
+    border: medium none;
+    color: #858585;
+    display: block;
+    font-size: 1.5rem;
+    line-height: 2rem;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#feeds-list > ul > li p:first-of-type {
+    padding-left: 1.5rem;
+    color: var(--fxos-ivory);
+    font-size: 1.8rem;
+    line-height: 2.2rem;
+    padding: 1rem 0 0;
 }
