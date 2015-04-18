@@ -415,7 +415,7 @@
                 
                 // ---
 
-                if (++_nbFeedsLoaded == _nbFeedsToLoad) {
+                if (++_nbFeedsLoaded >= _nbFeedsToLoad) {
                     console.log('*** ALL FEEDS LOADED *** :D');
                     //document.body.dispatchEvent(new CustomEvent('loadFeeds.end', {"detail": ""}));
                     dspEntries(gf.getEntries());
@@ -444,7 +444,7 @@
                 
                 // ---
 
-                if (++_nbFeedsLoaded == _nbFeedsToLoad) {
+                if (++_nbFeedsLoaded >= _nbFeedsToLoad) {
                     console.log('*** ALL FEEDS LOADED *** :D');
                     dspEntries(gf.getEntries());
                     dspFeeds(gf.getFeeds());
@@ -459,6 +459,8 @@
         // ============
         // --- Main ---
         // ============
+        
+        _onclick(sync, 'disable'); // Disable "sync" button when application start
         
         gf.setFeeds(myFeeds);
         gf.setNum(params.entries.numberOfEntriesToLoadPerFeed); // Load "num" entries per feed.
