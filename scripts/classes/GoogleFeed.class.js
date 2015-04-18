@@ -59,16 +59,19 @@ GoogleFeed.prototype.addEntries = function(entries) {
         
         // 1st image extraction
         
+            _entry['_myFirstImageUrl'] = "";
+        
+            var _results    = [];
             var _imageUrl   = '';
             var _regex      = /<img[^>]+src="(http:\/\/[^">]+)/g
-            var _results    = _regex.exec(_entry.content);
+            
+            _results    = _regex.exec(_entry.content);
             
             if ((_results !== null) && (Boolean(_results[1]))) { 
                 _entry['_myFirstImageUrl'] = _results[1];
             }
 
         // ---
-        
 
         _entry['_myTimestamp']  = Math.round(new Date(_entry.publishedDate).getTime()/1000);
         

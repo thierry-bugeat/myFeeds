@@ -167,12 +167,16 @@
                 
                 var _diff = _entrie.content.length - _entrie.contentSnippet.length;
                 
-                // 1st image extraction
+                // 1st image 
                 
-                if (_diff < params.entries.maxLengthForSmallEntries) {
-                    _imageUrl = '<img class="entry-small-image" src="' + _entrie._myFirstImageUrl + '"/>';
-                } else {
-                    _imageUrl = '<img class="entrie-image" src="' + _entrie._myFirstImageUrl + '"/>'; 
+                var _imageUrl = "";
+                
+                if (_entrie._myFirstImageUrl) {
+                    if (_diff < params.entries.maxLengthForSmallEntries) {
+                        _imageUrl = '<img class="entry-small-image" src="' + _entrie._myFirstImageUrl + '"/>';
+                    } else {
+                        _imageUrl = '<img class="entrie-image" src="' + _entrie._myFirstImageUrl + '"/>'; 
+                    }
                 }
                 
                 // Entry composition
