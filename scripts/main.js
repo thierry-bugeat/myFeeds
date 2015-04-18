@@ -294,9 +294,13 @@
         
         var _entry = sortedEntries[id];
         
+        console.log(_entry);
+        
         var _htmlEntry = "";
         
         _htmlEntry = _htmlEntry + '<div class="entrie-title">' + _entry.title + '</div>';
+        _htmlEntry = _htmlEntry + '<div class="entrie-date">' + new Date(_entry.publishedDate) + '</div>';
+        _htmlEntry = _htmlEntry + '<div class="entrie-author">' + _entry.author + '</div>';
         _htmlEntry = _htmlEntry + '<p class="entrie-contentSnippet">' + _entry.content + '</p>';
                             
         echo("content", _htmlEntry, "");
