@@ -21,7 +21,9 @@
 
     <div id="loading"></div>
     
+    <!-- =========== -->
     <!-- Main screen -->
+    <!-- =========== -->
 
     <section role="myHeader">
         <header>
@@ -45,7 +47,9 @@
         </header>
     </section>
     
+    <!-- =============== -->
     <!-- One news screen -->
+    <!-- =============== -->
     
     <div id="main-entry-container">
         
@@ -68,16 +72,26 @@
         
     </div>
     
-    <!-- Params screen -->
+    <!-- ==================== -->
+    <!-- Subscriptions screen -->
+    <!-- ==================== -->
          
     <section role="region" data-type="sidebar" id="feeds-list-container">
+        
         <section role="myHeader">
             <header class="mySystemHeader">
                 <h1 data-l10n-id="my-subscriptions">my Subscriptions</h1>
             </header>
         </section>
+        
         <div id="feeds-list" class="scrollable"></div>
-        <div id="feeds-list-toolbar" class="toolbar"><button id="closeFeedsList"><span data-icon="close"></span></button></div>
+        
+        <section role="myFooter" class="">
+            <header>
+                <button id="closeFeedsList"><span data-icon="close"></span></button>
+            </header>
+        </section>
+        
     </section>
     
 </body>

@@ -23,7 +23,6 @@
     box-sizing: border-box;
     width: 100%;
     height: calc(100% - 9.5rem) !important;
-    margin-bottom: 4.5rem;
     overflow-x:hidden;
     overflow-y:auto;
 }
