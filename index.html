@@ -48,11 +48,24 @@
     <!-- One news screen -->
     
     <div id="main-entry-container">
-        <div id="main-entry">
+        
+        <section role="myHeader">
+            <header>
+                <h1 data-l10n-id="my-news">my News</h1>
+            </header>
+        </section>
+    
+        <div id="main-entry" class="scrollable">
             <div id="browser"></div>
-            <p id="content" class="entrie-contentSnippet"></p>
+            <div id="content" class="entrie-contentSnippet"></div>
         </div>
-        <div id="main-entry-toolbar" class="toolbar"><a id="closeMainEntry"><img src="images/close.white.svg"/></a></div>
+        
+        <section role="myFooter" class="">
+            <header>
+                <button id="closeMainEntry"><span data-icon="close"></span></button>
+            </header>
+        </section>
+        
     </div>
     
     <!-- Params screen -->
@@ -64,7 +77,7 @@
             </header>
         </section>
         <div id="feeds-list" class="scrollable"></div>
-        <div id="feeds-list-toolbar" class="toolbar"><a id="closeFeedsList"><img src="images/close.white.svg"/></a></div>
+        <div id="feeds-list-toolbar" class="toolbar"><button id="closeFeedsList"><span data-icon="close"></span></button></div>
     </section>
     
 </body>
