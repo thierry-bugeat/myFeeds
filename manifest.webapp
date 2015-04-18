@@ -19,7 +19,6 @@
         "browser": {
             "description": "Needed for displaying external website in app."
         },
-        "embed-apps": {},
         "systemXHR": {
             "description": "request cross domain."
         }
