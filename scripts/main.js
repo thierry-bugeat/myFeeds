@@ -222,8 +222,7 @@
         var _small_entries = document.querySelectorAll(".entry-small");
         
         for (var i = 0; i < _small_entries.length; i++) {
-            //_small_entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("entry_link")); }
-            _small_entries[i].onclick = function() { _testIframe(); }
+            _small_entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("entry_link")); }
         }
 
         // onclick Entries :
@@ -234,32 +233,6 @@
             _entries[i].onclick = function() { entryFade(this); mainEntryOpen(this.getAttribute("i")); }
         }
 
-    }
-    
-    /**
-     * TESTS
-     * Write specific content in iFrame
-     * */
-    function _testIframe() {
-        
-        document.body.style.cssText = "overflow: hidden;"; // Disable scroll in entries list.
-        
-        echo("content", "", ""); // Remove main entry content
-
-        echo("browser", '<iframe id="_testIframe" src="" mozbrowser></iframe>', "");
-        
-        document.getElementById("browser").style.cssText = "display: block;";
-        
-        main_entry.scrollTop = 0;
-        
-        main_entry_container.style.cssText = "transform: translateX(-100%); -webkit-transition-duration: 1s; transition-duration: 1s;";
-
-        var doc = document.getElementById('_testIframe').contentWindow.document; // Permission denied to access property "document"
-        //var doc = window.frames[0].document; // Permission denied to access property "document"
-        doc.open();
-        doc.write('Test');
-        doc.close();
-        
     }
     
     function entryFade(_this) {
