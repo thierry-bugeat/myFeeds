@@ -1,8 +1,7 @@
 #browser {
     position: absolute;
     width: calc(100%);
-    height: calc(100% - 9.5rem);
-    top: 5rem;
+    height: calc(100%);
     left:0;
     background: var(--fxos-ivory);
 }

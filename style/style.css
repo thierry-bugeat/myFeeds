@@ -115,7 +115,7 @@ section[role="region"] {
 
 #main-entry-container > #main-entry{
     box-sizing: border-box;
-    padding:4%;
+    padding:0;
     width:100%;
     height: calc(100% - 9.5rem);
     background-color:#FFFFFF;
@@ -125,7 +125,7 @@ section[role="region"] {
 
 #main-entry-container > #main-entry > #content {
     max-width: 100%;
-    padding:0;
+    padding:4%;
     margin:0;
 }
 
