@@ -294,8 +294,6 @@
         
         var _entry = sortedEntries[id];
         
-        console.log(_entry);
-        
         var _htmlEntry = "";
         
         _htmlEntry = _htmlEntry + '<div class="entrie-title">' + _entry.title + '</div>';
