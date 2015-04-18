@@ -2,7 +2,7 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <title>my Feeds</title>
+    <title data-l10n-id="app-title">my Feeds</title>
     <link rel="icon" type="image/png" href="images/icon-128.png">
     <meta name="viewport" content="width=device-width"> 
     <link href="style/colors.css" type="text/css" rel="stylesheet">
@@ -27,7 +27,7 @@
         <header>
             <button id="menu"><span data-icon="menu"></span></button>
             <button id="add"><span data-icon="add"></span></button>
-            <h1>my Feeds</h1>
+            <h1 data-l10n-id="app-title">my Feeds</h1>
         </header>
     </section>
     
@@ -60,7 +60,7 @@
     <section role="region" data-type="sidebar" id="feeds-list-container">
         <section role="myHeader">
             <header class="mySystemHeader">
-                <h1>my Subscriptions</h1>
+                <h1 data-l10n-id="my-subscriptions">my Subscriptions</h1>
             </header>
         </section>
         <div id="feeds-list" class="scrollable"></div>
@@ -68,6 +68,11 @@
     </section>
     
 </body>
+
+<!-- App localization -->
+
+<script src="scripts/l10n.js"></script>
+<link rel="resource" type="application/l10n" href="locales/locales.ini" />
 
 <!-- classes -->
 

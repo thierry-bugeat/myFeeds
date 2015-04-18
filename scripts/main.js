@@ -118,7 +118,7 @@
         // --- Display feeds list ---
         // ==========================
         
-        _htmlFeeds = _htmlFeeds + '<h2>Feeds list</h2>';
+        _htmlFeeds = _htmlFeeds + '<h2 data-l10n-id="my-subscriptions-sources">Sources</h2>';
         _htmlFeeds = _htmlFeeds + '<ul>';
 
         for (var i = 0; i < feeds.length; i++) {

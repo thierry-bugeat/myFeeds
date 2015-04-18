@@ -1,6 +1,6 @@
 {
     "name": "my Feeds",
-    "description": "RSS feed reader",
+    "description": "RSS & ATOM feeds reader",
     "launch_path": "/index.html",
     "icons": {
         "60": "/images/icon-60.png",
@@ -9,6 +9,21 @@
     "developer": {
         "name": "Thierry Bugeat",
         "url": "http://www.bugeat.com"
+    },
+    "default_locale": "en",
+    "locales": {
+        "en": {
+            "name" : "my Feeds",
+            "description" : "RSS & ATOM feeds reader"
+        },
+        "es": {
+            "name" : "mis Noticias",
+            "description" : "Lector de RSS y ATOM."
+        },
+        "fr": {
+            "name" : "mes Fluxs",
+            "description" : "Lecteur de flux RSS & ATOM."
+        }
     },
     "type": "privileged",
     "csp": "default-src *; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'",
