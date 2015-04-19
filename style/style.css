@@ -84,6 +84,7 @@ section[role="region"] {
 .entry-small > .entry-small-image {
     max-width: 35%;
     float:right;
+    margin-left:2%;
 }
 
 .entry-small > .entry-small-title {
