@@ -381,9 +381,9 @@
         var _window = document.getElementById(divId);
         
         if (placement == "left") {
-            _window.style.cssText = "transform: translateX(0%); -webkit-transition-duration: 1s; transition-duration: 1s;";
+            _window.style.cssText = "transform: translateX(0%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
         } else {
-            _window.style.cssText = "transform: translateX(100%); -webkit-transition-duration: 1s; transition-duration: 1s;";
+            _window.style.cssText = "transform: translateX(100%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
         }
     }
     
