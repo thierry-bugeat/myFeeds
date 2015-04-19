@@ -24,28 +24,30 @@
     <!-- =========== -->
     <!-- Main screen -->
     <!-- =========== -->
+    
+    <div id="feeds-entries-container">
 
-    <section role="myHeader">
-        <header>
-            <button id="menu"><span data-icon="menu"></span></button>
-            <button id="add"><span data-icon="add"></span></button>
-            <h1 data-l10n-id="app-title">my Feeds</h1>
-        </header>
-    </section>
+        <section role="myHeader">
+            <header>
+                <button id="menu"><span data-icon="menu"></span></button>
+                <button id="add"><span data-icon="add"></span></button>
+                <h1 data-l10n-id="app-title">my Feeds</h1>
+            </header>
+        </section>
     
-    <div id="feeds-entries-container" class="scrollable">
-        <div id="feeds-entries"></div>
+        <div id="feeds-entries" class="scrollable"></div>
+    
+        <section role="myFooter" class="">
+            <header>
+                <button id="sync"><span data-icon="sync"></span></button>
+                <button id="topup"><span data-icon="topup"></span></button>
+                <a id="load">load</a>
+                <a id="save">save</a>
+                <button id="settings"><span data-icon="settings"></span></button>
+            </header>
+        </section>
+    
     </div>
-    
-    <section role="myFooter" class="">
-        <header>
-            <button id="sync"><span data-icon="sync"></span></button>
-            <button id="topup"><span data-icon="topup"></span></button>
-            <a id="load">load</a>
-            <a id="save">save</a>
-            <button id="settings"><span data-icon="settings"></span></button>
-        </header>
-    </section>
     
     <!-- =============== -->
     <!-- One news screen -->

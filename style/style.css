@@ -32,20 +32,20 @@ section[role="region"] {
 #feeds-entries-container{
     display:block;
     width: calc(100%);
-    height: calc(100% - 9.5rem);
+    height: calc(100%);
     background: var(--fxos-ivory);
 }
 #feeds-entries{
-    width:90%;
-    margin:0px auto;
-    margin-bottom: 4%;
+    width:100%;
+    height: calc(100% - 9.5rem);
 }
 
 .entrie, .entry-small{
     padding:4%;
     width:92%;
-    margin-top:4%;
+    margin:4%;
     background-color: var(--fxos-white);
+    box-sizing: border-box;
 }
 
 .entrie-title {
