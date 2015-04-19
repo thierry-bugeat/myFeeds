@@ -63,8 +63,8 @@
     closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container", "right"); }
     closeFeedsList.onclick  = function(event) { closeWindow("feeds-list-container", "left"); }
     
-    load.onclick            = function(event) { loadFile(); }
-    save.onclick            = function(event) { saveFeed(); }
+    //load.onclick            = function(event) { loadFile(); }
+    //save.onclick            = function(event) { saveFeed(); }
     
     // ---
     
