@@ -222,7 +222,7 @@
         var _small_entries = document.querySelectorAll(".entry-small");
         
         for (var i = 0; i < _small_entries.length; i++) {
-            _small_entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("entry_link")); }
+            _small_entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(null, this.getAttribute("entry_link")); }
         }
 
         // onclick Entries :
@@ -230,7 +230,8 @@
         var _entries = document.querySelectorAll(".entrie");
         
         for (var i = 0; i < _entries.length; i++) {
-            _entries[i].onclick = function() { entryFade(this); mainEntryOpen(this.getAttribute("i")); }
+            //_entries[i].onclick = function() { entryFade(this); mainEntryOpen(this.getAttribute("i")); }
+            _entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }
         }
 
     }
@@ -308,13 +309,28 @@
         main_entry_container.style.cssText = "transform: translateX(-100%); -webkit-transition-duration: 1s; transition-duration: 1s;";
     }
     
-    function mainEntryOpenInBrowser(url) {
-        console.log(url);
-        document.body.style.cssText = "overflow: hidden;"; // Disable scroll in entries list.
-        
-        echo("content", "", ""); // Remove main entry content
+    function mainEntryOpenInBrowser(entryId, url) {
+        document.body.style.cssText = "overflow: hidden;";  // Disable scroll in entries list.
+        echo("content", "", "");                            // Remove main entry content.
 
-        echo("browser", '<iframe src="' + url + '" sandbox="allow-same-origin allow-scripts" mozbrowser></iframe>', "");
+        if (entryId !== null) {
+            var _entry = sortedEntries[entryId];
+            var _srcDoc = "";
+            var _regex = new RegExp("'", "g");
+
+            // Inline CSS. @todo Find an other way
+            var _srcDocCss = '<style>* {box-sizing: border-box; background-color: #FFFFFF; max-width: 100%; height: auto;} html{margin:0; font-size: 62.5%; padding:4%;} .entrie-title {font-size: 2.3rem;} .entrie-date {font-size:1.4rem; color:#c4c4c4;} .entrie-contentSnippet{font-size: 1.7rem;}</style>';
+
+            _srcDoc = _srcDoc + _srcDocCss;
+            _srcDoc = _srcDoc + '<div class="entrie-title">' + _entry.title.replace(_regex, "&#39;") + '</div>';
+            _srcDoc = _srcDoc + '<div class="entrie-date">' + new Date(_entry.publishedDate) + '</div>';
+            _srcDoc = _srcDoc + '<div class="entrie-author">' + _entry.author + '</div>';
+            _srcDoc = _srcDoc + '<div class="entrie-contentSnippet">' + _entry.content.replace(_regex, "&#39;") + '</div>';
+            
+            echo("browser", '<iframe srcdoc=\'' + _srcDoc + '\' sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
+        } else {
+            echo("browser", '<iframe src="' + url + '" sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
+        }
         
         document.getElementById("browser").style.cssText = "display: block;";
         

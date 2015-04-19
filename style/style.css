@@ -45,7 +45,7 @@ section[role="region"] {
     padding:4%;
     width:92%;
     margin-top:4%;
-    background-color:#FFFFFF;
+    background-color: var(--fxos-white);
 }
 
 .entrie-title {
@@ -68,7 +68,7 @@ section[role="region"] {
 }
 
 .entrie-contentSnippet{
-    font-size: 1.9rem;
+    font-size: 1.7rem;
 }
 
 .entrie-more{

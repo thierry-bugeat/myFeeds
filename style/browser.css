@@ -3,10 +3,11 @@
     width: calc(100%);
     height: calc(100%);
     left:0;
-    background: var(--fxos-ivory);
+    background-color: var(--fxos-ivory);
 }
 
-#browser > iframe{
+#browser > iframe {
+    background-color: var(--fxos-ivory);
     border: 0px solid red;
     box-sizing: border-box;
     width: 100%;
@@ -16,6 +17,11 @@
     overflow-y:auto;
 }
 
+#browser > iframe > .entrie-title {
+    color: red;
+}
+
 iframe * {
+    color: red;
     max-width: 300px;
 }
