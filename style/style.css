@@ -34,6 +34,7 @@ section[role="region"] {
     width: calc(100%);
     height: calc(100%);
     background: var(--fxos-ivory);
+    position:fixed;
 }
 #feeds-entries{
     width:100%;
