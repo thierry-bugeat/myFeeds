@@ -51,9 +51,12 @@
     var sync                    = document.getElementById("sync");
     var menu                    = document.getElementById("menu");
     var topup                   = document.getElementById("topup");
+    var search                  = document.getElementById("search");
+    var settings                = document.getElementById("settings");
     
-    var load                    = document.getElementById("load");
-    var save                    = document.getElementById("save");
+    //var load                    = document.getElementById("load");
+    //var save                    = document.getElementById("save");
+    
     
     // DOM clicks :
     
@@ -458,7 +461,10 @@
         // --- Main ---
         // ============
         
-        _onclick(sync, 'disable'); // Disable "sync" button when application start
+        _onclick(sync, 'disable');      // Disable "sync" button when application start
+        
+        _onclick(search, 'disable');    // Not yet implemented
+        _onclick(settings, 'disable');  // Not yet implemented
         
         gf.setFeeds(myFeeds);
         gf.setNum(params.entries.numberOfEntriesToLoadPerFeed); // Load "num" entries per feed.
