@@ -59,7 +59,7 @@
     
     sync.onclick            = function(event) { _onclick(this, 'disable'); loadFeeds(); }
     menu.onclick            = function(event) { openWindow("feeds-list-container", "left"); }
-    topup.onclick           = function(event) { document.getElementById("feeds-entries-container").scrollTop = 0; }
+    topup.onclick           = function(event) { document.getElementById("feeds-entries").scrollTop = 0; }
     closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container", "right"); }
     closeFeedsList.onclick  = function(event) { closeWindow("feeds-list-container", "left"); }
     
