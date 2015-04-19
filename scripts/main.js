@@ -230,7 +230,6 @@
         var _entries = document.querySelectorAll(".entrie");
         
         for (var i = 0; i < _entries.length; i++) {
-            //_entries[i].onclick = function() { entryFade(this); mainEntryOpen(this.getAttribute("i")); }
             _entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }
         }
 
@@ -287,31 +286,8 @@
         }*/
     }
     
-    function mainEntryOpen(id) {
-        document.getElementById("browser").style.cssText = "display: none;";
-        document.body.style.cssText = "overflow: hidden;"; // Disable scroll in entries list.
-        
-        echo("browser", "", ""); // Remove browser content
-        
-        var _entry = sortedEntries[id];
-        
-        var _htmlEntry = "";
-        
-        _htmlEntry = _htmlEntry + '<div class="entrie-title">' + _entry.title + '</div>';
-        _htmlEntry = _htmlEntry + '<div class="entrie-date">' + new Date(_entry.publishedDate) + '</div>';
-        _htmlEntry = _htmlEntry + '<div class="entrie-author">' + _entry.author + '</div>';
-        _htmlEntry = _htmlEntry + '<p class="entrie-contentSnippet">' + _entry.content + '</p>';
-                            
-        echo("content", _htmlEntry, "");
-
-        main_entry.scrollTop = 0;
-        
-        main_entry_container.style.cssText = "transform: translateX(-100%); -webkit-transition-duration: 1s; transition-duration: 1s;";
-    }
-    
     function mainEntryOpenInBrowser(entryId, url) {
         document.body.style.cssText = "overflow: hidden;";  // Disable scroll in entries list.
-        echo("content", "", "");                            // Remove main entry content.
 
         if (entryId !== null) {
             var _entry = sortedEntries[entryId];
