@@ -19,9 +19,9 @@ var GoogleFeed = function() {
     };
     
     this.myFeeds = [];
-    this.sortedEntries = [];
+    this.gf_sortedEntries = [];
     this.sortedFeeds = [];
-    this.unsortedEntries = [];
+    this.gf_unsortedEntries = [];
     this.unsortedFeeds = [];
     this.nbFeedsLoaded = 0;
 
@@ -35,19 +35,69 @@ var GoogleFeed = function() {
 GoogleFeed.prototype.getVersion         = function()        { return this.gf.version;       }
 GoogleFeed.prototype.getOuput           = function()        { return this.gf.output;        }
 GoogleFeed.prototype.getNum             = function()        { return this.gf.num;           }
-GoogleFeed.prototype.getEntries         = function()        { this._sortEntries();  return this.sortedEntries;  }
+GoogleFeed.prototype.getEntries         = function()        { this._sortEntries();  return this.gf_sortedEntries;  }
 GoogleFeed.prototype.getFeeds           = function()        { this._sortFeeds();    return this.sortedFeeds;    }
 GoogleFeed.prototype.getNbFeedsLoaded   = function()        { return this.nbFeedsLoaded;    }
 
 GoogleFeed.prototype._setUrl            = function(q)       { this.gf.q = q;                }
 GoogleFeed.prototype._sortEntries       = function() {
     
-    // Sort entries by "_myTimestamp" 
-    // using library "underscore.js"
-    // http://documentcloud.github.io/underscore/
-        
-    this.sortedEntries = (_.sortBy(this.unsortedEntries, '_myTimestamp')).reverse();
+    // Sort entries by "_myTimestampInMs" 
+    
+    // =============================================
+    // --- Sort using javascript "sort" function ---
+    // =============================================
+    // Doesn't works !!!
+    
+    /*this.gf_sortedEntries = this.gf_unsortedEntries;
+    
+    this.gf_sortedEntries.sort(function(a, b){
+        return a._myTimestamp - b._myTimestamp
+    });
+    
+    this.gf_sortedEntries.reverse();
+    
+    console.log(this.gf_sortedEntries);*/
+    
+    // ==========================================
+    // --- Sort using "underscore.js" library ---
+    // ==========================================
+    // Doesn't works.
+    
+    //this.gf_sortedEntries = (_.sortBy(this.gf_unsortedEntries, '_myTimestamp')).reverse();        // Doesn't works !!!
+    //this.gf_sortedEntries = (_.sortBy(this.gf_unsortedEntries, '_myTimestampInMs')).reverse();    // Doesn't works !!!
+    
+    // ===================
+    // --- My own sort ---
+    // ===================
+    // Works only if publications dates are UNIQUES.
+    //
+    // See function "addEntries" below.
+    // In this function for values "_myTimestampInMs" I add a random 
+    // number between 0 & 500. (I add 0 to 0.5 seconde)
+    
+    this.gf_sortedEntries = [];
+    var _tmp = []; // It will contain all timestamps in ms.
+    
+    for (var i = 0; i < this.gf_unsortedEntries.length; i++) {
+        _tmp.push(this.gf_unsortedEntries[i]._myTimestampInMs);
+    }
+    
+    _tmp.sort().reverse();
+    
+    for (var i = 0; i < _tmp.length; i++) {
+        console.log(_tmp[i]);
+        for (var j = 0; j < this.gf_unsortedEntries.length; j++) {
+            if (_tmp[i] == this.gf_unsortedEntries[j]._myTimestampInMs) {
+                this.gf_sortedEntries.push(this.gf_unsortedEntries[j]);
+                break;
+            }
+        }
+    }
+
+    console.log(this.gf_sortedEntries);
 }
+
 GoogleFeed.prototype._sortFeeds         = function()        { this.sortedFeeds = _.sortBy(this.unsortedFeeds, 'title'); }
 GoogleFeed.prototype.setNum             = function(num)     { this.gf.num = num;            }
 GoogleFeed.prototype.setFeeds           = function(myFeeds) { this.myFeeds = myFeeds;       }
@@ -73,9 +123,18 @@ GoogleFeed.prototype.addEntries = function(entries) {
 
         // ---
 
-        _entry['_myTimestamp']  = Math.round(new Date(_entry.publishedDate).getTime()/1000);
+        // @todo
+        // A changer...
+        // Dans les 2 lignes ci-dessous j'ajoute une valer aléatoire pour ne pas avoir 2 dates de publication identiques.
+        // Sinon cela provoque un bug d'affichage dans l'ordre des news.
+        // Sur la 1ère ligne j'ajoute -120 à +120 secondes
+        // Sur la 2ième j'ajoute de 0 à 0.5 seconde.
+        _entry['_myTimestamp']          = Math.round(new Date(_entry.publishedDate).getTime()/1000);
+        _entry['_myTimestampInMs']      = Math.round(new Date(_entry.publishedDate).getTime()) + (Math.floor(Math.random()*500));
         
-        this.unsortedEntries.push(_entry);
+        _entry['_myPublishedDateUTC']   = new Date(_entry.publishedDate).toUTCString();
+        
+        this.gf_unsortedEntries.push(_entry);
     }
 }
 
@@ -86,6 +145,7 @@ GoogleFeed.prototype.addFeed = function(_myNewFeed) {
     _myNewFeed['_myNbEntries']            = _myNewFeed.entries.length;
     _myNewFeed['_myLastPublishedDate']    = _myNewFeed['entries'][0].publishedDate;
     _myNewFeed['_myLastTimestamp']        = _myNewFeed['entries'][0]._myTimestamp;
+    _myNewFeed['_myLastTimestampInMs']    = _myNewFeed['entries'][0]._myTimestampInMs;
     
     // Remove values.
     
@@ -99,7 +159,7 @@ GoogleFeed.prototype.addFeed = function(_myNewFeed) {
 GoogleFeed.prototype.loadFeeds  = function() {
     
     this.nbFeedsLoaded = 0;
-    this.unsortedEntries = [];
+    this.gf_unsortedEntries = [];
     this.unsortedFeeds = [];
     
     var _params = {"nbFeeds": this.myFeeds.length};

@@ -41,6 +41,12 @@ section[role="region"] {
     height: calc(100% - 9.5rem);
 }
 
+.feeds-entries-next-day {
+    padding:0% 4% 0% 4%;
+    font-size: 1.7rem;
+    color: var(--fxos-blue);
+}
+
 .entrie, .entry-small{
     padding:4%;
     width:92%;

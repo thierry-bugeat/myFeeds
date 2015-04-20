@@ -11,7 +11,14 @@
     // http://imikado.developpez.com/tutoriels/firefoxOS/ma-premier-application/
     // http://toddmotto.com/is-it-time-to-drop-jquery-essentials-to-learning-javascript-from-a-jquery-background/
     
-    var _myTimestamp = Math.floor(Date.now() / 1000);
+    var _now    = new Date();
+    var _year   = _now.getFullYear();
+    var _month  = _now.getMonth();
+    var _day    = _now.getDate();
+    
+    var _myUTC = new Date(Date.UTC(_year, _month, _day, '00','00','00')); // Start of today
+    var _myTimestamp = Math.floor(_myUTC.getTime() / 1000);
+    var _myTimestampInMs = Math.floor(_myUTC.getTime());
     
     var myFeeds = [
         {"url": "http://www.gameblog.fr/rss.php",               "num": 20 },
@@ -27,6 +34,11 @@
         {"url": "http://raphaelhertzog.fr/feed/",               "num": 20 },
         {"url": "http://www.dadall.info/blog/feed.php?rss",     "num": 20 }
     ];
+    
+    /*var myFeeds = [
+        {"url": "http://www.gameblog.fr/rss.php",               "num": 20 }
+    ];*/
+    
     
     //addFeedsFromMyOnlineAccounts();
     
@@ -60,7 +72,7 @@
     
     // DOM clicks :
     
-    sync.onclick            = function(event) { _onclick(this, 'disable'); loadFeeds(); }
+    sync.onclick            = function(event) { _onclick(this, 'disable'); console.log('loadFeeds ### 2 ###'); loadFeeds(); }
     menu.onclick            = function(event) { openWindow("feeds-list-container", "left"); }
     topup.onclick           = function(event) { document.getElementById("feeds-entries").scrollTop = 0; }
     closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container", "right"); }
@@ -81,7 +93,7 @@
         
         echo("feeds-list", "Loading...", "");
         
-        gf.loadFeeds();
+        console.log('loadFeeds ### 3 ###'); gf.loadFeeds();
         
     }
     
@@ -143,9 +155,12 @@
     function dspEntries(entries) {
         
         console.log("dspEntries()");
-        console.log(sortedEntries);
+        console.log(entries);
         
         sortedEntries = entries;
+        
+        var _previousDaysAgo    = 0; // Count days to groups entries by day.
+        var _entrieNbDaysAgo    = 0;
         
         // =======================
         // --- Display entries ---
@@ -157,7 +172,22 @@
             
             var _entrie = sortedEntries[i];
             
+
             if ((_myTimestamp - _entrie._myTimestamp) < (params.entries.dontDisplayEntriesOlderThan * 86400)) {
+                
+                // --- Day separator ? ---
+
+                _entrieNbDaysAgo = (1 + Math.floor((_myTimestamp - _entrie._myTimestamp) / 86400));
+                
+                if (_entrieNbDaysAgo != _previousDaysAgo ) {
+                    _previousDaysAgo = _entrieNbDaysAgo;
+                    console.log("============================================ " + _previousDaysAgo + ' day(s) ago');
+                    _htmlEntries = _htmlEntries + '<div class="feeds-entries-next-day">' + _previousDaysAgo + ' day(s) ago</div>';
+                }
+                
+                console.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+_myTimestamp+' (' + (new Date(_myTimestamp*1000)).toUTCString() + ') ==> Diff = ' + (_myTimestamp - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
+                
+                // ---
 
                 // Date analyse
                 // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Date/toLocaleString
@@ -410,17 +440,23 @@
                 var _nbFeedsLoaded = gf.getNbFeedsLoaded();
                 gf.setNbFeedsLoaded(++_nbFeedsLoaded);
                 
+                console.log('Feed ' + _nbFeedsLoaded + ' / ' + _nbFeedsToLoad + ' loaded.');
+                
                 // Percentage of loading ?
                 
                 _loading(Math.round((100 * _nbFeedsLoaded) / _nbFeedsToLoad));
                 
                 // ---
 
-                if (++_nbFeedsLoaded >= _nbFeedsToLoad) {
-                    console.log('*** ALL FEEDS LOADED *** :D');
+                if (++_nbFeedsLoaded == _nbFeedsToLoad) {
+                    console.log('*** ALL FEEDS LOADED *** :D ' + _nbFeedsLoaded + ' / ' + _nbFeedsToLoad);
                     //document.body.dispatchEvent(new CustomEvent('loadFeeds.end', {"detail": ""}));
+                    console.log('dspEntries ### 1 ###'); 
                     dspEntries(gf.getEntries());
                     dspFeeds(gf.getFeeds());
+                }
+                
+                if (_nbFeedsLoaded >= _nbFeedsToLoad) {
                     _loading(100); echo("loading", "", "");
                     _onclick(sync, 'enable');
                 }
@@ -446,8 +482,8 @@
                 // ---
 
                 if (++_nbFeedsLoaded >= _nbFeedsToLoad) {
-                    console.log('*** ALL FEEDS LOADED *** :D');
-                    dspEntries(gf.getEntries());
+                    console.log('*** ALL FEEDS LOADED *** :D ' + _nbFeedsLoaded + ' / ' + _nbFeedsToLoad);
+                    console.log('dspEntries ### 2 ###'); dspEntries(gf.getEntries());
                     dspFeeds(gf.getFeeds());
                     _loading(100); echo("loading", "", "");
                     _onclick(sync, 'enable');
@@ -460,7 +496,7 @@
         // ============
         // --- Main ---
         // ============
-        
+
         _onclick(sync, 'disable');      // Disable "sync" button when application start
         
         _onclick(search, 'disable');    // Not yet implemented
@@ -468,6 +504,6 @@
         
         gf.setFeeds(myFeeds);
         gf.setNum(params.entries.numberOfEntriesToLoadPerFeed); // Load "num" entries per feed.
-        gf.loadFeeds();
+        console.log('loadFeeds ### 1 ###'); gf.loadFeeds();
 
     };
