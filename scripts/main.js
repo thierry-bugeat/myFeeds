@@ -176,21 +176,20 @@
         for (var i = 0; i < sortedEntries.length; i++) {
             
             var _entrie = sortedEntries[i];
-            
 
             if ((_myTimestamp - _entrie._myTimestamp) < (params.entries.dontDisplayEntriesOlderThan * 86400)) {
-                
+
                 // --- Day separator ? ---
 
                 _entrieNbDaysAgo = (1 + Math.floor((_myTimestamp - _entrie._myTimestamp) / 86400));
                 
                 if (_entrieNbDaysAgo != _previousDaysAgo ) {
                     _previousDaysAgo = _entrieNbDaysAgo;
-                    console.log("============================================ " + _previousDaysAgo + ' day(s) ago');
+                    //console.log("============================================ " + _previousDaysAgo + ' day(s) ago');
                     _htmlEntries = _htmlEntries + '<div class="feeds-entries-next-day">' + myExtraTranslations['nb-days-ago'].replace('{{n}}', _previousDaysAgo) + '</div>';
                 }
                 
-                console.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+_myTimestamp+' (' + (new Date(_myTimestamp*1000)).toUTCString() + ') ==> Diff = ' + (_myTimestamp - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
+                //console.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+_myTimestamp+' (' + (new Date(_myTimestamp*1000)).toUTCString() + ') ==> Diff = ' + (_myTimestamp - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
                 
                 // ---
 
