@@ -80,7 +80,7 @@
     sync.onclick            = function(event) { _onclick(this, 'disable'); console.log('loadFeeds ### 2 ###'); loadFeeds(); }
     menu.onclick            = function(event) { openWindow("feeds-list-container", "left"); }
     topup.onclick           = function(event) { document.getElementById("feeds-entries").scrollTop = 0; }
-    closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container", "right"); }
+    closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container", "right"); echo("browser", "", ""); }
     closeFeedsList.onclick  = function(event) { closeWindow("feeds-list-container", "left"); }
     
     //load.onclick            = function(event) { loadFile(); }
