@@ -42,15 +42,15 @@ section[role="region"] {
 }
 
 .feeds-entries-next-day {
-    padding:0% 4% 0% 4%;
+    padding:0% var(--my-spacing) 0% var(--my-spacing);
     font-size: 1.7rem;
     color: var(--fxos-blue);
 }
 
 .entrie, .entry-small{
-    padding:4%;
-    width:92%;
-    margin:4%;
+    padding: var(--my-spacing);
+    width: calc(100% - (2 * var(--my-spacing)));
+    margin: var(--my-spacing);
     background-color: var(--fxos-white);
     box-sizing: border-box;
 }
@@ -133,7 +133,7 @@ section[role="region"] {
 
 #main-entry-container > #main-entry > #content {
     max-width: 100%;
-    padding:4%;
+    padding: var(--my-spacing);
     margin:0;
 }
 
