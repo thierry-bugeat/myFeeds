@@ -187,7 +187,7 @@
                 if (_entrieNbDaysAgo != _previousDaysAgo ) {
                     _previousDaysAgo = _entrieNbDaysAgo;
                     console.log("============================================ " + _previousDaysAgo + ' day(s) ago');
-                    _htmlEntries = _htmlEntries + '<div class="feeds-entries-next-day">' + _previousDaysAgo + ' day(s) ago</div>';
+                    _htmlEntries = _htmlEntries + '<div class="feeds-entries-next-day">' + myExtraTranslations['nb-days-ago'].replace('{{n}}', _previousDaysAgo) + '</div>';
                 }
                 
                 console.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+_myTimestamp+' (' + (new Date(_myTimestamp*1000)).toUTCString() + ') ==> Diff = ' + (_myTimestamp - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
