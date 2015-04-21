@@ -86,7 +86,7 @@ GoogleFeed.prototype._sortEntries       = function() {
     _tmp.sort().reverse();
     
     for (var i = 0; i < _tmp.length; i++) {
-        console.log(_tmp[i]);
+        //console.log(_tmp[i]);
         for (var j = 0; j < this.gf_unsortedEntries.length; j++) {
             if (_tmp[i] == this.gf_unsortedEntries[j]._myTimestampInMs) {
                 this.gf_sortedEntries.push(this.gf_unsortedEntries[j]);
@@ -116,12 +116,19 @@ GoogleFeed.prototype.addEntries = function(entries) {
         
             var _results    = [];
             var _imageUrl   = '';
-            var _regex      = /<img[^>]+src="(http(|s):\/\/[^">]+)/g
-            
+            var _regex      = /<img[^>]+src="(((http(|s):\/\/)|)[^">]+)/g
+
             _results    = _regex.exec(_entry.content);
             
             if ((_results !== null) && (Boolean(_results[1]))) { 
                 _entry['_myFirstImageUrl'] = _results[1];
+            }
+            
+            // Incorrect image url detected.
+            
+            if (_entry['_myFirstImageUrl'].substr(0,2) == '//') {
+                console.warn('Incorrect image url detected in entry content.');
+                _entry['_myFirstImageUrl'] = 'http:' + _entry['_myFirstImageUrl'];
             }
 
         // ---
