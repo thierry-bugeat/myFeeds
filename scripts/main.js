@@ -16,9 +16,14 @@
     var _month  = _now.getMonth();
     var _day    = _now.getDate();
     
-    var _myUTC = new Date(Date.UTC(_year, _month, _day, '00','00','00')); // Start of today
-    var _myTimestamp = Math.floor(_myUTC.getTime() / 1000);
-    var _myTimestampInMs = Math.floor(_myUTC.getTime());
+    var _mySod = new Date(_year, _month, _day, '00','00','00');             // Start of today
+    var _myUtc = new Date(Date.UTC(_year, _month, _day, '00','00','00'));   // Start of today (UTC time)
+    
+    var _myTimestamp        = Math.floor(_mySod.getTime() / 1000);
+    var _myTimestampInMs    = Math.floor(_mySod.getTime());
+    
+    var _myTimestampUtc     = Math.floor(_myUtc.getTime() / 1000);
+    var _myTimestampUtcInMs = Math.floor(_myUtc.getTime());
     
     var myFeeds = [
         {"url": "http://www.gameblog.fr/rss.php",               "num": 20 },
