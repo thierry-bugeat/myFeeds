@@ -98,7 +98,10 @@ GoogleFeed.prototype._sortEntries       = function() {
     console.log(this.gf_sortedEntries);
 }
 
-GoogleFeed.prototype._sortFeeds         = function()        { this.sortedFeeds = _.sortBy(this.unsortedFeeds, 'title'); }
+GoogleFeed.prototype._sortFeeds         = function() { 
+    this.sortedFeeds = this.unsortedFeeds;
+    this.sortedFeeds.sort(function(a, b){ return b.title < a.title });
+}
 GoogleFeed.prototype.setNum             = function(num)     { this.gf.num = num;            }
 GoogleFeed.prototype.setFeeds           = function(myFeeds) { this.myFeeds = myFeeds;       }
 GoogleFeed.prototype.setNbFeedsLoaded   = function()        { this.nbFeedsLoaded++;         }
