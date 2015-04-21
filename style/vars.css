@@ -1,0 +1,12 @@
+/* 
+ * Variables
+ * 
+ * Usage examples : http://www.w3.org/TR/css-variables/
+ * 
+ * */
+
+:root {
+    --my-spacing: 2%;   /* Used as padding and margin for entries  */
+                        /* Doesn't works for displaying main entry */
+                        /* becaus it's an inline CSS. See main.js  */
+}
