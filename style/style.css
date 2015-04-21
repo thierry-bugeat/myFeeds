@@ -44,7 +44,7 @@ section[role="region"] {
 .feeds-entries-next-day {
     padding:0% var(--my-spacing) 0% var(--my-spacing);
     font-size: 1.7rem;
-    color: var(--fxos-blue);
+    color: var(--fxos-orange);
 }
 
 .entrie, .entry-small{
@@ -56,7 +56,7 @@ section[role="region"] {
 }
 
 .entrie-title {
-    font-size: 2.3rem;
+    font-size: 1.9rem;
 }
 
 .entrie-title > a {
@@ -67,7 +67,7 @@ section[role="region"] {
 
 .entrie-date {
     font-size: 1.4rem;
-    color:#c4c4c4;
+    color: var(--fxos-orange);
 }
 
 .entrie > .entrie-image {
@@ -75,6 +75,7 @@ section[role="region"] {
 }
 
 .entrie-contentSnippet{
+    color: #858585;
     font-size: 1.7rem;
 }
 
@@ -105,6 +106,10 @@ section[role="region"] {
     clear: both;
     overflow: hidden;
     visibility: hidden;
+}
+
+.entry-small > .entry-small-date {
+    color: var(--fxos-orange);
 }
 
 /* Main Entry */
