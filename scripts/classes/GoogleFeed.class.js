@@ -113,7 +113,7 @@ GoogleFeed.prototype.addEntries = function(entries) {
         
             var _results    = [];
             var _imageUrl   = '';
-            var _regex      = /<img[^>]+src="(http:\/\/[^">]+)/g
+            var _regex      = /<img[^>]+src="(http(|s):\/\/[^">]+)/g
             
             _results    = _regex.exec(_entry.content);
             
