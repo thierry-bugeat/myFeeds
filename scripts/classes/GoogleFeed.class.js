@@ -110,25 +110,23 @@ GoogleFeed.prototype.addEntries = function(entries) {
     for (var entryId in entries) {
         var _entry = entries[entryId];
         
+        // Detect & update bad images urls in content
+        // Transform '<img src="//...' to '<img src="http://...'
+        
+        _entry.content = _entry.content.replace(/src="\/\//g, 'src="http:\/\/');
+        
         // 1st image extraction
         
             _entry['_myFirstImageUrl'] = "";
         
             var _results    = [];
             var _imageUrl   = '';
-            var _regex      = /<img[^>]+src="(((http(|s):\/\/)|)[^">]+)/g
+            var _regex      = /<img[^>]+src="(http(|s):\/\/[^">]+)/g
 
             _results    = _regex.exec(_entry.content);
             
             if ((_results !== null) && (Boolean(_results[1]))) { 
                 _entry['_myFirstImageUrl'] = _results[1];
-            }
-            
-            // Incorrect image url detected.
-            
-            if (_entry['_myFirstImageUrl'].substr(0,2) == '//') {
-                console.warn('Incorrect image url detected in entry content.');
-                _entry['_myFirstImageUrl'] = 'http:' + _entry['_myFirstImageUrl'];
             }
 
         // ---
