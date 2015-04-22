@@ -41,7 +41,13 @@
     ];
     
     /*var myFeeds = [
-        {"url": "http://www.gameblog.fr/rss.php",               "num": 20 }
+        {"url": "http://linuxfr.org/news.atom",                 "num": 20,  "includeHistoricalEntries": false },
+        {"url": "http://carlchenet.wordpress.com/feed/",        "num": 7,   "includeHistoricalEntries": false },
+        {"url": "http://le-libriste.fr/feed/",                  "num": 7,   "includeHistoricalEntries": false },
+        {"url": "http://www.planet-libre.org/rss10.php",        "num": 30,  "includeHistoricalEntries": false },
+        {"url": "http://planet.gnome.org/atom.xml",             "num": 20,  "includeHistoricalEntries": false },
+        {"url": "http://raphaelhertzog.fr/feed/",               "num": 7,   "includeHistoricalEntries": false },
+        {"url": "http://www.dadall.info/blog/feed.php?rss",     "num": 7,   "includeHistoricalEntries": false }
     ];*/
     
     
@@ -214,6 +220,7 @@
                     _htmlEntries = _htmlEntries + '<div class="entry-small" entry_link="' + _entrie.link + '">';
                     _htmlEntries = _htmlEntries + _imageUrl;
                     _htmlEntries = _htmlEntries + '<div class="entry-small-title">' + _entrie.title + '</div>';
+                    _htmlEntries = _htmlEntries + '<div class="entry-small-feed-title">' + _entrie._myFeedInformations.title + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entry-small-date">' + _date + '</div>';
                     //_htmlEntries = _htmlEntries + '<div class="entry-small-date">' + _entrie.link + '</div>';
                     _htmlEntries = _htmlEntries + "</div>";
@@ -225,6 +232,7 @@
                     _htmlEntries = _htmlEntries + '<div class="entrie" i="' + i + '" >';
                     //_htmlEntries = _htmlEntries + '<div class="entrie-feed-title">' + _entrie.author + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-title">' + _entrie.title + '</div>';
+                    _htmlEntries = _htmlEntries + '<div class="entrie-feed-title">' + _entrie._myFeedInformations.title + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-date">' + _date + '</div>';
                     _htmlEntries = _htmlEntries + _imageUrl;
                     _htmlEntries = _htmlEntries + '<p class="entrie-contentSnippet">' + _entrie.contentSnippet + '</p>';
@@ -412,7 +420,6 @@
 
             // Add feed entries to array "unsortedEntries"
 
-                gf.addEntries(event.detail.responseData.feed.entries);
                 gf.addFeed(event.detail.responseData.feed);
             
             // Check if all feeds were loaded

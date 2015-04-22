@@ -147,44 +147,56 @@ GoogleFeed.prototype.addEntries = function(entries) {
     }
 }
 
-GoogleFeed.prototype.addFeed = function(_myNewFeed) {
+GoogleFeed.prototype.addFeed = function(feed) {
+    
+    var _myNewfeed = feed;
+    var _myNewEntries = feed.entries;
+    
+    for (var i=0; i < _myNewEntries.length; i++) {
+        _myNewEntries[i]._myFeedInformations = feed;
+        delete _myNewEntries[i]._myFeedInformations.entries;
+    }
 
     // Add custom values.
     
-    _myNewFeed['_myNbEntries']          = _myNewFeed.entries.length;
-    _myNewFeed['_myLastPublishedDate']  = _myNewFeed['entries'][0].publishedDate;       // Non, les news ne sont pas ordonnées par date
-    _myNewFeed['_myLastTimestamp']      = _myNewFeed['entries'][0]._myTimestamp;        // Non, les news ne sont pas ordonnées par date
-    _myNewFeed['_myLastTimestampInMs']  = _myNewFeed['entries'][0]._myTimestampInMs;    // Non, les news ne sont pas ordonnées par date
+    _myNewfeed['_myNbEntries']          = _myNewEntries.length;
+    _myNewfeed['_myLastPublishedDate']  = _myNewEntries[0].publishedDate;       // Non, les news ne sont pas ordonnées par date
+    _myNewfeed['_myLastTimestamp']      = _myNewEntries[0]._myTimestamp;        // Non, les news ne sont pas ordonnées par date
+    _myNewfeed['_myLastTimestampInMs']  = _myNewEntries[0]._myTimestampInMs;    // Non, les news ne sont pas ordonnées par date
     
     // Pulsations ?
     
     var _timestamps = [];
     
-    for (var i = 0; i < _myNewFeed.entries.length; i++) {
-        _timestamps.push(Math.round(new Date(_myNewFeed.entries[i].publishedDate).getTime() / 1000));
+    for (var i = 0; i < _myNewEntries.length; i++) {
+        _timestamps.push(Math.round(new Date(_myNewEntries[i].publishedDate).getTime() / 1000));
     }
     
     var _timestampMin = Math.min.apply(Math, _timestamps);
     var _timestampMax = Math.max.apply(Math, _timestamps);
     var _nbDaysInFeed = (_timestampMax - _timestampMin) / 86400;
-    var _myPulsations = (_myNewFeed.entries.length / _nbDaysInFeed).toFixed(2);
+    var _myPulsations = (_myNewEntries.length / _nbDaysInFeed).toFixed(2);
     
-    _myNewFeed['_myPulsations'] = _myPulsations; // Estimation of news number per day
+    _myNewfeed['_myPulsations'] = _myPulsations; // Estimation of news number per day
     
-    if      (isNaN(_myPulsations))  { _myNewFeed['_myPulsationsIcone'] = 'signal-0'; }
-    else if (_myPulsations > 20)    { _myNewFeed['_myPulsationsIcone'] = 'signal-5'; }
-    else if (_myPulsations > 10)    { _myNewFeed['_myPulsationsIcone'] = 'signal-4'; }
-    else if (_myPulsations > 5 )    { _myNewFeed['_myPulsationsIcone'] = 'signal-3'; }
-    else if (_myPulsations > 3 )    { _myNewFeed['_myPulsationsIcone'] = 'signal-2'; }
-    else                            { _myNewFeed['_myPulsationsIcone'] = 'signal-1'; }
+    if      (isNaN(_myPulsations))  { _myNewfeed['_myPulsationsIcone'] = 'signal-0'; }
+    else if (_myPulsations > 20)    { _myNewfeed['_myPulsationsIcone'] = 'signal-5'; }
+    else if (_myPulsations > 10)    { _myNewfeed['_myPulsationsIcone'] = 'signal-4'; }
+    else if (_myPulsations > 5 )    { _myNewfeed['_myPulsationsIcone'] = 'signal-3'; }
+    else if (_myPulsations > 3 )    { _myNewfeed['_myPulsationsIcone'] = 'signal-2'; }
+    else                            { _myNewfeed['_myPulsationsIcone'] = 'signal-1'; }
     
     // Remove values.
     
-    delete _myNewFeed['entries'];
+    delete _myNewfeed.entries;
+    
+    // Add entries.
+    
+    this.addEntries(_myNewEntries);
     
     // Store feed
     
-    this.unsortedFeeds.push(_myNewFeed);
+    this.unsortedFeeds.push(_myNewfeed);
 }
 
 GoogleFeed.prototype.loadFeeds  = function() {

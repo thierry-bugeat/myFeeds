@@ -55,6 +55,10 @@ section[role="region"] {
     box-sizing: border-box;
 }
 
+.entrie > .entrie-feed-title{
+    color: #5F5F5F;
+}
+
 .entrie-title {
     font-size: 1.7rem;
     font-weight: bold;
@@ -112,6 +116,10 @@ section[role="region"] {
 
 .entry-small > .entry-small-date {
     color: var(--fxos-orange);
+}
+
+.entry-small > .entry-small-feed-title{
+    color: #5F5F5F;
 }
 
 /* Main Entry */
