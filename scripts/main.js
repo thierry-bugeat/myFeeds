@@ -226,17 +226,18 @@
                 
                 if (_diff < params.entries.maxLengthForSmallEntries) {
                     _htmlEntries = _htmlEntries + '<div class="entry-small" entry_link="' + _entrie.link + '">';
-                    _htmlEntries = _htmlEntries + _imageUrl;
-                    _htmlEntries = _htmlEntries + '<div class="entry-small-title">' + i + '/ ' + _entrie.title + '</div>';
-                    _htmlEntries = _htmlEntries + '<div class="entry-small-feed-title">' + _entrie._myFeedInformations.title + '</div>';
-                    _htmlEntries = _htmlEntries + '<div class="entry-small-date">' + _date + '</div>';
+                    //_htmlEntries = _htmlEntries + _imageUrl;
+                    _htmlEntries = _htmlEntries + '<p>' + i + '/ ' + _entrie.title + '</p>';
+                    //_htmlEntries = _htmlEntries + '<div class="entry-small-title222">' + i + '/ ' + _entrie.title + '</div>';
+                    //_htmlEntries = _htmlEntries + '<div class="entry-small-feed-title">' + _entrie._myFeedInformations.title + '</div>';
+                    _htmlEntries = _htmlEntries + '<p>' + _date + '</p>';
                     //_htmlEntries = _htmlEntries + '<div class="entry-small-date">' + _entrie.link + '</div>';
                     _htmlEntries = _htmlEntries + "</div>";
                 }
                 
                 // (2) Else
                 
-                else {
+                /*else {
                     _htmlEntries = _htmlEntries + '<div class="entrie" i="' + i + '" >';
                     //_htmlEntries = _htmlEntries + '<div class="entrie-feed-title">' + _entrie.author + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-title">' + i + '/ ' + _entrie.title + '</div>';
@@ -246,7 +247,7 @@
                     _htmlEntries = _htmlEntries + '<p class="entrie-contentSnippet">' + _entrie.contentSnippet + '</p>';
                     //_htmlEntries = _htmlEntries + '<div class="entrie-more"><button id="more"><span data-icon="more"></span></button></div>';
                     _htmlEntries = _htmlEntries + "</div>";
-                }
+                }*/
             
             } else { break; }
             

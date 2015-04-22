@@ -47,7 +47,7 @@ section[role="region"] {
     color: var(--fxos-orange);
 }
 
-.entrie, .entry-small{
+.entrie {
     padding: var(--my-spacing);
     width: calc(100% - (2 * var(--my-spacing)));
     margin: var(--my-spacing);
@@ -94,20 +94,38 @@ section[role="region"] {
 
 /* Entry small */
 
+.entry-small{
+    padding: 0;
+    width: 100%;
+    margin: 0;
+    background-color: var(--fxos-white);
+    box-sizing: border-box;
+    font-size: 1.5rem;
+    display: block;
+    height:80px;
+    border-left: 1rem solid red;
+    border-right: 1rem solid red;
+    border-top: 5px solid red;
+    border-bottom: 5pxm solid red;
+}
+
 .entry-small > .entry-small-image {
-    max-width: 35%;
-    float:right;
-    margin-left: var(--my-spacing);
+    /*max-width: 35%;
+    float:right;*/
+    width: 70px; height:70px;
+    margin-right: var(--my-spacing);
+}
+
+.entry-small > p {
+    height:35px;
 }
 
 .entry-small > .entry-small-title {
-    font-size: 1.5rem;
-    font-weight: bold;
+    /*font-weight: bold;*/
 }
 
 .entry-small > .entry-small-title:after {
     content: " ";
-    display: block;
     height: 0;
     clear: both;
     overflow: hidden;
