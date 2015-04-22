@@ -31,12 +31,12 @@
         {"url": "http://carlchenet.wordpress.com/feed/",        "num": 7,   "includeHistoricalEntries": false },
         {"url": "http://le-libriste.fr/feed/",                  "num": 7,   "includeHistoricalEntries": false },
         {"url": "http://www.nextinpact.com/rss/news.xml",       "num": 130, "includeHistoricalEntries": false },
-        {"url": "http://www.minimachines.net/feed/",            "num": 20,  "includeHistoricalEntries": false },
+        {"url": "http://www.minimachines.net/feed/",            "num": 30,  "includeHistoricalEntries": false },
         {"url": "http://www.planet-libre.org/rss10.php",        "num": 30,  "includeHistoricalEntries": false },
-        {"url": "http://www.webupd8.org/feeds/posts/default",   "num": 20,  "includeHistoricalEntries": false },
-        {"url": "http://feeds.feedburner.com/frandroid",        "num": 20,  "includeHistoricalEntries": false },
+        {"url": "http://www.webupd8.org/feeds/posts/default",   "num": 7,   "includeHistoricalEntries": false },
+        {"url": "http://feeds.feedburner.com/frandroid",        "num": 150, "includeHistoricalEntries": false },
         {"url": "http://planet.gnome.org/atom.xml",             "num": 20,  "includeHistoricalEntries": false },
-        {"url": "http://raphaelhertzog.fr/feed/",               "num": 20,  "includeHistoricalEntries": false },
+        {"url": "http://raphaelhertzog.fr/feed/",               "num": 7,   "includeHistoricalEntries": false },
         {"url": "http://www.dadall.info/blog/feed.php?rss",     "num": 7,   "includeHistoricalEntries": false }
     ];
     
