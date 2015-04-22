@@ -134,10 +134,9 @@ GoogleFeed.prototype.addEntries = function(entries) {
 
         // @todo
         // A changer...
-        // Dans les 2 lignes ci-dessous j'ajoute une valer aléatoire pour ne pas avoir 2 dates de publication identiques.
-        // Sinon cela provoque un bug d'affichage dans l'ordre des news.
-        // Sur la 1ère ligne j'ajoute -120 à +120 secondes
-        // Sur la 2ième j'ajoute de 0 à 0.5 seconde.
+        // Dans le timestamp en "ms" j'ajoute une valeur aléatoire pour ne pas avoir 2 dates de publication identiques.
+        // J'ajoute une valeur comprise entre 0 et 500 (0 à 0.5 seconde).
+        //
         _entry['_myTimestamp']          = Math.round(new Date(_entry.publishedDate).getTime()/1000);
         _entry['_myTimestampInMs']      = Math.round(new Date(_entry.publishedDate).getTime()) + (Math.floor(Math.random()*500));
         
