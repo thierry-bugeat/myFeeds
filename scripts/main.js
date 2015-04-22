@@ -178,7 +178,7 @@
         var _htmlEntries = "";
 
         for (var i = 0; i < sortedEntries.length; i++) {
-            
+
             var _entrie = sortedEntries[i];
 
             if ((_myTimestamp - _entrie._myTimestamp) < (params.entries.dontDisplayEntriesOlderThan * 86400)) {
@@ -227,7 +227,7 @@
                 if (_diff < params.entries.maxLengthForSmallEntries) {
                     _htmlEntries = _htmlEntries + '<div class="entry-small" entry_link="' + _entrie.link + '">';
                     _htmlEntries = _htmlEntries + _imageUrl;
-                    _htmlEntries = _htmlEntries + '<div class="entry-small-title">' + _entrie.title + '</div>';
+                    _htmlEntries = _htmlEntries + '<div class="entry-small-title">' + i + '/ ' + _entrie.title + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entry-small-feed-title">' + _entrie._myFeedInformations.title + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entry-small-date">' + _date + '</div>';
                     //_htmlEntries = _htmlEntries + '<div class="entry-small-date">' + _entrie.link + '</div>';
@@ -239,7 +239,7 @@
                 else {
                     _htmlEntries = _htmlEntries + '<div class="entrie" i="' + i + '" >';
                     //_htmlEntries = _htmlEntries + '<div class="entrie-feed-title">' + _entrie.author + '</div>';
-                    _htmlEntries = _htmlEntries + '<div class="entrie-title">' + _entrie.title + '</div>';
+                    _htmlEntries = _htmlEntries + '<div class="entrie-title">' + i + '/ ' + _entrie.title + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-feed-title">' + _entrie._myFeedInformations.title + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-date">' + _date + '</div>';
                     _htmlEntries = _htmlEntries + _imageUrl;
@@ -248,7 +248,7 @@
                     _htmlEntries = _htmlEntries + "</div>";
                 }
             
-            }
+            } else { break; }
             
         }
         
@@ -385,7 +385,7 @@
         
         var _window = document.getElementById(divId);
         
-        _window.scrollTop = 0;
+        //_window.scrollTop = 0;
         
         if (placement == "left") {
             _window.style.cssText = "transform: translateX(100%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
@@ -433,7 +433,7 @@
                 var _nbFeedsLoaded = gf.getNbFeedsLoaded();
                 gf.setNbFeedsLoaded(++_nbFeedsLoaded);
                 
-                console.log('Feed ' + _nbFeedsLoaded + ' / ' + _nbFeedsToLoad + ' loaded.');
+                //console.log('Feed ' + _nbFeedsLoaded + ' / ' + _nbFeedsToLoad + ' loaded.');
                 
                 // Percentage of loading ?
                 
