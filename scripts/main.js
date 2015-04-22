@@ -322,7 +322,7 @@
             var _regex = new RegExp("'", "g");
 
             // Inline CSS. @todo Find an other way
-            var _srcDocCss = '<style>* {box-sizing: border-box; background-color: #FFFFFF; max-width: 100%; height: auto; overflow-x:hidden;} html{margin:0; font-size: 62.5%; padding:2%;} .entrie-title {font-size: 2.3rem;} .entrie-date {font-size:1.4rem; color:#c4c4c4;} .entrie-contentSnippet{font-size: 1.7rem;}</style>';
+            var _srcDocCss = '<style>* {box-sizing: border-box; background-color: #FFFFFF; max-width: 100%; height: auto; overflow-x:hidden;} html{margin:0; font-size: 62.5%; padding:0;} .entrie-title {font-size: 1.7rem; font-weight:bold;} .entrie-date {font-size:1.4rem; color:#FF4E00;} .entrie-contentSnippet{font-size: 1.7rem; color:#858585;}</style>';
 
             _srcDoc = _srcDoc + _srcDocCss;
             _srcDoc = _srcDoc + '<div class="entrie-title">' + _entry.title.replace(_regex, "&#39;") + '</div>';
@@ -421,7 +421,7 @@
                 var _nbFeedsLoaded = gf.getNbFeedsLoaded();
                 gf.setNbFeedsLoaded(++_nbFeedsLoaded);
                 
-                console.log('Feed ' + _nbFeedsLoaded + ' / ' + _nbFeedsToLoad + ' loaded.');
+                //console.log('Feed ' + _nbFeedsLoaded + ' / ' + _nbFeedsToLoad + ' loaded.');
                 
                 // Percentage of loading ?
                 
