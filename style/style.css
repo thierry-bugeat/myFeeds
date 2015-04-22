@@ -76,7 +76,7 @@ section[role="region"] {
 }
 
 .entrie-contentSnippet{
-    color: #858585;
+    color: #5F5F5F;
     font-size: 1.7rem;
 }
 
@@ -93,7 +93,7 @@ section[role="region"] {
 .entry-small > .entry-small-image {
     max-width: 35%;
     float:right;
-    margin-left:2%;
+    margin-left: var(--my-spacing);
 }
 
 .entry-small > .entry-small-title {
