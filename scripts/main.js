@@ -34,20 +34,20 @@
         {"url": "http://www.minimachines.net/feed/",            "num": 30,  "includeHistoricalEntries": false },
         {"url": "http://www.planet-libre.org/rss10.php",        "num": 30,  "includeHistoricalEntries": false },
         {"url": "http://www.webupd8.org/feeds/posts/default",   "num": 7,   "includeHistoricalEntries": false },
-        {"url": "http://feeds.feedburner.com/frandroid",        "num": 150, "includeHistoricalEntries": false },
+        {"url": "http://feeds.feedburner.com/frandroid",        "num": 140, "includeHistoricalEntries": false },
         {"url": "http://planet.gnome.org/atom.xml",             "num": 20,  "includeHistoricalEntries": false },
         {"url": "http://raphaelhertzog.fr/feed/",               "num": 7,   "includeHistoricalEntries": false },
-        {"url": "http://www.dadall.info/blog/feed.php?rss",     "num": 7,   "includeHistoricalEntries": false }
+        {"url": "http://www.dadall.info/blog/feed.php?rss",     "num": 7,   "includeHistoricalEntries": false },
+        {"url": "http://www.gamekult.com/feeds/actu.html",      "num": 100, "includeHistoricalEntries": false },
+        {"url": "https://www.debian.org/security/dsa",          "num": 10,  "includeHistoricalEntries": false },
+        {"url": "http://www.theguardian.com/media/bbc/rss",     "num": 30,  "includeHistoricalEntries": false },
+        {"url": "http://www.lalibre.be/rss/section/actu.xml",   "num": 210, "includeHistoricalEntries": false },
+        {"url": "http://planete-play.fr/feed/",                 "num": 20,  "includeHistoricalEntries": false },
+        {"url": "http://www.gamergen.com/rss/ps4",              "num": 190, "includeHistoricalEntries": false }
     ];
     
     /*var myFeeds = [
-        {"url": "http://linuxfr.org/news.atom",                 "num": 20,  "includeHistoricalEntries": false },
-        {"url": "http://carlchenet.wordpress.com/feed/",        "num": 7,   "includeHistoricalEntries": false },
-        {"url": "http://le-libriste.fr/feed/",                  "num": 7,   "includeHistoricalEntries": false },
-        {"url": "http://www.planet-libre.org/rss10.php",        "num": 30,  "includeHistoricalEntries": false },
-        {"url": "http://planet.gnome.org/atom.xml",             "num": 20,  "includeHistoricalEntries": false },
-        {"url": "http://raphaelhertzog.fr/feed/",               "num": 7,   "includeHistoricalEntries": false },
-        {"url": "http://www.dadall.info/blog/feed.php?rss",     "num": 7,   "includeHistoricalEntries": false }
+        {"url": "http://www.gamergen.com/rss/ps4",              "num": 190, "includeHistoricalEntries": false }
     ];*/
     
     
@@ -98,6 +98,8 @@
     
     function loadFeeds() {
         
+        console.log('loadFeeds()');
+        
         //document.body.dispatchEvent(new CustomEvent('loadFeeds.start', {"detail": ""}));
         
         echo("feeds-list", "Loading...", "");
@@ -132,6 +134,12 @@
     
     function dspFeeds(feeds) {
         
+        console.log('dspFeeds()');
+
+        console.log(feeds);
+        console.log(feeds.length + ' feeds');
+        //console.log(feeds[17]);
+        
         var _htmlFeeds = "";
         
         // ==========================
@@ -143,7 +151,7 @@
 
         for (var i = 0; i < feeds.length; i++) {
             var _feed = feeds[i];
-            _htmlFeeds = _htmlFeeds + '<li><a href="#"><p><button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + ' <em>(' + _feed._myNbEntries + ')</em> <em>' + _feed._myPulsations + '</em></p><p><time datetime="17:43">' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
+            _htmlFeeds = _htmlFeeds + '<li><a href="#"><p><button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + (i+1) + '/' + _feed.title + ' <em>(' + _feed._myNbEntries + ')</em> <em>' + _feed._myPulsations + '</em></p><p><time datetime="17:43">' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
         }
         
         _htmlFeeds = _htmlFeeds + '</ul>';
@@ -154,7 +162,7 @@
     }
     
     function dspEntries(entries) {
-        
+
         console.log("dspEntries()");
         console.log(entries);
         
@@ -425,7 +433,7 @@
                 var _nbFeedsLoaded = gf.getNbFeedsLoaded();
                 gf.setNbFeedsLoaded(++_nbFeedsLoaded);
                 
-                //console.log('Feed ' + _nbFeedsLoaded + ' / ' + _nbFeedsToLoad + ' loaded.');
+                console.log('Feed ' + _nbFeedsLoaded + ' / ' + _nbFeedsToLoad + ' loaded.');
                 
                 // Percentage of loading ?
                 
@@ -433,7 +441,7 @@
                 
                 // ---
 
-                if (++_nbFeedsLoaded == _nbFeedsToLoad) {
+                if (_nbFeedsLoaded == _nbFeedsToLoad) {
                     console.log('*** ALL FEEDS LOADED *** :D ' + _nbFeedsLoaded + ' / ' + _nbFeedsToLoad);
                     //document.body.dispatchEvent(new CustomEvent('loadFeeds.end', {"detail": ""}));
                     dspEntries(gf.getEntries());
@@ -471,6 +479,7 @@
                     dspFeeds(gf.getFeeds());
                     _loading(100); echo("loading", "", "");
                     _onclick(sync, 'enable');
+                    console.log('************************ :D ');
                 }
             
             // ---

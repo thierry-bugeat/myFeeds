@@ -96,7 +96,7 @@ GoogleFeed.prototype._sortEntries       = function() {
         }
     }
 
-    console.log(this.gf_sortedEntries);
+    //console.log(this.gf_sortedEntries);
 }
 
 GoogleFeed.prototype._sortFeeds         = function() { 
@@ -108,8 +108,8 @@ GoogleFeed.prototype.setFeeds           = function(myFeeds) { this.myFeeds = myF
 GoogleFeed.prototype.setNbFeedsLoaded   = function()        { this.nbFeedsLoaded++;         }
 
 GoogleFeed.prototype.addEntries = function(entries) {
-    for (var entryId in entries) {
-        var _entry = entries[entryId];
+    for (var i = 0; i < entries.length; i++) {
+        var _entry = entries[i];
         
         // Detect & update bad images urls in content
         // Transform '<img src="//...' to '<img src="http://...'
@@ -151,7 +151,7 @@ GoogleFeed.prototype.addFeed = function(feed) {
     var _myNewfeed = feed;
     var _myNewEntries = feed.entries;
     
-    for (var i=0; i < _myNewEntries.length; i++) {
+    for (var i = 0; i < _myNewEntries.length; i++) {
         _myNewEntries[i]._myFeedInformations = feed;
         delete _myNewEntries[i]._myFeedInformations.entries;
     }
@@ -199,6 +199,8 @@ GoogleFeed.prototype.addFeed = function(feed) {
 }
 
 GoogleFeed.prototype.loadFeeds  = function() {
+    
+    console.log('GoogleFeed.prototype.loadFeeds()');
     
     this.nbFeedsLoaded = 0;
     this.gf_unsortedEntries = [];
