@@ -9,11 +9,12 @@
 var GoogleFeed = function() {
 
     this.gf = {
-        "output"        : "json",                               // Output format: json, xml
+        "output"        : "json",                               // Output format: json, xml, json_xml
         "num"           : 4,                                    // Number of news to read
         "q"             : "",                                   // Encoded feed url
         "key"           : "notsupplied",                        // Google API key
         "v"             : "1.0" ,                               // Google API version
+        "scoring"       : "h",                                  // Include historical entries
         "ServiceBase"   : "https://www.google.com/uds/Gfeeds?", //
         "method"        : "GET"
     };
@@ -35,8 +36,8 @@ var GoogleFeed = function() {
 GoogleFeed.prototype.getVersion         = function()        { return this.gf.version;       }
 GoogleFeed.prototype.getOuput           = function()        { return this.gf.output;        }
 GoogleFeed.prototype.getNum             = function()        { return this.gf.num;           }
-GoogleFeed.prototype.getEntries         = function()        { this._sortEntries();  return this.gf_sortedEntries;  }
-GoogleFeed.prototype.getFeeds           = function()        { this._sortFeeds();    return this.sortedFeeds;    }
+GoogleFeed.prototype.getEntries         = function()        { this._sortEntries();  return this.gf_sortedEntries;   }
+GoogleFeed.prototype.getFeeds           = function()        { this._sortFeeds();    return this.sortedFeeds;        }
 GoogleFeed.prototype.getNbFeedsLoaded   = function()        { return this.nbFeedsLoaded;    }
 
 GoogleFeed.prototype._setUrl            = function(q)       { this.gf.q = q;                }
@@ -102,7 +103,7 @@ GoogleFeed.prototype._sortFeeds         = function() {
     this.sortedFeeds = this.unsortedFeeds;
     this.sortedFeeds.sort(function(a, b){ return b.title < a.title });
 }
-GoogleFeed.prototype.setNum             = function(num)     { this.gf.num = num;            }
+GoogleFeed.prototype._setNum            = function(num)     { this.gf.num = num;            }
 GoogleFeed.prototype.setFeeds           = function(myFeeds) { this.myFeeds = myFeeds;       }
 GoogleFeed.prototype.setNbFeedsLoaded   = function()        { this.nbFeedsLoaded++;         }
 
@@ -150,10 +151,32 @@ GoogleFeed.prototype.addFeed = function(_myNewFeed) {
 
     // Add custom values.
     
-    _myNewFeed['_myNbEntries']            = _myNewFeed.entries.length;
-    _myNewFeed['_myLastPublishedDate']    = _myNewFeed['entries'][0].publishedDate;
-    _myNewFeed['_myLastTimestamp']        = _myNewFeed['entries'][0]._myTimestamp;
-    _myNewFeed['_myLastTimestampInMs']    = _myNewFeed['entries'][0]._myTimestampInMs;
+    _myNewFeed['_myNbEntries']          = _myNewFeed.entries.length;
+    _myNewFeed['_myLastPublishedDate']  = _myNewFeed['entries'][0].publishedDate;       // Non, les news ne sont pas ordonnées par date
+    _myNewFeed['_myLastTimestamp']      = _myNewFeed['entries'][0]._myTimestamp;        // Non, les news ne sont pas ordonnées par date
+    _myNewFeed['_myLastTimestampInMs']  = _myNewFeed['entries'][0]._myTimestampInMs;    // Non, les news ne sont pas ordonnées par date
+    
+    // Pulsations ?
+    
+    var _timestamps = [];
+    
+    for (var i = 0; i < _myNewFeed.entries.length; i++) {
+        _timestamps.push(Math.round(new Date(_myNewFeed.entries[i].publishedDate).getTime() / 1000));
+    }
+    
+    var _timestampMin = Math.min.apply(Math, _timestamps);
+    var _timestampMax = Math.max.apply(Math, _timestamps);
+    var _nbDaysInFeed = (_timestampMax - _timestampMin) / 86400;
+    var _myPulsations = (_myNewFeed.entries.length / _nbDaysInFeed).toFixed(2);
+    
+    _myNewFeed['_myPulsations'] = _myPulsations; // Estimation of news number per day
+    
+    if      (isNaN(_myPulsations))  { _myNewFeed['_myPulsationsIcone'] = 'signal-0'; }
+    else if (_myPulsations > 20)    { _myNewFeed['_myPulsationsIcone'] = 'signal-5'; }
+    else if (_myPulsations > 10)    { _myNewFeed['_myPulsationsIcone'] = 'signal-4'; }
+    else if (_myPulsations > 5 )    { _myNewFeed['_myPulsationsIcone'] = 'signal-3'; }
+    else if (_myPulsations > 3 )    { _myNewFeed['_myPulsationsIcone'] = 'signal-2'; }
+    else                            { _myNewFeed['_myPulsationsIcone'] = 'signal-1'; }
     
     // Remove values.
     
@@ -177,9 +200,12 @@ GoogleFeed.prototype.loadFeeds  = function() {
         var _myFeed = myFeeds[i];
         
         this._setUrl(_myFeed.url);
+        this._setNum(_myFeed.num);
         
-        var _urlParams = '&output=' + this.gf.output + '&num=' + this.gf.num + '&q=' + encodeURIComponent(this.gf.q) + '&key=' + this.gf.key + '&v=' + this.gf.v;
+        var _urlParams = '&output=' + this.gf.output + '&num=' + this.gf.num + '&scoring=' + this.gf.scoring + '&q=' + encodeURIComponent(this.gf.q) + '&key=' + this.gf.key + '&v=' + this.gf.v;
         var _url    = this.gf.ServiceBase + _urlParams;
+        
+        console.log(_url);
         
         var promise = this.get(_url, _params);
     

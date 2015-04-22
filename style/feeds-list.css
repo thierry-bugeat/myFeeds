@@ -99,3 +99,13 @@
     line-height: 2.2rem;
     padding: 1rem 0 0;
 }
+
+#feeds-list button {
+    color: var(--fxos-orange);
+    line-height:0;
+    height:2rem;
+    float:left;
+    width: 45px;
+    margin-right: var(--my-spacing);
+    background: none;
+}

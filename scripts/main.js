@@ -26,18 +26,18 @@
     var _myTimestampUtcInMs = Math.floor(_myUtc.getTime());
     
     var myFeeds = [
-        {"url": "http://www.gameblog.fr/rss.php",               "num": 20 },
-        {"url": "http://linuxfr.org/news.atom",                 "num": 20 },
-        {"url": "http://carlchenet.wordpress.com/feed/",        "num": 20 },
-        {"url": "http://le-libriste.fr/feed/",                  "num": 20 },
-        {"url": "http://www.nextinpact.com/rss/news.xml",       "num": 20 },
-        {"url": "http://www.minimachines.net/feed/",            "num": 20 },
-        {"url": "http://www.planet-libre.org/rss10.php",        "num": 20 },
-        {"url": "http://www.webupd8.org/feeds/posts/default",   "num": 20 },
-        {"url": "http://feeds.feedburner.com/frandroid",        "num": 20 },
-        {"url": "http://planet.gnome.org/atom.xml",             "num": 20 },
-        {"url": "http://raphaelhertzog.fr/feed/",               "num": 20 },
-        {"url": "http://www.dadall.info/blog/feed.php?rss",     "num": 20 }
+        {"url": "http://www.gameblog.fr/rss.php",               "num": 150, "includeHistoricalEntries": false },
+        {"url": "http://linuxfr.org/news.atom",                 "num": 20,  "includeHistoricalEntries": false },
+        {"url": "http://carlchenet.wordpress.com/feed/",        "num": 7,   "includeHistoricalEntries": false },
+        {"url": "http://le-libriste.fr/feed/",                  "num": 7,   "includeHistoricalEntries": false },
+        {"url": "http://www.nextinpact.com/rss/news.xml",       "num": 130, "includeHistoricalEntries": false },
+        {"url": "http://www.minimachines.net/feed/",            "num": 20,  "includeHistoricalEntries": false },
+        {"url": "http://www.planet-libre.org/rss10.php",        "num": 30,  "includeHistoricalEntries": false },
+        {"url": "http://www.webupd8.org/feeds/posts/default",   "num": 20,  "includeHistoricalEntries": false },
+        {"url": "http://feeds.feedburner.com/frandroid",        "num": 20,  "includeHistoricalEntries": false },
+        {"url": "http://planet.gnome.org/atom.xml",             "num": 20,  "includeHistoricalEntries": false },
+        {"url": "http://raphaelhertzog.fr/feed/",               "num": 20,  "includeHistoricalEntries": false },
+        {"url": "http://www.dadall.info/blog/feed.php?rss",     "num": 7,   "includeHistoricalEntries": false }
     ];
     
     /*var myFeeds = [
@@ -50,7 +50,6 @@
     var params = {
         "entries": {
             "maxLengthForSmallEntries": "400", // Max number of characters to display an entry as small entry
-            "numberOfEntriesToLoadPerFeed": "20", // Default 4
             "dontDisplayEntriesOlderThan": "7" // In days
         }
     };
@@ -73,7 +72,6 @@
     
     //var load                    = document.getElementById("load");
     //var save                    = document.getElementById("save");
-    
     
     // DOM clicks :
     
@@ -98,7 +96,7 @@
         
         echo("feeds-list", "Loading...", "");
         
-        console.log('loadFeeds ### 3 ###'); gf.loadFeeds();
+        gf.loadFeeds();
         
     }
     
@@ -130,10 +128,6 @@
         
         var _htmlFeeds = "";
         
-        // --- NAV start ---
-        
-        //_htmlFeeds = _htmlFeeds + '<nav>';
-        
         // ==========================
         // --- Display feeds list ---
         // ==========================
@@ -143,14 +137,10 @@
 
         for (var i = 0; i < feeds.length; i++) {
             var _feed = feeds[i];
-            _htmlFeeds = _htmlFeeds + '<li><a href="#"><p>' + _feed.title + ' <em>(' + _feed._myNbEntries + ')</em></p><p><time datetime="17:43">' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
+            _htmlFeeds = _htmlFeeds + '<li><a href="#"><p><button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + ' <em>(' + _feed._myNbEntries + ')</em> <em>' + _feed._myPulsations + '</em></p><p><time datetime="17:43">' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
         }
         
         _htmlFeeds = _htmlFeeds + '</ul>';
-        
-        // --- NAV end ---
-        
-        //_htmlFeeds = _htmlFeeds + '</nav>';
         
         // --- Display ---
         
@@ -233,12 +223,12 @@
                 
                 else {
                     _htmlEntries = _htmlEntries + '<div class="entrie" i="' + i + '" >';
-                    _htmlEntries = _htmlEntries + '<div class="entrie-feed-title">' + _entrie.author + '</div>';
+                    //_htmlEntries = _htmlEntries + '<div class="entrie-feed-title">' + _entrie.author + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-title">' + _entrie.title + '</div>';
                     _htmlEntries = _htmlEntries + '<div class="entrie-date">' + _date + '</div>';
                     _htmlEntries = _htmlEntries + _imageUrl;
                     _htmlEntries = _htmlEntries + '<p class="entrie-contentSnippet">' + _entrie.contentSnippet + '</p>';
-                    _htmlEntries = _htmlEntries + '<div class="entrie-more"><button id="more"><span data-icon="more"></span></button></div>';
+                    //_htmlEntries = _htmlEntries + '<div class="entrie-more"><button id="more"><span data-icon="more"></span></button></div>';
                     _htmlEntries = _htmlEntries + "</div>";
                 }
             
@@ -371,20 +361,7 @@
         }
 
     }
-    
-    function syncRotation() {
-
-        //var _sync = document.getElementById("sync");
         
-        //console.dir(_sync);
-        //_translateX = _sync.x + 10;
-        
-        //_sync.style.cssText = "transform: translateX(" + _translateX + "px); ";
-        //_sync.style.cssText = "transform: rotate(-720deg); transform-origin: 50% 50%;"
-        //_sync.style.cssText = "transform: rotate(720deg); transform-origin: 50% 50%; -webkit-transition-duration: 3s; transition-duration: 3s;"
-
-    }
-    
     /**
      * Open window from left or right
      * @param string divId Div identifiant
@@ -455,7 +432,6 @@
                 if (++_nbFeedsLoaded == _nbFeedsToLoad) {
                     console.log('*** ALL FEEDS LOADED *** :D ' + _nbFeedsLoaded + ' / ' + _nbFeedsToLoad);
                     //document.body.dispatchEvent(new CustomEvent('loadFeeds.end', {"detail": ""}));
-                    console.log('dspEntries ### 1 ###'); 
                     dspEntries(gf.getEntries());
                     dspFeeds(gf.getFeeds());
                 }
@@ -487,7 +463,7 @@
 
                 if (++_nbFeedsLoaded >= _nbFeedsToLoad) {
                     console.log('*** ALL FEEDS LOADED *** :D ' + _nbFeedsLoaded + ' / ' + _nbFeedsToLoad);
-                    console.log('dspEntries ### 2 ###'); dspEntries(gf.getEntries());
+                    dspEntries(gf.getEntries());
                     dspFeeds(gf.getFeeds());
                     _loading(100); echo("loading", "", "");
                     _onclick(sync, 'enable');
@@ -507,7 +483,6 @@
         _onclick(settings, 'disable');  // Not yet implemented
         
         gf.setFeeds(myFeeds);
-        gf.setNum(params.entries.numberOfEntriesToLoadPerFeed); // Load "num" entries per feed.
-        console.log('loadFeeds ### 1 ###'); gf.loadFeeds();
+        gf.loadFeeds();
 
     };
