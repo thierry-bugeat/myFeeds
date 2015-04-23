@@ -361,7 +361,7 @@
         
         main_entry.scrollTop = 0;
         
-        main_entry_container.style.cssText = "transform: translateX(-100%); -webkit-transition-duration: 1s; transition-duration: 1s;";
+        openWindow("main-entry-container", "right");
     }
     
     /**
@@ -414,9 +414,11 @@
         var _window = document.getElementById(divId);
         
         if (placement == "left") {
-            _window.style.cssText = "transform: translateX(0%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
+            //_window.style.cssText = "transform: translateX(0%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
+            _window.style.cssText = "transform: translateX(0%);";
         } else {
-            _window.style.cssText = "transform: translateX(100%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
+            //_window.style.cssText = "transform: translateX(100%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
+            _window.style.cssText = "transform: translateX(100%);";
         }
     }
     
