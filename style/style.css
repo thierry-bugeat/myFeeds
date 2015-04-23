@@ -39,15 +39,15 @@ section[role="region"] {
 #feeds-entries{
     width:100%;
     height: calc(100% - 9.5rem);
+    font-size:1.7rem;
 }
 
 .feeds-entries-next-day {
     padding:0% var(--my-spacing) 0% var(--my-spacing);
-    font-size: 1.7rem;
     color: var(--fxos-orange);
 }
 
-.entrie, .entry-small{
+.entrie {
     padding: var(--my-spacing);
     width: calc(100% - (2 * var(--my-spacing)));
     margin: var(--my-spacing);
@@ -60,7 +60,6 @@ section[role="region"] {
 }
 
 .entrie-title {
-    font-size: 1.7rem;
     font-weight: bold;
 }
 
@@ -81,7 +80,6 @@ section[role="region"] {
 
 .entrie-contentSnippet{
     color: #5F5F5F;
-    font-size: 1.7rem;
 }
 
 .entrie-more{
@@ -94,20 +92,38 @@ section[role="region"] {
 
 /* Entry small */
 
+.entry-small{
+    padding: 0;
+    width: 100%;
+    margin: 0;
+    background-color: var(--fxos-white);
+    box-sizing: border-box;
+    font-size: 1.5rem;
+    display: block;
+    height:80px;
+    border-left: 1rem solid red;
+    border-right: 1rem solid red;
+    border-top: 5px solid red;
+    border-bottom: 5px solid red;
+}
+
 .entry-small > .entry-small-image {
-    max-width: 35%;
-    float:right;
-    margin-left: var(--my-spacing);
+    /*max-width: 35%;
+    float:right;*/
+    width: 70px; height:70px;
+    margin-right: var(--my-spacing);
+}
+
+.entry-small > p {
+    height:35px;
 }
 
 .entry-small > .entry-small-title {
-    font-size: 1.5rem;
-    font-weight: bold;
+    /*font-weight: bold;*/
 }
 
 .entry-small > .entry-small-title:after {
     content: " ";
-    display: block;
     height: 0;
     clear: both;
     overflow: hidden;

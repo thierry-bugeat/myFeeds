@@ -214,39 +214,48 @@
                 
                 if (_entrie._myFirstImageUrl) {
                     if (_diff < params.entries.maxLengthForSmallEntries) {
-                        _imageUrl = '<img class="entry-small-image" src="' + _entrie._myFirstImageUrl + '"/>';
+                        _imageUrl = '<div class="my-image-container ratio-image-s"><img src="' + _entrie._myFirstImageUrl + '"/></div>'; 
                     } else {
-                        _imageUrl = '<img class="entrie-image" src="' + _entrie._myFirstImageUrl + '"/>'; 
+                        _imageUrl = '<div class="my-image-container ratio-image-l"><img src="' + _entrie._myFirstImageUrl + '"/></div>'; 
                     }
                 }
                 
-                // Entry composition
+                // Entry class ratio ?
                 
-                // (1) Content too short so no link to open entry.
+                var _ratioClass = 'ratio-entry-l';
                 
-                if (_diff < params.entries.maxLengthForSmallEntries) {
-                    _htmlEntries = _htmlEntries + '<div class="entry-small" entry_link="' + _entrie.link + '">';
-                    _htmlEntries = _htmlEntries + _imageUrl;
-                    _htmlEntries = _htmlEntries + '<div class="entry-small-title">' + i + '/ ' + _entrie.title + '</div>';
-                    _htmlEntries = _htmlEntries + '<div class="entry-small-feed-title">' + _entrie._myFeedInformations.title + '</div>';
-                    _htmlEntries = _htmlEntries + '<div class="entry-small-date">' + _date + '</div>';
-                    //_htmlEntries = _htmlEntries + '<div class="entry-small-date">' + _entrie.link + '</div>';
-                    _htmlEntries = _htmlEntries + "</div>";
+                if ((_diff <= params.entries.maxLengthForSmallEntries) && (!_entrie._myFirstImageUrl)) {
+                    _ratioClass = 'ratio-entry-s';
                 }
                 
-                // (2) Else
-                
-                else {
-                    _htmlEntries = _htmlEntries + '<div class="entrie" i="' + i + '" >';
-                    //_htmlEntries = _htmlEntries + '<div class="entrie-feed-title">' + _entrie.author + '</div>';
-                    _htmlEntries = _htmlEntries + '<div class="entrie-title">' + i + '/ ' + _entrie.title + '</div>';
-                    _htmlEntries = _htmlEntries + '<div class="entrie-feed-title">' + _entrie._myFeedInformations.title + '</div>';
-                    _htmlEntries = _htmlEntries + '<div class="entrie-date">' + _date + '</div>';
-                    _htmlEntries = _htmlEntries + _imageUrl;
-                    _htmlEntries = _htmlEntries + '<p class="entrie-contentSnippet">' + _entrie.contentSnippet + '</p>';
-                    //_htmlEntries = _htmlEntries + '<div class="entrie-more"><button id="more"><span data-icon="more"></span></button></div>';
-                    _htmlEntries = _htmlEntries + "</div>";
+                else if ((_diff <= params.entries.maxLengthForSmallEntries) || (!_entrie._myFirstImageUrl)) {
+                    _ratioClass = 'ratio-entry-m';
                 }
+                
+                // Content ( Normal / Small )
+                
+                var _content = "";
+                
+                if (_diff >= params.entries.maxLengthForSmallEntries) {
+                    _content = _content + '<div class="my-entry-l ' + _ratioClass + '" i="' + i + '">';
+                    _content = _content + '<div class="my-title">' + _entrie.title + '</div>';
+                    _content = _content + '<div class="my-feed-title">' + _entrie._myFeedInformations.title + '</div>';
+                    _content = _content + _imageUrl;
+                    _content = _content + '<div class="my-date">' + _date + '</div>';
+                    _content = _content + '<div class="my-snippet">' + _entrie.contentSnippet + '</div>';
+                    _content = _content + '</div>';
+                    
+                } else {
+                    _content = _content + '<div class="my-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
+                    _content = _content + '<div class="my-title">' + _entrie.title + '</div>';
+                    _content = _content + _imageUrl;
+                    _content = _content + '<div class="my-date">' + _date + '</div>';
+                    _content = _content + '</div>';
+                }
+                
+                // Add to html entries
+                
+                _htmlEntries = _htmlEntries + _content;
             
             } else { break; }
             
@@ -260,17 +269,17 @@
         // --- Add Events ---
         // ==================
         
-        // onclick Small Entries : 
+        // onclick Small Entries:
         
-        var _small_entries = document.querySelectorAll(".entry-small");
+        var _small_entries = document.querySelectorAll(".my-entry-s");
         
         for (var i = 0; i < _small_entries.length; i++) {
             _small_entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(null, this.getAttribute("entry_link")); }
         }
-
-        // onclick Entries :
         
-        var _entries = document.querySelectorAll(".entrie");
+        // onclick Normal Entries :
+        
+        var _entries = document.querySelectorAll(".my-entry-l");
         
         for (var i = 0; i < _entries.length; i++) {
             _entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }
@@ -279,7 +288,7 @@
     }
     
     function entryFade(_this) {
-        _this.style.cssText = "opacity : 0.4; z-index: -1;";
+        _this.style.cssText = "opacity : 0.4;";
     }
     
     function saveFeed(filename, data) {
@@ -352,7 +361,7 @@
         
         main_entry.scrollTop = 0;
         
-        main_entry_container.style.cssText = "transform: translateX(-100%); -webkit-transition-duration: 1s; transition-duration: 1s;";
+        openWindow("main-entry-container", "right");
     }
     
     /**
@@ -405,9 +414,11 @@
         var _window = document.getElementById(divId);
         
         if (placement == "left") {
-            _window.style.cssText = "transform: translateX(0%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
+            //_window.style.cssText = "transform: translateX(0%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
+            _window.style.cssText = "transform: translateX(0%);";
         } else {
-            _window.style.cssText = "transform: translateX(100%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
+            //_window.style.cssText = "transform: translateX(100%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
+            _window.style.cssText = "transform: translateX(100%);";
         }
     }
     

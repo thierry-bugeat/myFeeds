@@ -1,0 +1,94 @@
+/* images */
+
+/* Responsive images – how to prevent reflow */
+/* http://andmag.se/2012/10/responsive-images-how-to-prevent-reflow/ */
+
+/* --- Entry --- */
+
+.my-entry-s, .my-entry-l {
+    margin:var(--my-spacing);
+    padding:var(--my-spacing);
+    background-color:var(--fxos-white);
+    
+    position: relative;
+    height: 0;
+    overflow: hidden;
+}
+
+.my-title{
+    height:1.7rem;
+    line-height:1.7rem;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.my-feed-title{
+    font-size:1.5rem;
+    height:1.7rem;
+    line-height:1.7rem;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.my-date{
+    font-size:1.5rem;
+    height:2.5rem;
+    line-height:2.5rem;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--fxos-orange);
+}
+
+.my-snippet{
+    color: #5F5F5F;
+    height:6.8rem;
+    line-height:1.7rem;
+    width:100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.my-image-container {
+    position: relative;
+    height: 0;
+    overflow: hidden;
+}
+
+.my-image-container img{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width:100%;
+}
+
+/* --- RATIOS --- */
+
+.ratio-image-s { padding-bottom:25%; }
+.ratio-image-l { padding-bottom:45%; }
+
+.ratio-entry-s { padding-bottom: 12%; }
+.ratio-entry-m { padding-bottom: 36%; }
+.ratio-entry-l { padding-bottom: 76%; }
+
+.ratio-16-10{
+    padding-bottom:62.5%; /* 10/16*100 */
+}
+
+.ratio-16-9{
+    padding-bottom:56.25%; /* 9/16*100 */
+}
+
+.ratio-4-3{
+    padding-bottom:75%; /* 3/4*100 */
+}
+
+.ratio-1-1{
+    padding-bottom:100%; /* … */
+}
