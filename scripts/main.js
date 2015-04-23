@@ -238,7 +238,7 @@
                 
                 if (_diff >= params.entries.maxLengthForSmallEntries) {
                     _content = _content + '<div class="my-entry-l ' + _ratioClass + '" i="' + i + '">';
-                    _content = _content + '<div class="my-title">' + _entrie.title + '</div>';
+                    _content = _content + '<div class="my-title">' + i + '/ ' + _entrie.title + '</div>';
                     _content = _content + '<div class="my-feed-title">' + _entrie._myFeedInformations.title + '</div>';
                     _content = _content + _imageUrl;
                     _content = _content + '<div class="my-date">' + _date + '</div>';
@@ -247,7 +247,7 @@
                     
                 } else {
                     _content = _content + '<div class="my-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
-                    _content = _content + '<div class="my-title">' + _entrie.title + '</div>';
+                    _content = _content + '<div class="my-title">' + i + '/ ' + _entrie.title + '</div>';
                     _content = _content + _imageUrl;
                     _content = _content + '<div class="my-date">' + _date + '</div>';
                     _content = _content + '</div>';
