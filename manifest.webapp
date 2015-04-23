@@ -10,6 +10,7 @@
         "name": "Thierry Bugeat",
         "url": "http://www.bugeat.com"
     },
+    "orientation": "portrait-primary",
     "default_locale": "en",
     "locales": {
         "en": {
