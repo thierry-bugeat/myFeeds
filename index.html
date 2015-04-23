@@ -16,11 +16,34 @@
     <link href="style/feeds-list.css" type="text/css" rel="stylesheet">
     <link href="style/sidebar-params.css" type="text/css" rel="stylesheet">
     <link href="style/style.css" type="text/css" rel="stylesheet">
+    <link href="style/entries-list.css" type="text/css" rel="stylesheet">
 </head>
 
 <body>
 
     <div id="loading"></div>
+    
+    <!-- ==================== -->
+    <!-- Subscriptions screen -->
+    <!-- ==================== -->
+         
+    <section role="region" data-type="sidebar" id="feeds-list-container">
+        
+        <section role="myHeader">
+            <header class="mySystemHeader">
+                <h1 data-l10n-id="my-subscriptions">my Subscriptions</h1>
+            </header>
+        </section>
+        
+        <div id="feeds-list" class="scrollable"></div>
+        
+        <section role="myFooter" class="">
+            <header>
+                <button id="closeFeedsList"><span data-icon="close"></span></button>
+            </header>
+        </section>
+        
+    </section>
     
     <!-- =========== -->
     <!-- Main screen -->
@@ -71,28 +94,7 @@
         </section>
         
     </div>
-    
-    <!-- ==================== -->
-    <!-- Subscriptions screen -->
-    <!-- ==================== -->
-         
-    <section role="region" data-type="sidebar" id="feeds-list-container">
-        
-        <section role="myHeader">
-            <header class="mySystemHeader">
-                <h1 data-l10n-id="my-subscriptions">my Subscriptions</h1>
-            </header>
-        </section>
-        
-        <div id="feeds-list" class="scrollable"></div>
-        
-        <section role="myFooter" class="">
-            <header>
-                <button id="closeFeedsList"><span data-icon="close"></span></button>
-            </header>
-        </section>
-        
-    </section>
+
 </body>
 
 <!-- Inline CSS -->
