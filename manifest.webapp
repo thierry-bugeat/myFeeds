@@ -1,6 +1,8 @@
 {
     "name": "my Feeds",
     "description": "RSS & ATOM feeds reader",
+    "version": "0",
+    "fullscreen": "true",
     "launch_path": "/index.html",
     "icons": {
         "60": "/images/icon-60.png",
@@ -13,10 +15,6 @@
     "orientation": "portrait-primary",
     "default_locale": "en",
     "locales": {
-        "en": {
-            "name" : "my Feeds",
-            "description" : "RSS & ATOM feeds reader"
-        },
         "es": {
             "name" : "mis Noticias",
             "description" : "Lector de RSS y ATOM."
@@ -37,6 +35,12 @@
         },
         "systemXHR": {
             "description": "request cross domain."
+        },
+        "datastores-owned": {
+            "myFeedsData": {
+                "access": "readwrite",
+                "description": "my Feeds Data"
+            }
         }
     }
 }
