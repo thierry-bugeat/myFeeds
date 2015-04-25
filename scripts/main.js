@@ -69,6 +69,7 @@
     var main_entry              = document.getElementById("main-entry");
     var browser                 = document.getElementById("browser");
     var loading                 = document.getElementById("loading");
+    var feeds_entries           = document.getElementById("feeds-entries");
     
     var sync                    = document.getElementById("sync");
     var menu                    = document.getElementById("menu");
@@ -83,7 +84,7 @@
     
     sync.onclick            = function(event) { _onclick(this, 'disable'); console.log('loadFeeds ### 2 ###'); loadFeeds(); }
     menu.onclick            = function(event) { openWindow("feeds-list-container", "left"); }
-    topup.onclick           = function(event) { document.getElementById("feeds-entries").scrollTop = 0; }
+    topup.onclick           = function(event) { _onclick(topup, 'disable'); document.getElementById("feeds-entries").scrollTop = 0; }
     closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container", "right"); echo("browser", "", ""); }
     closeFeedsList.onclick  = function(event) { closeWindow("feeds-list-container", "left"); }
     
@@ -429,6 +430,41 @@
     
     window.onload = function () {
         
+        // =======================================
+        // --- Button [topup] enable / disable ---
+        // =======================================
+        
+        var _topup = {
+            "previousScrollTop": 0, 
+            "previousStatus": "disabled"
+        };
+        
+        setInterval(function() {
+
+            // Scroll in progress
+            
+            if (feeds_entries.scrollTop != _topup['previousScrollTop']) {
+                
+                if (_topup['previousScrollTop'] == 0) { 
+                    _onclick(topup, 'enable'); 
+                    _topup['previousStatus'] = 'enabled'; 
+                }
+                
+                _topup['previousScrollTop'] = feeds_entries.scrollTop;
+            } 
+            
+            // End scroll
+            
+            else {
+                
+                if ((_topup['previousStatus'] == 'enabled') && (feeds_entries.scrollTop == 0)) {
+                    _onclick(topup, 'disable'); 
+                    _topup['previousStatus'] = 'disabled';
+                }
+            }
+            
+        }, 500);
+        
         // ==============
         // --- Events ---
         // ==============
@@ -502,6 +538,7 @@
         // --- Main ---
         // ============
 
+        _onclick(topup, 'disable');     // Disable "topup" button when application start
         _onclick(sync, 'disable');      // Disable "sync" button when application start
         
         _onclick(search, 'disable');    // Not yet implemented
