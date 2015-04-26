@@ -91,12 +91,6 @@
     //load.onclick            = function(event) { loadFile(); }
     //save.onclick            = function(event) { saveFeed(); }
     
-    // ---
-    
-    browser.addEventListener('mozbrowsererror', function (event) {
-        console.dir("Erreur de chargement : " + event.detail);
-    });
-    
     function loadFeeds() {
         
         console.log('loadFeeds()');
@@ -139,7 +133,6 @@
 
         console.log(feeds);
         console.log(feeds.length + ' feeds');
-        //console.log(feeds[17]);
         
         var _htmlFeeds = "";
         
@@ -168,6 +161,9 @@
         console.log(entries);
         
         sortedEntries = entries;
+        
+        var _myTimestamp        = Math.floor(_mySod.getTime() / 1000);
+        var _myTimestampInMs    = Math.floor(_mySod.getTime());
         
         var _previousDaysAgo    = 0; // Count days to groups entries by day.
         var _entrieNbDaysAgo    = 0;
@@ -396,8 +392,6 @@
         
         var _window = document.getElementById(divId);
         
-        //_window.scrollTop = 0;
-        
         if (placement == "left") {
             _window.style.cssText = "transform: translateX(100%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
         } else {
@@ -416,10 +410,8 @@
         var _window = document.getElementById(divId);
         
         if (placement == "left") {
-            //_window.style.cssText = "transform: translateX(0%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
             _window.style.cssText = "transform: translateX(0%);";
         } else {
-            //_window.style.cssText = "transform: translateX(100%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
             _window.style.cssText = "transform: translateX(100%);";
         }
     }
@@ -468,6 +460,10 @@
         // ==============
         // --- Events ---
         // ==============
+        
+        browser.addEventListener('mozbrowsererror', function (event) {
+            console.dir("Moz Browser loading error : " + event.detail);
+        });
     
         document.body.addEventListener('GoogleFeed.load.done', function(event){
 
@@ -481,8 +477,6 @@
                 var _nbFeedsLoaded = gf.getNbFeedsLoaded();
                 gf.setNbFeedsLoaded(++_nbFeedsLoaded);
                 
-                //console.log('Feed ' + _nbFeedsLoaded + ' / ' + _nbFeedsToLoad + ' loaded.');
-                
                 // Percentage of loading ?
                 
                 _loading(Math.round((100 * _nbFeedsLoaded) / _nbFeedsToLoad));
@@ -490,8 +484,6 @@
                 // ---
 
                 if (_nbFeedsLoaded == _nbFeedsToLoad) {
-                    console.log('*** ALL FEEDS LOADED *** :D ' + _nbFeedsLoaded + ' / ' + _nbFeedsToLoad);
-                    //document.body.dispatchEvent(new CustomEvent('loadFeeds.end', {"detail": ""}));
                     dspEntries(gf.getEntries());
                     dspFeeds(gf.getFeeds());
                 }
@@ -522,12 +514,10 @@
                 // ---
 
                 if (++_nbFeedsLoaded >= _nbFeedsToLoad) {
-                    console.log('*** ALL FEEDS LOADED *** :D ' + _nbFeedsLoaded + ' / ' + _nbFeedsToLoad);
                     dspEntries(gf.getEntries());
                     dspFeeds(gf.getFeeds());
                     _loading(100); echo("loading", "", "");
                     _onclick(sync, 'enable');
-                    console.log('************************ :D ');
                 }
             
             // ---
