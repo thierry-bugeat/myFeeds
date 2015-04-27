@@ -11,19 +11,7 @@
     // http://imikado.developpez.com/tutoriels/firefoxOS/ma-premier-application/
     // http://toddmotto.com/is-it-time-to-drop-jquery-essentials-to-learning-javascript-from-a-jquery-background/
     
-    var _now    = new Date();
-    var _year   = _now.getFullYear();
-    var _month  = _now.getMonth();
-    var _day    = _now.getDate();
-    
-    var _mySod = new Date(_year, _month, _day, '00','00','00');             // Start of today
-    var _myUtc = new Date(Date.UTC(_year, _month, _day, '00','00','00'));   // Start of today (UTC time)
-    
-    var _myTimestamp        = Math.floor(_mySod.getTime() / 1000);
-    var _myTimestampInMs    = Math.floor(_mySod.getTime());
-    
-    var _myTimestampUtc     = Math.floor(_myUtc.getTime() / 1000);
-    var _myTimestampUtcInMs = Math.floor(_myUtc.getTime());
+    var _myTimestamp;       // Value set by function "_setMyTimestamp()"
     
     var myFeeds = [
         {"url": "http://www.gameblog.fr/rss.php",               "num": 150, "includeHistoricalEntries": false },
@@ -43,13 +31,13 @@
         {"url": "http://www.theguardian.com/media/bbc/rss",     "num": 30,  "includeHistoricalEntries": false },
         {"url": "http://www.lalibre.be/rss/section/actu.xml",   "num": 210, "includeHistoricalEntries": false },
         {"url": "http://planete-play.fr/feed/",                 "num": 20,  "includeHistoricalEntries": false },
-        {"url": "http://www.gamergen.com/rss/ps4",              "num": 190, "includeHistoricalEntries": false }
+        {"url": "http://www.gamergen.com/rss/ps4",              "num": 190, "includeHistoricalEntries": false },
+        {"url": "http://www.sudouest.fr/pyrenees-atlantiques/anglet/rss.xml",   "num": 10, "includeHistoricalEntries": false }
     ];
     
     /*var myFeeds = [
         {"url": "http://www.gamergen.com/rss/ps4",              "num": 190, "includeHistoricalEntries": false }
     ];*/
-    
     
     //addFeedsFromMyOnlineAccounts();
     
@@ -162,8 +150,7 @@
         
         sortedEntries = entries;
         
-        var _myTimestamp        = Math.floor(_mySod.getTime() / 1000);
-        var _myTimestampInMs    = Math.floor(_mySod.getTime());
+        _setMyTimestamp();
         
         var _previousDaysAgo    = 0; // Count days to groups entries by day.
         var _entrieNbDaysAgo    = 0;
@@ -414,6 +401,21 @@
         } else {
             _window.style.cssText = "transform: translateX(100%);";
         }
+    }
+    
+    /**
+     * Set start of day timestamp.
+     * @param {null}
+     * */
+    function _setMyTimestamp() {
+        var _now    = new Date();
+        var _year   = _now.getFullYear();
+        var _month  = _now.getMonth();
+        var _day    = _now.getDate();
+        
+        var _mySod = new Date(_year, _month, _day, '00','00','00');
+        
+        _myTimestamp = Math.floor(_mySod.getTime() / 1000);
     }
     
     // ======================
