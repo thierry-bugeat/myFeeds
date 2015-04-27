@@ -43,8 +43,9 @@
     
     var params = {
         "entries": {
-            "maxLengthForSmallEntries": "400", // Max number of characters to display an entry as small entry
-            "dontDisplayEntriesOlderThan": "7" // In days
+            "maxLengthForSmallEntries": "400",  // Max number of characters to display an entry as small entry
+            "dontDisplayEntriesOlderThan": "7", // In days
+            "displaySmallEntries": true         // Display small entries. Default true, false
         }
     };
     
@@ -229,7 +230,7 @@
                     _content = _content + '<div class="my-snippet">' + _entrie.contentSnippet + '</div>';
                     _content = _content + '</div>';
                     
-                } else {
+                } else if (params.entries.displaySmallEntries) {
                     _content = _content + '<div class="my-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
                     _content = _content + '<div class="my-title">' + i + '/ ' + _entrie.title + '</div>';
                     _content = _content + _imageUrl;
