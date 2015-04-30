@@ -11,10 +11,12 @@
     <link href="style/fonts.css" type="text/css" rel="stylesheet">
     <link href="style/gaia-icons.css" type="text/css" rel="stylesheet">
     <link href="style/header.css" type="text/css" rel="stylesheet">
+    <link href="style/subheader.css" type="text/css" rel="stylesheet">
     <link href="style/footer.css" type="text/css" rel="stylesheet">
     <link href="style/toolbar.css" type="text/css" rel="stylesheet">
     <link href="style/browser.css" type="text/css" rel="stylesheet">
     <link href="style/feeds-list.css" type="text/css" rel="stylesheet">
+    <link href="style/find-feeds.css" type="text/css" rel="stylesheet">
     <link href="style/sidebar-params.css" type="text/css" rel="stylesheet">
     <link href="style/style.css" type="text/css" rel="stylesheet">
     <link href="style/entries-list.css" type="text/css" rel="stylesheet">
@@ -23,6 +25,38 @@
 <body>
 
     <div id="loading"></div>
+    
+    <!-- ================= -->
+    <!-- Find feeds screen -->
+    <!-- ================= -->
+         
+    <section role="region" data-type="sidebar" id="find-feeds-container">
+        
+        <section role="myHeader">
+            <header class="mySystemHeader">
+                <h1 data-l10n-id="find-feeds">Find Feeds</h1>
+            </header>
+        </section>
+
+        <section role="mySubHeader">
+            <header class="mySystemHeader">
+            <form action="#">
+                <input type="text" required="required" placeholder="search">
+                <button type="reset"><span data-icon="delete"></span></button>
+                <button type="submit" id="findFeedsSubmit"><span data-icon="search"></span></button>
+            </form>
+            </header>
+        </section>
+
+        <div id="find-feeds" class="scrollable">qsdqsdd</div>
+        
+        <section role="myFooter" class="">
+            <header>
+                <button id="findFeedsClose"><span data-icon="close"></span></button>
+            </header>
+        </section>
+        
+    </section>
     
     <!-- ==================== -->
     <!-- Subscriptions screen -->
@@ -41,6 +75,8 @@
         <section role="myFooter" class="">
             <header>
                 <button id="closeFeedsList"><span data-icon="close"></span></button>
+                <button id="addFeed"><span data-icon="add"></span></button>
+                <button id="findFeedsOpen"><span data-icon="search"></span></button>
             </header>
         </section>
         
@@ -91,6 +127,7 @@
         <section role="myFooter" class="">
             <header>
                 <button id="closeMainEntry"><span data-icon="close"></span></button>
+                <button id="share"><span data-icon="share"></span></button>
             </header>
         </section>
         
@@ -114,6 +151,7 @@
 <script type="text/javascript" src="scripts/classes/TheOldReader.class.js"></script>
 <script type="text/javascript" src="scripts/classes/TheOldReader/Auth.class.js"></script>
 <script type="text/javascript" src="scripts/classes/GoogleFeed.class.js"></script>
+<script type="text/javascript" src="scripts/classes/MyIndexedDb.class.js"></script>
 <script type="text/javascript" src="scripts/classes.js"></script>
 
 <script type="text/javascript" src="scripts/main.js"></script>

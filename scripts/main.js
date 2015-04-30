@@ -12,32 +12,9 @@
     // http://toddmotto.com/is-it-time-to-drop-jquery-essentials-to-learning-javascript-from-a-jquery-background/
     
     var _myTimestamp;       // Value set by function "_setMyTimestamp()"
+    var _idb;               // IndexedDb
     
-    var myFeeds = [
-        {"url": "http://www.gameblog.fr/rss.php",               "num": 150, "includeHistoricalEntries": false },
-        {"url": "http://linuxfr.org/news.atom",                 "num": 20,  "includeHistoricalEntries": false },
-        {"url": "http://carlchenet.wordpress.com/feed/",        "num": 7,   "includeHistoricalEntries": false },
-        {"url": "http://le-libriste.fr/feed/",                  "num": 7,   "includeHistoricalEntries": false },
-        {"url": "http://www.nextinpact.com/rss/news.xml",       "num": 130, "includeHistoricalEntries": false },
-        {"url": "http://www.minimachines.net/feed/",            "num": 30,  "includeHistoricalEntries": false },
-        {"url": "http://www.planet-libre.org/rss10.php",        "num": 30,  "includeHistoricalEntries": false },
-        {"url": "http://www.webupd8.org/feeds/posts/default",   "num": 7,   "includeHistoricalEntries": false },
-        {"url": "http://feeds.feedburner.com/frandroid",        "num": 140, "includeHistoricalEntries": false },
-        {"url": "http://planet.gnome.org/atom.xml",             "num": 20,  "includeHistoricalEntries": false },
-        {"url": "http://raphaelhertzog.fr/feed/",               "num": 7,   "includeHistoricalEntries": false },
-        {"url": "http://www.dadall.info/blog/feed.php?rss",     "num": 7,   "includeHistoricalEntries": false },
-        {"url": "http://www.gamekult.com/feeds/actu.html",      "num": 100, "includeHistoricalEntries": false },
-        {"url": "https://www.debian.org/security/dsa",          "num": 10,  "includeHistoricalEntries": false },
-        {"url": "http://www.theguardian.com/media/bbc/rss",     "num": 30,  "includeHistoricalEntries": false },
-        {"url": "http://www.lalibre.be/rss/section/actu.xml",   "num": 210, "includeHistoricalEntries": false },
-        {"url": "http://planete-play.fr/feed/",                 "num": 20,  "includeHistoricalEntries": false },
-        {"url": "http://www.gamergen.com/rss/ps4",              "num": 190, "includeHistoricalEntries": false },
-        {"url": "http://www.sudouest.fr/pyrenees-atlantiques/anglet/rss.xml",   "num": 10, "includeHistoricalEntries": false }
-    ];
-    
-    /*var myFeeds = [
-        {"url": "http://www.gamergen.com/rss/ps4",              "num": 190, "includeHistoricalEntries": false }
-    ];*/
+    var myFeeds = [];       // Store informations about feeds (urls)
     
     //addFeedsFromMyOnlineAccounts();
     
@@ -65,33 +42,32 @@
     var topup                   = document.getElementById("topup");
     var search                  = document.getElementById("search");
     var settings                = document.getElementById("settings");
-    
+    var find_feeds              = document.getElementById("find-feeds");
+    var findFeedsOpen           = document.getElementById("findFeedsOpen");
+    var findFeedsClose          = document.getElementById("findFeedsClose");
+    var findFeedsSubmit         = document.getElementById("findFeedsSubmit");
+        
     //var load                    = document.getElementById("load");
     //var save                    = document.getElementById("save");
     
     // DOM clicks :
     
-    sync.onclick            = function(event) { _onclick(this, 'disable'); console.log('loadFeeds ### 2 ###'); loadFeeds(); }
+    sync.onclick            = function(event) { _onclick(this, 'disable'); echo("feeds-list", "Loading...", ""); gf.loadFeeds(); }
     menu.onclick            = function(event) { openWindow("feeds-list-container", "left"); }
     topup.onclick           = function(event) { _onclick(topup, 'disable'); document.getElementById("feeds-entries").scrollTop = 0; }
     closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container", "right"); echo("browser", "", ""); }
     closeFeedsList.onclick  = function(event) { closeWindow("feeds-list-container", "left"); }
+    findFeedsOpen.onclick   = function(event) { openWindow("find-feeds-container", "left"); }
+    findFeedsClose.onclick  = function(event) { closeWindow("find-feeds-container", "left"); }
+    findFeedsSubmit.onclick = function(event) { echo("find-feeds", "Loading...NOT YET IMPLEMENTED", ""); }
     
     //load.onclick            = function(event) { loadFile(); }
     //save.onclick            = function(event) { saveFeed(); }
     
-    function loadFeeds() {
-        
-        console.log('loadFeeds()');
-        
-        //document.body.dispatchEvent(new CustomEvent('loadFeeds.start', {"detail": ""}));
-        
-        echo("feeds-list", "Loading...", "");
-        
-        gf.loadFeeds();
-        
-    }
-    
+    /**
+     * Display loading bar.
+     * param {int} percentage
+     * */
     function _loading(percentage) {
         if (percentage >= 100) {
             loading.style.cssText = "width: 0%";
@@ -116,6 +92,41 @@
         }
     }
     
+    function deleteFeed(_this) {
+        console.log('deleteFeed() ', arguments);
+        
+        var _feedUrl = _this.getAttribute("feedUrl");
+        var _confirm = window.confirm(document.webL10n.get('confirm-delete-feed'));
+        
+        if (_confirm) {
+
+            var _tmp = [];
+            
+            entryFade(_this);
+            
+            // (1) Delete feedUrl from array "myFeeds"
+            
+            for (var i = 0; i < myFeeds.length; i++) {
+                if (myFeeds[i].url != _feedUrl) {
+                    //delete myFeeds[i];
+                    _tmp.push(myFeeds[i]);
+                    //break;
+                }
+            }
+
+            myFeeds = _tmp;
+            
+            // (2) Delete from database
+            
+            //_idb._delete_('mySubscriptions', feedUrl);
+            
+            // (3) Reload UI
+            
+            gf.setFeeds(myFeeds);
+            gf.loadFeeds();
+        }
+    }
+    
     function dspFeeds(feeds) {
         
         console.log('dspFeeds()');
@@ -134,14 +145,26 @@
 
         for (var i = 0; i < feeds.length; i++) {
             var _feed = feeds[i];
-            _htmlFeeds = _htmlFeeds + '<li><a href="#"><p><button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + (i+1) + '/' + _feed.title + ' <em>(' + _feed._myNbEntries + ')</em> <em>' + _feed._myPulsations + '</em></p><p><time datetime="17:43">' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
+            _htmlFeeds = _htmlFeeds + '<li><a href="#"><p><button class="delete" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button><button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + (i+1) + '/' + _feed.title + ' <em>(' + _feed._myNbEntries + ')</em> <em>' + _feed._myPulsations + '</em></p><p><time datetime="17:43">' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
         }
-        
+
         _htmlFeeds = _htmlFeeds + '</ul>';
         
         // --- Display ---
         
         echo("feeds-list", _htmlFeeds, "");
+        
+        // ==================
+        // --- Add Events ---
+        // ==================
+        
+        // onclick delete button :
+        
+        var _deletes = document.querySelectorAll(".delete");
+        
+        for (var i = 0; i < _deletes.length; i++) {
+            _deletes[i].onclick = function() { deleteFeed(this);}
+        }
     }
     
     function dspEntries(entries) {
@@ -398,9 +421,9 @@
         var _window = document.getElementById(divId);
         
         if (placement == "left") {
-            _window.style.cssText = "transform: translateX(0%);";
+            _window.style.cssText = "transform: translateX(0%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
         } else {
-            _window.style.cssText = "transform: translateX(100%);";
+            _window.style.cssText = "transform: translateX(100%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
         }
     }
     
@@ -419,11 +442,46 @@
         _myTimestamp = Math.floor(_mySod.getTime() / 1000);
     }
     
+    // Callback from event "idb.open.onsuccess"
+    // 1st feeds loading.
+    
+    function initAndLoadFeeds(results) {
+        console.log('start arguments: ', arguments);
+
+        // Add feeds from indexedDb database
+        
+        for (var i = 0; i < results.length; i++) {
+            myFeeds.push(results[i]);
+        }
+        
+        // 1st feeds loading
+        
+        gf.setFeeds(myFeeds);
+        gf.loadFeeds();
+    }
+    
     // ======================
     // --- Ready to start ---
     // ======================
     
     window.onload = function () {
+        
+        // =====================
+        // --- Open Database ---
+        // =====================
+
+        var _idbParams = {
+            "databaseName"  : "myFeeds",
+            "tableName"     : "mySubscriptions",
+            "version"       : 1,
+            "keyPath"       : "url",
+            "indexs": {
+                "url": {"unique": true  },
+                "num": {"unique": false }
+            }
+        };
+        
+        _idb.open(_idbParams);
         
         // =======================================
         // --- Button [topup] enable / disable ---
@@ -466,6 +524,41 @@
         
         browser.addEventListener('mozbrowsererror', function (event) {
             console.dir("Moz Browser loading error : " + event.detail);
+        });
+        
+        document.body.addEventListener('idb.open.onsuccess', function(event){
+
+            // Populate database for tests
+            
+            var _populateDatabase = [
+                {"url": "http://www.gameblog.fr/rss.php",               "num": 150},
+                {"url": "http://feeds.feedburner.com/frandroid",        "num": 140},
+                {"url": "http://linuxfr.org/news.atom",                 "num": 20},
+                {"url": "http://carlchenet.wordpress.com/feed/",        "num": 7},
+                {"url": "http://le-libriste.fr/feed/",                  "num": 7},
+                {"url": "http://www.nextinpact.com/rss/news.xml",       "num": 130},
+                {"url": "http://www.minimachines.net/feed/",            "num": 30},
+                {"url": "http://www.planet-libre.org/rss10.php",        "num": 30},
+                {"url": "http://www.webupd8.org/feeds/posts/default",   "num": 7},
+                {"url": "http://planet.gnome.org/atom.xml",             "num": 20},
+                {"url": "http://raphaelhertzog.fr/feed/",               "num": 7},
+                {"url": "http://www.dadall.info/blog/feed.php?rss",     "num": 7},
+                {"url": "http://www.gamekult.com/feeds/actu.html",      "num": 100},
+                {"url": "https://www.debian.org/security/dsa",          "num": 10},
+                {"url": "http://www.lalibre.be/rss/section/actu.xml",   "num": 210},
+                {"url": "http://planete-play.fr/feed/",                 "num": 20},
+                {"url": "http://www.gamergen.com/rss/ps4",              "num": 190},
+                {"url": "http://www.sudouest.fr/pyrenees-atlantiques/anglet/rss.xml",   "num": 10}
+            ];
+            
+            for (var i = 0; i < _populateDatabase.length; i++) {
+                _idb.insert('mySubscriptions', _populateDatabase[i]);
+            }
+            
+            // ---
+        
+            _idb.select("mySubscriptions", "url", "*", initAndLoadFeeds); // Load feeds from indexedDb database then initAndLoadFeeds()
+            //_idb.deleteDatabase('myFeeds');
         });
     
         document.body.addEventListener('GoogleFeed.load.done', function(event){
@@ -534,10 +627,10 @@
         _onclick(topup, 'disable');     // Disable "topup" button when application start
         _onclick(sync, 'disable');      // Disable "sync" button when application start
         
+        _onclick(addFeed, 'disable');   // Not yet implemented.
+        
         _onclick(search, 'disable');    // Not yet implemented
         _onclick(settings, 'disable');  // Not yet implemented
         
-        gf.setFeeds(myFeeds);
-        gf.loadFeeds();
-
+        _onclick(share, 'disable');     // Not yet implemented.
     };

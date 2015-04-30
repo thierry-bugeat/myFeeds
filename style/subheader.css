@@ -1,0 +1,108 @@
+
+/*
+ * Firefox OS Style Guide.
+ * https://www.mozilla.org/en-US/styleguide/products/firefox-os/headers/
+ * */
+ 
+ /* ====================== */
+ /* --- Default Header --- */
+ /* ====================== */
+ 
+section[role="mySubHeader"] {
+    width: 100%;
+    height: 4.5rem;
+    margin:0;
+    position: relative;
+    z-index:1;
+}
+
+section[role="mySubHeader"] > header:first-child {
+    background-color: #f97c17;
+    padding:0;
+    height:4.5rem;
+    border:medium none;
+}
+
+section[role="mySubHeader"] > header:first-child h1 {
+    color: var(--fxos-white);
+    font-size: 2.3rem;
+    line-height: 4.5rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: block;
+    overflow: hidden;
+    margin: 0;
+    padding: 0 1rem;
+    height: 100%;
+    font-weight: 300;
+    font-style: italic;
+    text-align: center;
+}
+
+section[role="mySubHeader"] > header:first-child button {
+    color: var(--fxos-white);
+}
+
+section[role="mySubHeader"] > header:first-child a, 
+section[role="mySubHeader"] > header:first-child button {
+    color: var(--fxos-white);
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    overflow: hidden;
+    float: left;
+    min-width: 20%;
+    width: auto;
+    height: 4.5rem;
+    border: medium none;
+    background: transparent none repeat scroll 0% 0%;
+    padding: 0px 1rem;
+    margin: 0px;
+    font-weight: 400;
+    font-size: 1.5rem;
+    line-height: 4.5rem;
+    border-radius: 0px;
+    text-decoration: none;
+    text-align: center;
+    text-shadow: none;
+    font-style: italic;
+}
+
+section[role="mySubHeader"] > header:first-child a:active,
+section[role="mySubHeader"] > header:first-child button:active {
+    color: var(--fxos-blue);
+}
+
+section[role="mySubHeader"] > header input[type="text"] {
+    background: none repeat scroll 0 0 #fff;
+    border: 0.1rem solid #c7c7c7;
+    border-radius: 0;
+    box-shadow: none;
+    box-sizing: border-box;
+    color: #333;
+    font-family: sans-serif;
+    font-size: 1.6rem;
+    height: 4.5rem;
+    line-height: 4.5rem;
+    margin: 0 0 1rem;
+    padding: 0 1.5rem;
+    resize: none;
+    unicode-bidi: -moz-plaintext;
+    width: 60%;
+}
+
+/* --- Section option(s) --- */
+
+section[role="mySubHeader"]._fixed{
+    top: 0;
+    position: fixed;
+}
+
+ /* ================================= */
+ /* --- System (edit mode) header --- */
+ /* ================================= */
+
+section[role="mySubHeader"] > header.mySystemHeader{
+    color: var(--fxos-white);
+    background-color: var(--fxos-grey);
+}

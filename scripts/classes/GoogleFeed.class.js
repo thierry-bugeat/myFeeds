@@ -9,13 +9,14 @@
 var GoogleFeed = function() {
 
     this.gf = {
-        "output"        : "json",                               // Output format: json, xml, json_xml
-        "num"           : 4,                                    // Number of news to read
-        "q"             : "",                                   // Encoded feed url
-        "key"           : "notsupplied",                        // Google API key
-        "v"             : "1.0" ,                               // Google API version
-        "scoring"       : "h",                                  // Include historical entries
-        "ServiceBase"   : "https://www.google.com/uds/Gfeeds?", //
+        "output"        : "json",                                                   // Output format: json, xml, json_xml
+        "num"           : 4,                                                        // Number of news to read
+        "q"             : "",                                                       // Encoded feed url
+        "key"           : "notsupplied",                                            // Google API key
+        "v"             : "1.0" ,                                                   // Google API version
+        "scoring"       : "h",                                                      // Include historical entries
+        "ServiceBase"   : "https://www.google.com/uds/Gfeeds?",                     //
+        "ServiceFind"   : "https://ajax.googleapis.com/ajax/services/feed/find?",   //
         "method"        : "GET"
     };
     
@@ -230,6 +231,36 @@ GoogleFeed.prototype.loadFeeds  = function() {
             console.error("ERROR ", error);
         });
     }
+
+}
+
+/**
+ * findFeeds(keywords, callback)
+ * 
+ * @param {string} keywords
+ * @param {string} callback
+ * 
+ * Documentation : https://developers.google.com/feed/v1/jsondevguide
+ * */
+GoogleFeed.prototype.findFeeds = function(keywords, callback) {
+    
+    console.log('GoogleFeed.prototype.findFeeds()', arguments);
+    
+    var _params = {};
+    var _urlParams = '&q=' + encodeURIComponent(this.gf.q) + '&v=' + this.gf.v + '&callback=' + callback;
+    var _url    = this.gf.ServiceFind + _urlParams;
+    
+    console.log(_url);
+    
+    var promise = this.get(_url, _params);
+
+    promise.then(function(response) {
+        document.body.dispatchEvent(new CustomEvent('GoogleFeed.find.done', {"detail": response}));
+    }, function(error) {
+        error._myParams = _params;
+        document.body.dispatchEvent(new CustomEvent('GoogleFeed.find.error', {"detail": error}));
+        console.error("ERROR ", error);
+    });
 
 }
 

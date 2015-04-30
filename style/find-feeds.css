@@ -1,0 +1,112 @@
+/* 
+ * Firefox OS Lists
+ * 
+ * Documentation  : https://www.mozilla.org/en-US/styleguide/products/firefox-os/lists/
+ * Usage examples : http://www.w3.org/TR/css-variables/
+ * 
+ * */
+ 
+#find-feeds-container{
+    width:100%;
+    height:100%;
+    margin:0px auto;
+    position: fixed;
+    top:0%;
+    left:-100%;
+    z-index:12;
+    box-sizing: border-box;
+}
+
+#find-feeds {
+    background-color: var(--fxos-black);
+    color: var(--fxos-white);
+    border: 0px solid red;
+    box-sizing: border-box;
+    width: 100%;
+    height: calc(100% - 14rem) !important;
+    overflow-x:hidden;
+    overflow-y:auto;
+}
+
+#find-feeds > h2 {
+    color: var(--fxos-orange);
+    overflow: auto;
+    padding: 0 1.5rem;
+    list-style: none outside none;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+#find-feeds > h3 {
+    overflow: auto;
+    padding: 0 1.5rem;
+    list-style: none outside none;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+#find-feeds > ul {
+    overflow: auto;
+    padding: 0 1.5rem;
+    list-style: none outside none;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+#find-feeds > ul > li {
+    width: 100%;
+    height: 6rem;
+    box-sizing: border-box;
+    border-bottom: solid 0.1rem var(--fxos-grey);
+    color: #333;
+    margin: 0;  
+    display: block;
+    position: relative;
+}
+ 
+#find-feeds > ul > li:last-child {
+    border: none;
+}
+
+#find-feeds > ul > li > a {
+    text-decoration: none;
+    color: var(--fxos-ivory);
+    display: block;
+    height: 6rem;
+    position: relative;
+    border: none; 
+    outline: none;
+}
+
+#find-feeds > ul > li p {
+    border: medium none;
+    color: #858585;
+    display: block;
+    font-size: 1.5rem;
+    line-height: 2rem;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#find-feeds > ul > li p:first-of-type {
+    padding-left: 1.5rem;
+    color: var(--fxos-ivory);
+    font-size: 1.8rem;
+    line-height: 2.2rem;
+    padding: 1rem 0 0;
+}
+
+#find-feeds button {
+    color: var(--fxos-orange);
+    line-height:0;
+    height:2rem;
+    float:left;
+    width: 45px;
+    margin-right: var(--my-spacing);
+    background: none;
+}
