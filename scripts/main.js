@@ -47,6 +47,7 @@
     var findFeedsOpen           = document.getElementById("findFeedsOpen");
     var findFeedsClose          = document.getElementById("findFeedsClose");
     var findFeedsSubmit         = document.getElementById("findFeedsSubmit");
+    var share                   = document.getElementById("share");
         
     //var load                    = document.getElementById("load");
     //var save                    = document.getElementById("save");
@@ -420,6 +421,8 @@
             var _regex = new RegExp("'", "g");
             var _author = "";
             
+            share.setAttribute("i", entryId);
+            
             if (_entry.author !== "") {
                 _author = '<div class="entrie-author">' + myExtraTranslations['by'] + ' ' + _entry.author + '</div>';
             }
@@ -625,6 +628,22 @@
             gf.loadFeeds();
         }, (params.entries.updateEvery * 1000));
         
+        // Share entry :
+        
+        share.onclick = function() {
+            console.log(this);
+            var _entryId = this.getAttribute("i");
+            var _entry = sortedEntries[_entryId];
+            console.log(_entry);
+            new MozActivity({
+                name: "share",
+                data: {
+                    number: 1,
+                    url: "mailto:?subject=" + _entry.title + "&body=" + _entry.link
+                }
+            });
+        };
+        
         // ---
         
         document.body.addEventListener('idb.open.onsuccess', function(event){
@@ -705,6 +724,4 @@
         
         _onclick(search, 'disable');    // Not yet implemented
         _onclick(settings, 'disable');  // Not yet implemented
-        
-        _onclick(share, 'disable');     // Not yet implemented.
     };
