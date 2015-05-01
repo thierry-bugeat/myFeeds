@@ -21,7 +21,7 @@
     var params = {
         "entries": {
             "maxLengthForSmallEntries": "400",  // Max number of characters to display an entry as small entry
-            "dontDisplayEntriesOlderThan": "7", // In days
+            "dontDisplayEntriesOlderThan": "3", // In days
             "displaySmallEntries": true         // Display small entries. Default true, false
         }
     };
@@ -519,24 +519,12 @@
             var _confirm = window.confirm(document.webL10n.get('confirm-populate-database'));
             if (_confirm) {
                 var _populateDatabase = [
-                    {"url": "http://www.gameblog.fr/rss.php",               "num": 150},
-                    {"url": "http://feeds.feedburner.com/frandroid",        "num": 140},
-                    {"url": "http://linuxfr.org/news.atom",                 "num": 20},
-                    {"url": "http://carlchenet.wordpress.com/feed/",        "num": 7},
-                    {"url": "http://le-libriste.fr/feed/",                  "num": 7},
-                    {"url": "http://www.nextinpact.com/rss/news.xml",       "num": 130},
-                    {"url": "http://www.minimachines.net/feed/",            "num": 30},
-                    {"url": "http://www.planet-libre.org/rss10.php",        "num": 30},
-                    {"url": "http://www.webupd8.org/feeds/posts/default",   "num": 7},
-                    {"url": "http://planet.gnome.org/atom.xml",             "num": 20},
-                    {"url": "http://raphaelhertzog.fr/feed/",               "num": 7},
-                    {"url": "http://www.dadall.info/blog/feed.php?rss",     "num": 7},
-                    {"url": "http://www.gamekult.com/feeds/actu.html",      "num": 100},
-                    {"url": "https://www.debian.org/security/dsa",          "num": 10},
-                    {"url": "http://www.lalibre.be/rss/section/actu.xml",   "num": 210},
-                    {"url": "http://planete-play.fr/feed/",                 "num": 20},
-                    {"url": "http://www.gamergen.com/rss/ps4",              "num": 190},
-                    {"url": "http://www.sudouest.fr/pyrenees-atlantiques/anglet/rss.xml",   "num": 10}
+                    {"url": "https://www.reddit.com/r/FireFoxOS/.rss",          "num": 4},
+                    {"url": "http://www.webupd8.org/feeds/posts/default",       "num": 4},
+                    {"url": "http://metro.co.uk/sport/football/feed/",          "num": 10},
+                    {"url": "http://sourceforge.net/blog/feed/",                "num": 4},
+                    {"url": "http://www.gorillavsbear.net/category/mp3/feed/",  "num": 4},
+                    {"url": "http://www.wired.com/feed/",                       "num": 10}
                 ];
                 
                 for (var i = 0; i < _populateDatabase.length; i++) {
