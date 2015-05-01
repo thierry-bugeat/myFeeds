@@ -242,12 +242,12 @@ GoogleFeed.prototype.loadFeeds  = function() {
  * 
  * Documentation : https://developers.google.com/feed/v1/jsondevguide
  * */
-GoogleFeed.prototype.findFeeds = function(keywords, callback) {
+GoogleFeed.prototype.findFeeds = function(keywords) {
     
     console.log('GoogleFeed.prototype.findFeeds()', arguments);
     
     var _params = {};
-    var _urlParams = '&q=' + encodeURIComponent(this.gf.q) + '&v=' + this.gf.v + '&callback=' + callback;
+    var _urlParams = '&q=' + encodeURIComponent(keywords) + '&v=' + this.gf.v;
     var _url    = this.gf.ServiceFind + _urlParams;
     
     console.log(_url);
@@ -255,6 +255,7 @@ GoogleFeed.prototype.findFeeds = function(keywords, callback) {
     var promise = this.get(_url, _params);
 
     promise.then(function(response) {
+        console.log(response);
         document.body.dispatchEvent(new CustomEvent('GoogleFeed.find.done', {"detail": response}));
     }, function(error) {
         error._myParams = _params;

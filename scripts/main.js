@@ -59,7 +59,7 @@
     closeFeedsList.onclick  = function(event) { closeWindow("feeds-list-container", "left"); }
     findFeedsOpen.onclick   = function(event) { openWindow("find-feeds-container", "left"); }
     findFeedsClose.onclick  = function(event) { closeWindow("find-feeds-container", "left"); }
-    findFeedsSubmit.onclick = function(event) { echo("find-feeds", "Loading...NOT YET IMPLEMENTED", ""); }
+    findFeedsSubmit.onclick = function(event) { echo("find-feeds", "Loading...", "");  gf.findFeeds(document.getElementById("findFeedsText").value); }
     
     //load.onclick            = function(event) { loadFile(); }
     //save.onclick            = function(event) { saveFeed(); }
@@ -124,6 +124,26 @@
             
             gf.setFeeds(myFeeds);
             gf.loadFeeds();
+        }
+    }
+    
+    function findFeedsDisplayResults(event) {
+        console.log('findFeedsDisplayResults()', arguments);
+        console.log(event);
+        
+        if (event.detail.responseStatus == 200) {
+            var _results = event.detail.responseData.entries;
+            var _htmlResults = "<ul>";
+            
+            for (var i = 0 ; i < _results.length; i++) {
+                _htmlResults = _htmlResults + '<li><a href="#"><p><button class="addNewFeed" feedUrl="' + _results[i].feed + '"><span data-icon="add"></span></button>' + _results[i].title + '</p><p><time>' + _results[i].url + '</time></p></a></li>';
+            }
+            
+            _htmlResults = _htmlResults + "</ul>";
+        
+            echo("find-feeds", _htmlResults, "");
+        } else {
+            echo("find-feeds", "Find feeds : Network error", "prepend");
         }
     }
     
@@ -619,6 +639,8 @@
             // ---
             
         }, true);
+        
+        document.body.addEventListener('GoogleFeed.find.done', findFeedsDisplayResults, true)
     
         // ============
         // --- Main ---
