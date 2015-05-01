@@ -22,7 +22,7 @@
         "entries": {
             "maxLengthForSmallEntries": "400",  // Max number of characters to display an entry as small entry
             "dontDisplayEntriesOlderThan": "3", // In days
-            "displaySmallEntries": true         // Display small entries. Default true, false
+            "displaySmallEntries": false        // Display small entries. Default true, false
         }
     };
     
