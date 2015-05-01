@@ -16,6 +16,7 @@ body {
     width: 100%;
     height: inherit;
     overflow: hidden;
+    background-color: var(--fxos-grey);
 }
 
 section[role="region"] {
