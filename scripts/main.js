@@ -59,7 +59,7 @@
     closeFeedsList.onclick  = function(event) { closeWindow("feeds-list-container", "left"); }
     findFeedsOpen.onclick   = function(event) { openWindow("find-feeds-container", "left"); }
     findFeedsClose.onclick  = function(event) { closeWindow("find-feeds-container", "left"); }
-    findFeedsSubmit.onclick = function(event) { echo("find-feeds", "Loading...", "");  gf.findFeeds(document.getElementById("findFeedsText").value); }
+    findFeedsSubmit.onclick = function(event) { var _keywords = document.getElementById("findFeedsText").value; if (_keywords) {echo("find-feeds", "Loading...", ""); gf.findFeeds(_keywords);} }
     
     //load.onclick            = function(event) { loadFile(); }
     //save.onclick            = function(event) { saveFeed(); }
@@ -588,7 +588,7 @@
 
             // Populate database for tests
             
-            /*var _populateDatabase = [
+            var _populateDatabase = [
                 {"url": "http://www.gameblog.fr/rss.php",               "num": 150},
                 {"url": "http://feeds.feedburner.com/frandroid",        "num": 140},
                 {"url": "http://linuxfr.org/news.atom",                 "num": 20},
@@ -611,7 +611,7 @@
             
             for (var i = 0; i < _populateDatabase.length; i++) {
                 _idb.insert('mySubscriptions', _populateDatabase[i]);
-            }*/
+            }
             
             // ---
         
