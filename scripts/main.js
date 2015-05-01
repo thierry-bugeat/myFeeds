@@ -118,7 +118,7 @@
             
             // (2) Delete from database
             
-            //_idb._delete_('mySubscriptions', feedUrl);
+            _idb._delete_('mySubscriptions', _feedUrl);
             
             // (3) Reload UI
             
@@ -136,14 +136,52 @@
             var _htmlResults = "<ul>";
             
             for (var i = 0 ; i < _results.length; i++) {
-                _htmlResults = _htmlResults + '<li><a href="#"><p><button class="addNewFeed" feedUrl="' + _results[i].feed + '"><span data-icon="add"></span></button>' + _results[i].title + '</p><p><time>' + _results[i].url + '</time></p></a></li>';
+                _htmlResults = _htmlResults + '<li><a href="#"><p><button class="addNewFeed" feedUrl="' + _results[i].url + '"><span data-icon="add"></span></button>' + _results[i].title + '</p><p><time>' + _results[i].url + '</time></p></a></li>';
             }
             
             _htmlResults = _htmlResults + "</ul>";
         
             echo("find-feeds", _htmlResults, "");
+            
+            // ==================
+            // --- Add Events ---
+            // ==================
+            
+            // onclick delete button :
+            
+            var _adds = document.querySelectorAll(".addNewFeed");
+            
+            for (var i = 0; i < _adds.length; i++) {
+                _adds[i].onclick = function() { findFeedsAddNewFeed(this);}
+            }
+        
         } else {
             echo("find-feeds", "Find feeds : Network error", "prepend");
+        }
+    }
+    
+    function findFeedsAddNewFeed(_this) {
+        console.log('findFeedsAddNewFeed() ', arguments);
+        
+        var _feedUrl = _this.getAttribute("feedUrl");
+        var _confirm = window.confirm(document.webL10n.get('confirm-add-feed'));
+        
+        if (_confirm) {
+            
+            var _myNewFeed = {"url": _feedUrl, "num": 20};
+            
+            // (1) Add feedUrl to array "myFeeds"
+
+            myFeeds.push(_myNewFeed);
+            
+            // (2) Add into database
+            
+            _idb.insert('mySubscriptions', _myNewFeed);
+            
+            // (3) Reload UI
+            
+            gf.setFeeds(myFeeds);
+            gf.loadFeeds();
         }
     }
     
@@ -550,7 +588,7 @@
 
             // Populate database for tests
             
-            var _populateDatabase = [
+            /*var _populateDatabase = [
                 {"url": "http://www.gameblog.fr/rss.php",               "num": 150},
                 {"url": "http://feeds.feedburner.com/frandroid",        "num": 140},
                 {"url": "http://linuxfr.org/news.atom",                 "num": 20},
@@ -573,7 +611,7 @@
             
             for (var i = 0; i < _populateDatabase.length; i++) {
                 _idb.insert('mySubscriptions', _populateDatabase[i]);
-            }
+            }*/
             
             // ---
         
