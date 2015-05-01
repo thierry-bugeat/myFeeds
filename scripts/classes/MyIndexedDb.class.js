@@ -60,35 +60,6 @@ MyIndexedDb.prototype.open = function(params) {
 
 }
 
-MyIndexedDb.prototype.openV0 = function() {
-    console.log("open()");
-    
-    var _request = indexedDB.open(this.idb.NAME, this.idb.VERSION);
-    
-    _request.onsuccess = function (evt) {
-        //this.db = this.result;
-        _MyIndexedDb.db = this.result;
-        console.log("idb.open.onsuccess");
-        console.log(_MyIndexedDb.db);
-        document.body.dispatchEvent(new CustomEvent('idb.open.onsuccess', {"detail": ""}));
-    };
-    
-    _request.onerror = function (evt) {
-        console.error("idb.open.onerror", evt.target);
-        document.body.dispatchEvent(new CustomEvent('idb.open.onerror', {"detail": ""}));
-    };
-
-    _request.onupgradeneeded = function (evt) {
-        console.log("idb.open.onupgradeneeded");
-        console.log(evt);
-        var _table = evt.currentTarget.result.createObjectStore( this.idb.TABLE, { keyPath: 'src' } );
-
-        _table.createIndex('src', 'src', { unique: true });
-        _table.createIndex('num', 'num', { unique: false });
-    };
-
-}
-
 /**
  * Select record(s) in table.
  * 
