@@ -209,27 +209,29 @@ GoogleFeed.prototype.loadFeeds  = function() {
     
     var _params = {"nbFeeds": this.myFeeds.length};
     
-    for (var i = 0; i < this.myFeeds.length; i++) {
+    if (this.myFeeds.length > 0) {
+        for (var i = 0; i < this.myFeeds.length; i++) {
 
-        var _myFeed = myFeeds[i];
+            var _myFeed = myFeeds[i];
+            
+            this._setUrl(_myFeed.url);
+            this._setNum(_myFeed.num);
+            
+            var _urlParams = '&output=' + this.gf.output + '&num=' + this.gf.num + '&scoring=' + this.gf.scoring + '&q=' + encodeURIComponent(this.gf.q) + '&key=' + this.gf.key + '&v=' + this.gf.v;
+            var _url    = this.gf.ServiceBase + _urlParams;
+            
+            console.log(_url);
+            
+            var promise = this.get(_url, _params);
         
-        this._setUrl(_myFeed.url);
-        this._setNum(_myFeed.num);
-        
-        var _urlParams = '&output=' + this.gf.output + '&num=' + this.gf.num + '&scoring=' + this.gf.scoring + '&q=' + encodeURIComponent(this.gf.q) + '&key=' + this.gf.key + '&v=' + this.gf.v;
-        var _url    = this.gf.ServiceBase + _urlParams;
-        
-        console.log(_url);
-        
-        var promise = this.get(_url, _params);
-    
-        promise.then(function(response) {
-            document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": response}));
-        }, function(error) {
-            error._myParams = _params;
-            document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.error', {"detail": error}));
-            console.error("ERROR ", error);
-        });
+            promise.then(function(response) {
+                document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": response}));
+            }, function(error) {
+                error._myParams = _params;
+                document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.error', {"detail": error}));
+                console.error("ERROR ", error);
+            });
+        }
     }
 
 }

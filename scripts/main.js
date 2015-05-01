@@ -121,9 +121,15 @@
             _idb._delete_('mySubscriptions', _feedUrl);
             
             // (3) Reload UI
-            
-            gf.setFeeds(myFeeds);
-            gf.loadFeeds();
+
+            if (myFeeds.length > 0) {
+                gf.setFeeds(myFeeds);
+                gf.loadFeeds();
+            } else {
+                echo("feeds-list", "", "");
+                echo("feeds-entries", "", "");
+                _onclick(sync, 'disable');
+            }
         }
     }
     
