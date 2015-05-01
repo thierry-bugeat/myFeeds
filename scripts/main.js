@@ -22,7 +22,8 @@
         "entries": {
             "maxLengthForSmallEntries": "400",  // Max number of characters to display an entry as small entry
             "dontDisplayEntriesOlderThan": "3", // In days
-            "displaySmallEntries": false        // Display small entries. Default true, false
+            "displaySmallEntries": false,       // Display small entries. Default true, false
+            "updateEvery": 900                  // Update entries every N seconds
         }
     };
     
@@ -616,6 +617,15 @@
         browser.addEventListener('mozbrowsererror', function (event) {
             console.dir("Moz Browser loading error : " + event.detail);
         });
+        
+        // Automatic update entries every N seconds :
+        
+        setInterval(function() {
+            _onclick(sync, 'disable');
+            gf.loadFeeds();
+        }, (params.entries.updateEvery * 1000));
+        
+        // ---
         
         document.body.addEventListener('idb.open.onsuccess', function(event){
         
