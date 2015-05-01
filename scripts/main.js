@@ -512,6 +512,40 @@
             myFeeds.push(results[i]);
         }
         
+        // No feeds sets.
+        // Use default feeds ?
+        
+        if (myFeeds.length == 0) {
+            var _confirm = window.confirm(document.webL10n.get('confirm-populate-database'));
+            if (_confirm) {
+                var _populateDatabase = [
+                    {"url": "http://www.gameblog.fr/rss.php",               "num": 150},
+                    {"url": "http://feeds.feedburner.com/frandroid",        "num": 140},
+                    {"url": "http://linuxfr.org/news.atom",                 "num": 20},
+                    {"url": "http://carlchenet.wordpress.com/feed/",        "num": 7},
+                    {"url": "http://le-libriste.fr/feed/",                  "num": 7},
+                    {"url": "http://www.nextinpact.com/rss/news.xml",       "num": 130},
+                    {"url": "http://www.minimachines.net/feed/",            "num": 30},
+                    {"url": "http://www.planet-libre.org/rss10.php",        "num": 30},
+                    {"url": "http://www.webupd8.org/feeds/posts/default",   "num": 7},
+                    {"url": "http://planet.gnome.org/atom.xml",             "num": 20},
+                    {"url": "http://raphaelhertzog.fr/feed/",               "num": 7},
+                    {"url": "http://www.dadall.info/blog/feed.php?rss",     "num": 7},
+                    {"url": "http://www.gamekult.com/feeds/actu.html",      "num": 100},
+                    {"url": "https://www.debian.org/security/dsa",          "num": 10},
+                    {"url": "http://www.lalibre.be/rss/section/actu.xml",   "num": 210},
+                    {"url": "http://planete-play.fr/feed/",                 "num": 20},
+                    {"url": "http://www.gamergen.com/rss/ps4",              "num": 190},
+                    {"url": "http://www.sudouest.fr/pyrenees-atlantiques/anglet/rss.xml",   "num": 10}
+                ];
+                
+                for (var i = 0; i < _populateDatabase.length; i++) {
+                    _idb.insert('mySubscriptions', _populateDatabase[i]);
+                    myFeeds.push(_populateDatabase[i]);
+                }
+            }
+        }
+        
         // 1st feeds loading
         
         gf.setFeeds(myFeeds);
@@ -585,35 +619,6 @@
         });
         
         document.body.addEventListener('idb.open.onsuccess', function(event){
-
-            // Populate database for tests
-            
-            var _populateDatabase = [
-                {"url": "http://www.gameblog.fr/rss.php",               "num": 150},
-                {"url": "http://feeds.feedburner.com/frandroid",        "num": 140},
-                {"url": "http://linuxfr.org/news.atom",                 "num": 20},
-                {"url": "http://carlchenet.wordpress.com/feed/",        "num": 7},
-                {"url": "http://le-libriste.fr/feed/",                  "num": 7},
-                {"url": "http://www.nextinpact.com/rss/news.xml",       "num": 130},
-                {"url": "http://www.minimachines.net/feed/",            "num": 30},
-                {"url": "http://www.planet-libre.org/rss10.php",        "num": 30},
-                {"url": "http://www.webupd8.org/feeds/posts/default",   "num": 7},
-                {"url": "http://planet.gnome.org/atom.xml",             "num": 20},
-                {"url": "http://raphaelhertzog.fr/feed/",               "num": 7},
-                {"url": "http://www.dadall.info/blog/feed.php?rss",     "num": 7},
-                {"url": "http://www.gamekult.com/feeds/actu.html",      "num": 100},
-                {"url": "https://www.debian.org/security/dsa",          "num": 10},
-                {"url": "http://www.lalibre.be/rss/section/actu.xml",   "num": 210},
-                {"url": "http://planete-play.fr/feed/",                 "num": 20},
-                {"url": "http://www.gamergen.com/rss/ps4",              "num": 190},
-                {"url": "http://www.sudouest.fr/pyrenees-atlantiques/anglet/rss.xml",   "num": 10}
-            ];
-            
-            for (var i = 0; i < _populateDatabase.length; i++) {
-                _idb.insert('mySubscriptions', _populateDatabase[i]);
-            }
-            
-            // ---
         
             _idb.select("mySubscriptions", "url", "*", initAndLoadFeeds); // Load feeds from indexedDb database then initAndLoadFeeds()
             //_idb.deleteDatabase('myFeeds');
