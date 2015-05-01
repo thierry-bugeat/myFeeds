@@ -118,23 +118,23 @@ MyIndexedDb.prototype.select = function(_tablename, _index, _value, callback) {
 
     if (_value.match(/\.\.\./g)){
         var _values = _value.split("..."); 
-        this._dbSelectRange(_tablename, _index, _values[0], _values[1]);
+        this._dbSelectRange(_tablename, _index, _values[0], _values[1], callback);
     } else if (_value.substr(0, 2) == "<=") {
         var _myValue = _value.substr(2, _value.length);
-        this._dbSelectUpper(_tablename, _index, _myValue, false);
+        this._dbSelectUpper(_tablename, _index, _myValue, false, callback);
     } else if (_value.substr(0, 1) == "<") {
         var _myValue = _value.substr(1, _value.length);
-        this._dbSelectUpper(_tablename, _index, _myValue, true);
+        this._dbSelectUpper(_tablename, _index, _myValue, true, callback);
     } else if (_value.substr(0, 2) == ">=") {
         var _myValue = _value.substr(2, _value.length);
-        this._dbSelectLower(_tablename, _index, _myValue, false);
+        this._dbSelectLower(_tablename, _index, _myValue, false, callback);
     } else if (_value.substr(0, 1) == ">") {
         var _myValue = _value.substr(1, _value.length);
-        this._dbSelectLower(_tablename, _index, _myValue, true);
+        this._dbSelectLower(_tablename, _index, _myValue, true, callback);
     } else if ((_value === "") || (_value == "*")) {
         this._dbSelectAll(_tablename, _index, callback);
     } else {
-        this._dbSelectOnly(_tablename, _index, _value);
+        this._dbSelectOnly(_tablename, _index, _value, callback);
     }
 }
 
@@ -156,7 +156,7 @@ MyIndexedDb.prototype._dbSelectAll = function(_tablename, _index, callback) {
     };
 }
 
-MyIndexedDb.prototype._dbSelectRange = function(_tablename, _index, _value1, _value2) {
+MyIndexedDb.prototype._dbSelectRange = function(_tablename, _index, _value1, _value2, callback) {
     var _results    = [];
     var _table      = this._getObjectStore(_tablename, 'readonly');
     var _range      = IDBKeyRange.bound(_value1, _value2, false, false);
@@ -169,11 +169,12 @@ MyIndexedDb.prototype._dbSelectRange = function(_tablename, _index, _value1, _va
         } else {
             console.log(_results);
             document.body.dispatchEvent(new CustomEvent('idb.select.onsuccess', {"detail": {"tablename": _tablename, "results": _results}}));
+            callback(_results);
         }
     };
 }
 
-MyIndexedDb.prototype._dbSelectOnly = function(_tablename, _index, _value) {
+MyIndexedDb.prototype._dbSelectOnly = function(_tablename, _index, _value, callback) {
     var _results    = [];
     var _table      = this._getObjectStore(_tablename, 'readonly');
     var _range      = IDBKeyRange.only(_value);
@@ -186,11 +187,12 @@ MyIndexedDb.prototype._dbSelectOnly = function(_tablename, _index, _value) {
         } else {
             console.log(_results);
             document.body.dispatchEvent(new CustomEvent('idb.select.onsuccess', {"detail": {"tablename": _tablename, "results": _results}}));
+            callback(_results);
         }
     };
 }
 
-MyIndexedDb.prototype._dbSelectUpper = function(_tablename, _index, _value, _boolean) {
+MyIndexedDb.prototype._dbSelectUpper = function(_tablename, _index, _value, _boolean, callback) {
     var _results    = [];
     var _table      = this._getObjectStore(_tablename, 'readonly');
     var _range      = IDBKeyRange.upperBound(_value, _boolean);
@@ -203,11 +205,12 @@ MyIndexedDb.prototype._dbSelectUpper = function(_tablename, _index, _value, _boo
         } else {
             console.log(_results);
             document.body.dispatchEvent(new CustomEvent('idb.select.onsuccess', {"detail": {"tablename": _tablename, "results": _results}}));
+            callback(_results);
         }
     };
 }
 
-MyIndexedDb.prototype._dbSelectLower = function(_tablename, _index, _value, _boolean) {
+MyIndexedDb.prototype._dbSelectLower = function(_tablename, _index, _value, _boolean, callback) {
     var _results    = [];
     var _table      = this._getObjectStore(_tablename, 'readonly');
     var _range      = IDBKeyRange.lowerBound(_value, _boolean);
@@ -220,6 +223,7 @@ MyIndexedDb.prototype._dbSelectLower = function(_tablename, _index, _value, _boo
         } else {
             console.log(_results);
             document.body.dispatchEvent(new CustomEvent('idb.select.onsuccess', {"detail": {"tablename": _tablename, "results": _results}}));
+            callback(_results);
         }
     };
 }
