@@ -40,6 +40,12 @@
                 "access": "readwrite",
                 "description": "my Feeds Data"
             }
+        },
+        "device-storage:apps":      { "access": "readwrite" },
+        "device-storage:sdcard":    { "access": "readwrite" },
+        "webapps-manage": { },
+        "storage": {
+            "description": "Required for storing and retrieving data."
         }
     }
 }
