@@ -2,7 +2,6 @@
     "name": "my Feeds",
     "description": "RSS & ATOM feeds reader",
     "version": "0",
-    "fullscreen": "true",
     "launch_path": "/index.html",
     "icons": {
         "60": "/images/icon-60.png",
