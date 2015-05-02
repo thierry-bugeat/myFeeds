@@ -49,8 +49,8 @@
     var findFeedsSubmit         = document.getElementById("findFeedsSubmit");
     var share                   = document.getElementById("share");
         
-    //var load                    = document.getElementById("load");
-    //var save                    = document.getElementById("save");
+    //var loadSubscriptions     = document.getElementById("loadSubscriptions");
+    //var saveSubscriptions     = document.getElementById("saveSubscriptions");
     
     // DOM clicks :
     
@@ -63,10 +63,28 @@
     findFeedsClose.onclick  = function(event) { closeWindow("find-feeds-container", "left"); }
     findFeedsSubmit.onclick = function(event) { var _keywords = document.getElementById("findFeedsText").value; if (_keywords) {echo("find-feeds", "Loading...", ""); gf.findFeeds(_keywords);} }
     
-    load.onclick            = function(event) { _load_file("subscriptions.json"); }
-    save.onclick            = function(event) { 
+    loadSubscriptions.onclick   = function(event) { 
+        if (window.confirm(document.webL10n.get('confirm-load-subscriptions'))) {
+            _load(
+                'subscriptions.json', 
+                function (_mySubscriptions) {
+                    for (var i = 0 ; i < myFeeds.length; i++ ) {
+                        _idb._delete_("mySubscriptions", myFeeds[i].url);
+                    }
+                    for (var i = 0 ; i < _mySubscriptions.length; i++ ) {
+                        _idb.insert("mySubscriptions", _mySubscriptions[i]);
+                    }
+                    myFeeds = _mySubscriptions;
+                    gf.setFeeds(myFeeds);
+                    gf.loadFeeds();
+                }
+            );
+        }
+    }
+    
+    saveSubscriptions.onclick   = function(event) { 
         if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
-            _save_file("subscriptions.json", "application/json", JSON.stringify(gf.getFeeds())); 
+            _save("subscriptions.json", "application/json", JSON.stringify(myFeeds)); 
         }
     }
     
@@ -374,7 +392,7 @@
      * @param {string} mimetype "text/plain" "application/json"
      * @param {string} content
      * */
-    function _save_file(filename, mimetype, content) {
+    function _save(filename, mimetype, content) {
 
         var sdcard = navigator.getDeviceStorage("sdcard");
         var file   = new Blob([content], {type: mimetype});
@@ -406,36 +424,55 @@
             console.warn("Unable to write the file: ", this.error);
         }
     }
-        
-    function _load_file(filename) {
+    
+    function _file_informations(filename) {
+        var sdcard = navigator.getDeviceStorage('sdcard');
 
-        console.log("saveFeed(" + filename + ")");
-        
-        var files = navigator.getDeviceStorage("sdcard");
-        
-        var cursor = files.enumerate();
+        var request = sdcard.get("myFeeds/" + filename);
 
-        cursor.onsuccess = function() {
-            
+        request.onsuccess = function () {
             var file = this.result;
-            
-            if (file != null) {
-                console.log(file);
-                this.done = false;
-            } else {
-                this.done = true;
-            }
-
-            if (!this.done) {
-                this.continue();
-            }
-        }
-        
-        cursor.onerror = function () {
-            console.log(':( :( :(');
+            console.log("Get the file: ", file);
         }
 
+        request.onerror = function () {
+            console.warn("Unable to get the file: " + this.error);
+        }
     }
+    
+    var _load = (function(filename, callback) {
+        
+        var sdcard      = navigator.getDeviceStorage('sdcard');
+        var request     = sdcard.get('myFeeds/' + filename);
+        var dataType    = filename.split('.').pop();            // ".json"
+        var results     = "";
+
+        request.onsuccess = function () {
+            var file = this.result;
+            console.log("Get the file: ", file);
+            var _fr = new FileReader();
+            
+            _fr.onloadend = function(event) {
+                if (event.target.readyState == FileReader.DONE) {
+                    if (dataType == "json") {
+                        results = JSON.parse(event.target.result);
+                        console.log(JSON.parse(event.target.result));
+                    } else {
+                        results = event.target.result;
+                        console.log(event.target.result);
+                    }
+                    callback(results);
+                }
+            };
+            
+            _fr.readAsText(file);
+        }
+
+        request.onerror = function () {
+            console.warn("Unable to get the file: ", this.error);
+        }
+
+    });
     
     function mainEntryOpenInBrowser(entryId, url) {
         document.body.style.cssText = "overflow: hidden;";  // Disable scroll in entries list.
@@ -744,8 +781,6 @@
 
         _onclick(topup, 'disable');     // Disable "topup" button when application start
         _onclick(sync, 'disable');      // Disable "sync" button when application start
-        
-        _onclick(addFeed, 'disable');   // Not yet implemented.
         
         _onclick(search, 'disable');    // Not yet implemented
         _onclick(settings, 'disable');  // Not yet implemented
