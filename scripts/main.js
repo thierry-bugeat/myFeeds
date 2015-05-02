@@ -64,7 +64,11 @@
     findFeedsSubmit.onclick = function(event) { var _keywords = document.getElementById("findFeedsText").value; if (_keywords) {echo("find-feeds", "Loading...", ""); gf.findFeeds(_keywords);} }
     
     load.onclick            = function(event) { _load_file("subscriptions.json"); }
-    save.onclick            = function(event) { _save_file("subscriptions.json", "test"); }
+    save.onclick            = function(event) { 
+        if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
+            _save_file("subscriptions.json", "application/json", JSON.stringify(gf.getFeeds())); 
+        }
+    }
     
     /**
      * Display loading bar.
@@ -365,15 +369,19 @@
         _this.style.cssText = "opacity : 0.4;";
     }
     
-    function _save_file(filename, data) {
-        
+    /**
+     * @param {string} filename
+     * @param {string} mimetype "text/plain" "application/json"
+     * @param {string} content
+     * */
+    function _save_file(filename, mimetype, content) {
+
         var sdcard = navigator.getDeviceStorage("sdcard");
-        
-        var file   = new Blob([data], {type: "text/plain"});
+        var file   = new Blob([content], {type: mimetype});
         
         // Delete previous file
         
-        var request = sdcard.delete("myFeeds/sources.txt");
+        var request = sdcard.delete("myFeeds/" + filename);
 
         request.onsuccess = function () {
             console.log("File deleted");
@@ -385,12 +393,11 @@
 
         // Save new file
 
-        var request = sdcard.addNamed(file, "myFeeds/sources.txt");
+        var request = sdcard.addNamed(file, "myFeeds/" + filename);
         //var request = myStorage.add(file);
 
         request.onsuccess = function () {
             console.log('File "' + this.result);
-            //console.log("====> Saved file " + this.result.name);
             
         }
 
