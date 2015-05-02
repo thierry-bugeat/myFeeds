@@ -63,8 +63,8 @@
     findFeedsClose.onclick  = function(event) { closeWindow("find-feeds-container", "left"); }
     findFeedsSubmit.onclick = function(event) { var _keywords = document.getElementById("findFeedsText").value; if (_keywords) {echo("find-feeds", "Loading...", ""); gf.findFeeds(_keywords);} }
     
-    //load.onclick            = function(event) { loadFile(); }
-    //save.onclick            = function(event) { saveFeed(); }
+    load.onclick            = function(event) { _load_file("subscriptions.json"); }
+    save.onclick            = function(event) { _save_file("subscriptions.json", "test"); }
     
     /**
      * Display loading bar.
@@ -365,51 +365,69 @@
         _this.style.cssText = "opacity : 0.4;";
     }
     
-    function saveFeed(filename, data) {
-
-        console.log("saveFeed(" + filename + ")");
+    function _save_file(filename, data) {
         
-        var myStorage = navigator.getDeviceStorage("apps");
-        var file   = new Blob(["This is a text file."], {type: "text/plain"});
+        var sdcard = navigator.getDeviceStorage("sdcard");
+        
+        var file   = new Blob([data], {type: "text/plain"});
+        
+        // Delete previous file
+        
+        var request = sdcard.delete("myFeeds/sources.txt");
 
-        var request = myStorage.addNamed(file, filename);
+        request.onsuccess = function () {
+            console.log("File deleted");
+        }
+
+        request.onerror = function () {
+            console.log("Unable to delete the file: ", this.error);
+        }
+
+        // Save new file
+
+        var request = sdcard.addNamed(file, "myFeeds/sources.txt");
         //var request = myStorage.add(file);
 
         request.onsuccess = function () {
-            console.log('File "' + this.name + '" successfully wrote on the sdcard storage area');
+            console.log('File "' + this.result);
             //console.log("====> Saved file " + this.result.name);
             
         }
 
         // An error typically occur if a file with the same name already exist
         request.onerror = function () {
-            console.log("Unable to write the file: " + this.error);
+            console.warn("Unable to write the file: ", this.error);
         }
     }
-    
-    // TESTS
-    function loadFile() {
-        console.log("loadFile()");
         
-        //var myStorage = navigator.getDeviceStorage("apps");
-        
-        /*var cursor = files.enumerate();
+    function _load_file(filename) {
 
-        cursor.onsuccess = function () {
-            console.log(this.result);
-        }*/
-        /*var request = myStorage.get("feed-11.txt");
+        console.log("saveFeed(" + filename + ")");
         
-        request.onsuccess = function () {
+        var files = navigator.getDeviceStorage("sdcard");
+        
+        var cursor = files.enumerate();
 
-        var file = this.result;
-            console.dir("Get the file: " + file.name);
+        cursor.onsuccess = function() {
+            
+            var file = this.result;
+            
+            if (file != null) {
+                console.log(file);
+                this.done = false;
+            } else {
+                this.done = true;
+            }
+
+            if (!this.done) {
+                this.continue();
+            }
+        }
+        
+        cursor.onerror = function () {
+            console.log(':( :( :(');
         }
 
-        request.onerror = function () {
-            console.log("Unable to get the file: " + this.error);
-            console.log(this);
-        }*/
     }
     
     function mainEntryOpenInBrowser(entryId, url) {
