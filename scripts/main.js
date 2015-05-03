@@ -65,7 +65,7 @@
     
     loadSubscriptions.onclick   = function(event) { 
         if (window.confirm(document.webL10n.get('confirm-load-subscriptions'))) {
-            _load(
+            My._load(
                 'subscriptions.json', 
                 function (_mySubscriptions) {
                     for (var i = 0 ; i < myFeeds.length; i++ ) {
@@ -455,40 +455,6 @@
         }
     }
     
-    var _load = (function(filename, callback) {
-        
-        var sdcard      = navigator.getDeviceStorage('sdcard');
-        var request     = sdcard.get('myFeeds/' + filename);
-        var dataType    = filename.split('.').pop();            // ".json"
-        var results     = "";
-
-        request.onsuccess = function () {
-            var file = this.result;
-            console.log("Get the file: ", file);
-            var _fr = new FileReader();
-            
-            _fr.onloadend = function(event) {
-                if (event.target.readyState == FileReader.DONE) {
-                    if (dataType == "json") {
-                        results = JSON.parse(event.target.result);
-                        console.log(JSON.parse(event.target.result));
-                    } else {
-                        results = event.target.result;
-                        console.log(event.target.result);
-                    }
-                    callback(results);
-                }
-            };
-            
-            _fr.readAsText(file);
-        }
-
-        request.onerror = function () {
-            console.warn("Unable to get the file: ", this.error);
-        }
-
-    });
-    
     function mainEntryOpenInBrowser(entryId, url) {
         document.body.style.cssText = "overflow: hidden;";  // Disable scroll in entries list.
 
@@ -730,6 +696,10 @@
         });
     
         document.body.addEventListener('GoogleFeed.load.done', function(event){
+            
+            // Save feed as file
+            
+                _save('cache/feeds/' + btoa(event.detail.responseData.feed.feedUrl) + ".json", "application/json", JSON.stringify(event.detail.responseData.feed));
 
             // Add feed entries to array "unsortedEntries"
 

@@ -166,6 +166,7 @@ GoogleFeed.prototype.addFeed = function(feed) {
     _myNewfeed['_myLastPublishedDate']  = _myNewEntries[0].publishedDate;       // Non, les news ne sont pas ordonnées par date
     _myNewfeed['_myLastTimestamp']      = _myNewEntries[0]._myTimestamp;        // Non, les news ne sont pas ordonnées par date
     _myNewfeed['_myLastTimestampInMs']  = _myNewEntries[0]._myTimestampInMs;    // Non, les news ne sont pas ordonnées par date
+    _myNewfeed['_myFeedId']             = _MyFeeds.base64_encode(_myNewfeed.feedUrl);
     
     // Pulsations ?
     

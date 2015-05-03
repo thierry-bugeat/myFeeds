@@ -1,4 +1,4 @@
-var my = new MyFeeds();
+var My = new MyFeeds();
 var theOldReader = new TheOldReader();
 var auth = new Auth();
 var gf = new GoogleFeed();
