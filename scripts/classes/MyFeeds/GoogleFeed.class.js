@@ -7,6 +7,8 @@
 // https://www.google.com/uds/Gfeeds?&num=4&hl=en&output=json&q=http%3A%2F%2Fwww.nextinpact.com%2Frss%2Fnews.xml&key=notsupplied&v=1.0
 
 var GoogleFeed = function() {
+    
+    MyFeeds.call(this); /* Appel du constructeur de la classe parente */
 
     this.gf = {
         "output"        : "json",                                                   // Output format: json, xml, json_xml
@@ -29,6 +31,7 @@ var GoogleFeed = function() {
 
     _GoogleFeed = this;
 }
+GoogleFeed.prototype = new MyFeeds();
 
 /* ================ */
 /* --- Methodes --- */
