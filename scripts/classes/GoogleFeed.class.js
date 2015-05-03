@@ -208,7 +208,7 @@ GoogleFeed.prototype.loadFeeds  = function() {
     this.unsortedFeeds = [];
     
     var _params = {"nbFeeds": this.myFeeds.length};
-    
+
     if (this.myFeeds.length > 0) {
         for (var i = 0; i < this.myFeeds.length; i++) {
 
@@ -275,8 +275,10 @@ GoogleFeed.prototype.findFeeds = function(keywords) {
  * 
  * */
  
-GoogleFeed.prototype.get = function (url, myParams) 
-{
+GoogleFeed.prototype.get = function (url, myParams) {
+    
+    console.log('GoogleFeed.prototype.get()', arguments);
+    
     return new Promise(function(resolve, reject) {
         
         var xhr = new XMLHttpRequest({ mozSystem: true });
@@ -292,7 +294,7 @@ GoogleFeed.prototype.get = function (url, myParams)
                     _response.responseData._myParams = myParams; // Add extra values
                     resolve(_response);
                 } catch(err) {
-                    reject(Error(err));
+                    reject(Error(xhr.statusText));
                 }
                 
             } else {
@@ -301,7 +303,8 @@ GoogleFeed.prototype.get = function (url, myParams)
         };
 
         xhr.onerror = function() {
-            reject(Error("Network error."));
+            var _response = {"responseData": {"_myParams": myParams}};
+            reject(Error(_response));
         };
         
         xhr.send();

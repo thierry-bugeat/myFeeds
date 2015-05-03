@@ -82,11 +82,26 @@
         }
     }
     
-    saveSubscriptions.onclick   = function(event) { 
+    saveSubscriptions.onclick   = function(event) {
         if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
             _save("subscriptions.json", "application/json", JSON.stringify(myFeeds)); 
         }
     }
+    
+    /*saveSubscriptions.onclick   = function(event) { 
+        if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
+            var _output = [];
+            var _feeds = gf.getFeeds();
+            var _feed = "";
+            for (var i = 0 ; i < _feeds.length; i++) {
+                _url = _feeds[i].feedUrl;
+                _num = 2 + Math.floor(_feeds[i]._myPulsations * params.entries.dontDisplayEntriesOlderThan);
+                _feed = {"url": _url, "num": _num};
+                _output.push(_feed);
+            }
+            _save("subscriptions.json", "application/json", JSON.stringify(_output));
+        }
+    }*/
     
     /**
      * Display loading bar.
@@ -762,7 +777,7 @@
                 
                 // ---
 
-                if (++_nbFeedsLoaded >= _nbFeedsToLoad) {
+                if (_nbFeedsLoaded >= _nbFeedsToLoad) {
                     dspEntries(gf.getEntries());
                     dspFeeds(gf.getFeeds());
                     _loading(100); echo("loading", "", "");
