@@ -102,6 +102,7 @@
             _onclick(nextDay, 'enable');
         }
         dspEntries(gf.getEntries(), params.entries.nbDaysAgo);
+        feeds_entries.scrollTop = 0;
     }
     
     previousDay.onclick = function(event) {
@@ -115,6 +116,7 @@
             _onclick(previousDay, 'enable');
         }
         dspEntries(gf.getEntries(), params.entries.nbDaysAgo);
+        feeds_entries.scrollTop = 0;
     }
     
     /*saveSubscriptions.onclick   = function(event) { 
