@@ -20,6 +20,7 @@
     
     var params = {
         "entries": {
+            "nbDaysAgo": 0,                     // Display only today's entries
             "maxLengthForSmallEntries": "400",  // Max number of characters to display an entry as small entry
             "dontDisplayEntriesOlderThan": "3", // In days
             "displaySmallEntries": false,       // Display small entries. Default true, false
@@ -42,7 +43,7 @@
     var menu                    = document.getElementById("menu");
     var topup                   = document.getElementById("topup");
     var search                  = document.getElementById("search");
-    var settings                = document.getElementById("settings");
+    var settingsOpen            = document.getElementById("settingsOpen");
     var find_feeds              = document.getElementById("find-feeds");
     var findFeedsOpen           = document.getElementById("findFeedsOpen");
     var findFeedsClose          = document.getElementById("findFeedsClose");
@@ -62,6 +63,8 @@
     findFeedsOpen.onclick   = function(event) { openWindow("find-feeds-container", "left"); }
     findFeedsClose.onclick  = function(event) { closeWindow("find-feeds-container", "left"); }
     findFeedsSubmit.onclick = function(event) { var _keywords = document.getElementById("findFeedsText").value; if (_keywords) {echo("find-feeds", "Loading...", ""); gf.findFeeds(_keywords);} }
+    settingsOpen.onclick    = function(event) { openWindow("settings-container", "right"); }
+    settingsClose.onclick   = function(event) { closeWindow("settings-container", "right"); }
     
     loadSubscriptions.onclick   = function(event) { 
         if (window.confirm(document.webL10n.get('confirm-load-subscriptions'))) {
@@ -86,6 +89,32 @@
         if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
             _save("subscriptions.json", "application/json", JSON.stringify(myFeeds)); 
         }
+    }
+    
+    nextDay.onclick = function(event) {
+        if (params.entries.nbDaysAgo > 0 ) {
+            params.entries.nbDaysAgo--;
+        }
+        _onclick(previousDay, 'enable');
+        if (params.entries.nbDaysAgo == 0) {
+            _onclick(nextDay, 'disable');
+        } else {
+            _onclick(nextDay, 'enable');
+        }
+        dspEntries(gf.getEntries(), params.entries.nbDaysAgo);
+    }
+    
+    previousDay.onclick = function(event) {
+        if (params.entries.nbDaysAgo < params.entries.dontDisplayEntriesOlderThan) {
+            params.entries.nbDaysAgo++;
+        }
+        _onclick(nextDay, 'enable');
+        if (params.entries.nbDaysAgo == params.entries.dontDisplayEntriesOlderThan) {
+            _onclick(previousDay, 'disable');
+        } else {
+            _onclick(previousDay, 'enable');
+        }
+        dspEntries(gf.getEntries(), params.entries.nbDaysAgo);
     }
     
     /*saveSubscriptions.onclick   = function(event) { 
@@ -230,6 +259,21 @@
         }
     }
     
+    function dspSettings() {
+        var _now = new Date();
+        
+        var _htmlSettings = [
+        '<h2>                                                                       ',
+        'Last update ' + _now.getHours() + ':' + _now.getMinutes() + '              ',
+        '</h2>                                                                      ',
+        '<h2>                                                                       ',
+        'Update feeds every : ' + Math.floor(params.entries.updateEvery / 60) + 'min',
+        '</h2>                                                                      '
+        ].join(''); 
+
+        echo("settings", _htmlSettings, "");
+    }
+    
     function dspFeeds(feeds) {
         
         console.log('dspFeeds()');
@@ -270,14 +314,17 @@
         }
     }
     
-    function dspEntries(entries) {
+    function dspEntries(entries, nbDaysAgo) {
 
-        console.log("dspEntries()");
+        console.log("dspEntries()", arguments);
         console.log(entries);
         
         sortedEntries = entries;
         
         _setMyTimestamp();
+        
+        var _timestampMin = _myTimestamp - (86400 * nbDaysAgo);
+        var _timestampMax = _myTimestamp - (86400 * nbDaysAgo) + 86400;
         
         var _previousDaysAgo    = 0; // Count days to groups entries by day.
         var _entrieNbDaysAgo    = 0;
@@ -291,84 +338,87 @@
         for (var i = 0; i < sortedEntries.length; i++) {
 
             var _entrie = sortedEntries[i];
-
-            if ((_myTimestamp - _entrie._myTimestamp) < (params.entries.dontDisplayEntriesOlderThan * 86400)) {
-
-                // --- Day separator ? ---
-
-                _entrieNbDaysAgo = (1 + Math.floor((_myTimestamp - _entrie._myTimestamp) / 86400));
-                
-                if (_entrieNbDaysAgo != _previousDaysAgo ) {
-                    _previousDaysAgo = _entrieNbDaysAgo;
-                    //console.log("============================================ " + _previousDaysAgo + ' day(s) ago');
-                    _htmlEntries = _htmlEntries + '<div class="feeds-entries-next-day">' + myExtraTranslations['nb-days-ago'].replace('{{n}}', _previousDaysAgo) + '</div>';
-                }
-                
-                //console.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+_myTimestamp+' (' + (new Date(_myTimestamp*1000)).toUTCString() + ') ==> Diff = ' + (_myTimestamp - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
-                
-                // ---
-
-                // Date analyse
-                // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Date/toLocaleString
-                // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/DateTimeFormat
-                
-                var _date = new Date(_entrie.publishedDate);
-                
-                // Diff between "contentSnippet" et "content" ?
-                // Small article or not ?
-                
-                var _diff = _entrie.content.length - _entrie.contentSnippet.length;
-                
-                // 1st image 
-                
-                var _imageUrl = "";
-                
-                if (_entrie._myFirstImageUrl) {
-                    if (_diff < params.entries.maxLengthForSmallEntries) {
-                        _imageUrl = '<div class="my-image-container ratio-image-s"><img src="' + _entrie._myFirstImageUrl + '"/></div>'; 
-                    } else {
-                        _imageUrl = '<div class="my-image-container ratio-image-l"><img src="' + _entrie._myFirstImageUrl + '"/></div>'; 
-                    }
-                }
-                
-                // Entry class ratio ?
-                
-                var _ratioClass = 'ratio-entry-l';
-                
-                if ((_diff <= params.entries.maxLengthForSmallEntries) && (!_entrie._myFirstImageUrl)) {
-                    _ratioClass = 'ratio-entry-s';
-                }
-                
-                else if ((_diff <= params.entries.maxLengthForSmallEntries) || (!_entrie._myFirstImageUrl)) {
-                    _ratioClass = 'ratio-entry-m';
-                }
-                
-                // Content ( Normal / Small )
-                
-                var _content = "";
-                
-                if (_diff >= params.entries.maxLengthForSmallEntries) {
-                    _content = _content + '<div class="my-entry-l ' + _ratioClass + '" i="' + i + '">';
-                    _content = _content + '<div class="my-title">' + i + '/ ' + _entrie.title + '</div>';
-                    _content = _content + '<div class="my-feed-title">' + _entrie._myFeedInformations.title + '</div>';
-                    _content = _content + _imageUrl;
-                    _content = _content + '<div class="my-date">' + _date + '</div>';
-                    _content = _content + '<div class="my-snippet">' + _entrie.contentSnippet + '</div>';
-                    _content = _content + '</div>';
-                    
-                } else if (params.entries.displaySmallEntries) {
-                    _content = _content + '<div class="my-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
-                    _content = _content + '<div class="my-title">' + i + '/ ' + _entrie.title + '</div>';
-                    _content = _content + _imageUrl;
-                    _content = _content + '<div class="my-date">' + _date + '</div>';
-                    _content = _content + '</div>';
-                }
-                
-                // Add to html entries
-                
-                _htmlEntries = _htmlEntries + _content;
             
-            } else { break; }
+            if ((_entrie._myTimestamp >= _timestampMin) && (_entrie._myTimestamp < _timestampMax)) {
+
+                if ((_myTimestamp - _entrie._myTimestamp) < (params.entries.dontDisplayEntriesOlderThan * 86400)) {
+
+                    // --- Day separator ? ---
+
+                    _entrieNbDaysAgo = (1 + Math.floor((_myTimestamp - _entrie._myTimestamp) / 86400));
+                    
+                    if (_entrieNbDaysAgo != _previousDaysAgo ) {
+                        _previousDaysAgo = _entrieNbDaysAgo;
+                        //console.log("============================================ " + _previousDaysAgo + ' day(s) ago');
+                        _htmlEntries = _htmlEntries + '<div class="feeds-entries-next-day">' + myExtraTranslations['nb-days-ago'].replace('{{n}}', _previousDaysAgo) + '</div>';
+                    }
+                    
+                    //console.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+_myTimestamp+' (' + (new Date(_myTimestamp*1000)).toUTCString() + ') ==> Diff = ' + (_myTimestamp - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
+                    
+                    // ---
+
+                    // Date analyse
+                    // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Date/toLocaleString
+                    // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/DateTimeFormat
+                    
+                    var _date = new Date(_entrie.publishedDate);
+                    
+                    // Diff between "contentSnippet" et "content" ?
+                    // Small article or not ?
+                    
+                    var _diff = _entrie.content.length - _entrie.contentSnippet.length;
+                    
+                    // 1st image 
+                    
+                    var _imageUrl = "";
+                    
+                    if (_entrie._myFirstImageUrl) {
+                        if (_diff < params.entries.maxLengthForSmallEntries) {
+                            _imageUrl = '<div class="my-image-container ratio-image-s"><img src="' + _entrie._myFirstImageUrl + '"/></div>'; 
+                        } else {
+                            _imageUrl = '<div class="my-image-container ratio-image-l"><img src="' + _entrie._myFirstImageUrl + '"/></div>'; 
+                        }
+                    }
+                    
+                    // Entry class ratio ?
+                    
+                    var _ratioClass = 'ratio-entry-l';
+                    
+                    if ((_diff <= params.entries.maxLengthForSmallEntries) && (!_entrie._myFirstImageUrl)) {
+                        _ratioClass = 'ratio-entry-s';
+                    }
+                    
+                    else if ((_diff <= params.entries.maxLengthForSmallEntries) || (!_entrie._myFirstImageUrl)) {
+                        _ratioClass = 'ratio-entry-m';
+                    }
+                    
+                    // Content ( Normal / Small )
+                    
+                    var _content = "";
+                    
+                    if (_diff >= params.entries.maxLengthForSmallEntries) {
+                        _content = _content + '<div class="my-entry-l ' + _ratioClass + '" i="' + i + '">';
+                        _content = _content + '<div class="my-title">' + i + '/ ' + _entrie.title + '</div>';
+                        _content = _content + '<div class="my-feed-title">' + _entrie._myFeedInformations.title + '</div>';
+                        _content = _content + _imageUrl;
+                        _content = _content + '<div class="my-date">' + _date + '</div>';
+                        _content = _content + '<div class="my-snippet">' + _entrie.contentSnippet + '</div>';
+                        _content = _content + '</div>';
+                        
+                    } else if (params.entries.displaySmallEntries) {
+                        _content = _content + '<div class="my-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
+                        _content = _content + '<div class="my-title">' + i + '/ ' + _entrie.title + '</div>';
+                        _content = _content + _imageUrl;
+                        _content = _content + '<div class="my-date">' + _date + '</div>';
+                        _content = _content + '</div>';
+                    }
+                    
+                    // Add to html entries
+                    
+                    _htmlEntries = _htmlEntries + _content;
+                
+                } else { break; }
+            }
             
         }
         
@@ -456,6 +506,7 @@
     }
     
     function mainEntryOpenInBrowser(entryId, url) {
+        console.log('mainEntryOpenInBrowser()', arguments);
         document.body.style.cssText = "overflow: hidden;";  // Disable scroll in entries list.
 
         if (entryId !== null) {
@@ -718,8 +769,9 @@
                 // ---
 
                 if (_nbFeedsLoaded == _nbFeedsToLoad) {
-                    dspEntries(gf.getEntries());
+                    dspEntries(gf.getEntries(), params.entries.nbDaysAgo);
                     dspFeeds(gf.getFeeds());
+                    dspSettings();
                 }
                 
                 if (_nbFeedsLoaded >= _nbFeedsToLoad) {
@@ -748,10 +800,11 @@
                 // ---
 
                 if (_nbFeedsLoaded >= _nbFeedsToLoad) {
-                    dspEntries(gf.getEntries());
+                    dspEntries(gf.getEntries(), params.entries.nbDaysAgo);
                     dspFeeds(gf.getFeeds());
                     _loading(100); echo("loading", "", "");
                     _onclick(sync, 'enable');
+                    dspSettings();
                 }
             
             // ---
@@ -766,7 +819,7 @@
 
         _onclick(topup, 'disable');     // Disable "topup" button when application start
         _onclick(sync, 'disable');      // Disable "sync" button when application start
+        _onclick(nextDay, 'disable');
         
         _onclick(search, 'disable');    // Not yet implemented
-        _onclick(settings, 'disable');  // Not yet implemented
     };

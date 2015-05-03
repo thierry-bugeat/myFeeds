@@ -14,6 +14,7 @@ section[role="myHeader"] {
     margin:0;
     position: relative;
     z-index:1;
+    text-align:center;
 }
 
 section[role="myHeader"] > header:first-child {
@@ -29,34 +30,27 @@ section[role="myHeader"] > header:first-child h1 {
     line-height: 5rem;
     white-space: nowrap;
     text-overflow: ellipsis;
-    display: block;
+    display: inline-block;
     overflow: hidden;
     margin: 0;
-    padding: 0 1rem;
+    padding: 0rem;
     height: 100%;
     font-weight: 300;
     font-style: italic;
     text-align: center;
 }
 
-section[role="myHeader"] > header:first-child button {
-    color: var(--fxos-white);
-}
-
 section[role="myHeader"] > header:first-child a, 
-section[role="myHeader"] > header:first-child button {
+section[role="myHeader"] > header button {
     color: var(--fxos-white);
     box-sizing: border-box;
-    position: relative;
-    display: block;
     overflow: hidden;
-    float: left;
     min-width: 20%;
     width: auto;
     height: 5rem;
     border: medium none;
     background: transparent none repeat scroll 0% 0%;
-    padding: 0px 1rem;
+    padding: 0px;
     margin: 0px;
     font-weight: 400;
     font-size: 1.5rem;
@@ -71,6 +65,20 @@ section[role="myHeader"] > header:first-child button {
 section[role="myHeader"] > header:first-child a:active,
 section[role="myHeader"] > header:first-child button:active {
     color: var(--fxos-blue);
+}
+
+section[role="myHeader"] > header button:first-child {
+    color: var(--fxos-white);
+    position:absolute;
+    top:0;
+    left:0;
+}
+
+section[role="myHeader"] > header button:last-child {
+    color: var(--fxos-white);
+    position:absolute;
+    top:0;
+    right:0;
 }
 
 /* --- Section option(s) --- */
