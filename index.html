@@ -16,6 +16,7 @@
     <link href="style/browser.css" type="text/css" rel="stylesheet">
     <link href="style/feeds-list.css" type="text/css" rel="stylesheet">
     <link href="style/find-feeds.css" type="text/css" rel="stylesheet">
+    <link href="style/settings.css" type="text/css" rel="stylesheet">
     <link href="style/style.css" type="text/css" rel="stylesheet">
     <link href="style/entries-list.css" type="text/css" rel="stylesheet">
 </head>
@@ -101,7 +102,7 @@
                 <button id="sync"><span data-icon="sync"></span></button>
                 <button id="topup"><span data-icon="topup"></span></button>
                 <button id="search"><span data-icon="search"></span></button>
-                <button id="settings"><span data-icon="settings"></span></button>
+                <button id="settingsOpen"><span data-icon="settings"></span></button>
             </header>
         </section>
     
@@ -131,6 +132,28 @@
         </section>
         
     </div>
+    
+    <!-- =============== -->
+    <!-- Settings screen -->
+    <!-- =============== -->
+    
+    <section role="region" data-type="sidebar" id="settings-container">
+        
+        <section role="myHeader">
+            <header class="mySystemHeader">
+                <h1 data-l10n-id="my-settings">my Settings</h1>
+            </header>
+        </section>
+    
+        <div id="settings" class="scrollable"></div>
+        
+        <section role="myFooter" class="">
+            <header>
+                <button id="settingsClose"><span data-icon="close"></span></button>
+            </header>
+        </section>
+        
+    </section>
 
 </body>
 
