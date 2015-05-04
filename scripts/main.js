@@ -265,12 +265,16 @@
         var _now = new Date();
         
         var _htmlSettings = [
-        '<h2>                                                                       ',
-        'Last update ' + _now.getHours() + ':' + _now.getMinutes() + '              ',
-        '</h2>                                                                      ',
-        '<h2>                                                                       ',
-        'Update feeds every : ' + Math.floor(params.entries.updateEvery / 60) + 'min',
-        '</h2>                                                                      '
+        '<h2>' + document.webL10n.get('settings-feeds') + '</h2>                                                                                            ',
+        '<ul>                                                                                                                                               ',
+        '   <li><span data-icon="reload"></span>' + document.webL10n.get('settings-last-update') + _now.getHours() + ':' + _now.getMinutes() + '</li>       ',
+        '   <li><span data-icon="sync"></span>' + document.webL10n.get('settings-update-every') + Math.floor(params.entries.updateEvery / 60) + 'min</li>   ',
+        '</ul>                                                                                                                                              ',
+        '<h2>' + document.webL10n.get('settings-news') + '</h2>                                                                                             ',
+        '<ul>                                                                                                                                               ',
+        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-small-news') + params.entries.displaySmallEntries + '</li>             ',
+        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-number-of-days') + params.entries.dontDisplayEntriesOlderThan + '</li> ',
+        '</ul>                                                                                                                                              '
         ].join(''); 
 
         echo("settings", _htmlSettings, "");

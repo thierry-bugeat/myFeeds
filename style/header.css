@@ -94,5 +94,5 @@ section[role="myHeader"]._fixed{
 
 section[role="myHeader"] > header.mySystemHeader{
     color: var(--fxos-white);
-    background-color: var(--fxos-black);
+    background-color: var(--fxos-grey);
 }
