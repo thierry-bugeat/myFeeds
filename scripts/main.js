@@ -22,7 +22,7 @@
         "entries": {
             "nbDaysAgo": 0,                     // Display only today's entries
             "maxLengthForSmallEntries": "400",  // Max number of characters to display an entry as small entry
-            "dontDisplayEntriesOlderThan": "3", // In days
+            "dontDisplayEntriesOlderThan": "5", // In days
             "displaySmallEntries": false,       // Display small entries. Default true, false
             "updateEvery": 900                  // Update entries every N seconds
         }
@@ -347,8 +347,8 @@
 
                     // --- Day separator ? ---
 
-                    _entrieNbDaysAgo = (1 + Math.floor((_myTimestamp - _entrie._myTimestamp) / 86400));
-                    
+                    _entrieNbDaysAgo = (1 + Math.floor(((_myTimestamp-1) - _entrie._myTimestamp) / 86400));
+
                     if (_entrieNbDaysAgo != _previousDaysAgo ) {
                         _previousDaysAgo = _entrieNbDaysAgo;
                         //console.log("============================================ " + _previousDaysAgo + ' day(s) ago');
