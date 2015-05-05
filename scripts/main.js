@@ -22,7 +22,7 @@
         "entries": {
             "nbDaysAgo": 0,                     // Display only today's entries
             "maxLengthForSmallEntries": "400",  // Max number of characters to display an entry as small entry
-            "dontDisplayEntriesOlderThan": "5", // In days
+            "dontDisplayEntriesOlderThan": "7", // In days
             "displaySmallEntries": false,       // Display small entries. Default true, false
             "updateEvery": 900                  // Update entries every N seconds
         }
@@ -55,7 +55,7 @@
     
     // DOM clicks :
     
-    sync.onclick            = function(event) { _onclick(this, 'disable'); echo("feeds-list", "Loading...", ""); gf.loadFeeds(); }
+    sync.onclick            = function(event) { _onclick(this, 'disable'); echo("feeds-list", "Loading...", ""); gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan); }
     menu.onclick            = function(event) { openWindow("feeds-list-container", "left"); }
     topup.onclick           = function(event) { _onclick(topup, 'disable'); document.getElementById("feeds-entries").scrollTop = 0; }
     closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container", "right"); echo("browser", "", ""); }
@@ -79,15 +79,29 @@
                     }
                     myFeeds = _mySubscriptions;
                     gf.setFeeds(myFeeds);
-                    gf.loadFeeds();
+                    gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
                 }
             );
         }
     }
     
-    saveSubscriptions.onclick   = function(event) {
+    /*saveSubscriptions.onclick   = function(event) {
         if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
             _save("subscriptions.json", "application/json", JSON.stringify(myFeeds)); 
+        }
+    }*/
+    
+    saveSubscriptions.onclick   = function(event) { 
+        if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
+            var _output = [];
+            var _feeds = gf.getFeeds();
+            var _feed = "";
+            for (var i = 0 ; i < _feeds.length; i++) {
+                _url = _feeds[i].feedUrl;
+                _feed = {"url": _url, "pulsations": _feeds[i]._myPulsations};
+                _output.push(_feed);
+            }
+            _save("subscriptions.json", "application/json", JSON.stringify(_output));
         }
     }
     
@@ -118,21 +132,6 @@
         dspEntries(gf.getEntries(), params.entries.nbDaysAgo);
         feeds_entries.scrollTop = 0;
     }
-    
-    /*saveSubscriptions.onclick   = function(event) { 
-        if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
-            var _output = [];
-            var _feeds = gf.getFeeds();
-            var _feed = "";
-            for (var i = 0 ; i < _feeds.length; i++) {
-                _url = _feeds[i].feedUrl;
-                _num = 2 + Math.floor(_feeds[i]._myPulsations * params.entries.dontDisplayEntriesOlderThan);
-                _feed = {"url": _url, "num": _num};
-                _output.push(_feed);
-            }
-            _save("subscriptions.json", "application/json", JSON.stringify(_output));
-        }
-    }*/
     
     /**
      * Display loading bar.
@@ -194,7 +193,7 @@
 
             if (myFeeds.length > 0) {
                 gf.setFeeds(myFeeds);
-                gf.loadFeeds();
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
             } else {
                 echo("feeds-list", "", "");
                 echo("feeds-entries", "", "");
@@ -244,7 +243,7 @@
         
         if (_confirm) {
             
-            var _myNewFeed = {"url": _feedUrl, "num": 20};
+            var _myNewFeed = {"url": _feedUrl, "pulsations": 20};
             
             // (1) Add feedUrl to array "myFeeds"
 
@@ -257,7 +256,7 @@
             // (3) Reload UI
             
             gf.setFeeds(myFeeds);
-            gf.loadFeeds();
+            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }
     }
     
@@ -303,7 +302,7 @@
 
         for (var i = 0; i < feeds.length; i++) {
             var _feed = feeds[i];
-            _htmlFeeds = _htmlFeeds + '<li><a href="#"><p><button class="delete" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button><button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + (i+1) + '/' + _feed.title + ' <em>(' + _feed._myNbEntries + ')</em> <em>' + _feed._myPulsations + '</em></p><p><time datetime="17:43">' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
+            _htmlFeeds = _htmlFeeds + '<li><a href="#"><p><button class="delete" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button><button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + (i+1) + '/' + _feed.title + ' <em>(' + _feed._myPulsations + ')</em></p><p><time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds + '</ul>';
@@ -552,6 +551,39 @@
     }
     
     /**
+     * @param {null}
+     * Update feeds pulsations once all feeds are loaded.
+     * Update array "myFeeds" & indexedDb database.
+     * */
+    function updateFeedsPulsations() {
+        var _tmp = [];
+        var _feeds = gf.getFeeds();
+        var _pulsations;
+        var _feed = '';
+
+        for (var i = 0 ; i < myFeeds.length; i++) {
+            
+            for (var j = 0 ; j < _feeds.length; j++) {
+                
+                if (myFeeds[i].url == _feeds[j].feedUrl) {
+
+                    _url        = _feeds[j].feedUrl;
+                    _pulsations = _feeds[j]._myPulsations;
+                    
+                    if (isNaN(_pulsations)) {
+                        // do nothing
+                    } else {
+                        myFeeds[i].pulsations = _pulsations;
+                        _idb.update("mySubscriptions", _url, {url: _url, pulsations: _pulsations});
+                    }
+                    
+                    break;
+                }
+            }
+        }
+    }
+    
+    /**
      * Output one html string in div element
      * 
      * param string divId    : Div id element
@@ -639,12 +671,12 @@
             var _confirm = window.confirm(document.webL10n.get('confirm-populate-database'));
             if (_confirm) {
                 var _populateDatabase = [
-                    {"url": "https://www.reddit.com/r/FireFoxOS/.rss",          "num": 4},
-                    {"url": "http://www.webupd8.org/feeds/posts/default",       "num": 4},
-                    {"url": "http://metro.co.uk/sport/football/feed/",          "num": 10},
-                    {"url": "http://sourceforge.net/blog/feed/",                "num": 4},
-                    {"url": "http://www.gorillavsbear.net/category/mp3/feed/",  "num": 4},
-                    {"url": "http://www.wired.com/feed/",                       "num": 10}
+                    {"url": "https://www.reddit.com/r/FireFoxOS/.rss",          "pulsations": 2},
+                    {"url": "http://www.webupd8.org/feeds/posts/default",       "pulsations": 2},
+                    {"url": "http://metro.co.uk/sport/football/feed/",          "pulsations": 5},
+                    {"url": "http://sourceforge.net/blog/feed/",                "pulsations": 2},
+                    {"url": "http://www.gorillavsbear.net/category/mp3/feed/",  "pulsations": 2},
+                    {"url": "http://www.wired.com/feed/",                       "pulsations": 5}
                 ];
                 
                 for (var i = 0; i < _populateDatabase.length; i++) {
@@ -657,7 +689,7 @@
         // 1st feeds loading
         
         gf.setFeeds(myFeeds);
-        gf.loadFeeds();
+        gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
     }
     
     // ======================
@@ -673,11 +705,11 @@
         var _idbParams = {
             "databaseName"  : "myFeeds",
             "tableName"     : "mySubscriptions",
-            "version"       : 1,
+            "version"       : 2,
             "keyPath"       : "url",
             "indexs": {
-                "url": {"unique": true  },
-                "num": {"unique": false }
+                "url"       : {"unique": true  },
+                "pulsations": {"unique": false }
             }
         };
         
@@ -730,7 +762,7 @@
         
         setInterval(function() {
             _onclick(sync, 'disable');
-            gf.loadFeeds();
+            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }, (params.entries.updateEvery * 1000));
         
         // Share entry :
@@ -783,6 +815,7 @@
                     dspEntries(gf.getEntries(), params.entries.nbDaysAgo);
                     dspFeeds(gf.getFeeds());
                     dspSettings();
+                    updateFeedsPulsations();
                 }
                 
                 if (_nbFeedsLoaded >= _nbFeedsToLoad) {
@@ -810,12 +843,16 @@
                 
                 // ---
 
-                if (_nbFeedsLoaded >= _nbFeedsToLoad) {
+                if (_nbFeedsLoaded == _nbFeedsToLoad) {
                     dspEntries(gf.getEntries(), params.entries.nbDaysAgo);
                     dspFeeds(gf.getFeeds());
+                    dspSettings();
+                    updateFeedsPulsations();
+                }
+                
+                if (_nbFeedsLoaded >= _nbFeedsToLoad) {
                     _loading(100); echo("loading", "", "");
                     _onclick(sync, 'enable');
-                    dspSettings();
                 }
             
             // ---

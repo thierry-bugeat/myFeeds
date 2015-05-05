@@ -203,7 +203,10 @@ GoogleFeed.prototype.addFeed = function(feed) {
     this.unsortedFeeds.push(_myNewfeed);
 }
 
-GoogleFeed.prototype.loadFeeds  = function() {
+/**
+ * @param {int} nbDaysToLoad Limit loading to N days.
+ * */
+GoogleFeed.prototype.loadFeeds  = function(nbDaysToLoad) {
     
     console.log('GoogleFeed.prototype.loadFeeds()');
     
@@ -219,7 +222,7 @@ GoogleFeed.prototype.loadFeeds  = function() {
             var _myFeed = myFeeds[i];
             
             this._setUrl(_myFeed.url);
-            this._setNum(_myFeed.num);
+            this._setNum(Math.floor(1 + (_myFeed.pulsations * nbDaysToLoad))); // Pulsations = Estimation of news per day.
             
             var _urlParams = '&output=' + this.gf.output + '&num=' + this.gf.num + '&scoring=' + this.gf.scoring + '&q=' + encodeURIComponent(this.gf.q) + '&key=' + this.gf.key + '&v=' + this.gf.v;
             var _url    = this.gf.ServiceBase + _urlParams;
@@ -232,6 +235,7 @@ GoogleFeed.prototype.loadFeeds  = function() {
                 document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": response}));
             }, function(error) {
                 error._myParams = _params;
+                error._myFeedUrl = _myFeed.url;
                 document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.error', {"detail": error}));
                 console.error("ERROR ", error);
             });
@@ -298,7 +302,9 @@ GoogleFeed.prototype.get = function (url, myParams) {
                     _response.responseData._myParams = myParams; // Add extra values
                     resolve(_response);
                 } catch(err) {
-                    reject(Error(xhr.statusText));
+                    //reject(Error(xhr.statusText));
+                    var _response = {"responseData": {"_myParams": myParams}};
+                    reject(Error(_response));
                 }
                 
             } else {
