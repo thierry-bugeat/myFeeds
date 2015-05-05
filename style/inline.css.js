@@ -20,5 +20,6 @@ var _srcDocCss = [
 '.entrie-feed-title     {color: #00AACC;}                           ',
 '.entrie-contentSnippet {font-size: 1.7rem; color: #5F5F5F;}        ',
 'a                      {text-decoration: none; color: #00AACC;}    ',
+'a:hover                {text-decoration: underline;}               ',
 '</style>                                                           '
 ].join(''); 
