@@ -263,11 +263,16 @@
     
     function dspSettings() {
         var _now = new Date();
+        var _minutes = _now.getMinutes();
+        
+        if (_minutes < 10) {
+            _minutes = "0" + _minutes;
+        }
         
         var _htmlSettings = [
         '<h2>' + document.webL10n.get('settings-feeds') + '</h2>                                                                                            ',
         '<ul>                                                                                                                                               ',
-        '   <li><span data-icon="reload"></span>' + document.webL10n.get('settings-last-update') + _now.getHours() + ':' + _now.getMinutes() + '</li>       ',
+        '   <li><span data-icon="reload"></span>' + document.webL10n.get('settings-last-update') + _now.getHours() + ':' + _minutes + '</li>                ',
         '   <li><span data-icon="sync"></span>' + document.webL10n.get('settings-update-every') + Math.floor(params.entries.updateEvery / 60) + 'min</li>   ',
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-news') + '</h2>                                                                                             ',
