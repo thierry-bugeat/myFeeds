@@ -11,6 +11,7 @@ var _srcDocCss = [
 '   overflow-x: hidden;                                             ',
 '   margin: 0;                                                      ',
 '   padding: 0;                                                     ',
+'   font-size: 1.7rem;                                              ',
 '}                                                                  ',
 'body                   {padding: 2.5%;}                            ',
 'html                   {margin: 0; font-size: 62.5%; padding: 0;}  ',
@@ -21,5 +22,7 @@ var _srcDocCss = [
 '.entrie-contentSnippet {font-size: 1.7rem; color: #5F5F5F;}        ',
 'a                      {text-decoration: none; color: #00AACC;}    ',
 'a:hover                {text-decoration: underline;}               ',
+'p                      {margin: 5% 0 5% 0;}                        ',
+'li                     {padding: 2.5%}                             ',
 '</style>                                                           '
 ].join(''); 

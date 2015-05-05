@@ -48,11 +48,12 @@
 
 .my-snippet{
     color: #5F5F5F;
-    height:6.8rem;
-    line-height:1.7rem;
+    height:6.6rem;
+    line-height:2.2rem;
     width:100%;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-size: 1.7rem;
 }
 
 .my-image-container {
