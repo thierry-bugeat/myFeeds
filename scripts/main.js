@@ -339,6 +339,8 @@
         var _previousDaysAgo    = 0; // Count days to groups entries by day.
         var _entrieNbDaysAgo    = 0;
         
+        var _nbEntriesDisplayed = 0;
+        
         // =======================
         // --- Display entries ---
         // =======================
@@ -350,6 +352,8 @@
             var _entrie = sortedEntries[i];
             
             if ((_entrie._myTimestamp >= _timestampMin) && (_entrie._myTimestamp < _timestampMax)) {
+                
+                _nbEntriesDisplayed++;
 
                 if ((_myTimestamp - _entrie._myTimestamp) < (params.entries.dontDisplayEntriesOlderThan * 86400)) {
 
@@ -434,7 +438,11 @@
         
         // Display entries
         
-        echo("feeds-entries", _htmlEntries, "");
+        if (_nbEntriesDisplayed > 0) {
+            echo("feeds-entries", _htmlEntries, "");
+        } else {
+            echo("feeds-entries", '<div class="notification">' + document.webL10n.get('no-news-today') + '</div>', "");
+        }
         
         // ==================
         // --- Add Events ---

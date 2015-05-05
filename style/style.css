@@ -185,6 +185,18 @@ section[role="region"] {
     z-index:100;
 }
 
+/* Notification message */
+
+.notification{
+    width: 100%;
+    box-sizing: border-box;
+    padding: var(--my-spacing);
+}
+
+.notification > span {
+    vertical-align: -moz-middle-with-baseline;
+}
+
 /* --- */
 
 .scrollable {
