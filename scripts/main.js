@@ -784,7 +784,7 @@
                 name: "share",
                 data: {
                     number: 1,
-                    url: "mailto:?subject=" + _entry.title + "&body=" + _entry.link
+                    url: "mailto:?subject=" + encodeURIComponent(_entry.title) + "&body=" + encodeURIComponent(_entry.link)
                 }
             });
         };
