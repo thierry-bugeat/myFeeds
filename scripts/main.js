@@ -707,6 +707,8 @@
     
     window.onload = function () {
         
+        _swipe("");
+        
         // =====================
         // --- Open Database ---
         // =====================
