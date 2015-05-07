@@ -107,7 +107,14 @@ GoogleFeed.prototype._sortFeeds         = function() {
     this.sortedFeeds = this.unsortedFeeds;
     this.sortedFeeds.sort(function(a, b){ return b.title < a.title });
 }
-GoogleFeed.prototype._setNum            = function(num)     { this.gf.num = num;            }
+GoogleFeed.prototype._setNum            = function(num)     { 
+    if (isNaN(num)) {
+        this.gf.num = 20;
+        console.warn('_setNum : incorrect value ' + num);
+    } else {
+        this.gf.num = num;
+    }
+}
 GoogleFeed.prototype.setFeeds           = function(myFeeds) { this.myFeeds = myFeeds;       }
 GoogleFeed.prototype.setNbFeedsLoaded   = function()        { this.nbFeedsLoaded++;         }
 
