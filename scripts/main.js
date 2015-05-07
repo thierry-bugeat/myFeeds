@@ -37,7 +37,6 @@
     var main_entry              = document.getElementById("main-entry");
     var browser                 = document.getElementById("browser");
     var loading                 = document.getElementById("loading");
-    var loading2                = document.getElementById("loading2");
     var feeds_entries           = document.getElementById("feeds-entries");
     
     var sync                    = document.getElementById("sync");
