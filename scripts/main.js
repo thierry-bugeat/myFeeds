@@ -71,15 +71,15 @@
             My._load(
                 'subscriptions.json', 
                 function (_mySubscriptions) {
+                    myFeeds = _mySubscriptions;
+                    gf.setFeeds(myFeeds);
+                    gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
                     for (var i = 0 ; i < myFeeds.length; i++ ) {
                         _idb._delete_("mySubscriptions", myFeeds[i].url);
                     }
                     for (var i = 0 ; i < _mySubscriptions.length; i++ ) {
                         _idb.insert("mySubscriptions", _mySubscriptions[i]);
                     }
-                    myFeeds = _mySubscriptions;
-                    gf.setFeeds(myFeeds);
-                    gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
                 }
             );
         }
