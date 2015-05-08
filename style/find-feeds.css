@@ -23,7 +23,7 @@
     border: 0px solid red;
     box-sizing: border-box;
     width: 100%;
-    height: calc(100% - 14rem) !important;
+    height: calc(100% - 13.5rem) !important;
     overflow-x:hidden;
     overflow-y:auto;
 }

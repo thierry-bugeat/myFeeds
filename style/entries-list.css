@@ -93,3 +93,22 @@
 .ratio-1-1{
     padding-bottom:100%; /* … */
 }
+
+/* Entries */
+
+#feeds-entries-container{
+    display:block;
+    width: calc(100%);
+    height: calc(100%);
+    background: var(--fxos-ivory);
+    position:fixed;
+}
+#feeds-entries{
+    width:100%;
+    height: calc(100% - 13.5rem);
+    font-size:1.7rem;
+}
+
+#feeds-entries > div:first-child {
+    margin-top:0rem;
+}

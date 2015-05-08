@@ -10,29 +10,46 @@
  
 section[role="mySubHeader"] {
     width: 100%;
-    height: 4.5rem;
+    height: 4rem;
     margin:0;
     position: relative;
     z-index:1;
 }
 
 section[role="mySubHeader"] > header:first-child {
-    background-color: #f97c17;
+    background-color: var(--fxos-ivory);
     padding:0;
-    height:4.5rem;
+    height:4rem;
     border:medium none;
 }
 
 section[role="mySubHeader"] > header:first-child h1 {
-    color: var(--fxos-white);
+    color: var(--fxos-black);
     font-size: 2.3rem;
-    line-height: 4.5rem;
+    line-height: 4rem;
     white-space: nowrap;
     text-overflow: ellipsis;
     display: block;
     overflow: hidden;
     margin: 0;
     padding: 0 1rem;
+    height: 100%;
+    font-weight: 300;
+    font-style: italic;
+    text-align: center;
+}
+
+section[role="mySubHeader"] > header h2 {
+    color: var(--fxos-black);
+    font-size: 1.7rem;
+    line-height: 4rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: inline-block;
+    overflow: hidden;
+    margin: 0;
+    padding: 0rem;
+    padding-left: var(--my-spacing);
     height: 100%;
     font-weight: 300;
     font-style: italic;
@@ -53,14 +70,14 @@ section[role="mySubHeader"] > header:first-child button {
     float: left;
     min-width: 20%;
     width: auto;
-    height: 4.5rem;
+    height: 4rem;
     border: medium none;
     background: transparent none repeat scroll 0% 0%;
     padding: 0px 1rem;
     margin: 0px;
     font-weight: 400;
     font-size: 1.5rem;
-    line-height: 4.5rem;
+    line-height: 4rem;
     border-radius: 0px;
     text-decoration: none;
     text-align: center;
@@ -82,8 +99,8 @@ section[role="mySubHeader"] > header input[type="text"] {
     color: #333;
     font-family: sans-serif;
     font-size: 1.6rem;
-    height: 4.5rem;
-    line-height: 4.5rem;
+    height: 4rem;
+    line-height: 4rem;
     margin: 0 0 1rem;
     padding: 0 1.5rem;
     resize: none;
@@ -104,5 +121,5 @@ section[role="mySubHeader"]._fixed{
 
 section[role="mySubHeader"] > header.mySystemHeader{
     color: var(--fxos-white);
-    background-color: var(--fxos-grey);
+    background-color: var(--fxos-ivory);
 }

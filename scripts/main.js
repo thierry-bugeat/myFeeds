@@ -23,7 +23,7 @@
             "nbDaysAgo": 0,                     // Display only today's entries
             "maxLengthForSmallEntries": "400",  // Max number of characters to display an entry as small entry
             "dontDisplayEntriesOlderThan": "7", // In days
-            "displaySmallEntries": false,       // Display small entries. Default true, false
+            "displaySmallEntries": true,        // Display small entries. Default true, false
             "updateEvery": 900                  // Update entries every N seconds
         }
     };
@@ -49,6 +49,7 @@
     var findFeedsClose          = document.getElementById("findFeedsClose");
     var findFeedsSubmit         = document.getElementById("findFeedsSubmit");
     var share                   = document.getElementById("share");
+    var feedsEntriesNbDaysAgo   = document.getElementById("feedsEntriesNbDaysAgo");
         
     //var loadSubscriptions     = document.getElementById("loadSubscriptions");
     //var saveSubscriptions     = document.getElementById("saveSubscriptions");
@@ -337,7 +338,7 @@
         var _timestampMin = _myTimestamp - (86400 * nbDaysAgo);
         var _timestampMax = _myTimestamp - (86400 * nbDaysAgo) + 86400;
         
-        var _previousDaysAgo    = 0; // Count days to groups entries by day.
+        var _previousDaysAgo    = -1; // Count days to groups entries by day.
         var _entrieNbDaysAgo    = 0;
         
         var _nbEntriesDisplayed = 0;
@@ -347,6 +348,7 @@
         // =======================
                     
         var _htmlEntries = "";
+        var _firstEntry = true;
 
         for (var i = 0; i < sortedEntries.length; i++) {
 
@@ -355,17 +357,30 @@
             if ((_entrie._myTimestamp >= _timestampMin) && (_entrie._myTimestamp < _timestampMax)) {
                 
                 _nbEntriesDisplayed++;
+                
 
                 if ((_myTimestamp - _entrie._myTimestamp) < (params.entries.dontDisplayEntriesOlderThan * 86400)) {
 
-                    // --- Day separator ? ---
+                    // --- Today / Yesterday / Nb days ago ---
+                    
+                    if (_firstEntry) {
+                        var _daySeparator = "";
 
-                    _entrieNbDaysAgo = (1 + Math.floor(((_myTimestamp-1) - _entrie._myTimestamp) / 86400));
+                        _entrieNbDaysAgo = (1 + Math.floor(((_myTimestamp-1) - _entrie._myTimestamp) / 86400));
 
-                    if (_entrieNbDaysAgo != _previousDaysAgo ) {
-                        _previousDaysAgo = _entrieNbDaysAgo;
-                        //console.log("============================================ " + _previousDaysAgo + ' day(s) ago');
-                        _htmlEntries = _htmlEntries + '<div class="feeds-entries-next-day">' + myExtraTranslations['nb-days-ago'].replace('{{n}}', _previousDaysAgo) + '</div>';
+                        if (_entrieNbDaysAgo != _previousDaysAgo ) {
+                            _previousDaysAgo = _entrieNbDaysAgo;
+                            if (_previousDaysAgo == 0) {
+                                _daySeparator = document.webL10n.get('nb-days-ago-today');
+                            } else if (_previousDaysAgo == 1) {
+                                _daySeparator = document.webL10n.get('nb-days-ago-yesterday');
+                            } else {
+                                _daySeparator = myExtraTranslations['nb-days-ago'].replace('{{n}}', _previousDaysAgo);
+                            }
+                        }
+                        
+                        echo('feedsEntriesNbDaysAgo', _daySeparator, '');
+                        _firstEntry = false;
                     }
                     
                     //console.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+_myTimestamp+' (' + (new Date(_myTimestamp*1000)).toUTCString() + ') ==> Diff = ' + (_myTimestamp - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
