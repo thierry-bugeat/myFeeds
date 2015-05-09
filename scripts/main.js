@@ -19,11 +19,14 @@
     //addFeedsFromMyOnlineAccounts();
     
     var params = {
+        "feeds": {
+            "selectedFeed": ""                  // Display all feeds if empty otherwise display specified feed url
+        },
         "entries": {
             "nbDaysAgo": 0,                     // Display only today's entries
             "maxLengthForSmallEntries": "400",  // Max number of characters to display an entry as small entry
             "dontDisplayEntriesOlderThan": "7", // In days
-            "displaySmallEntries": false,       // Display small entries. Default true, false
+            "displaySmallEntries": false,       // Display small entries. true, false
             "updateEvery": 900                  // Update entries every N seconds
         }
     };
@@ -117,7 +120,7 @@
         } else {
             _onclick(nextDay, 'enable');
         }
-        dspEntries(gf.getEntries(), params.entries.nbDaysAgo);
+        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
         feeds_entries.scrollTop = 0;
     }
     
@@ -131,7 +134,7 @@
         } else {
             _onclick(previousDay, 'enable');
         }
-        dspEntries(gf.getEntries(), params.entries.nbDaysAgo);
+        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
         feeds_entries.scrollTop = 0;
     }
     
@@ -301,10 +304,12 @@
         
         _htmlFeeds = _htmlFeeds + '<h2 data-l10n-id="my-subscriptions-sources">Sources</h2>';
         _htmlFeeds = _htmlFeeds + '<ul>';
+        
+        _htmlFeeds = _htmlFeeds + '<li><a href="#" class="open" feedUrl=""><p>' + document.webL10n.get('all-feeds') + '</p></a></li>';
 
         for (var i = 0; i < feeds.length; i++) {
             var _feed = feeds[i];
-            _htmlFeeds = _htmlFeeds + '<li><a href="#"><p><button class="delete" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button><button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + (i+1) + '/' + _feed.title + ' <em>(' + _feed._myPulsations + ')</em></p><p><time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
+            _htmlFeeds = _htmlFeeds + '<li><a href="#" class="open" feedUrl="' + _feed.feedUrl + '"><p><button class="delete" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button><button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + (i+1) + '/' + _feed.title + ' <em>(' + _feed._myPulsations + ')</em></p><p><time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds + '</ul>';
@@ -322,11 +327,27 @@
         var _deletes = document.querySelectorAll(".delete");
         
         for (var i = 0; i < _deletes.length; i++) {
-            _deletes[i].onclick = function() { deleteFeed(this);}
+            _deletes[i].onclick = function(e) { 
+                e.stopPropagation();
+                e.preventDefault();
+                deleteFeed(this);
+            }
+        }
+        
+        // onclick open feed : 
+        
+        var _opens = document.querySelectorAll(".open");
+        
+        for (var i = 0; i < _opens.length; i++) {
+            _opens[i].onclick = function() { 
+                closeWindow("feeds-list-container", "left");
+                params.feeds.selectedFeed = this.getAttribute("feedUrl");
+                dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+            }
         }
     }
     
-    function dspEntries(entries, nbDaysAgo) {
+    function dspEntries(entries, nbDaysAgo, feedUrl) {
 
         console.log("dspEntries()", arguments);
         console.log(entries);
@@ -351,7 +372,17 @@
 
         for (var i = 0; i < sortedEntries.length; i++) {
 
-            var _entrie = sortedEntries[i];
+            // Get entries of specific feed or get all entries.
+            
+            var _entrie = "";
+            
+            if ((feedUrl !== "") && (feedUrl == sortedEntries[i]._myFeedInformations.feedUrl)) {
+                var _entrie = sortedEntries[i];
+            } else if (feedUrl == "") {
+                var _entrie = sortedEntries[i];
+            }
+            
+            // ---
             
             if ((_entrie._myTimestamp >= _timestampMin) && (_entrie._myTimestamp < _timestampMax)) {
                 
@@ -826,7 +857,7 @@
                 // ---
 
                 if (_nbFeedsLoaded == _nbFeedsToLoad) {
-                    dspEntries(gf.getEntries(), params.entries.nbDaysAgo);
+                    dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
                     dspFeeds(gf.getFeeds());
                     dspSettings();
                     updateFeedsPulsations();
@@ -858,7 +889,7 @@
                 // ---
 
                 if (_nbFeedsLoaded == _nbFeedsToLoad) {
-                    dspEntries(gf.getEntries(), params.entries.nbDaysAgo);
+                    dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
                     dspFeeds(gf.getFeeds());
                     dspSettings();
                     updateFeedsPulsations();
