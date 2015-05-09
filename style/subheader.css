@@ -50,6 +50,7 @@ section[role="mySubHeader"] > header h2 {
     margin: 0;
     padding: 0rem;
     padding-left: var(--my-spacing);
+    padding-right: var(--my-spacing);
     height: 100%;
     font-weight: 300;
     font-style: italic;

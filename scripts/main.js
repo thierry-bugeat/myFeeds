@@ -23,7 +23,7 @@
             "nbDaysAgo": 0,                     // Display only today's entries
             "maxLengthForSmallEntries": "400",  // Max number of characters to display an entry as small entry
             "dontDisplayEntriesOlderThan": "7", // In days
-            "displaySmallEntries": true,        // Display small entries. Default true, false
+            "displaySmallEntries": false,       // Display small entries. Default true, false
             "updateEvery": 900                  // Update entries every N seconds
         }
     };
@@ -348,7 +348,6 @@
         // =======================
                     
         var _htmlEntries = "";
-        var _firstEntry = true;
 
         for (var i = 0; i < sortedEntries.length; i++) {
 
@@ -358,30 +357,7 @@
                 
                 _nbEntriesDisplayed++;
                 
-
                 if ((_myTimestamp - _entrie._myTimestamp) < (params.entries.dontDisplayEntriesOlderThan * 86400)) {
-
-                    // --- Today / Yesterday / Nb days ago ---
-                    
-                    if (_firstEntry) {
-                        var _daySeparator = "";
-
-                        _entrieNbDaysAgo = (1 + Math.floor(((_myTimestamp-1) - _entrie._myTimestamp) / 86400));
-
-                        if (_entrieNbDaysAgo != _previousDaysAgo ) {
-                            _previousDaysAgo = _entrieNbDaysAgo;
-                            if (_previousDaysAgo == 0) {
-                                _daySeparator = document.webL10n.get('nb-days-ago-today');
-                            } else if (_previousDaysAgo == 1) {
-                                _daySeparator = document.webL10n.get('nb-days-ago-yesterday');
-                            } else {
-                                _daySeparator = myExtraTranslations['nb-days-ago'].replace('{{n}}', _previousDaysAgo);
-                            }
-                        }
-                        
-                        echo('feedsEntriesNbDaysAgo', _daySeparator, '');
-                        _firstEntry = false;
-                    }
                     
                     //console.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+_myTimestamp+' (' + (new Date(_myTimestamp*1000)).toUTCString() + ') ==> Diff = ' + (_myTimestamp - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
                     
@@ -451,6 +427,18 @@
             }
             
         }
+        
+        // --- Display Today / Yesterday / Nb days ago ---
+
+        if (nbDaysAgo == 0) {
+            _daySeparator = document.webL10n.get('nb-days-ago-today');
+        } else if (nbDaysAgo == 1) {
+            _daySeparator = document.webL10n.get('nb-days-ago-yesterday');
+        } else {
+            _daySeparator = myExtraTranslations['nb-days-ago'].replace('{{n}}', nbDaysAgo);
+        }
+        
+        echo('feedsEntriesNbDaysAgo', _daySeparator, '');
         
         // Display entries
         
