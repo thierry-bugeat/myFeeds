@@ -305,7 +305,7 @@
         
         document.getElementById('toggleDisplaySmallEntries').onclick = function(e) {
             params.entries.displaySmallEntries = !params.entries.displaySmallEntries;
-            My._save("params.json", "application/json", JSON.stringify(params));
+            _saveParams();
         }
 
     }
@@ -364,6 +364,7 @@
                 closeWindow("feeds-list-container", "left");
                 params.entries.nbDaysAgo = 0;
                 params.feeds.selectedFeed = this.getAttribute("feedUrl");
+                _saveParams();
                 dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             }
         }
@@ -725,6 +726,12 @@
         
         gf.setFeeds(myFeeds);
         gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+    }
+    
+    function _saveParams() {
+        var _tmpParams = params;
+        _tmpParams.entries.nbDaysAgo = 0;   // Reset nbDaysAgo value before saving file.
+        My._save("params.json", "application/json", JSON.stringify(_tmpParams));
     }
     
     // ======================
