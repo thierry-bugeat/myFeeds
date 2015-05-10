@@ -41,7 +41,7 @@ MyFeeds.prototype._load = function(filename, callback) {
     }
 
     request.onerror = function () {
-        console.warn("Unable to get the file: ", this.error);
+        console.warn("Unable to get the file: " + filename, this.error);
     }
 
 }

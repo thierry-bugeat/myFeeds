@@ -31,6 +31,11 @@
         }
     };
     
+    My._load('params.json', function(_myParams){
+        console.log('loading params from file params.json ...', _myParams);
+        params = _myParams;
+    });
+    
     var sortedEntries = [];
     var sortedFeeds = [];
     
