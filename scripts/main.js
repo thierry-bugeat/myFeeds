@@ -386,8 +386,6 @@
             
             if ((_entrie._myTimestamp >= _timestampMin) && (_entrie._myTimestamp < _timestampMax)) {
                 
-                _nbEntriesDisplayed++;
-                
                 if ((_myTimestamp - _entrie._myTimestamp) < (params.entries.dontDisplayEntriesOlderThan * 86400)) {
                     
                     //console.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+_myTimestamp+' (' + (new Date(_myTimestamp*1000)).toUTCString() + ') ==> Diff = ' + (_myTimestamp - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
@@ -442,12 +440,16 @@
                         _content = _content + '<div class="my-snippet">' + _entrie.contentSnippet + '</div>';
                         _content = _content + '</div>';
                         
+                        _nbEntriesDisplayed++;
+                        
                     } else if (params.entries.displaySmallEntries) {
                         _content = _content + '<div class="my-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
                         _content = _content + '<div class="my-title">' + i + '/ ' + _entrie.title + '</div>';
                         _content = _content + _imageUrl;
                         _content = _content + '<div class="my-date">' + _date + '</div>';
                         _content = _content + '</div>';
+                        
+                        _nbEntriesDisplayed++;
                     }
                     
                     // Add to html entries
