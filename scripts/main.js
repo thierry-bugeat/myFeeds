@@ -273,6 +273,12 @@
             _minutes = "0" + _minutes;
         }
         
+        if (params.entries.displaySmallEntries) {
+            _displaySmallEntriesChecked = 'checked=""';
+        } else {
+            _displaySmallEntriesChecked = "";
+        }
+        
         var _htmlSettings = [
         '<h2>' + document.webL10n.get('settings-feeds') + '</h2>                                                                                            ',
         '<ul>                                                                                                                                               ',
@@ -281,12 +287,21 @@
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-news') + '</h2>                                                                                             ',
         '<ul>                                                                                                                                               ',
-        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-small-news') + params.entries.displaySmallEntries + '</li>             ',
+        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-small-news') + '<div><label class="pack-switch"><input id="toggleDisplaySmallEntries" type="checkbox" ' + _displaySmallEntriesChecked + '><span></span></label></div></li>',
         '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-number-of-days') + params.entries.dontDisplayEntriesOlderThan + '</li> ',
         '</ul>                                                                                                                                              '
         ].join(''); 
 
         echo("settings", _htmlSettings, "");
+        
+        // ==================
+        // --- Add Events ---
+        // ==================
+        
+        document.getElementById('toggleDisplaySmallEntries').onclick = function(e) {
+            params.entries.displaySmallEntries = !params.entries.displaySmallEntries;
+        }
+
     }
     
     function dspFeeds(feeds) {
