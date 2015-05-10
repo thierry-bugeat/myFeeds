@@ -92,7 +92,7 @@
     
     /*saveSubscriptions.onclick   = function(event) {
         if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
-            _save("subscriptions.json", "application/json", JSON.stringify(myFeeds)); 
+            My._save("subscriptions.json", "application/json", JSON.stringify(myFeeds)); 
         }
     }*/
     
@@ -106,7 +106,7 @@
                 _feed = {"url": _url, "pulsations": _feeds[i]._myPulsations};
                 _output.push(_feed);
             }
-            _save("subscriptions.json", "application/json", JSON.stringify(_output));
+            My._save("subscriptions.json", "application/json", JSON.stringify(_output));
         }
     }
     
@@ -529,44 +529,6 @@
         _this.style.cssText = "opacity : 0.4;";
     }
     
-    /**
-     * @param {string} filename
-     * @param {string} mimetype "text/plain" "application/json"
-     * @param {string} content
-     * */
-    function _save(filename, mimetype, content) {
-
-        var sdcard = navigator.getDeviceStorage("sdcard");
-        var file   = new Blob([content], {type: mimetype});
-        
-        // Delete previous file
-        
-        var request = sdcard.delete("myFeeds/" + filename);
-
-        request.onsuccess = function () {
-            console.log("File deleted");
-        }
-
-        request.onerror = function () {
-            console.log("Unable to delete the file: ", this.error);
-        }
-
-        // Save new file
-
-        var request = sdcard.addNamed(file, "myFeeds/" + filename);
-        //var request = myStorage.add(file);
-
-        request.onsuccess = function () {
-            console.log('File "' + this.result);
-            
-        }
-
-        // An error typically occur if a file with the same name already exist
-        request.onerror = function () {
-            console.warn("Unable to write the file: ", this.error);
-        }
-    }
-    
     function _file_informations(filename) {
         var sdcard = navigator.getDeviceStorage('sdcard');
 
@@ -862,7 +824,7 @@
             
             // Save feed as file
             
-                _save('cache/feeds/' + btoa(event.detail.responseData.feed.feedUrl) + ".json", "application/json", JSON.stringify(event.detail.responseData.feed));
+                My._save('cache/feeds/' + btoa(event.detail.responseData.feed.feedUrl) + ".json", "application/json", JSON.stringify(event.detail.responseData.feed));
 
             // Add feed entries to array "unsortedEntries"
 

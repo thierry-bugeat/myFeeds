@@ -45,3 +45,41 @@ MyFeeds.prototype._load = function(filename, callback) {
     }
 
 }
+
+/**
+ * @param {string} filename
+ * @param {string} mimetype "text/plain" "application/json"
+ * @param {string} content
+ * */
+MyFeeds.prototype._save = function(filename, mimetype, content) {
+
+    var sdcard = navigator.getDeviceStorage("sdcard");
+    var file   = new Blob([content], {type: mimetype});
+    
+    // Delete previous file
+    
+    var request = sdcard.delete("myFeeds/" + filename);
+
+    request.onsuccess = function () {
+        console.log("File deleted");
+    }
+
+    request.onerror = function () {
+        console.log("Unable to delete the file: ", this.error);
+    }
+
+    // Save new file
+
+    var request = sdcard.addNamed(file, "myFeeds/" + filename);
+    //var request = myStorage.add(file);
+
+    request.onsuccess = function () {
+        console.log('File "' + this.result);
+        
+    }
+
+    // An error typically occur if a file with the same name already exist
+    request.onerror = function () {
+        console.warn("Unable to write the file: ", this.error);
+    }
+}
