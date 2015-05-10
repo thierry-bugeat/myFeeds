@@ -300,6 +300,7 @@
         
         document.getElementById('toggleDisplaySmallEntries').onclick = function(e) {
             params.entries.displaySmallEntries = !params.entries.displaySmallEntries;
+            My._save("params.json", "application/json", JSON.stringify(params));
         }
 
     }
