@@ -341,6 +341,7 @@
         for (var i = 0; i < _opens.length; i++) {
             _opens[i].onclick = function() { 
                 closeWindow("feeds-list-container", "left");
+                params.entries.nbDaysAgo = 0;
                 params.feeds.selectedFeed = this.getAttribute("feedUrl");
                 dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             }
