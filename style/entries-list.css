@@ -112,3 +112,14 @@
 #feeds-entries > div:first-child {
     margin-top:0rem;
 }
+
+#feeds-entries > h2 {
+    color: var(--fxos-orange);
+    overflow: auto;
+    list-style: none outside none;
+    margin: 0;
+    overflow: hidden;
+    padding: 0 var(--my-spacing) 0 var(--my-spacing);
+    font-size:1.7rem;
+    font-weight:normal;
+}

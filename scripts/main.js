@@ -370,6 +370,8 @@
         // =======================
                     
         var _htmlEntries = "";
+        var _htmlFeedTitle = "";
+        var _firstEntrie = true;
 
         for (var i = 0; i < sortedEntries.length; i++) {
 
@@ -379,6 +381,10 @@
             
             if ((feedUrl !== "") && (feedUrl == sortedEntries[i]._myFeedInformations.feedUrl)) {
                 var _entrie = sortedEntries[i];
+                if (_firstEntrie) {
+                    _htmlFeedTitle = _htmlFeedTitle + '<h2>' + _entrie._myFeedInformations.title + '</h2>'; // Specific feed title
+                    _firstEntrie = false;
+                }
             } else if (feedUrl == "") {
                 var _entrie = sortedEntries[i];
             }
@@ -477,9 +483,9 @@
         // Display entries
         
         if (_nbEntriesDisplayed > 0) {
-            echo("feeds-entries", _htmlEntries, "");
+            echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
         } else {
-            echo("feeds-entries", '<div class="notification">' + document.webL10n.get('no-news-today') + '</div>', "");
+            echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('no-news-today') + '</div>', "");
         }
         
         // ==================
