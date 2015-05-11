@@ -305,6 +305,25 @@
         
         _htmlSelectUpdateEvery = _htmlSelectUpdateEvery + '</select>';
         
+        // Max nb Days 
+        
+        var _days = [3, 5, 7, 10];
+        var _htmlMaxNbDays = "";
+        var _selected = "";
+        
+        _htmlMaxNbDays = _htmlMaxNbDays + '<select id="selectMaxNbDays">';
+
+        for (var i = 0; i < _days.length; i++) {
+            if (params.entries.dontDisplayEntriesOlderThan == _days[i]) {
+                _selected = "selected";
+            } else {
+                _selected = "";
+            }
+            _htmlMaxNbDays = _htmlMaxNbDays + '<option value="' + _days[i] + '" ' + _selected + ' >' + _days[i] + '</option>';
+        }
+        
+        _htmlMaxNbDays = _htmlMaxNbDays + '</select>';
+        
         // ---
         
         var _htmlSettings = [
@@ -316,7 +335,7 @@
         '<h2>' + document.webL10n.get('settings-news') + '</h2>                                                                                             ',
         '<ul>                                                                                                                                               ',
         '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-small-news') + '<div><label class="pack-switch"><input id="toggleDisplaySmallEntries" type="checkbox" ' + _displaySmallEntriesChecked + '><span></span></label></div></li>',
-        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-number-of-days') + params.entries.dontDisplayEntriesOlderThan + '</li> ',
+        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-number-of-days') + _htmlMaxNbDays + '</li> ',
         '</ul>                                                                                                                                              '
         ].join(''); 
 
@@ -334,6 +353,12 @@
         var _selectUpdateEvery = document.getElementById('selectUpdateEvery');
         _selectUpdateEvery.onchange = function(e) {
             params.entries.updateEvery = _selectUpdateEvery.options[_selectUpdateEvery.selectedIndex].value;
+            _saveParams();
+        }
+        
+        var _selectMaxNbDays = document.getElementById('selectMaxNbDays');
+        _selectMaxNbDays.onchange = function(e) {
+            params.entries.dontDisplayEntriesOlderThan = _selectMaxNbDays.options[_selectMaxNbDays.selectedIndex].value;
             _saveParams();
         }
 
