@@ -278,17 +278,40 @@
             _minutes = "0" + _minutes;
         }
         
+        // Small entries selector
+        
         if (params.entries.displaySmallEntries) {
             _displaySmallEntriesChecked = 'checked=""';
         } else {
             _displaySmallEntriesChecked = "";
         }
         
+        // Update every 
+        
+        var _every = [900, 1800, 3600]; // In seconds
+        var _htmlSelectUpdateEvery = "";
+        var _selected = "";
+        
+        _htmlSelectUpdateEvery = _htmlSelectUpdateEvery + '<select id="selectUpdateEvery">';
+
+        for (var i = 0; i < _every.length; i++) {
+            if (params.entries.updateEvery == _every[i]) {
+                _selected = "selected";
+            } else {
+                _selected = "";
+            }
+            _htmlSelectUpdateEvery = _htmlSelectUpdateEvery + '<option value="' + _every[i] + '" ' + _selected + ' >' + Math.floor(_every[i] / 60) + 'min</option>';
+        }
+        
+        _htmlSelectUpdateEvery = _htmlSelectUpdateEvery + '</select>';
+        
+        // ---
+        
         var _htmlSettings = [
         '<h2>' + document.webL10n.get('settings-feeds') + '</h2>                                                                                            ',
         '<ul>                                                                                                                                               ',
         '   <li><span data-icon="reload"></span>' + document.webL10n.get('settings-last-update') + _now.getHours() + ':' + _minutes + '</li>                ',
-        '   <li><span data-icon="sync"></span>' + document.webL10n.get('settings-update-every') + Math.floor(params.entries.updateEvery / 60) + 'min</li>   ',
+        '   <li><span data-icon="sync"></span>' + document.webL10n.get('settings-update-every') + _htmlSelectUpdateEvery + '</li>                               ',
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-news') + '</h2>                                                                                             ',
         '<ul>                                                                                                                                               ',
@@ -305,6 +328,12 @@
         
         document.getElementById('toggleDisplaySmallEntries').onclick = function(e) {
             params.entries.displaySmallEntries = !params.entries.displaySmallEntries;
+            _saveParams();
+        }
+        
+        var _selectUpdateEvery = document.getElementById('selectUpdateEvery');
+        _selectUpdateEvery.onchange = function(e) {
+            params.entries.updateEvery = _selectUpdateEvery.options[_selectUpdateEvery.selectedIndex].value;
             _saveParams();
         }
 
