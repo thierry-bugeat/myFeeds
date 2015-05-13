@@ -261,6 +261,12 @@ MyIndexedDb.prototype._delete_ = function(_tablename, _value) {
     
 }
 
+MyIndexedDb.prototype.deleteAll = function(_tablename) {
+    console.log("MyIndexedDb.prototype.deleteAll()", arguments);
+    this._delete_(_tablename, "");
+    
+}
+
 MyIndexedDb.prototype.deleteDatabase = function(_databasename) {
 
     var _request = indexedDB.deleteDatabase(_databasename);
