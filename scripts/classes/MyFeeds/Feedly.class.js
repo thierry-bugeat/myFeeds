@@ -5,7 +5,7 @@
 
 var Feedly = function() {
     
-    Feedly.call(this); /* Appel du constructeur de la classe parente */
+    MyFeeds.call(this); /* Appel du constructeur de la classe parente */
 
     this.feedly = {
         "host"          : "https://sandbox.feedly.com",
@@ -67,6 +67,7 @@ Feedly.prototype._loginCallback = function(url) {
         
         this.post(_url, _params, function(response) {
             _Feedly.setToken(response);
+            _Feedly._save('cache/feedly/access_token.json', 'application/json', JSON.stringify(response));
             document.body.dispatchEvent(new CustomEvent('Feedly.login.done', {"detail": response}));
             console.log('CustomEvent : Feedly.login.done');
         });

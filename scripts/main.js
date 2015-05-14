@@ -328,12 +328,16 @@
         '<h2>' + document.webL10n.get('settings-feeds') + '</h2>                                                                                            ',
         '<ul>                                                                                                                                               ',
         '   <li><span data-icon="reload"></span>' + document.webL10n.get('settings-last-update') + _now.getHours() + ':' + _minutes + '</li>                ',
-        '   <li><span data-icon="sync"></span>' + document.webL10n.get('settings-update-every') + _htmlSelectUpdateEvery + '</li>                               ',
+        '   <li><span data-icon="sync"></span>' + document.webL10n.get('settings-update-every') + _htmlSelectUpdateEvery + '</li>                           ',
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-news') + '</h2>                                                                                             ',
         '<ul>                                                                                                                                               ',
         '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-small-news') + '<div><label class="pack-switch"><input id="toggleDisplaySmallEntries" type="checkbox" ' + _displaySmallEntriesChecked + '><span></span></label></div></li>',
-        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-number-of-days') + _htmlMaxNbDays + '</li> ',
+        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-number-of-days') + _htmlMaxNbDays + '</li>                             ',
+        '</ul>                                                                                                                                              ',
+        '<h2>' + document.webL10n.get('settings-online-accounts') + '</h2>                                                                                  ',
+        '<ul>                                                                                                                                               ',
+        '<li><button id="feedlyLogin">Feedly</button></li>                                                                                                                                    ',
         '</ul>                                                                                                                                              '
         ].join(''); 
 
@@ -358,6 +362,10 @@
         _selectMaxNbDays.onchange = function(e) {
             params.entries.dontDisplayEntriesOlderThan = _selectMaxNbDays.options[_selectMaxNbDays.selectedIndex].value;
             _saveParams();
+        }
+        
+        document.getElementById('feedlyLogin').onclick = function() {
+            feedly.login();
         }
 
     }
@@ -966,7 +974,12 @@
             
         }, true);
         
-        document.body.addEventListener('GoogleFeed.find.done', findFeedsDisplayResults, true)
+        document.body.addEventListener('GoogleFeed.find.done', findFeedsDisplayResults, true);
+        
+        document.body.addEventListener('Feedly.login.done', function(response){
+            console.log(feedly.getToken());
+            document.getElementById('feedlyLogin').innerHTML = 'Feedly disconnect';
+        });
     
         // ============
         // --- Main ---
