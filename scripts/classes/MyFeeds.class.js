@@ -83,3 +83,20 @@ MyFeeds.prototype._save = function(filename, mimetype, content) {
         console.warn("Unable to write the file: ", this.error);
     }
 }
+
+MyFeeds.prototype._file_exists = function(filename, callback) {
+    console.log('MyFeeds.prototype._file_exist', arguments);
+    
+    var sdcard  = navigator.getDeviceStorage("sdcard");
+    var request = sdcard.get('myFeeds/' + filename);
+
+    request.onsuccess = function () {
+        console.log('_file_exist() = 1 "', this.result);
+        callback(1);
+    }
+
+    request.onerror = function () {
+        console.warn("_file_exist() = 0 ", this.error);
+        callback(0);
+    }
+}

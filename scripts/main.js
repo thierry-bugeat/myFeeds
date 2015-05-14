@@ -81,9 +81,7 @@
                 'subscriptions.json', 
                 function (_mySubscriptions) {
                     console.log(_mySubscriptions);
-                    for (var i = 0 ; i < myFeeds.length; i++ ) {
-                        _idb._delete_("mySubscriptions", myFeeds[i].url);
-                    }
+                    _idb.deleteAll("mySubscriptions");
                     for (var i = 0 ; i < _mySubscriptions.length; i++ ) {
                         _idb.insert("mySubscriptions", _mySubscriptions[i]);
                     }
@@ -752,7 +750,7 @@
         
         for (var i = 0; i < results.length; i++) {
             myFeeds.push(results[i]);
-        }
+        }        
         
         // No feeds sets.
         // Use default feeds ?
@@ -795,7 +793,7 @@
     window.onload = function () {
         
         _swipe("");
-        
+
         // =====================
         // --- Open Database ---
         // =====================
@@ -812,6 +810,17 @@
         };
         
         _idb.open(_idbParams);
+        
+        // =================================
+        // --- Button load subscriptions ---
+        // =================================
+        // Disable button if subscriptions file doesn't exists.
+        
+        My._file_exists('subscriptions.json', function(exists){
+            if (!exists) {
+                _onclick(loadSubscriptions, 'disable');
+            }
+        });
         
         // =======================================
         // --- Button [topup] enable / disable ---
