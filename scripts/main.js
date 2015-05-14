@@ -28,6 +28,9 @@
             "dontDisplayEntriesOlderThan": "7", // In days
             "displaySmallEntries": false,       // Display small entries. true, false
             "updateEvery": 900                  // Update entries every N seconds
+        },
+        "accounts": {
+            "feedly": false
         }
     };
     
@@ -284,6 +287,14 @@
             _displaySmallEntriesChecked = "";
         }
         
+        // Feedly selector
+        
+        if (params.accounts.feedly) {
+            _feedlyAccount = 'checked=""';
+        } else {
+            _feedlyAccount = "";
+        }
+        
         // Update every 
         
         var _every = [900, 1800, 3600]; // In seconds
@@ -337,7 +348,7 @@
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-online-accounts') + '</h2>                                                                                  ',
         '<ul>                                                                                                                                               ',
-        '<li><button id="feedlyLogin">Feedly</button></li>                                                                                                                                    ',
+        '   <li><span data-icon="messages"></span>Feedly<div><label class="pack-switch"><input id="feedlyLogin" type="checkbox" ' + _feedlyAccount + '><span></span></label></div></li>',
         '</ul>                                                                                                                                              '
         ].join(''); 
 
@@ -364,10 +375,17 @@
             _saveParams();
         }
         
+        // Feedly checkbox
+        
         document.getElementById('feedlyLogin').onclick = function() {
-            feedly.login();
+            if (this.checked) {
+                feedly.login();
+            } else {
+                params.accounts.feedly = false;
+                _saveParams();
+            }
         }
-
+        
     }
     
     function dspFeeds(feeds) {
@@ -978,7 +996,8 @@
         
         document.body.addEventListener('Feedly.login.done', function(response){
             console.log(feedly.getToken());
-            document.getElementById('feedlyLogin').innerHTML = 'Feedly disconnect';
+            params.accounts.feedly = true;
+            _saveParams();
         });
     
         // ============
