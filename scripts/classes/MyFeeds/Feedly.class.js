@@ -12,6 +12,7 @@ var Feedly = function() {
         "client_id"     : "sandbox",
         "client_secret" : "4205DQXBAP99S8SUHXI3",
         "method"        : "GET",
+        "code"          : "",
         "token"         : {}
     };
 
@@ -56,6 +57,8 @@ Feedly.prototype._loginCallback = function(url) {
     
     if (params = url.match(/code=([^&]+)/)) {
         
+        _Feedly.feedly.code = params[1];
+        
         var _url = _Feedly.feedly.host + '/v3/auth/token';
 
         var _params = 'code=' + encodeURIComponent(params[1]) + 
@@ -86,7 +89,8 @@ Feedly.prototype._loginCallback = function(url) {
 Feedly.prototype.getSubscriptions = function () {
     console.log('Feedly.prototype.getSubscriptions()');
     
-    var _url = _Feedly.feedly.host + '/v3/subscriptions';
+    var _url = _Feedly.feedly.host + '/v3/subscriptions' + 
+            '?output=json';
     
     var promise = this.get(_url, '');
     
@@ -120,7 +124,7 @@ Feedly.prototype.get = function (url, myParams) {
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         
         if (_Feedly.feedly.token) {
-            xhr.setRequestHeader("authorization", "OAuth " + _Feedly.feedly.token.access_token);
+            xhr.setRequestHeader("Authorization", "OAuth " + _Feedly.feedly.token.access_token);
         }
 
         xhr.onload = function() {
@@ -129,12 +133,13 @@ Feedly.prototype.get = function (url, myParams) {
                 var _response = JSON.parse(xhr.response);
 
                 try {
-                    _response.responseData._myParams = myParams; // Add extra values
+                    //_response.responseData._myParams = myParams; // Add extra values
                     resolve(_response);
                 } catch(err) {
                     //reject(Error(xhr.statusText));
-                    var _response = {"responseData": {"_myParams": myParams}};
-                    reject(Error(_response));
+                    //var _response = {"responseData": {"_myParams": myParams}};
+                    //reject(Error(_response));
+                    reject(Error(err));
                 }
                 
             } else {
