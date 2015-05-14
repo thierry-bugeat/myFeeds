@@ -379,6 +379,7 @@
         
         document.getElementById('feedlyLogin').onclick = function() {
             if (this.checked) {
+                this.checked = false; // False until CustomEvent Feedly.login.done
                 feedly.login();
             } else {
                 params.accounts.feedly = false;
@@ -998,6 +999,8 @@
             console.log(feedly.getToken());
             params.accounts.feedly = true;
             _saveParams();
+            document.getElementById('feedlyLogin').checked = true; // Enable settings checkbox
+            //feedly.getSubscriptions();
         });
     
         // ============

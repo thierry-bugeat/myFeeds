@@ -80,6 +80,27 @@ Feedly.prototype._loginCallback = function(url) {
 }
 
 /**
+ * 
+ * */
+
+Feedly.prototype.getSubscriptions = function () {
+    console.log('Feedly.prototype.getSubscriptions()');
+    
+    var _url = _Feedly.feedly.host + '/v3/subscriptions';
+    
+    var promise = this.get(_url, '');
+    
+    promise.then(function(response) {
+        console.log(response);
+        document.body.dispatchEvent(new CustomEvent('Feedly.getSubscriptions.done', {"detail": response}));
+        console.log("CustomEvent : Feedly.getSubscriptions.done");
+    }, function(error) {
+        document.body.dispatchEvent(new CustomEvent('Feedly.getSubscriptions.error', {"detail": error}));
+        console.error("CustomEvent : Feedly.getSubscriptions.error", error);
+    });
+}
+
+/**
  * get(url, myParams)
  * 
  * @param string url Url to load.
@@ -95,6 +116,12 @@ Feedly.prototype.get = function (url, myParams) {
         var xhr = new XMLHttpRequest({ mozSystem: true });
         
         xhr.open('GET', url);
+        
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        
+        if (_Feedly.feedly.token) {
+            xhr.setRequestHeader("authorization", "OAuth " + _Feedly.feedly.token.access_token);
+        }
 
         xhr.onload = function() {
             if (xhr.status == 200) {
