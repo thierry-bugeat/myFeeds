@@ -25,6 +25,9 @@
     },
     "type": "privileged",
     "csp": "default-src *; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'",
+    "redirects": [
+        {"from": "http://localhost/",            "to": "/scripts/feedly/loginCallback.html"}
+    ],
     "permissions": {
         "desktop-notification": {
             "description": "Needed for creating system notifications."
