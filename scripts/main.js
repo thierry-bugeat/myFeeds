@@ -821,9 +821,12 @@
     }
     
     function _saveParams() {
+        var _tmp = params.entries.nbDaysAgo;
         var _tmpParams = params;
         _tmpParams.entries.nbDaysAgo = 0;   // Reset nbDaysAgo value before saving file.
+                                            // Reset affect "params" object !!!!!
         My._save("params.json", "application/json", JSON.stringify(_tmpParams));
+        params.entries.nbDaysAgo = _tmp;
     }
     
     // ======================
