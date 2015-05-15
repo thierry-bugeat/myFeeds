@@ -27,7 +27,8 @@
             "maxLengthForSmallEntries": "400",  // Max number of characters to display an entry as small entry
             "dontDisplayEntriesOlderThan": "7", // In days
             "displaySmallEntries": false,       // Display small entries. true, false
-            "updateEvery": 900                  // Update entries every N seconds
+            "updateEvery": 900,                 // Update entries every N seconds
+            "theme": "grid"                     // card (default), grid
         },
         "accounts": {
             "feedly": false
@@ -61,6 +62,8 @@
     var findFeedsSubmit         = document.getElementById("findFeedsSubmit");
     var share                   = document.getElementById("share");
     var feedsEntriesNbDaysAgo   = document.getElementById("feedsEntriesNbDaysAgo");
+    var displayGrid             = document.getElementById("displayGrid");
+    var displayCard             = document.getElementById("displayCard");
         
     //var loadSubscriptions     = document.getElementById("loadSubscriptions");
     //var saveSubscriptions     = document.getElementById("saveSubscriptions");
@@ -77,6 +80,16 @@
     findFeedsSubmit.onclick = function(event) { var _keywords = document.getElementById("findFeedsText").value; if (_keywords) {echo("find-feeds", "Loading...", ""); gf.findFeeds(_keywords);} }
     settingsOpen.onclick    = function(event) { openWindow("settings-container", "right"); }
     settingsClose.onclick   = function(event) { closeWindow("settings-container", "right"); }
+    displayGrid.onclick     = function() {
+        params.entries.theme = "grid"; 
+        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+        _saveParams();
+    }
+    displayCard.onclick     = function() {
+        params.entries.theme = "card"; 
+        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+        _saveParams();
+    }
     
     loadSubscriptions.onclick   = function(event) { 
         if (window.confirm(document.webL10n.get('confirm-load-subscriptions'))) {
@@ -401,8 +414,7 @@
         // ==========================
         // --- Display feeds list ---
         // ==========================
-        
-        _htmlFeeds = _htmlFeeds + '<h2 data-l10n-id="my-subscriptions-sources">Sources</h2>';
+
         _htmlFeeds = _htmlFeeds + '<ul>';
         
         _htmlFeeds = _htmlFeeds + '<li><a href="#" class="open" feedUrl=""><p>' + document.webL10n.get('all-feeds') + '</p></a></li>';
@@ -473,6 +485,7 @@
         var _htmlEntries = "";
         var _htmlFeedTitle = "";
         var _firstEntrie = true;
+        var _theme = params.entries.theme;
 
         for (var i = 0; i < sortedEntries.length; i++) {
 
@@ -517,22 +530,22 @@
                     
                     if (_entrie._myFirstImageUrl) {
                         if (_diff < params.entries.maxLengthForSmallEntries) {
-                            _imageUrl = '<div class="my-image-container ratio-image-s"><img src="' + _entrie._myFirstImageUrl + '"/></div>'; 
+                            _imageUrl = '<div class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="' + _entrie._myFirstImageUrl + '"/></div>'; 
                         } else {
-                            _imageUrl = '<div class="my-image-container ratio-image-l"><img src="' + _entrie._myFirstImageUrl + '"/></div>'; 
+                            _imageUrl = '<div class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="' + _entrie._myFirstImageUrl + '"/></div>'; 
                         }
                     }
                     
                     // Entry class ratio ?
                     
-                    var _ratioClass = 'ratio-entry-l';
+                    var _ratioClass = _theme + '-ratio-entry-l';
                     
                     if ((_diff <= params.entries.maxLengthForSmallEntries) && (!_entrie._myFirstImageUrl)) {
-                        _ratioClass = 'ratio-entry-s';
+                        _ratioClass = _theme + '-ratio-entry-s';
                     }
                     
                     else if ((_diff <= params.entries.maxLengthForSmallEntries) || (!_entrie._myFirstImageUrl)) {
-                        _ratioClass = 'ratio-entry-m';
+                        _ratioClass = _theme + '-ratio-entry-m';
                     }
                     
                     // Content ( Normal / Small )
@@ -540,21 +553,21 @@
                     var _content = "";
                     
                     if (_diff >= params.entries.maxLengthForSmallEntries) {
-                        _content = _content + '<div class="my-entry-l ' + _ratioClass + '" i="' + i + '">';
-                        _content = _content + '<div class="my-title">' + i + '/ ' + _entrie.title + '</div>';
-                        _content = _content + '<div class="my-feed-title">' + _entrie._myFeedInformations.title + '</div>';
+                        _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
+                        _content = _content + '<div class="my-'+_theme+'-title">' + i + '/ ' + _entrie.title + '</div>';
+                        _content = _content + '<div class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</div>';
                         _content = _content + _imageUrl;
-                        _content = _content + '<div class="my-date">' + _date + '</div>';
-                        _content = _content + '<div class="my-snippet">' + _entrie.contentSnippet + '</div>';
+                        _content = _content + '<div class="my-'+_theme+'-date">' + _date + '</div>';
+                        _content = _content + '<div class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</div>';
                         _content = _content + '</div>';
                         
                         _nbEntriesDisplayed++;
                         
                     } else if (params.entries.displaySmallEntries) {
-                        _content = _content + '<div class="my-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
-                        _content = _content + '<div class="my-title">' + i + '/ ' + _entrie.title + '</div>';
+                        _content = _content + '<div class="my-'+_theme+'-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
+                        _content = _content + '<div class="my-'+_theme+'-title">' + i + '/ ' + _entrie.title + '</div>';
                         _content = _content + _imageUrl;
-                        _content = _content + '<div class="my-date">' + _date + '</div>';
+                        _content = _content + '<div class="my-'+_theme+'-date">' + _date + '</div>';
                         _content = _content + '</div>';
                         
                         _nbEntriesDisplayed++;
@@ -595,7 +608,7 @@
         
         // onclick Small Entries:
         
-        var _small_entries = document.querySelectorAll(".my-entry-s");
+        var _small_entries = document.querySelectorAll(".my-"+_theme+"-entry-s");
         
         for (var i = 0; i < _small_entries.length; i++) {
             _small_entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(null, this.getAttribute("entry_link")); }
@@ -603,7 +616,7 @@
         
         // onclick Normal Entries :
         
-        var _entries = document.querySelectorAll(".my-entry-l");
+        var _entries = document.querySelectorAll(".my-"+_theme+"-entry-l");
         
         for (var i = 0; i < _entries.length; i++) {
             _entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }

@@ -3,19 +3,20 @@
 /* Responsive images – how to prevent reflow */
 /* http://andmag.se/2012/10/responsive-images-how-to-prevent-reflow/ */
 
-/* --- Entry --- */
+/* ======================== */
+/* --- Entry CARD theme --- */
+/* ======================== */
 
-.my-entry-s, .my-entry-l {
+.my-card-entry-s, .my-card-entry-l {
     margin:var(--my-spacing);
     padding:var(--my-spacing);
     background-color:var(--fxos-white);
-    
     position: relative;
     height: 0;
     overflow: hidden;
 }
 
-.my-title{
+.my-card-title{
     height:1.7rem;
     line-height:1.7rem;
     width: 100%;
@@ -25,7 +26,7 @@
     font-weight: bold;
 }
 
-.my-feed-title{
+.my-card-feed-title{
     font-size:1.5rem;
     height:1.7rem;
     line-height:1.7rem;
@@ -35,7 +36,7 @@
     white-space: nowrap;
 }
 
-.my-date{
+.my-card-date{
     font-size:1.5rem;
     height:2.5rem;
     line-height:2.5rem;
@@ -46,7 +47,7 @@
     color: var(--fxos-orange);
 }
 
-.my-snippet{
+.my-card-snippet{
     color: #5F5F5F;
     height:6.6rem;
     line-height:2.2rem;
@@ -56,13 +57,13 @@
     font-size: 1.7rem;
 }
 
-.my-image-container {
+.my-card-image-container {
     position: relative;
     height: 0;
     overflow: hidden;
 }
 
-.my-image-container img{
+.my-card-image-container img{
     position: absolute;
     top: 0;
     left: 0;
@@ -71,30 +72,108 @@
 
 /* --- RATIOS --- */
 
-.ratio-image-s { padding-bottom:25%; }
-.ratio-image-l { padding-bottom:45%; }
+.card-ratio-image-s { padding-bottom:25%; }
+.card-ratio-image-l { padding-bottom:45%; }
 
-.ratio-entry-s { padding-bottom: 12%; }
-.ratio-entry-m { padding-bottom: 36%; }
-.ratio-entry-l { padding-bottom: 76%; }
+.card-ratio-entry-s { padding-bottom: 12%; }
+.card-ratio-entry-m { padding-bottom: 36%; }
+.card-ratio-entry-l { padding-bottom: 76%; }
 
-.ratio-16-10{
+.card-ratio-16-10{
     padding-bottom:62.5%; /* 10/16*100 */
 }
 
-.ratio-16-9{
+.card-ratio-16-9{
     padding-bottom:56.25%; /* 9/16*100 */
 }
 
-.ratio-4-3{
+.card-ratio-4-3{
     padding-bottom:75%; /* 3/4*100 */
 }
 
-.ratio-1-1{
+.card-ratio-1-1{
     padding-bottom:100%; /* … */
 }
 
-/* Entries */
+/* ======================== */
+/* --- Entry GRID theme --- */
+/* ======================== */
+
+.my-grid-entry-s, .my-grid-entry-l {
+    /*margin:var(--my-spacing);*/
+    padding:0;
+    background-color:var(--fxos-ivory);
+    position: relative;
+    height: 0;
+    overflow: hidden;
+    width: 50%;
+    box-sizing: border-box;
+    float:left;
+    /*border-bottom:2px solid var(--fxos-ivory);*/
+    margin-bottom: var(--my-spacing);
+}
+
+.my-grid-entry-s:nth-child(odd), .my-grid-entry-l:nth-child(odd) {
+    border-right:4px solid var(--fxos-ivory);
+}
+
+.my-grid-entry-s:nth-child(even), .my-grid-entry-l:nth-child(even) {
+    border-left:4px solid var(--fxos-ivory);
+}
+
+.my-grid-title{
+    box-sizing: border-box;
+    height:auto;
+    color:var(--fxos-ivory);
+    line-height:1.7rem;
+    width: 100%;
+    overflow: hidden;
+    font-weight: bold;
+    position:absolute;
+    z-index: 1;
+    padding:1px;
+    height:100%;
+    background: -moz-linear-gradient(top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+    /*background: -moz-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);*/
+}
+
+.my-grid-feed-title{
+    display: none;
+}
+
+.my-grid-date{
+    display: none;
+}
+
+.my-grid-snippet{
+    display: none;
+}
+
+.my-grid-image-container {
+    position: relative;
+    height: 0;
+    overflow: hidden;
+}
+
+.my-grid-image-container img{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height:100%;
+}
+
+/* RATIOS */
+
+.grid-ratio-image-s { padding-bottom:100%; }
+.grid-ratio-image-l { padding-bottom:100%; }
+
+.grid-ratio-entry-s { padding-bottom:50%; }
+.grid-ratio-entry-m { padding-bottom:50%; }
+.grid-ratio-entry-l { padding-bottom:50%; }
+
+/* =============== */
+/* --- Entries --- */
+/* =============== */
 
 #feeds-entries-container{
     display:block;
