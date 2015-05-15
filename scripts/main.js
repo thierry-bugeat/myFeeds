@@ -836,6 +836,7 @@
     window.onload = function () {
         
         _swipe("");
+        dspSettings();
 
         // =====================
         // --- Open Database ---
