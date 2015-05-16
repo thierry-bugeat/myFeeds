@@ -80,12 +80,12 @@
     findFeedsSubmit.onclick = function(event) { var _keywords = document.getElementById("findFeedsText").value; if (_keywords) {echo("find-feeds", "Loading...", ""); gf.findFeeds(_keywords);} }
     settingsOpen.onclick    = function(event) { openWindow("settings-container", "right"); }
     settingsClose.onclick   = function(event) { closeWindow("settings-container", "right"); }
-    displayGrid.onclick     = function() {
+    displayGrid.onclick     = function(event) {
         params.entries.theme = "grid"; 
         dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
         _saveParams();
     }
-    displayCard.onclick     = function() {
+    displayCard.onclick     = function(event) {
         params.entries.theme = "card"; 
         dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
         _saveParams();

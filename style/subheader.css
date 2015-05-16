@@ -55,6 +55,7 @@ section[role="mySubHeader"] > header h2 {
     font-weight: 300;
     font-style: italic;
     text-align: center;
+    vertical-align: bottom;
 }
 
 section[role="mySubHeader"] > header:first-child button {
@@ -107,6 +108,20 @@ section[role="mySubHeader"] > header input[type="text"] {
     resize: none;
     unicode-bidi: -moz-plaintext;
     width: 60%;
+}
+
+section[role="mySubHeader"] > header span {
+    line-height: 4rem;
+    float:right;
+    margin-left: var(--my-spacing);
+    margin-right: var(--my-spacing);
+    display: block;
+    box-sizing: border-box;
+    background:red;
+}
+
+section[role="mySubHeader"] > header span:active {
+    color: var(--fxos-blue);
 }
 
 /* --- Section option(s) --- */
