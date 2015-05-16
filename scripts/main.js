@@ -101,7 +101,7 @@
                     for (var i = 0 ; i < _mySubscriptions.length; i++ ) {
                         _idb.insert("mySubscriptions", _mySubscriptions[i]);
                     }
-                    myFeeds = _mySubscriptions;
+                    myFeeds = _mySubscriptions.slice();
                     gf.setFeeds(myFeeds);
                     gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
                 }
@@ -207,7 +207,7 @@
                 }
             }
 
-            myFeeds = _tmp;
+            myFeeds = _tmp.slice();
             
             // (2) Delete from database
             
@@ -816,17 +816,21 @@
         
         // 1st feeds loading
         
-        gf.setFeeds(myFeeds);
-        gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+        if (myFeeds.length > 0) {
+            gf.setFeeds(myFeeds);
+            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+        }
+        
+        // ---
+        
+        dspSettings();
     }
     
     function _saveParams() {
-        var _tmp = params.entries.nbDaysAgo;
-        var _tmpParams = params;
-        _tmpParams.entries.nbDaysAgo = 0;   // Reset nbDaysAgo value before saving file.
-                                            // Reset affect "params" object !!!!!
-        My._save("params.json", "application/json", JSON.stringify(_tmpParams));
-        params.entries.nbDaysAgo = _tmp;
+        var _params = params.slice();
+        _params.entries.nbDaysAgo = 0;  // Reset nbDaysAgo value before saving file.
+                                        // Reset affect "params" object !!!!!
+        My._save("params.json", "application/json", JSON.stringify(_params));
     }
     
     // ======================
@@ -836,7 +840,6 @@
     window.onload = function () {
         
         _swipe("");
-        dspSettings();
 
         // =====================
         // --- Open Database ---
