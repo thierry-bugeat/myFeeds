@@ -111,17 +111,21 @@ section[role="mySubHeader"] > header input[type="text"] {
 }
 
 section[role="mySubHeader"] > header span {
+    color: var(--fxos-grey);
     line-height: 4rem;
     float:right;
-    margin-left: var(--my-spacing);
-    margin-right: var(--my-spacing);
     display: block;
     box-sizing: border-box;
-    background:red;
+    width:20%;
+    text-align:center;
 }
 
 section[role="mySubHeader"] > header span:active {
     color: var(--fxos-blue);
+}
+
+section[role="mySubHeader"] > header button > span {
+    width:100%;
 }
 
 /* --- Section option(s) --- */
