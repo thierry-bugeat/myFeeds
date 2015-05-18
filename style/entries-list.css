@@ -19,8 +19,8 @@
 }
 
 .my-list-title {
-    line-height:1.7rem;
-    max-height: 3.4rem;
+    line-height:2rem;
+    max-height: 4rem;
     width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -62,8 +62,7 @@
 
 .my-list-snippet {
     color: #5F5F5F;
-    height:6.6rem;
-    line-height:2.2rem;
+    line-height:2rem;
     width:100%;
     text-overflow: ellipsis;
     font-size: 1.7rem;
@@ -87,9 +86,9 @@
 /* --- RATIOS --- */
 
 .list-ratio-image-s { padding-bottom:25%; }
-.list-ratio-image-l { padding-bottom:18%; }
+.list-ratio-image-l { padding-bottom:16%; }
 
-.list-ratio-entry-s { padding-bottom: 15%; }
+.list-ratio-entry-s { padding-bottom: 16%; }
 .list-ratio-entry-m { padding-bottom: 32%; }
 .list-ratio-entry-l { padding-bottom: 38%; }
 

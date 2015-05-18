@@ -191,11 +191,10 @@ GoogleFeed.prototype.addFeed = function(feed) {
     _myNewfeed['_myPulsations'] = _myPulsations; // Estimation of news number per day
     
     if      (isNaN(_myPulsations))  { _myNewfeed['_myPulsationsIcone'] = 'signal-0'; }
-    else if (_myPulsations > 20)    { _myNewfeed['_myPulsationsIcone'] = 'signal-5'; }
-    else if (_myPulsations > 10)    { _myNewfeed['_myPulsationsIcone'] = 'signal-4'; }
-    else if (_myPulsations > 5 )    { _myNewfeed['_myPulsationsIcone'] = 'signal-3'; }
-    else if (_myPulsations > 3 )    { _myNewfeed['_myPulsationsIcone'] = 'signal-2'; }
-    else                            { _myNewfeed['_myPulsationsIcone'] = 'signal-1'; }
+    else if (_myPulsations > 15)    { _myNewfeed['_myPulsationsIcone'] = 'wifi-4'; }
+    else if (_myPulsations > 8 )    { _myNewfeed['_myPulsationsIcone'] = 'wifi-3'; }
+    else if (_myPulsations > 3 )    { _myNewfeed['_myPulsationsIcone'] = 'wifi-2'; }
+    else                            { _myNewfeed['_myPulsationsIcone'] = 'wifi-1'; }
     
     // Remove values.
     
