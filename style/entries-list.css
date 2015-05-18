@@ -4,6 +4,112 @@
 /* http://andmag.se/2012/10/responsive-images-how-to-prevent-reflow/ */
 
 /* ======================== */
+/* --- Entry LIST theme --- */
+/* ======================== */
+
+.my-list-entry-s, .my-list-entry-l {
+    margin-bottom:0.1rem;
+    padding:var(--my-spacing);
+    background-color:var(--fxos-white);
+    position: relative;
+    height: 0;
+    overflow: hidden;
+    
+    background: var(--fxos-white) linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.1) 100%);
+}
+
+.my-list-title {
+    line-height:1.7rem;
+    max-height: 3.4rem;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
+    margin-top: 1.7rem;
+    display:block;
+}
+
+.my-list-feed-title {
+    font-size:1.5rem;
+    line-height:1.7rem;
+    color: #5F5F5F;
+    width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    position: absolute;
+    top: 0;
+    left:0;
+    padding: var(--my-spacing) var(--my-spacing) 0% var(--my-spacing);
+    box-sizing: border-box;
+}
+
+.my-list-date {
+    font-size:1.5rem;
+    line-height:1.7rem;
+    width: 40%;
+    overflow: hidden;
+    text-align:right;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--fxos-orange);
+    position: absolute;
+    top: 0;
+    left:60%;
+    padding: var(--my-spacing) var(--my-spacing) 0% 0%;
+    box-sizing: border-box;
+}
+
+.my-list-snippet {
+    color: #5F5F5F;
+    height:6.6rem;
+    line-height:2.2rem;
+    width:100%;
+    text-overflow: ellipsis;
+    font-size: 1.7rem;
+}
+
+.my-list-image-container {
+    float: right;
+    height: 0;
+    overflow: hidden;
+    width: 30%;
+    display: inline-block;
+}
+
+.my-list-image-container img{
+    position: relative;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width:100%;
+}
+
+/* --- RATIOS --- */
+
+.list-ratio-image-s { padding-bottom:25%; }
+.list-ratio-image-l { padding-bottom:18%; }
+
+.list-ratio-entry-s { padding-bottom: 15%; }
+.list-ratio-entry-m { padding-bottom: 32%; }
+.list-ratio-entry-l { padding-bottom: 38%; }
+
+.list-ratio-16-10{
+    padding-bottom:62.5%; /* 10/16*100 */
+}
+
+.list-ratio-16-9{
+    padding-bottom:56.25%; /* 9/16*100 */
+}
+
+.list-ratio-4-3{
+    padding-bottom:75%; /* 3/4*100 */
+}
+
+.list-ratio-1-1{
+    padding-bottom:100%; /* … */
+}
+
+/* ======================== */
 /* --- Entry CARD theme --- */
 /* ======================== */
 
@@ -24,6 +130,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     font-weight: bold;
+    display: block;
 }
 
 .my-card-feed-title{
@@ -34,6 +141,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    display: block;
+}
+
+.my-card-entry-s > .my-card-feed-title{
+    display: none;
 }
 
 .my-card-date{
@@ -45,6 +157,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     color: var(--fxos-orange);
+    display: block;
 }
 
 .my-card-snippet{
@@ -55,12 +168,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 1.7rem;
+    display: block;
 }
 
 .my-card-image-container {
     position: relative;
     height: 0;
     overflow: hidden;
+    display: block;
 }
 
 .my-card-image-container img{
@@ -95,9 +210,9 @@
     padding-bottom:100%; /* … */
 }
 
-/* ======================== */
-/* --- Entry GRID theme --- */
-/* ======================== */
+/* =============================== */
+/* --- Entry SQUARE GRID theme --- */
+/* =============================== */
 
 .my-grid-entry-s, .my-grid-entry-l {
     /*margin:var(--my-spacing);*/
@@ -153,6 +268,7 @@
     position: relative;
     height: 0;
     overflow: hidden;
+    display: block;
 }
 
 .my-grid-image-container img{
@@ -168,9 +284,9 @@
 .grid-ratio-image-s { padding-bottom:100%; }
 .grid-ratio-image-l { padding-bottom:100%; }
 
-.grid-ratio-entry-s { padding-bottom:50%; }
-.grid-ratio-entry-m { padding-bottom:50%; }
-.grid-ratio-entry-l { padding-bottom:50%; }
+.grid-ratio-entry-s { padding-bottom:40%; }
+.grid-ratio-entry-m { padding-bottom:40%; }
+.grid-ratio-entry-l { padding-bottom:40%; }
 
 /* =============== */
 /* --- Entries --- */

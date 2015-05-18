@@ -64,6 +64,7 @@
     var feedsEntriesNbDaysAgo   = document.getElementById("feedsEntriesNbDaysAgo");
     var displayGrid             = document.getElementById("displayGrid");
     var displayCard             = document.getElementById("displayCard");
+    var displayList             = document.getElementById("displayList");
         
     //var loadSubscriptions     = document.getElementById("loadSubscriptions");
     //var saveSubscriptions     = document.getElementById("saveSubscriptions");
@@ -87,6 +88,11 @@
     }
     displayCard.onclick     = function(event) {
         params.entries.theme = "card"; 
+        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+        _saveParams();
+    }
+    displayList.onclick     = function(event) {
+        params.entries.theme = "list"; 
         dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
         _saveParams();
     }
@@ -530,9 +536,9 @@
                     
                     if (_entrie._myFirstImageUrl) {
                         if (_diff < params.entries.maxLengthForSmallEntries) {
-                            _imageUrl = '<div class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="' + _entrie._myFirstImageUrl + '"/></div>'; 
+                            _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="' + _entrie._myFirstImageUrl + '"/></span>'; 
                         } else {
-                            _imageUrl = '<div class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="' + _entrie._myFirstImageUrl + '"/></div>'; 
+                            _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="' + _entrie._myFirstImageUrl + '"/></span>'; 
                         }
                     }
                     
@@ -554,20 +560,21 @@
                     
                     if (_diff >= params.entries.maxLengthForSmallEntries) {
                         _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
-                        _content = _content + '<div class="my-'+_theme+'-title">' + i + '/ ' + _entrie.title + '</div>';
-                        _content = _content + '<div class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</div>';
+                        _content = _content + '<span class="my-'+_theme+'-title">' + i + '/ ' + _entrie.title + '</span>';
+                        _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                         _content = _content + _imageUrl;
-                        _content = _content + '<div class="my-'+_theme+'-date">' + _date + '</div>';
-                        _content = _content + '<div class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</div>';
+                        _content = _content + '<span class="my-'+_theme+'-date">' + _date + '</span>';
+                        _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
                         _content = _content + '</div>';
                         
                         _nbEntriesDisplayed++;
                         
                     } else if (params.entries.displaySmallEntries) {
                         _content = _content + '<div class="my-'+_theme+'-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
-                        _content = _content + '<div class="my-'+_theme+'-title">' + i + '/ ' + _entrie.title + '</div>';
+                        _content = _content + '<span class="my-'+_theme+'-title">' + i + '/ ' + _entrie.title + '</span>';
+                        _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                         _content = _content + _imageUrl;
-                        _content = _content + '<div class="my-'+_theme+'-date">' + _date + '</div>';
+                        _content = _content + '<span class="my-'+_theme+'-date">' + _date + '</span>';
                         _content = _content + '</div>';
                         
                         _nbEntriesDisplayed++;
@@ -827,10 +834,11 @@
     }
     
     function _saveParams() {
-        var _params = params.slice();
-        _params.entries.nbDaysAgo = 0;  // Reset nbDaysAgo value before saving file.
+        var _nbDaysAgo = params.entries.nbDaysAgo;
+        params.entries.nbDaysAgo = 0;   // Reset nbDaysAgo value before saving file.
                                         // Reset affect "params" object !!!!!
-        My._save("params.json", "application/json", JSON.stringify(_params));
+        My._save("params.json", "application/json", JSON.stringify(params));
+        params.entries.nbDaysAgo = _nbDaysAgo;
     }
     
     // ======================
