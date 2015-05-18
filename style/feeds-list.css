@@ -18,13 +18,14 @@
 }
 
 #feeds-list {
-    background-color: var(--fxos-black);
+    background-color: var(--fxos-ivory);
     border: 0px solid red;
     box-sizing: border-box;
     width: 100%;
     height: calc(100% - 9.5rem) !important;
     overflow-x:hidden;
     overflow-y:auto;
+    padding: var(--my-spacing);
 }
 
 #feeds-list > h2 {
@@ -47,19 +48,21 @@
 }
 
 #feeds-list > ul {
+    background-color: var(--fxos-white);
     overflow: auto;
-    padding: 0 1.5rem;
     list-style: none outside none;
     margin: 0;
     overflow: hidden;
-    padding: 0;
+    padding-left: var(--my-spacing);
+    padding-right: var(--my-spacing);
+    font-size:1.7rem;
 }
 
 #feeds-list > ul > li {
     width: 100%;
     height: 6rem;
     box-sizing: border-box;
-    border-bottom: solid 0.1rem var(--fxos-grey);
+    border-bottom: solid 0.1rem var(--fxos-ivory);
     color: #333;
     margin: 0;  
     display: block;
@@ -94,7 +97,7 @@
 
 #feeds-list > ul > li p:first-of-type {
     padding-left: 1.5rem;
-    color: var(--fxos-ivory);
+    color: #333;
     font-size: 1.8rem;
     line-height: 2.2rem;
     padding: 1rem 0 0;
@@ -102,10 +105,14 @@
 
 #feeds-list button {
     color: var(--fxos-orange);
-    line-height:0;
-    height:2rem;
-    float:left;
-    width: 45px;
-    margin-right: var(--my-spacing);
+    line-height: 0;
+    height: 2rem;
+    float: left;
     background: none;
+    border: none;
+}
+
+#feeds-list button:nth-of-type(2) {
+    float: right;
+    color: var(--fxos-grey);
 }

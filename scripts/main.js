@@ -423,11 +423,11 @@
 
         _htmlFeeds = _htmlFeeds + '<ul>';
         
-        _htmlFeeds = _htmlFeeds + '<li><a href="#" class="open" feedUrl=""><p>' + document.webL10n.get('all-feeds') + '</p></a></li>';
+        _htmlFeeds = _htmlFeeds + '<li><a href="#" class="open" feedUrl=""><p><button class="delete"><span data-icon="forward"></span></button>' + document.webL10n.get('all-feeds') + '</p></a></li>';
 
         for (var i = 0; i < feeds.length; i++) {
             var _feed = feeds[i];
-            _htmlFeeds = _htmlFeeds + '<li><a href="#" class="open" feedUrl="' + _feed.feedUrl + '"><p><button class="delete" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button><button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + (i+1) + '/' + _feed.title + ' <em>(' + _feed._myPulsations + ')</em></p><p><time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
+            _htmlFeeds = _htmlFeeds + '<li><a href="#" class="open" feedUrl="' + _feed.feedUrl + '"><p><button class="delete" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button><button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + ' <em>(' + _feed._myPulsations + ')</em></p><p><time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds + '</ul>';
