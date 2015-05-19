@@ -423,7 +423,7 @@
 
         _htmlFeeds = _htmlFeeds + '<ul>';
         
-        _htmlFeeds = _htmlFeeds + '<li><a href="#" class="open" feedUrl=""><p><button class="delete"><span data-icon="forward"></span></button>' + document.webL10n.get('all-feeds') + '</p></a></li>';
+        _htmlFeeds = _htmlFeeds + '<li><a href="#" class="open" feedUrl=""><p><button><span data-icon="forward"></span></button>' + document.webL10n.get('all-feeds') + '</p></a></li>';
 
         for (var i = 0; i < feeds.length; i++) {
             var _feed = feeds[i];
