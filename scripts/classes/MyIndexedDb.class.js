@@ -120,7 +120,6 @@ MyIndexedDb.prototype._dbSelectAll = function(_tablename, _index, callback) {
             _results.push(_cursor.value);
             _cursor.continue();
         } else {
-            console.log(_results);
             document.body.dispatchEvent(new CustomEvent('idb.select.onsuccess', {"detail": {"tablename": _tablename, "results": _results}}));
             callback(_results);
         }
@@ -268,6 +267,7 @@ MyIndexedDb.prototype.deleteAll = function(_tablename) {
 }
 
 MyIndexedDb.prototype.deleteDatabase = function(_databasename) {
+    console.log("MyIndexedDb.prototype.deleteDatabase()", arguments);
 
     var _request = indexedDB.deleteDatabase(_databasename);
     

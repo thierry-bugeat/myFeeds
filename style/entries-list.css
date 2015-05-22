@@ -29,6 +29,12 @@
     display:block;
 }
 
+.my-list-title img{
+    height: 2rem;
+    vertical-align: bottom;
+    margin-right: var(--my-spacing);
+}
+
 .my-list-feed-title {
     font-size:1.5rem;
     line-height:1.7rem;
@@ -130,6 +136,12 @@
     white-space: nowrap;
     font-weight: bold;
     display: block;
+}
+
+.my-card-title img{
+    height: 1.7rem;
+    vertical-align: bottom;
+    margin-right: var(--my-spacing);
 }
 
 .my-card-feed-title{
@@ -249,6 +261,12 @@
     height:100%;
     background: -moz-linear-gradient(top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
     /*background: -moz-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);*/
+}
+
+.my-grid-title img{
+    height: 2rem;
+    vertical-align: bottom;
+    margin-right: var(--my-spacing);
 }
 
 .my-grid-feed-title{

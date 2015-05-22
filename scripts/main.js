@@ -14,7 +14,7 @@
     var _myTimestamp;       // Value set by function "_setMyTimestamp()"
     var _idb;               // IndexedDb
     
-    var myFeeds = [];       // Store informations about feeds (urls)
+    var myFeedsSubscriptions = { 'local': [], 'feedly': []} ; // Store informations about feeds (urls)
     
     //addFeedsFromMyOnlineAccounts();
     
@@ -100,26 +100,15 @@
     loadSubscriptions.onclick   = function(event) { 
         if (window.confirm(document.webL10n.get('confirm-load-subscriptions'))) {
             My._load(
-                'subscriptions.json', 
+                'subscriptions.local.json', 
                 function (_mySubscriptions) {
-                    console.log(_mySubscriptions);
-                    _idb.deleteAll("mySubscriptions");
-                    for (var i = 0 ; i < _mySubscriptions.length; i++ ) {
-                        _idb.insert("mySubscriptions", _mySubscriptions[i]);
-                    }
-                    myFeeds = _mySubscriptions.slice();
-                    gf.setFeeds(myFeeds);
+                    addNewSubscriptions(_mySubscriptions);
+                    gf.setFeedsSubscriptions(myFeedsSubscriptions);
                     gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
                 }
             );
         }
     }
-    
-    /*saveSubscriptions.onclick   = function(event) {
-        if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
-            My._save("subscriptions.json", "application/json", JSON.stringify(myFeeds)); 
-        }
-    }*/
     
     saveSubscriptions.onclick   = function(event) { 
         if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
@@ -128,10 +117,10 @@
             var _feed = "";
             for (var i = 0 ; i < _feeds.length; i++) {
                 _url = _feeds[i].feedUrl;
-                _feed = {"url": _url, "pulsations": _feeds[i]._myPulsations};
+                _feed = {"url": _url, "pulsations": _feeds[i]._myPulsations, "account": _feeds[i]._myAccount};
                 _output.push(_feed);
             }
-            My._save("subscriptions.json", "application/json", JSON.stringify(_output));
+            My._save("subscriptions.local.json", "application/json", JSON.stringify(_output));
         }
     }
     
@@ -203,17 +192,17 @@
             
             entryFade(_this);
             
-            // (1) Delete feedUrl from array "myFeeds"
+            // (1) Delete feedUrl from array "myFeedsSubscriptions.local"
             
-            for (var i = 0; i < myFeeds.length; i++) {
-                if (myFeeds[i].url != _feedUrl) {
-                    //delete myFeeds[i];
-                    _tmp.push(myFeeds[i]);
+            for (var i = 0; i < myFeedsSubscriptions.local.length; i++) {
+                if (myFeedsSubscriptions.local[i].url != _feedUrl) {
+                    //delete myFeedsSubscriptions.local[i];
+                    _tmp.push(myFeedsSubscriptions.local[i]);
                     //break;
                 }
             }
 
-            myFeeds = _tmp.slice();
+            myFeedsSubscriptions.local = _tmp.slice();
             
             // (2) Delete from database
             
@@ -221,8 +210,8 @@
             
             // (3) Reload UI
 
-            if (myFeeds.length > 0) {
-                gf.setFeeds(myFeeds);
+            if (myFeedsSubscriptions.local.length > 0) {
+                gf.setFeedsSubscriptions(myFeedsSubscriptions);
                 gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
             } else {
                 echo("feeds-list", "", "");
@@ -275,9 +264,9 @@
             
             var _myNewFeed = {"url": _feedUrl, "pulsations": 20};
             
-            // (1) Add feedUrl to array "myFeeds"
+            // (1) Add feedUrl to array "myFeedsSubscriptions.local"
 
-            myFeeds.push(_myNewFeed);
+            myFeedsSubscriptions.local.push(_myNewFeed);
             
             // (2) Add into database
             
@@ -285,7 +274,7 @@
             
             // (3) Reload UI
             
-            gf.setFeeds(myFeeds);
+            gf.setFeedsSubscriptions(myFeedsSubscriptions);
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }
     }
@@ -368,6 +357,11 @@
         '<h2>' + document.webL10n.get('settings-online-accounts') + '</h2>                                                                                  ',
         '<ul>                                                                                                                                               ',
         '   <li><span data-icon="messages"></span>Feedly<div><label class="pack-switch"><input id="feedlyLogin" type="checkbox" ' + _feedlyAccount + '><span></span></label></div></li>',
+        '</ul>                                                                                                                                              ',
+        '<h2>' + document.webL10n.get('settings-developper-menu') + '</h2>                                                                                  ',
+        '<ul>                                                                                                                                               ',
+        '   <li><span data-icon="messages"></span>Database<div><span><button id="deleteDatabase" class="danger">Clear</button></span></div></li>',
+        '   <li><span data-icon="messages"></span>Database<div><button id="logDatabaseContent">Log content</button></div></li>',
         '</ul>                                                                                                                                              '
         ].join(''); 
 
@@ -406,6 +400,21 @@
             }
         }
         
+        // Delete database
+        
+        document.getElementById('deleteDatabase').onclick = function(event) {
+            var _confirm = window.confirm(document.webL10n.get('confirm-delete-database'));
+            if (_confirm) {
+                _idb.deleteDatabase(_idbParams.databaseName);
+            }
+        }
+        
+        document.getElementById('logDatabaseContent').onclick = function(event) {
+            _idb.select("mySubscriptions", "url", "*", function(results){
+            console.log(results);
+        });
+    }
+        
     }
     
     function dspFeeds(feeds) {
@@ -427,7 +436,13 @@
 
         for (var i = 0; i < feeds.length; i++) {
             var _feed = feeds[i];
-            _htmlFeeds = _htmlFeeds + '<li><a href="#" class="open" feedUrl="' + _feed.feedUrl + '"><p><button class="delete" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button><button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + ' <em>(' + _feed._myPulsations + ')</em></p><p><time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
+            var _accountIcone = '';
+            
+             if (_feed._myAccount != 'local') {
+                 _accountIcone = '<img src="images/' + _feed._myAccount + '.png" />';
+             } 
+            
+            _htmlFeeds = _htmlFeeds + '<li><a href="#" class="open" feedUrl="' + _feed.feedUrl + '"><p><button class="delete" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button><button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + ' <em>(' + _feed._myPulsations + ')</em></p><p>' + _accountIcone + '<time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds + '</ul>';
@@ -554,13 +569,21 @@
                         _ratioClass = _theme + '-ratio-entry-m';
                     }
                     
+                    // Account icone ?
+                    
+                    var _accountIcone = '';
+                    
+                    if (_entrie._myFeedInformations._myAccount != 'local') {
+                        _accountIcone = '<img src="images/' + _entrie._myFeedInformations._myAccount + '.png" />';
+                    }
+
                     // Content ( Normal / Small )
                     
                     var _content = "";
                     
                     if (_diff >= params.entries.maxLengthForSmallEntries) {
                         _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
-                        _content = _content + '<span class="my-'+_theme+'-title">' + i + '/ ' + _entrie.title + '</span>';
+                        _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                         _content = _content + _imageUrl;
                         _content = _content + '<span class="my-'+_theme+'-date">' + _date + '</span>';
@@ -571,7 +594,7 @@
                         
                     } else if (params.entries.displaySmallEntries) {
                         _content = _content + '<div class="my-'+_theme+'-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
-                        _content = _content + '<span class="my-'+_theme+'-title">' + i + '/ ' + _entrie.title + '</span>';
+                        _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                         _content = _content + _imageUrl;
                         _content = _content + '<span class="my-'+_theme+'-date">' + _date + '</span>';
@@ -688,7 +711,7 @@
     /**
      * @param {null}
      * Update feeds pulsations once all feeds are loaded.
-     * Update array "myFeeds" & indexedDb database.
+     * Update array "myFeedsSubscriptions.local" & indexedDb database.
      * */
     function updateFeedsPulsations() {
         var _tmp = [];
@@ -696,20 +719,21 @@
         var _pulsations;
         var _feed = '';
 
-        for (var i = 0 ; i < myFeeds.length; i++) {
+        for (var i = 0 ; i < myFeedsSubscriptions.local.length; i++) {
             
             for (var j = 0 ; j < _feeds.length; j++) {
                 
-                if (myFeeds[i].url == _feeds[j].feedUrl) {
+                if (myFeedsSubscriptions.local[i].url == _feeds[j].feedUrl) {
 
                     _url        = _feeds[j].feedUrl;
                     _pulsations = _feeds[j]._myPulsations;
+                    _account    = _feeds[j]._myAccount; // test
                     
                     if (isNaN(_pulsations)) {
                         // do nothing
                     } else {
-                        myFeeds[i].pulsations = _pulsations;
-                        _idb.update("mySubscriptions", _url, {url: _url, pulsations: _pulsations});
+                        myFeedsSubscriptions.local[i].pulsations = _pulsations;
+                        _idb.update("mySubscriptions", _url, {url: _url, pulsations: _pulsations, account:_account});
                     }
                     
                     break;
@@ -796,13 +820,20 @@
         // Add feeds from indexedDb database
         
         for (var i = 0; i < results.length; i++) {
-            myFeeds.push(results[i]);
+            var _account = results[i].account;
+            myFeedsSubscriptions[_account].push(results[i]);
         }        
         
         // No feeds sets.
         // Use default feeds ?
         
-        if (myFeeds.length == 0) {
+        var _nbFeedsSubscriptions = 0;
+        
+        for (var _account in myFeedsSubscriptions) {
+            _nbFeedsSubscriptions = _nbFeedsSubscriptions + myFeedsSubscriptions[_account].length;
+        }
+        
+        if (myFeedsSubscriptions.local.length == 0) {
             var _confirm = window.confirm(document.webL10n.get('confirm-populate-database'));
             if (_confirm) {
                 var _populateDatabase = [
@@ -816,15 +847,19 @@
                 
                 for (var i = 0; i < _populateDatabase.length; i++) {
                     _idb.insert('mySubscriptions', _populateDatabase[i]);
-                    myFeeds.push(_populateDatabase[i]);
+                    myFeedsSubscriptions.local.push(_populateDatabase[i]);
                 }
             }
         }
         
         // 1st feeds loading
         
-        if (myFeeds.length > 0) {
-            gf.setFeeds(myFeeds);
+        console.log('========================');
+        console.log(myFeedsSubscriptions);
+        console.log('========================');
+        
+        if (myFeedsSubscriptions.local.length > 0) {
+            gf.setFeedsSubscriptions(myFeedsSubscriptions);
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }
         
@@ -841,6 +876,38 @@
         params.entries.nbDaysAgo = _nbDaysAgo;
     }
     
+    /**
+     * Add new feeds in array myFeedsSubscriptions
+     * if feeds doesn't exists in array.
+     * @param {_feeds} array
+     * */
+    function addNewSubscriptions(_feeds) {
+        for (var i = 0; i < _feeds.length; i++) {
+            _addNewSubscription(_feeds[i]);
+        }
+    }
+    
+    function _addNewSubscription(_feed) {
+        console.log('_addNewSubscription()', arguments);
+        
+        var _insertNewFeed = true;
+        var _account = _feed.account;
+        
+        var i = myFeedsSubscriptions[_account].length;
+        while (i--) {
+            if (myFeedsSubscriptions[_account][i].url === _feed.url) {
+                _insertNewFeed = false;
+                break;
+            }
+        }
+        
+        if (_insertNewFeed) {
+            myFeedsSubscriptions[_account].push(_feed);
+            console.log('=====>>>',_feed);
+            _idb.insert('mySubscriptions', _feed);
+        }
+    }
+    
     // ======================
     // --- Ready to start ---
     // ======================
@@ -854,13 +921,13 @@
         // =====================
 
         var _idbParams = {
-            "databaseName"  : "myFeeds",
+            "databaseName"  : "myWeeklyFeeds",
             "tableName"     : "mySubscriptions",
             "version"       : 1,
             "keyPath"       : "url",
             "indexs": {
                 "url"       : {"unique": true  },
-                "pulsations": {"unique": false }
+                "account"   : {"unique": false }
             }
         };
         
@@ -871,7 +938,7 @@
         // =================================
         // Disable button if subscriptions file doesn't exists.
         
-        My._file_exists('subscriptions.json', function(exists){
+        My._file_exists('subscriptions.local.json', function(exists){
             if (!exists) {
                 _onclick(loadSubscriptions, 'disable');
             }
@@ -912,6 +979,18 @@
             
         }, 500);
         
+        // ======================================
+        // --- Button [sync] enable / disable ---
+        // ======================================
+        
+        /*setInterval(function() {
+            var _syncStatus = sync.style.pointerEvents;
+            if (((myFeedsSubscriptions.local.lenght > 0) || (myFeedsSubscriptions.feedly.length > 0)) && (_syncStatus != _previousSyncStatus)) {
+                _onclick(sync, 'enable');
+                _previousSyncStatus = _syncStatus;
+            }
+        }, 500);*/
+        
         // ==============
         // --- Events ---
         // ==============
@@ -948,7 +1027,7 @@
         document.body.addEventListener('idb.open.onsuccess', function(event){
         
             _idb.select("mySubscriptions", "url", "*", initAndLoadFeeds); // Load feeds from indexedDb database then initAndLoadFeeds()
-            //_idb.deleteDatabase('myFeeds');
+            //_idb.deleteDatabase(_idbParams.databaseName);
         });
     
         document.body.addEventListener('GoogleFeed.load.done', function(event){
@@ -1028,7 +1107,26 @@
             params.accounts.feedly = true;
             _saveParams();
             document.getElementById('feedlyLogin').checked = true; // Enable settings checkbox
-            //feedly.getSubscriptions();
+            feedly.getSubscriptions(); // CustomEvent Feedly.getSubscriptions.done
+        });
+        
+        document.body.addEventListener('Feedly.getSubscriptions.done', function(response){
+            console.log('CustomEvent : Feedly.getSubscriptions.done');
+            var _subscriptions = response.detail;
+            var _feed = '';
+            var _newFeeds = [];
+            for (var i = 0; i < _subscriptions.length; i++) {
+                _feed = {
+                    'url': _subscriptions[i].id.substr(5, _subscriptions[i].id.length),
+                    'pulsations': 20,
+                    'account': 'feedly'
+                };
+                _newFeeds.push(_feed);
+            }
+            addNewSubscriptions(_newFeeds);
+            gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            My._save("subscriptions.feedly.json", "application/json", JSON.stringify(myFeedsSubscriptions.feedly));
         });
     
         // ============

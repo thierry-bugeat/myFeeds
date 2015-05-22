@@ -97,7 +97,7 @@
     padding: 1rem 0 0;
 }
 
-#settings button {
+/*#settings button {
     color: var(--fxos-orange);
     line-height:0;
     height:2rem;
@@ -105,7 +105,7 @@
     width: 45px;
     margin-right: var(--my-spacing);
     background: none;
-}
+}*/
 
 #settings span{
     height: 6rem;

@@ -83,7 +83,8 @@ Feedly.prototype._loginCallback = function(url) {
 }
 
 /**
- * 
+ * @param   {null}
+ * @return  {CustomEvent} Feedly.getSubscriptions.done | Feedly.getSubscriptions.error
  * */
 
 Feedly.prototype.getSubscriptions = function () {

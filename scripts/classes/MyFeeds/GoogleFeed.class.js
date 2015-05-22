@@ -22,7 +22,7 @@ var GoogleFeed = function() {
         "method"        : "GET"
     };
     
-    this.myFeeds = [];
+    this.myFeedsSubscriptions = [];
     this.gf_sortedEntries = [];
     this.sortedFeeds = [];
     this.gf_unsortedEntries = [];
@@ -115,7 +115,22 @@ GoogleFeed.prototype._setNum            = function(num)     {
         this.gf.num = num;
     }
 }
-GoogleFeed.prototype.setFeeds           = function(myFeeds) { this.myFeeds = myFeeds;       }
+
+GoogleFeed.prototype.setFeedsSubscriptions = function(myFeedsSubscriptions) { 
+    console.log('GoogleFeed.prototype.setFeedsSubscriptions()', arguments);
+    
+    var _tmp = [];
+    
+    for (var _account in myFeedsSubscriptions) {
+        for (var i = 0 ; i < myFeedsSubscriptions[_account].length ; i++) {
+            myFeedsSubscriptions[_account][i].account = _account;
+            _tmp.push(myFeedsSubscriptions[_account][i]);
+        }
+    }
+    
+    this.myFeedsSubscriptions = _tmp;
+}
+
 GoogleFeed.prototype.setNbFeedsLoaded   = function()        { this.nbFeedsLoaded++;         }
 
 GoogleFeed.prototype.addEntries = function(entries) {
@@ -158,6 +173,7 @@ GoogleFeed.prototype.addEntries = function(entries) {
 }
 
 GoogleFeed.prototype.addFeed = function(feed) {
+    console.log('GoogleFeed.prototype.addFeed()', arguments);
     
     var _myNewfeed = feed;
     var _myNewEntries = feed.entries;
@@ -212,21 +228,20 @@ GoogleFeed.prototype.addFeed = function(feed) {
 /**
  * @param {int} nbDaysToLoad Limit loading to N days.
  * */
-GoogleFeed.prototype.loadFeeds  = function(nbDaysToLoad) {
+GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
     
     console.log('GoogleFeed.prototype.loadFeeds()');
-    
+
     this.nbFeedsLoaded = 0;
     this.gf_unsortedEntries = [];
     this.unsortedFeeds = [];
     
-    var _params = {"nbFeeds": this.myFeeds.length};
+    //var _params = {"nbFeeds": this.myFeedsSubscriptions.length};
 
-    if (this.myFeeds.length > 0) {
-        for (var i = 0; i < this.myFeeds.length; i++) {
+    if (this.myFeedsSubscriptions.length > 0) {
+        for (var i = 0; i < this.myFeedsSubscriptions.length; i++) {
 
-            var _myFeed = myFeeds[i];
-            
+            var _myFeed = this.myFeedsSubscriptions[i];
             this._setUrl(_myFeed.url);
             this._setNum(Math.floor(1 + (_myFeed.pulsations * nbDaysToLoad))); // Pulsations = Estimation of news per day.
             
@@ -235,9 +250,12 @@ GoogleFeed.prototype.loadFeeds  = function(nbDaysToLoad) {
             
             console.log(_url);
             
+            var _params = {"nbFeeds": this.myFeedsSubscriptions.length, "account": _myFeed.account};
+            
             var promise = this.get(_url, _params);
         
             promise.then(function(response) {
+                response.responseData.feed._myAccount = response.responseData._myParams.account; // Add _myAccount value
                 document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": response}));
             }, function(error) {
                 error._myParams = _params;

@@ -103,6 +103,10 @@
     padding: 1rem 0 0;
 }
 
+#feeds-list > ul > li img {
+    height: 2rem;
+}
+
 #feeds-list button {
     color: var(--fxos-orange);
     line-height: 0;

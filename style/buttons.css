@@ -1,0 +1,42 @@
+button, .button {
+    background: none repeat scroll 0 0 #d8d8d8;
+    border: medium none;
+    border-radius: 2rem;
+    box-sizing: border-box;
+    color: #333;
+    display: inline-block;
+    font-family: sans-serif;
+    font-size: 1.6rem;
+    font-style: italic;
+    font-weight: normal;
+    height: 4rem;
+    line-height: 4rem;
+    margin: 0 0 1rem;
+    outline: medium none;
+    overflow: hidden;
+    padding: 0 1.2rem;
+    text-align: center;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 100%;
+}
+
+/* Recommend */
+button.recommend, .bb-button.recommend {
+    background-color: #00caf2;
+    color: #fff;
+}
+
+/* Danger */
+button.danger, .danger.bb-button {
+    background-color: #e51e1e;
+    color: #fff;
+}
+
+/* Pressed */
+button:active, .button:active {
+    background-color: #b2f2ff;
+    color: #fff;
+}
