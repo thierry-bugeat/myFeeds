@@ -108,6 +108,10 @@
 }
 
 #feeds-list button {
+    width:12%;
+}
+
+/*#feeds-list button {
     color: var(--fxos-orange);
     line-height: 0;
     height: 2rem;
@@ -119,4 +123,4 @@
 #feeds-list button:nth-of-type(2) {
     float: right;
     color: var(--fxos-grey);
-}
+}*/

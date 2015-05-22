@@ -424,28 +424,29 @@
         console.log(feeds);
         console.log(feeds.length + ' feeds');
         
+        var _html = { 
+            'local': '<h2>Local</h2><ul>', 
+            'feedly': '<h2>Feedly</h2><ul>'
+        };
         var _htmlFeeds = "";
         
         // ==========================
         // --- Display feeds list ---
         // ==========================
-
-        _htmlFeeds = _htmlFeeds + '<ul>';
         
-        _htmlFeeds = _htmlFeeds + '<li><a href="#" class="open" feedUrl=""><p><button><span data-icon="forward"></span></button>' + document.webL10n.get('all-feeds') + '</p></a></li>';
-
         for (var i = 0; i < feeds.length; i++) {
             var _feed = feeds[i];
-            var _accountIcone = '';
-            
-             if (_feed._myAccount != 'local') {
-                 _accountIcone = '<img src="images/' + _feed._myAccount + '.png" />';
-             } 
-            
-            _htmlFeeds = _htmlFeeds + '<li><a href="#" class="open" feedUrl="' + _feed.feedUrl + '"><p><button class="delete" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button><button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + ' <em>(' + _feed._myPulsations + ')</em></p><p>' + _accountIcone + '<time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
+            var _account = _feed._myAccount;
+            var _deleteIcone = '';
+             
+             if (_account == 'local') {
+                 _deleteIcone = '<button class="delete" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button>';
+             }
+
+            _html[_account] = _html[_account] + '<li><a href="#" class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + ' <em>(' + _feed._myPulsations + ')</em></p><p><time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
         }
 
-        _htmlFeeds = _htmlFeeds + '</ul>';
+        _htmlFeeds = _htmlFeeds + '<ul><li><a href="#" class="open" feedUrl=""><p><button><span data-icon="forward"></span></button>' + document.webL10n.get('all-feeds') + '</p></a></li></ul>' + _html['local'] + '</ul>' + _html['feedly'] + '</ul>';
         
         // --- Display ---
         
