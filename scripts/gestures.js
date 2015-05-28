@@ -12,11 +12,11 @@ function _swipe(callback) {
     myGesture._action       = "";
     myGesture._scrollTop    = false;
     
-    var _body = document.body;
+    var _element = document.getElementById("feeds-entries");
     
     var direction = "";
     
-    _body.addEventListener("touchstart", function(event) {
+    _element.addEventListener("touchstart", function(event) {
         //event.preventDefault();
         direction = "";
         var _t = event.touches[0];
@@ -31,7 +31,7 @@ function _swipe(callback) {
         
     }, false);
     
-    _body.addEventListener('touchmove', function(event) {
+    _element.addEventListener('touchmove', function(event) {
 
         var direction = _getDirection(myGesture);
         var t = event.touches[0];
@@ -53,7 +53,7 @@ function _swipe(callback) {
         
     }, false);
     
-    _body.addEventListener('touchend', function(event) {
+    _element.addEventListener('touchend', function(event) {
         
         direction = _getDirection(myGesture);
         
@@ -76,7 +76,7 @@ function _swipe(callback) {
             console.log("Direction : " + direction);
 
             if (typeof callback == 'function') {
-                callback(_body, direction);
+                callback(_element, direction);
             }
         }
         
