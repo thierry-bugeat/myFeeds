@@ -71,6 +71,9 @@
     
     // DOM clicks :
     
+    search.onclick = function(event) {
+        feedly.deleteSubscription('http://linuxfr.org/news.atom');
+    }
     sync.onclick            = function(event) { _onclick(this, 'disable'); echo("feeds-list", "Loading...", ""); gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan); }
     menu.onclick            = function(event) { openWindow("feeds-list-container", "left"); }
     topup.onclick           = function(event) { _onclick(topup, 'disable'); document.getElementById("feeds-entries").scrollTop = 0; }
@@ -184,7 +187,8 @@
         console.log('deleteFeed() ', arguments);
         
         var _feedUrl = _this.getAttribute("feedUrl");
-        var _confirm = window.confirm(document.webL10n.get('confirm-delete-feed'));
+        var _account = _this.getAttribute("account");
+        var _confirm = window.confirm(_account + ' : ' + document.webL10n.get('confirm-delete-feed'));
         
         if (_confirm) {
 
@@ -192,25 +196,31 @@
             
             entryFade(_this);
             
-            // (1) Delete feedUrl from array "myFeedsSubscriptions.local"
+            // (1) Delete feedUrl from array "myFeedsSubscriptions[_account]"
             
-            for (var i = 0; i < myFeedsSubscriptions.local.length; i++) {
-                if (myFeedsSubscriptions.local[i].url != _feedUrl) {
+            for (var i = 0; i < myFeedsSubscriptions[_account].length; i++) {
+                if (myFeedsSubscriptions[_account][i].url != _feedUrl) {
                     //delete myFeedsSubscriptions.local[i];
-                    _tmp.push(myFeedsSubscriptions.local[i]);
+                    _tmp.push(myFeedsSubscriptions[_account][i]);
                     //break;
                 }
             }
 
-            myFeedsSubscriptions.local = _tmp.slice();
+            myFeedsSubscriptions[_account] = _tmp.slice();
             
             // (2) Delete from database
             
             _idb._delete_('mySubscriptions', _feedUrl);
             
-            // (3) Reload UI
+            // (3) Delete from Feedly
+            
+            if (_account == 'feedly') {
+                feedly.deleteSubscription(_feedUrl);
+            }
+            
+            // (4) Reload UI
 
-            if (myFeedsSubscriptions.local.length > 0) {
+            if ((myFeedsSubscriptions.local.length > 0) || (myFeedsSubscriptions.feedly.length > 0)) {
                 gf.setFeedsSubscriptions(myFeedsSubscriptions);
                 gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
             } else {
@@ -430,6 +440,8 @@
         };
         var _htmlFeeds = "";
         
+        var _feedlyAccessToken = feedly.getToken().access_token;
+        
         // ==========================
         // --- Display feeds list ---
         // ==========================
@@ -438,11 +450,13 @@
             var _feed = feeds[i];
             var _account = _feed._myAccount;
             var _deleteIcone = '';
-             
-             if (_account == 'local') {
-                 _deleteIcone = '<button class="delete" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button>';
-             }
-
+            
+            if ((_account == 'local') || 
+                ((_account == 'feedly') && (_feedlyAccessToken !== undefined))
+            ){
+                _deleteIcone = '<button class="delete" account="' + _account + '" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button>';
+            }
+            
             _html[_account] = _html[_account] + '<li><a href="#" class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + ' <em>(' + _feed._myPulsations + ')</em></p><p><time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
         }
 
@@ -1138,5 +1152,5 @@
         _onclick(sync, 'disable');      // Disable "sync" button when application start
         _onclick(nextDay, 'disable');
         
-        _onclick(search, 'disable');    // Not yet implemented
+        //_onclick(search, 'disable');    // Not yet implemented
     };

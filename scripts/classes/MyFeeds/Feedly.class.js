@@ -106,6 +106,28 @@ Feedly.prototype.getSubscriptions = function () {
 }
 
 /**
+ * @param   {feedId} String Feed url
+ * @return  {CustomEvent} Feedly.deleteSubscription.done | Feedly.deleteSubscription.error
+ * */
+
+Feedly.prototype.deleteSubscription = function (feedId) {
+    console.log('Feedly.prototype.deleteSubscription()', arguments);
+    
+    var _url = _Feedly.feedly.host + '/v3/subscriptions/' + encodeURIComponent('feed/' + feedId);
+    
+    var promise = this._delete(_url, '');
+    
+    promise.then(function(response) {
+        console.log(response);
+        document.body.dispatchEvent(new CustomEvent('Feedly.deleteSubscription.done', {"detail": response}));
+        console.log("CustomEvent : Feedly.deleteSubscription.done");
+    }, function(error) {
+        document.body.dispatchEvent(new CustomEvent('Feedly.deleteSubscription.error', {"detail": error}));
+        console.error("CustomEvent : Feedly.deleteSubscription.error", error);
+    });
+}
+
+/**
  * get(url, myParams)
  * 
  * @param string url Url to load.
@@ -190,3 +212,38 @@ Feedly.prototype.post = function (url, params, callback) {
     });
 }
 
+/**
+ * _delete(url, callback)
+ * 
+ * @param {string} url Url to load.
+ * @param {string} callback.
+ * 
+ * */
+ 
+Feedly.prototype._delete = function (url, callback) {
+    console.log('Feedly.prototype._delete()', arguments);
+    
+    return new Promise(function(resolve, reject) {
+
+        var xhr = new XMLHttpRequest({ mozSystem: true });
+
+        xhr.open('DELETE', url, true);
+
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        console.log(_Feedly);
+        if (_Feedly.feedly.token) {
+            xhr.setRequestHeader("Authorization", "OAuth " + _Feedly.feedly.token.access_token);
+        }
+
+        xhr.onload = function() {
+            var _response = JSON.parse(xhr.response);
+            typeof callback === 'function' && callback(_response);
+        };
+
+        xhr.onerror = function(e) {
+            typeof callback === 'function' && callback(Error(e));
+        };
+        
+        xhr.send(params);
+    });
+}
