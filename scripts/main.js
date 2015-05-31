@@ -38,6 +38,12 @@
     My._load('params.json', function(_myParams){
         console.log('loading params from file params.json ...', _myParams);
         params = _myParams;
+        // Get and set feedly token from cache
+        if (params.accounts.feedly) {
+            My._load('cache/feedly/access_token.json', function(_token){
+                feedly.setToken(_token);
+            });
+        }
     });
     
     var sortedEntries = [];
@@ -457,7 +463,7 @@
                 _deleteIcone = '<button class="delete" account="' + _account + '" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button>';
             }
             
-            _html[_account] = _html[_account] + '<li><a href="#" class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + ' <em>(' + _feed._myPulsations + ')</em></p><p><time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
+            _html[_account] = _html[_account] + '<li><a href="#" class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds + '<ul><li><a href="#" class="open" feedUrl=""><p><button><span data-icon="forward"></span></button>' + document.webL10n.get('all-feeds') + '</p></a></li></ul>' + _html['local'] + '</ul>' + _html['feedly'] + '</ul>';
@@ -1017,7 +1023,7 @@
         
         // Automatic update entries every N seconds :
         
-        setInterval(function() {
+        var _entriesUpdateInterval = setInterval(function() {
             _onclick(sync, 'disable');
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }, (params.entries.updateEvery * 1000));

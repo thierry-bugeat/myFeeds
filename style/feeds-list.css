@@ -52,6 +52,7 @@
     overflow: auto;
     list-style: none outside none;
     margin: 0;
+    margin-bottom: var(--my-spacing);
     overflow: hidden;
     padding-left: var(--my-spacing);
     padding-right: var(--my-spacing);
@@ -64,7 +65,7 @@
     box-sizing: border-box;
     border-bottom: solid 0.1rem var(--fxos-ivory);
     color: #333;
-    margin: 0;  
+    margin: var(--my-spacing) 0 var(--my-spacing) 0;  
     display: block;
     position: relative;
 }
@@ -93,6 +94,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    height: 2rem;
 }
 
 #feeds-list > ul > li p:first-of-type {
@@ -100,7 +102,8 @@
     color: #333;
     font-size: 1.8rem;
     line-height: 2.2rem;
-    padding: 1rem 0 0;
+    padding: 0;
+    height: 4rem;
 }
 
 #feeds-list > ul > li img {
@@ -108,19 +111,7 @@
 }
 
 #feeds-list button {
-    width:12%;
+    width:4rem;
+    padding:0;
+    margin-right: var(--my-spacing);
 }
-
-/*#feeds-list button {
-    color: var(--fxos-orange);
-    line-height: 0;
-    height: 2rem;
-    float: left;
-    background: none;
-    border: none;
-}
-
-#feeds-list button:nth-of-type(2) {
-    float: right;
-    color: var(--fxos-grey);
-}*/
