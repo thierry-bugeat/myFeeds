@@ -61,7 +61,6 @@
 
 #feeds-list > ul > li {
     width: 100%;
-    height: 6rem;
     box-sizing: border-box;
     border-bottom: solid 0.1rem var(--fxos-ivory);
     color: #333;
@@ -78,7 +77,6 @@
     text-decoration: none;
     color: var(--fxos-ivory);
     display: block;
-    height: 6rem;
     position: relative;
     border: none; 
     outline: none;
