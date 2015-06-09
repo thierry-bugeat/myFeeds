@@ -10,7 +10,7 @@ var Feedly = function() {
     this.feedly = {
         "host"          : "https://sandbox.feedly.com",
         "client_id"     : "sandbox",
-        "client_secret" : "4205DQXBAP99S8SUHXI3",
+        "client_secret" : "A4143F56J75FGQY7TAJM",
         "method"        : "GET",
         "code"          : "",
         "token"         : {}
@@ -26,7 +26,14 @@ Feedly.prototype = new MyFeeds();
 
 Feedly.prototype.setToken = function(token) {
     console.log('Feedly.prototype.setToken()', arguments);
-    this.feedly.token = token;
+    if (typeof token['access_token'] !== 'undefined') {
+        this.feedly.token = token;
+        return 1;
+    } else {
+        document.body.dispatchEvent(new CustomEvent('Feedly.setToken.error', {"detail": token}));
+        window.alert("Feedly Error : \n" + JSON.stringify(token));
+        return 0;
+    }
 }
 
 Feedly.prototype.getToken = function() {
@@ -69,10 +76,14 @@ Feedly.prototype._loginCallback = function(url) {
                 '&grant_type=authorization_code';
         
         this.post(_url, _params, function(response) {
-            _Feedly.setToken(response);
-            _Feedly._save('cache/feedly/access_token.json', 'application/json', JSON.stringify(response));
-            document.body.dispatchEvent(new CustomEvent('Feedly.login.done', {"detail": response}));
-            console.log('CustomEvent : Feedly.login.done');
+            if (_Feedly.setToken(response)) {
+                _Feedly._save('cache/feedly/access_token.json', 'application/json', JSON.stringify(response));
+                document.body.dispatchEvent(new CustomEvent('Feedly.login.done', {"detail": response}));
+                console.log('CustomEvent : Feedly.login.done');
+            } else {
+                document.body.dispatchEvent(new CustomEvent('Feedly.login.error', {"detail": response}));
+                console.log('CustomEvent : Feedly.login.error');
+            }
         });
         
     } else {
