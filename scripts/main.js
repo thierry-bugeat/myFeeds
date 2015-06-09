@@ -77,9 +77,9 @@
     
     // DOM clicks :
     
-    search.onclick = function(event) {
+    /*search.onclick = function(event) {
         feedly.deleteSubscription('http://linuxfr.org/news.atom');
-    }
+    }*/
     sync.onclick            = function(event) { _onclick(this, 'disable'); echo("feeds-list", "Loading...", ""); gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan); }
     menu.onclick            = function(event) { openWindow("feeds-list-container", "left"); }
     topup.onclick           = function(event) { _onclick(topup, 'disable'); document.getElementById("feeds-entries").scrollTop = 0; }
@@ -1124,12 +1124,19 @@
         
         document.body.addEventListener('GoogleFeed.find.done', findFeedsDisplayResults, true);
         
+        /* --- Feedly Events --- */
+        
         document.body.addEventListener('Feedly.login.done', function(response){
             console.log(feedly.getToken());
             params.accounts.feedly = true;
             _saveParams();
             document.getElementById('feedlyLogin').checked = true; // Enable settings checkbox
-            feedly.getSubscriptions(); // CustomEvent Feedly.getSubscriptions.done
+            feedly.getSubscriptions(); // CustomEvent Feedly.getSubscriptions.done, Feedly.getSubscriptions.error
+        });
+        
+        document.body.addEventListener('Feedly.login.error', function(response){
+            console.log('CustomEvent : Feedly.login.error', arguments);
+            window.alert('Feedly login error');
         });
         
         document.body.addEventListener('Feedly.getSubscriptions.done', function(response){
@@ -1150,6 +1157,11 @@
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
             My._save("subscriptions.feedly.json", "application/json", JSON.stringify(myFeedsSubscriptions.feedly));
         });
+        
+        document.body.addEventListener('Feedly.getSubscriptions.error', function(response) {
+            console.log('CustomEvent : Feedly.getSubscriptions.error', arguments);
+            window.alert('Feedly error');
+        });
     
         // ============
         // --- Main ---
@@ -1159,5 +1171,5 @@
         _onclick(sync, 'disable');      // Disable "sync" button when application start
         _onclick(nextDay, 'disable');
         
-        //_onclick(search, 'disable');    // Not yet implemented
+        _onclick(search, 'disable');    // Not yet implemented
     };
