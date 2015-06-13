@@ -1,4 +1,8 @@
- 
+
+.developper-menu {
+    display: none;
+}
+
 #settings-container{
     width:100%;
     height:100%;

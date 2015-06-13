@@ -359,8 +359,8 @@
         '<ul>                                                                                                                                               ',
         '   <li><span data-icon="messages"></span>Feedly<div><label class="pack-switch"><input id="feedlyLogin" type="checkbox" ' + _feedlyAccount + '><span></span></label></div></li>',
         '</ul>                                                                                                                                              ',
-        '<h2>' + document.webL10n.get('settings-developper-menu') + '</h2>                                                                                  ',
-        '<ul>                                                                                                                                               ',
+        '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                                                  ',
+        '<ul class="developper-menu">                                                                                                                                               ',
         '   <li><span data-icon="messages"></span>Database<div><span><button id="deleteDatabase" class="danger">Clear</button></span></div></li>            ',
         '   <li><span data-icon="messages"></span>Database<div><button id="logDatabaseContent">Log content</button></div></li>                              ',
         '   <li><span data-icon="messages"></span>Connection<div>@todo</div></li>                                                          ',
@@ -368,6 +368,18 @@
         ].join(''); 
 
         ui.echo("settings", _htmlSettings, "");
+        
+        // ============================
+        // --- Show developper menu ---
+        // ============================
+        
+        if (settings.developper_menu == true) {
+            var dm = document.getElementsByClassName("developper-menu");
+            var i;
+            for (i = 0; i < dm.length; i++) {
+                dm[i].style.display = "block";
+            }
+        }
         
         // ==================
         // --- Add Events ---
