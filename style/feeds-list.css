@@ -31,11 +31,12 @@
 #feeds-list > h2 {
     color: var(--fxos-orange);
     overflow: auto;
-    padding: 0 1.5rem;
     list-style: none outside none;
     margin: 0;
     overflow: hidden;
-    padding: 0;
+    padding: var(--my-spacing);
+    font-size:1.7rem;
+    font-weight:normal;
 }
 
 #feeds-list > h3 {
@@ -52,7 +53,6 @@
     overflow: auto;
     list-style: none outside none;
     margin: 0;
-    margin-bottom: var(--my-spacing);
     overflow: hidden;
     padding-left: var(--my-spacing);
     padding-right: var(--my-spacing);

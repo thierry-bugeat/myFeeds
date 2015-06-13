@@ -35,6 +35,21 @@
         }
     };
     
+    var settings = {
+        "developper_menu": false
+    }
+    
+    var _entriesUpdateInterval = '';
+    
+    // @todo
+    /*var _connection = navigator.mozMobileConnection;
+    _connection.onsuccess = function () {
+        console.log('connection operation succesful: ', this.result);
+        console.log('connection : ', _connection);
+    }*/
+
+    //var connectionType = connection.type;
+    
     My._load('params.json', function(_myParams){
         console.log('loading params from file params.json ...', _myParams);
         params = _myParams;
@@ -59,7 +74,6 @@
     
     var sync                    = document.getElementById("sync");
     var menu                    = document.getElementById("menu");
-    var topup                   = document.getElementById("topup");
     var search                  = document.getElementById("search");
     var settingsOpen            = document.getElementById("settingsOpen");
     var find_feeds              = document.getElementById("find-feeds");
@@ -80,14 +94,13 @@
     /*search.onclick = function(event) {
         feedly.deleteSubscription('http://linuxfr.org/news.atom');
     }*/
-    sync.onclick            = function(event) { _onclick(this, 'disable'); echo("feeds-list", "Loading...", ""); gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan); }
+    sync.onclick            = function(event) { ui._onclick(this, 'disable'); ui.echo("feeds-list", "Loading...", ""); gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan); }
     menu.onclick            = function(event) { openWindow("feeds-list-container", "left"); }
-    topup.onclick           = function(event) { _onclick(topup, 'disable'); document.getElementById("feeds-entries").scrollTop = 0; }
-    closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container", "right"); echo("browser", "", ""); }
+    closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container", "right"); ui.echo("browser", "", ""); }
     closeFeedsList.onclick  = function(event) { closeWindow("feeds-list-container", "left"); }
     findFeedsOpen.onclick   = function(event) { openWindow("find-feeds-container", "left"); }
     findFeedsClose.onclick  = function(event) { closeWindow("find-feeds-container", "left"); }
-    findFeedsSubmit.onclick = function(event) { var _keywords = document.getElementById("findFeedsText").value; if (_keywords) {echo("find-feeds", "Loading...", ""); gf.findFeeds(_keywords);} }
+    findFeedsSubmit.onclick = function(event) { var _keywords = document.getElementById("findFeedsText").value; if (_keywords) {ui.echo("find-feeds", "Loading...", ""); gf.findFeeds(_keywords);} }
     settingsOpen.onclick    = function(event) { openWindow("settings-container", "right"); }
     settingsClose.onclick   = function(event) { closeWindow("settings-container", "right"); }
     displayGrid.onclick     = function(event) {
@@ -137,11 +150,11 @@
         if (params.entries.nbDaysAgo > 0 ) {
             params.entries.nbDaysAgo--;
         }
-        _onclick(previousDay, 'enable');
+        ui._onclick(previousDay, 'enable');
         if (params.entries.nbDaysAgo == 0) {
-            _onclick(nextDay, 'disable');
+            ui._onclick(nextDay, 'disable');
         } else {
-            _onclick(nextDay, 'enable');
+            ui._onclick(nextDay, 'enable');
         }
         dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
         feeds_entries.scrollTop = 0;
@@ -151,42 +164,14 @@
         if (params.entries.nbDaysAgo < params.entries.dontDisplayEntriesOlderThan) {
             params.entries.nbDaysAgo++;
         }
-        _onclick(nextDay, 'enable');
+        ui._onclick(nextDay, 'enable');
         if (params.entries.nbDaysAgo == params.entries.dontDisplayEntriesOlderThan) {
-            _onclick(previousDay, 'disable');
+            ui._onclick(previousDay, 'disable');
         } else {
-            _onclick(previousDay, 'enable');
+            ui._onclick(previousDay, 'enable');
         }
         dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
         feeds_entries.scrollTop = 0;
-    }
-    
-    /**
-     * Display loading bar.
-     * param {int} percentage
-     * */
-    function _loading(percentage) {
-        if (percentage >= 100) {
-            loading.style.cssText = "width: 0%";
-        } else {
-            loading.style.cssText = "width: " + percentage + "%";
-        }
-    }
-    
-    /**
-     *
-     * https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events
-     * */
-    function _onclick(_this, pointerEvents) {
-        console.log(_this);
-        
-        if (pointerEvents == 'enable') {
-            _this.style.cssText = "opacity: 1";
-            _this.style.pointerEvents = 'auto';
-        } else {
-            _this.style.cssText = "opacity: 0.3";
-            _this.style.pointerEvents = 'none';
-        }
     }
     
     function deleteFeed(_this) {
@@ -230,9 +215,9 @@
                 gf.setFeedsSubscriptions(myFeedsSubscriptions);
                 gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
             } else {
-                echo("feeds-list", "", "");
-                echo("feeds-entries", "", "");
-                _onclick(sync, 'disable');
+                ui.echo("feeds-list", "", "");
+                ui.echo("feeds-entries", "", "");
+                ui._onclick(sync, 'disable');
             }
         }
     }
@@ -251,7 +236,7 @@
             
             _htmlResults = _htmlResults + "</ul>";
         
-            echo("find-feeds", _htmlResults, "");
+            ui.echo("find-feeds", _htmlResults, "");
             
             // ==================
             // --- Add Events ---
@@ -266,7 +251,7 @@
             }
         
         } else {
-            echo("find-feeds", "Find feeds : Network error", "prepend");
+            ui.echo("find-feeds", "Find feeds : Network error", "prepend");
         }
     }
     
@@ -376,12 +361,13 @@
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-developper-menu') + '</h2>                                                                                  ',
         '<ul>                                                                                                                                               ',
-        '   <li><span data-icon="messages"></span>Database<div><span><button id="deleteDatabase" class="danger">Clear</button></span></div></li>',
-        '   <li><span data-icon="messages"></span>Database<div><button id="logDatabaseContent">Log content</button></div></li>',
+        '   <li><span data-icon="messages"></span>Database<div><span><button id="deleteDatabase" class="danger">Clear</button></span></div></li>            ',
+        '   <li><span data-icon="messages"></span>Database<div><button id="logDatabaseContent">Log content</button></div></li>                              ',
+        '   <li><span data-icon="messages"></span>Connection<div>@todo</div></li>                                                          ',
         '</ul>                                                                                                                                              '
         ].join(''); 
 
-        echo("settings", _htmlSettings, "");
+        ui.echo("settings", _htmlSettings, "");
         
         // ==================
         // --- Add Events ---
@@ -396,6 +382,17 @@
         _selectUpdateEvery.onchange = function(e) {
             params.entries.updateEvery = _selectUpdateEvery.options[_selectUpdateEvery.selectedIndex].value;
             _saveParams();
+            
+            // Automatic update entries every N seconds :
+            // Clear and reset interval
+            
+            clearInterval(_entriesUpdateInterval);
+            
+            _entriesUpdateInterval = setInterval(function() {
+                ui._onclick(sync, 'disable');
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            }, (params.entries.updateEvery * 1000));
+            
         }
         
         var _selectMaxNbDays = document.getElementById('selectMaxNbDays');
@@ -470,7 +467,7 @@
         
         // --- Display ---
         
-        echo("feeds-list", _htmlFeeds, "");
+        ui.echo("feeds-list", _htmlFeeds, "");
         
         // ==================
         // --- Add Events ---
@@ -643,14 +640,14 @@
             _daySeparator = myExtraTranslations['nb-days-ago'].replace('{{n}}', nbDaysAgo);
         }
         
-        echo('feedsEntriesNbDaysAgo', _daySeparator, '');
+        ui.echo('feedsEntriesNbDaysAgo', _daySeparator, '');
         
         // Display entries
         
         if (_nbEntriesDisplayed > 0) {
-            echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
+            ui.echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
         } else {
-            echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('no-news-today') + '</div>', "");
+            ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('no-news-today') + '</div>', "");
         }
         
         // ==================
@@ -718,9 +715,9 @@
             _srcDoc = _srcDoc + '<div class="entrie-contentSnippet">' + _entry.content.replace(_regex, "&#39;") + '</div>';
             _srcDoc = _srcDoc + '<div class="entrie-visit-website"><a href="' + _entry.link + '">' + document.webL10n.get('entry-visit-website') + '</a></div>';
             
-            echo("browser", '<iframe srcdoc=\'' + _srcDoc + '\' sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
+            ui.echo("browser", '<iframe srcdoc=\'' + _srcDoc + '\' sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
         } else {
-            echo("browser", '<iframe src="' + url + '" sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
+            ui.echo("browser", '<iframe src="' + url + '" sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
         }
         
         document.getElementById("browser").style.cssText = "display: block;";
@@ -762,26 +759,6 @@
                 }
             }
         }
-    }
-    
-    /**
-     * Output one html string in div element
-     * 
-     * param string divId    : Div id element
-     * param string msg      : Html string to write
-     * param string placement: "append", "prepend", ""
-     * */
-    function echo(divId, msg, placement) {
-        var _out = document.getElementById(divId);
-        
-        if (placement == 'prepend') {
-            _out.innerHTML = msg + _out.innerHTML;
-        } else if (Boolean(placement)) {
-            _out.innerHTML = _out.innerHTML + msg;
-        } else {
-            _out.innerHTML = msg;
-        }
-
     }
         
     /**
@@ -925,7 +902,6 @@
         
         if (_insertNewFeed) {
             myFeedsSubscriptions[_account].push(_feed);
-            console.log('=====>>>',_feed);
             _idb.insert('mySubscriptions', _feed);
         }
     }
@@ -962,44 +938,9 @@
         
         My._file_exists('subscriptions.local.json', function(exists){
             if (!exists) {
-                _onclick(loadSubscriptions, 'disable');
+                ui._onclick(loadSubscriptions, 'disable');
             }
         });
-        
-        // =======================================
-        // --- Button [topup] enable / disable ---
-        // =======================================
-        
-        var _topup = {
-            "previousScrollTop": 0, 
-            "previousStatus": "disabled"
-        };
-        
-        setInterval(function() {
-
-            // Scroll in progress
-            
-            if (feeds_entries.scrollTop != _topup['previousScrollTop']) {
-                
-                if (_topup['previousScrollTop'] == 0) { 
-                    _onclick(topup, 'enable'); 
-                    _topup['previousStatus'] = 'enabled'; 
-                }
-                
-                _topup['previousScrollTop'] = feeds_entries.scrollTop;
-            } 
-            
-            // End scroll
-            
-            else {
-                
-                if ((_topup['previousStatus'] == 'enabled') && (feeds_entries.scrollTop == 0)) {
-                    _onclick(topup, 'disable'); 
-                    _topup['previousStatus'] = 'disabled';
-                }
-            }
-            
-        }, 500);
         
         // ======================================
         // --- Button [sync] enable / disable ---
@@ -1008,7 +949,7 @@
         /*setInterval(function() {
             var _syncStatus = sync.style.pointerEvents;
             if (((myFeedsSubscriptions.local.lenght > 0) || (myFeedsSubscriptions.feedly.length > 0)) && (_syncStatus != _previousSyncStatus)) {
-                _onclick(sync, 'enable');
+                ui._onclick(sync, 'enable');
                 _previousSyncStatus = _syncStatus;
             }
         }, 500);*/
@@ -1023,8 +964,8 @@
         
         // Automatic update entries every N seconds :
         
-        var _entriesUpdateInterval = setInterval(function() {
-            _onclick(sync, 'disable');
+        _entriesUpdateInterval = setInterval(function() {
+            ui._onclick(sync, 'disable');
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }, (params.entries.updateEvery * 1000));
         
@@ -1070,7 +1011,7 @@
                 
                 // Percentage of loading ?
                 
-                _loading(Math.round((100 * _nbFeedsLoaded) / _nbFeedsToLoad));
+                ui._loading(Math.round((100 * _nbFeedsLoaded) / _nbFeedsToLoad));
                 
                 // ---
 
@@ -1082,8 +1023,8 @@
                 }
                 
                 if (_nbFeedsLoaded >= _nbFeedsToLoad) {
-                    _loading(100); echo("loading", "", "");
-                    _onclick(sync, 'enable');
+                    ui._loading(100); ui.echo("loading", "", "");
+                    ui._onclick(sync, 'enable');
                 }
             
             // ---
@@ -1102,7 +1043,7 @@
                 
                 // Percentage of loading ?
                 
-                _loading(Math.round((100 * _nbFeedsLoaded) / _nbFeedsToLoad));
+                ui._loading(Math.round((100 * _nbFeedsLoaded) / _nbFeedsToLoad));
                 
                 // ---
 
@@ -1114,8 +1055,8 @@
                 }
                 
                 if (_nbFeedsLoaded >= _nbFeedsToLoad) {
-                    _loading(100); echo("loading", "", "");
-                    _onclick(sync, 'enable');
+                    ui._loading(100); ui.echo("loading", "", "");
+                    ui._onclick(sync, 'enable');
                 }
             
             // ---
@@ -1166,10 +1107,6 @@
         // ============
         // --- Main ---
         // ============
-
-        _onclick(topup, 'disable');     // Disable "topup" button when application start
-        _onclick(sync, 'disable');      // Disable "sync" button when application start
-        _onclick(nextDay, 'disable');
         
-        _onclick(search, 'disable');    // Not yet implemented
+        ui.init();
     };

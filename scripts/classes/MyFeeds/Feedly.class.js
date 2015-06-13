@@ -8,13 +8,32 @@ var Feedly = function() {
     MyFeeds.call(this); /* Appel du constructeur de la classe parente */
 
     this.feedly = {
-        "host"          : "https://sandbox.feedly.com",
-        "client_id"     : "sandbox",
-        "client_secret" : "A4143F56J75FGQY7TAJM",
+        "host"          : "",
+        "client_id"     : "",
+        "client_secret" : "",
         "method"        : "GET",
         "code"          : "",
-        "token"         : {}
+        "token"         : {},
+        "environment"   : "dev", // dev, prod
+        "environments"  : {
+            "dev" : 
+            {
+                "host"          : "https://sandbox.feedly.com",
+                "client_id"     : "sandbox",
+                "client_secret" : "A4143F56J75FGQY7TAJM",
+            },
+            "prod" : 
+            {
+                "host"          : "https://feedly.com",
+                "client_id"     : "myfeeds",
+                "client_secret" : "FE01MWBCIPM6HU8LHAW2215UPUFO",
+            }
+        }
     };
+    
+    this.host                   = this.feedly.environments[this.feedly.environment].host;
+    this.feedly.client_id       = this.feedly.environments[this.feedly.environment].client_id;
+    this.feedly.client_secret   = this.feedly.environments[this.feedly.environment].client_secret;
 
     _Feedly = this;
 }

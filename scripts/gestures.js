@@ -64,8 +64,8 @@ function _swipe(callback) {
         // Sync : Launch a sync if no synchro is in progress
         
         if ((myGesture._action == "sync") && (sync.style.pointerEvents == 'auto')) {
-            _onclick(sync, 'disable');
-            echo("feeds-list", "Loading...", ""); 
+            ui._onclick(sync, 'disable');
+            ui.echo("feeds-list", "Loading...", ""); 
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }
         
