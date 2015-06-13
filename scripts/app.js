@@ -36,7 +36,7 @@
     };
     
     var settings = {
-        "developper_menu": false
+        "developper_menu": false                // Display or not developper menu in settings
     }
     
     var _entriesUpdateInterval = '';
