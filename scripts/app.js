@@ -14,7 +14,7 @@
     var _myTimestamp;       // Value set by function "_setMyTimestamp()"
     var _idb;               // IndexedDb
     
-    var myFeedsSubscriptions = { 'local': [], 'feedly': []} ; // Store informations about feeds (urls)
+    var myFeedsSubscriptions = {'local': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
     
     //addFeedsFromMyOnlineAccounts();
     
@@ -31,12 +31,17 @@
             "theme": "grid"                     // card (default), grid
         },
         "accounts": {
-            "feedly": false
+            "feedly": false,
+            "theoldreader": false
         }
     };
     
     var settings = {
-        "developper_menu": false                // Display or not developper menu in settings
+        "developper_menu": false,               // Display or not developper menu in settings
+        "update": {
+            "every": [900, 1800, 3600]          // In seconds 5mn, 30mn, 60mn
+        },
+        "days": [3, 5, 7, 10]
     }
     
     var _entriesUpdateInterval = '';
@@ -53,12 +58,18 @@
     My._load('params.json', function(_myParams){
         console.log('loading params from file params.json ...', _myParams);
         params = _myParams;
-        // Get and set feedly token from cache
+        // Get and set Feedly token from cache
         if (params.accounts.feedly) {
             My._load('cache/feedly/access_token.json', function(_token){
                 feedly.setToken(_token);
             });
         }
+        // Get and set The Old Reader token from cache
+        /*if (params.accounts.theoldreader) {
+            My._load('cache/theoldreader/access_token.json', function(_token){
+                tor.setToken(_token);
+            });
+        }*/
     });
     
     var sortedEntries = [];
@@ -91,9 +102,10 @@
     
     // DOM clicks :
     
-    /*search.onclick = function(event) {
-        feedly.deleteSubscription('http://linuxfr.org/news.atom');
-    }*/
+    search.onclick = function(event) {
+        tor.login(); // test a supprimer
+        //feedly.deleteSubscription('http://linuxfr.org/news.atom');
+    }
     sync.onclick            = function(event) { ui._onclick(this, 'disable'); ui.echo("feeds-list", "Loading...", ""); gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan); }
     menu.onclick            = function(event) { openWindow("feeds-list-container", "left"); }
     closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container", "right"); ui.echo("browser", "", ""); }
@@ -211,7 +223,10 @@
             
             // (4) Reload UI
 
-            if ((myFeedsSubscriptions.local.length > 0) || (myFeedsSubscriptions.feedly.length > 0)) {
+            if ((myFeedsSubscriptions.local.length > 0) || 
+                (myFeedsSubscriptions.feedly.length > 0) ||
+                (myFeedsSubscriptions.theoldreader.length > 0)
+            ){
                 gf.setFeedsSubscriptions(myFeedsSubscriptions);
                 gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
             } else {
@@ -304,9 +319,17 @@
             _feedlyAccount = "";
         }
         
+        // The Old Reader selector
+        
+        if (params.accounts.theoldreader) {
+            _theoldreaderAccount = 'checked=""';
+        } else {
+            _theolsreaderAccount = "";
+        }
+        
         // Update every 
         
-        var _every = [900, 1800, 3600]; // In seconds
+        var _every = settings.update.every;
         var _htmlSelectUpdateEvery = "";
         var _selected = "";
         
@@ -325,7 +348,7 @@
         
         // Max nb Days 
         
-        var _days = [3, 5, 7, 10];
+        var _days = settings.days;
         var _htmlMaxNbDays = "";
         var _selected = "";
         
@@ -358,6 +381,9 @@
         '<h2>' + document.webL10n.get('settings-online-accounts') + '</h2>                                                                                  ',
         '<ul>                                                                                                                                               ',
         '   <li><span data-icon="messages"></span>Feedly<div><label class="pack-switch"><input id="feedlyLogin" type="checkbox" ' + _feedlyAccount + '><span></span></label></div></li>',
+        '   <li><span data-icon="messages"></span>The Old Reader<div><label class="pack-switch"><input id="theoldreaderLogin" type="checkbox" ' + _theoldreaderAccount + '><span></span></label></div></li>',
+        '   <li><span data-icon="messages"></span>Email<div><label><input id="theoldreaderEmail" name="theoldreaderEmail" type="text" value=""><span></span></label></div></li>',
+        '   <li><span data-icon="messages"></span>Passwd<div><label><input id="theoldreaderPasswd" name="theoldreaderPasswd" type="text" value=""><span></span></label></div></li>',
         '</ul>                                                                                                                                              ',
         '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                                                  ',
         '<ul class="developper-menu">                                                                                                                                               ',
@@ -425,6 +451,20 @@
             }
         }
         
+        // Feedly checkbox
+        
+        document.getElementById('theoldreaderLogin').onclick = function() {
+            if (this.checked) {
+                this.checked = false; // False until CustomEvent TheOldReader.login.done
+                var _email = document.getElementById("theoldreaderEmail").value;
+                var _passwd = document.getElementById("theoldreaderPasswd").value;
+                tor.login(_email, _passwd);
+            } else {
+                params.accounts.feedly = false;
+                _saveParams();
+            }
+        }
+        
         // Delete database
         
         document.getElementById('deleteDatabase').onclick = function(event) {
@@ -451,11 +491,12 @@
         
         var _html = { 
             'local': '<h2>Local</h2><ul>', 
-            'feedly': '<h2>Feedly</h2><ul>'
+            'feedly': '<h2>Feedly</h2><ul>',
+            'theoldreader': '<h2>The Old Reader</h2><ul>'
         };
         var _htmlFeeds = "";
-        
         var _feedlyAccessToken = feedly.getToken().access_token;
+        var _theoldreaderAuth = tor.getToken().Auth;
         
         // ==========================
         // --- Display feeds list ---
@@ -467,7 +508,8 @@
             var _deleteIcone = '';
             
             if ((_account == 'local') || 
-                ((_account == 'feedly') && (_feedlyAccessToken !== undefined))
+                ((_account == 'feedly') && (_feedlyAccessToken !== undefined)) || 
+                ((_account == 'theoldreader') && (_theoldreaderAuth !== undefined))
             ){
                 _deleteIcone = '<button class="delete" account="' + _account + '" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button>';
             }
@@ -475,7 +517,14 @@
             _html[_account] = _html[_account] + '<li><a href="#" class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
         }
 
-        _htmlFeeds = _htmlFeeds + '<ul><li><a href="#" class="open" feedUrl=""><p><button><span data-icon="forward"></span></button>' + document.webL10n.get('all-feeds') + '</p></a></li></ul>' + _html['local'] + '</ul>' + _html['feedly'] + '</ul>';
+        _htmlFeeds = _htmlFeeds + 
+            '<ul>' +
+            '<li><a href="#" class="open" feedUrl=""><p><button><span data-icon="forward"></span></button>' + document.webL10n.get('all-feeds') + '</p></a></li>' +
+            '</ul>' + 
+            _html['local'] + '</ul>' + 
+            _html['feedly'] + '</ul>' + 
+            _html['theoldreader'] + '</ul>' + 
+            '';
         
         // --- Display ---
         
@@ -1114,6 +1163,45 @@
         document.body.addEventListener('Feedly.getSubscriptions.error', function(response) {
             console.log('CustomEvent : Feedly.getSubscriptions.error', arguments);
             window.alert('Feedly error');
+        });
+        
+        /* --- The Old Reader Events --- */
+        
+        document.body.addEventListener('TheOldReader.login.done', function(response){
+            console.log('TheOldReader.getToken()', tor.getToken());
+            params.accounts.theoldreader = true;
+            _saveParams();
+            document.getElementById('theoldreaderLogin').checked = true; // Enable settings checkbox
+            tor.getSubscriptions(); // CustomEvent TheOldReader.getSubscriptions.done, TheOldReader.getSubscriptions.error
+        });
+        
+        document.body.addEventListener('TheOldReader.login.error', function(response){
+            console.log('CustomEvent : TheOldReader.login.error', arguments);
+            window.alert('The Old Reader login error');
+        });
+        
+        document.body.addEventListener('TheOldReader.getSubscriptions.done', function(response){
+            console.log('CustomEvent : TheOldReader.getSubscriptions.done', response);
+            var _subscriptions = response.detail.subscriptions;
+            var _feed = '';
+            var _newFeeds = [];
+            for (var i = 0; i < _subscriptions.length; i++) {
+                _feed = {
+                    'url': _subscriptions[i].url,
+                    'pulsations': 20,
+                    'account': 'theoldreader'
+                };
+                _newFeeds.push(_feed);
+            }
+            addNewSubscriptions(_newFeeds);
+            gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            My._save("subscriptions.theoldreader.json", "application/json", JSON.stringify(myFeedsSubscriptions.theoldreader));
+        });
+        
+        document.body.addEventListener('TheOldReader.getSubscriptions.error', function(response) {
+            console.log('CustomEvent : TheOldReader.getSubscriptions.error', arguments);
+            window.alert('The Old Reader error');
         });
     
         // ============
