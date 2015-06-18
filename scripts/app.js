@@ -404,9 +404,11 @@
         '<h2>' + document.webL10n.get('settings-online-accounts') + '</h2>                                                                                  ',
         '<ul>                                                                                                                                               ',
         '   <li><span data-icon="messages"></span>Feedly<div><label class="pack-switch"><input id="feedlyLogin" type="checkbox" ' + _feedlyAccount + '><span></span></label></div></li>',
-        '   <li><span data-icon="messages"></span>The Old Reader<div><label class="pack-switch"><input id="theoldreaderLogin" type="checkbox" ' + _theoldreaderAccount + '><span></span></label></div></li>',
-        '   <li><span data-icon="messages"></span>Email<div><label><input id="theoldreaderEmail" name="theoldreaderEmail" type="text" value=""><span></span></label></div></li>',
-        '   <li><span data-icon="messages"></span>Passwd<div><label><input id="theoldreaderPasswd" name="theoldreaderPasswd" type="text" value=""><span></span></label></div></li>',
+        '   <li>',
+        '       <span data-icon="messages"></span>The Old Reader<div><label class="pack-switch"><input id="theoldreaderLogin" type="checkbox" ' + _theoldreaderAccount + '><span></span></label></div>',
+        '       <p><input id="theoldreaderEmail" required="" placeholder="Email" name="theoldreaderEmail" type="text" value=""></p>                         ',
+        '       <p><input id="theoldreaderPasswd" required="" placeholder="Password" name="theoldreaderPasswd" type="text" value=""><p>                     ',
+        '   </li>                                                                                                                                           ',
         '</ul>                                                                                                                                              ',
         '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
         '<ul class="developper-menu">                                                                                                                       ',
@@ -417,7 +419,7 @@
         ].join(''); 
 
         ui.echo("settings", _htmlSettings, "");
-        
+
         // ============================
         // --- Show developper menu ---
         // ============================
