@@ -11,6 +11,15 @@
     // http://imikado.developpez.com/tutoriels/firefoxOS/ma-premier-application/
     // http://toddmotto.com/is-it-time-to-drop-jquery-essentials-to-learning-javascript-from-a-jquery-background/
     
+    var My = new MyFeeds();
+    var ui = new MyUi();
+
+    var tor = new TheOldReader();
+    var feedly = new Feedly();
+
+    var gf = new GoogleFeed();
+    var _idb = new MyIndexedDb();
+    
     var _myTimestamp;       // Value set by function "_setMyTimestamp()"
     var _idb;               // IndexedDb
     
@@ -55,22 +64,29 @@
 
     //var connectionType = connection.type;
     
-    My._load('params.json', function(_myParams){
+    // Load params from SDCard.
+    // Save file if file doesn't exists.
+    
+    My._load('params.json').then(function(_myParams) {
         console.log('loading params from file params.json ...', _myParams);
         params = _myParams;
         // Get and set Feedly token from cache
         if (params.accounts.feedly) {
-            My._load('cache/feedly/access_token.json', function(_token){
+            My._load('cache/feedly/access_token.json').then(function(_token){
                 feedly.setToken(_token);
             });
         }
         // Get and set The Old Reader token from cache
-        /*if (params.accounts.theoldreader) {
-            My._load('cache/theoldreader/access_token.json', function(_token){
+        if (params.accounts.theoldreader) {
+            My._load('cache/theoldreader/access_token.json').then(function(_token){
                 tor.setToken(_token);
             });
-        }*/
+        }
+    }).catch(function(error) {
+        _saveParams();
     });
+    
+    // ---
     
     var sortedEntries = [];
     var sortedFeeds = [];
@@ -102,10 +118,10 @@
     
     // DOM clicks :
     
-    search.onclick = function(event) {
-        tor.login(); // test a supprimer
+    //search.onclick = function(event) {
+      //  tor.login(); // test a supprimer
         //feedly.deleteSubscription('http://linuxfr.org/news.atom');
-    }
+    //}
     sync.onclick            = function(event) { ui._onclick(this, 'disable'); ui.echo("feeds-list", "Loading...", ""); gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan); }
     menu.onclick            = function(event) { openWindow("feeds-list-container", "left"); }
     closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container", "right"); ui.echo("browser", "", ""); }
@@ -133,14 +149,19 @@
     
     loadSubscriptions.onclick   = function(event) { 
         if (window.confirm(document.webL10n.get('confirm-load-subscriptions'))) {
-            My._load(
-                'subscriptions.local.json', 
+            My._load('subscriptions.local.json').then(
                 function (_mySubscriptions) {
-                    addNewSubscriptions(_mySubscriptions);
+                    try{
+                        addNewSubscriptions(_mySubscriptions);
+                    } catch (err) {
+                        window.alert(err.message);
+                    }
                     gf.setFeedsSubscriptions(myFeedsSubscriptions);
                     gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
                 }
-            );
+            ).catch(function(error) {
+                window.alert(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
+            });
         }
     }
     
@@ -150,9 +171,11 @@
             var _feeds = gf.getFeeds();
             var _feed = "";
             for (var i = 0 ; i < _feeds.length; i++) {
-                _url = _feeds[i].feedUrl;
-                _feed = {"url": _url, "pulsations": _feeds[i]._myPulsations, "account": _feeds[i]._myAccount};
-                _output.push(_feed);
+                if ( _feeds[i]._myAccount == "local") {
+                    _url = _feeds[i].feedUrl;
+                    _feed = {"url": _url, "pulsations": _feeds[i]._myPulsations, "account": _feeds[i]._myAccount};
+                    _output.push(_feed);
+                }
             }
             My._save("subscriptions.local.json", "application/json", JSON.stringify(_output));
         }
@@ -324,7 +347,7 @@
         if (params.accounts.theoldreader) {
             _theoldreaderAccount = 'checked=""';
         } else {
-            _theolsreaderAccount = "";
+            _theoldreaderAccount = "";
         }
         
         // Update every 
@@ -385,11 +408,11 @@
         '   <li><span data-icon="messages"></span>Email<div><label><input id="theoldreaderEmail" name="theoldreaderEmail" type="text" value=""><span></span></label></div></li>',
         '   <li><span data-icon="messages"></span>Passwd<div><label><input id="theoldreaderPasswd" name="theoldreaderPasswd" type="text" value=""><span></span></label></div></li>',
         '</ul>                                                                                                                                              ',
-        '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                                                  ',
-        '<ul class="developper-menu">                                                                                                                                               ',
+        '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
+        '<ul class="developper-menu">                                                                                                                       ',
         '   <li><span data-icon="messages"></span>Database<div><span><button id="deleteDatabase" class="danger">Clear</button></span></div></li>            ',
         '   <li><span data-icon="messages"></span>Database<div><button id="logDatabaseContent">Log content</button></div></li>                              ',
-        '   <li><span data-icon="messages"></span>Connection<div>@todo</div></li>                                                          ',
+        '   <li><span data-icon="messages"></span>Connection<div>@todo</div></li>                                                                           ',
         '</ul>                                                                                                                                              '
         ].join(''); 
 
@@ -875,12 +898,15 @@
     // 1st feeds loading.
     
     function initAndLoadFeeds(results) {
-        console.log('start arguments: ', arguments);
+        console.log('initAndLoadFeeds()', arguments);
 
         // Add feeds from indexedDb database
         
         for (var i = 0; i < results.length; i++) {
             var _account = results[i].account;
+            if (myFeedsSubscriptions[_account] === undefined) {
+                myFeedsSubscriptions[_account] = [];
+            }
             myFeedsSubscriptions[_account].push(results[i]);
         }        
         
@@ -897,12 +923,12 @@
             var _confirm = window.confirm(document.webL10n.get('confirm-populate-database'));
             if (_confirm) {
                 var _populateDatabase = [
-                    {"url": "https://www.reddit.com/r/FireFoxOS/.rss",          "pulsations": 2},
-                    {"url": "http://www.webupd8.org/feeds/posts/default",       "pulsations": 2},
-                    {"url": "http://metro.co.uk/sport/football/feed/",          "pulsations": 5},
-                    {"url": "http://sourceforge.net/blog/feed/",                "pulsations": 2},
-                    {"url": "http://www.gorillavsbear.net/category/mp3/feed/",  "pulsations": 2},
-                    {"url": "http://www.wired.com/feed/",                       "pulsations": 5}
+                    {"url": "https://www.reddit.com/r/FireFoxOS/.rss",          "pulsations": 2,    "account": "local"},
+                    {"url": "http://www.webupd8.org/feeds/posts/default",       "pulsations": 2,    "account": "local"},
+                    {"url": "http://metro.co.uk/sport/football/feed/",          "pulsations": 5,    "account": "local"},
+                    {"url": "http://sourceforge.net/blog/feed/",                "pulsations": 2,    "account": "local"},
+                    {"url": "http://www.gorillavsbear.net/category/mp3/feed/",  "pulsations": 2,    "account": "local"},
+                    {"url": "http://www.wired.com/feed/",                       "pulsations": 5,    "account": "local"}
                 ];
                 
                 for (var i = 0; i < _populateDatabase.length; i++) {
@@ -942,6 +968,7 @@
      * @param {_feeds} array
      * */
     function addNewSubscriptions(_feeds) {
+        console.log('addNewSubscriptions()', arguments);
         for (var i = 0; i < _feeds.length; i++) {
             _addNewSubscription(_feeds[i]);
         }
@@ -952,6 +979,10 @@
         
         var _insertNewFeed = true;
         var _account = _feed.account;
+        
+        if (myFeedsSubscriptions[_account] === undefined) {
+            myFeedsSubscriptions[_account] = [];
+        }
         
         var i = myFeedsSubscriptions[_account].length;
         while (i--) {

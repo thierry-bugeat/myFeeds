@@ -31,7 +31,7 @@ var Feedly = function() {
         }
     };
     
-    this.host                   = this.feedly.environments[this.feedly.environment].host;
+    this.feedly.host            = this.feedly.environments[this.feedly.environment].host;
     this.feedly.client_id       = this.feedly.environments[this.feedly.environment].client_id;
     this.feedly.client_secret   = this.feedly.environments[this.feedly.environment].client_secret;
 

@@ -93,12 +93,14 @@ MyUi.prototype.bind = function() {
 MyUi.prototype._onclick = function(_this, pointerEvents) {
     console.log(_this);
     
-    if (pointerEvents == 'enable') {
-        _this.style.cssText = "opacity: 1";
-        _this.style.pointerEvents = 'auto';
-    } else {
-        _this.style.cssText = "opacity: 0.3";
-        _this.style.pointerEvents = 'none';
+    if (_this !== null) {
+        if (pointerEvents == 'enable') {
+            _this.style.cssText = "opacity: 1";
+            _this.style.pointerEvents = 'auto';
+        } else {
+            _this.style.cssText = "opacity: 0.3";
+            _this.style.pointerEvents = 'none';
+        }
     }
 }
 

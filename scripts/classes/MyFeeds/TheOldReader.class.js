@@ -15,7 +15,8 @@ var TheOldReader = function() {
         "client"        : "myFeeds",
         "email"         : "",
         "password"      : "",
-        "token"         : {}
+        "token"         : {},
+        "subscriptions" : []
     };
 
     _TheOldReader = this;
@@ -90,12 +91,25 @@ TheOldReader.prototype.getSubscriptions = function () {
     var promise = this.get(_url, '');
     
     promise.then(function(response) {
+        _TheOldReader.tor.subscriptions = response;
         document.body.dispatchEvent(new CustomEvent('TheOldReader.getSubscriptions.done', {"detail": response}));
         console.log("CustomEvent : TheOldReader.getSubscriptions.done");
     }, function(error) {
         document.body.dispatchEvent(new CustomEvent('TheOldReader.getSubscriptions.error', {"detail": error}));
         console.error("CustomEvent : TheOldReader.getSubscriptions.error", error);
     });
+}
+
+/**
+ * @param   {feedId} String Feed url
+ * @return  {CustomEvent} Feedly.deleteSubscription.done | TheOldReader.deleteSubscription.error
+ * */
+
+TheOldReader.prototype.deleteSubscription = function (feedId) {
+    console.log('TheOldReader.prototype.deleteSubscription()', arguments);
+    console.log('TheOldReader.prototype.deleteSubscription()', _TheOldReader.tor.subscriptions);
+    //ac=unsubscribe
+    //s=feed/00157a17b192950b65be3791 # Stream Id
 }
 
 /**
