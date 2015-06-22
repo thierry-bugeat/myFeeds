@@ -46,7 +46,7 @@
     };
     
     var settings = {
-        "developper_menu": false,               // Display or not developper menu in settings
+        "developper_menu": true,               // Display or not developper menu in settings
         "update": {
             "every": [900, 1800, 3600]          // In seconds 5mn, 30mn, 60mn
         },
@@ -55,12 +55,17 @@
     
     var _entriesUpdateInterval = '';
     
-    // @todo
-    /*var _connection = navigator.mozMobileConnection;
-    _connection.onsuccess = function () {
-        console.log('connection operation succesful: ', this.result);
-        console.log('connection : ', _connection);
-    }*/
+    // Connection type : wifi, cellular, none
+
+    /*var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    var connectionType = connection.type;
+
+    function updateConnectionStatus() {
+        console.log("Connection type is change from " + connectionType + " to " + connection.type);
+        connectionType = connection.type;
+    }
+
+    connection.addEventListener('typechange', updateConnectionStatus);*/
 
     //var connectionType = connection.type;
     
@@ -414,7 +419,7 @@
         '<ul class="developper-menu">                                                                                                                       ',
         '   <li><span data-icon="messages"></span>Database<div><span><button id="deleteDatabase" class="danger">Clear</button></span></div></li>            ',
         '   <li><span data-icon="messages"></span>Database<div><button id="logDatabaseContent">Log content</button></div></li>                              ',
-        '   <li><span data-icon="messages"></span>Connection<div>@todo</div></li>                                                                           ',
+        '   <li><span data-icon="messages"></span>Connection<div>todo</div></li>                                                          ',
         '</ul>                                                                                                                                              '
         ].join(''); 
 
