@@ -18,10 +18,8 @@
     var feedly = new Feedly();
 
     var gf = new GoogleFeed();
-    var _idb = new MyIndexedDb();
     
     var _myTimestamp;       // Value set by function "_setMyTimestamp()"
-    var _idb;               // IndexedDb
     
     var myFeedsSubscriptions = {'local': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
     
@@ -54,20 +52,16 @@
     }
     
     var _entriesUpdateInterval = '';
-    
+
     // Connection type : wifi, cellular, none
 
-    /*var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    var connectionType = connection.type;
-
-    function updateConnectionStatus() {
-        console.log("Connection type is change from " + connectionType + " to " + connection.type);
+    /*var connectionType = "none";
+    var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    try {
         connectionType = connection.type;
-    }
-
-    connection.addEventListener('typechange', updateConnectionStatus);*/
-
-    //var connectionType = connection.type;
+    } catch(err) {
+        console.error(err.message);
+    }*/
     
     // Load params from SDCard.
     // Save file if file doesn't exists.
@@ -79,12 +73,16 @@
         if (params.accounts.feedly) {
             My._load('cache/feedly/access_token.json').then(function(_token){
                 feedly.setToken(_token);
+            }).catch(function(error) {
+                window.alert("Can't load and set Feedly token");
             });
         }
         // Get and set The Old Reader token from cache
         if (params.accounts.theoldreader) {
             My._load('cache/theoldreader/access_token.json').then(function(_token){
                 tor.setToken(_token);
+            }).catch(function(error) {
+                window.alert("Can't load and set T.O.R. token");
             });
         }
     }).catch(function(error) {
@@ -239,10 +237,6 @@
 
             myFeedsSubscriptions[_account] = _tmp.slice();
             
-            // (2) Delete from database
-            
-            _idb._delete_('mySubscriptions', _feedUrl);
-            
             // (3) Delete from Feedly
             
             if (_account == 'feedly') {
@@ -312,11 +306,7 @@
 
             myFeedsSubscriptions.local.push(_myNewFeed);
             
-            // (2) Add into database
-            
-            _idb.insert('mySubscriptions', _myNewFeed);
-            
-            // (3) Reload UI
+            // (2) Reload UI
             
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
@@ -417,9 +407,7 @@
         '</ul>                                                                                                                                              ',
         '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
         '<ul class="developper-menu">                                                                                                                       ',
-        '   <li><span data-icon="messages"></span>Database<div><span><button id="deleteDatabase" class="danger">Clear</button></span></div></li>            ',
-        '   <li><span data-icon="messages"></span>Database<div><button id="logDatabaseContent">Log content</button></div></li>                              ',
-        '   <li><span data-icon="messages"></span>Connection<div>todo</div></li>                                                          ',
+        '   <li><span data-icon="messages"></span>Connection<div id="connectionType">@todo</div></li>                                                       ',
         '</ul>                                                                                                                                              '
         ].join(''); 
 
@@ -495,20 +483,17 @@
             }
         }
         
-        // Delete database
-        
-        document.getElementById('deleteDatabase').onclick = function(event) {
-            var _confirm = window.confirm(document.webL10n.get('confirm-delete-database'));
-            if (_confirm) {
-                _idb.deleteDatabase(_idbParams.databaseName);
-            }
+        // Update connection type : wifi, cellular, none
+
+        /*function updateConnectionStatus() {
+            console.log("Connection type is change from " + connectionType + " to " + connection.type);
+            connectionType = connection.type;
+            echo("connectionType", connectionType, "");
         }
+
+        connection.addEventListener('typechange', updateConnectionStatus);*/
         
-        document.getElementById('logDatabaseContent').onclick = function(event) {
-            _idb.select("mySubscriptions", "url", "*", function(results){
-            console.log(results);
-        });
-    }
+        // ---
         
     }
     
@@ -843,7 +828,6 @@
                         // do nothing
                     } else {
                         myFeedsSubscriptions.local[i].pulsations = _pulsations;
-                        _idb.update("mySubscriptions", _url, {url: _url, pulsations: _pulsations, account:_account});
                     }
                     
                     break;
@@ -907,7 +891,7 @@
     function initAndLoadFeeds(results) {
         console.log('initAndLoadFeeds()', arguments);
 
-        // Add feeds from indexedDb database
+        // Add feeds from subscription file
         
         for (var i = 0; i < results.length; i++) {
             var _account = results[i].account;
@@ -929,7 +913,7 @@
         if (myFeedsSubscriptions.local.length == 0) {
             var _confirm = window.confirm(document.webL10n.get('confirm-populate-database'));
             if (_confirm) {
-                var _populateDatabase = [
+                var _populateMySubscriptions = [
                     {"url": "https://www.reddit.com/r/FireFoxOS/.rss",          "pulsations": 2,    "account": "local"},
                     {"url": "http://www.webupd8.org/feeds/posts/default",       "pulsations": 2,    "account": "local"},
                     {"url": "http://metro.co.uk/sport/football/feed/",          "pulsations": 5,    "account": "local"},
@@ -938,9 +922,8 @@
                     {"url": "http://www.wired.com/feed/",                       "pulsations": 5,    "account": "local"}
                 ];
                 
-                for (var i = 0; i < _populateDatabase.length; i++) {
-                    _idb.insert('mySubscriptions', _populateDatabase[i]);
-                    myFeedsSubscriptions.local.push(_populateDatabase[i]);
+                for (var i = 0; i < _populateMySubscriptions.length; i++) {
+                    myFeedsSubscriptions.local.push(_populateMySubscriptions[i]);
                 }
             }
         }
@@ -1001,7 +984,6 @@
         
         if (_insertNewFeed) {
             myFeedsSubscriptions[_account].push(_feed);
-            _idb.insert('mySubscriptions', _feed);
         }
     }
     
@@ -1013,22 +995,43 @@
         
         _swipe("");
 
-        // =====================
-        // --- Open Database ---
-        // =====================
+        // @todo 
+        // load subscriptions.feedly.json
+        // load subscriptions.theolsreader.json
 
-        var _idbParams = {
-            "databaseName"  : "myWeeklyFeeds",
-            "tableName"     : "mySubscriptions",
-            "version"       : 1,
-            "keyPath"       : "url",
-            "indexs": {
-                "url"       : {"unique": true  },
-                "account"   : {"unique": false }
+        /*My._file_exists('subscriptions.local.json', function(exists){
+            if (exists) {
+                My._load('subscriptions.local.json').then(function(results) {
+                    initAndLoadFeeds(results);
+                }).catch(function(error) {
+                    window.alert(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
+                });
             }
-        };
+        });*/
         
-        _idb.open(_idbParams);
+        My._file_exists_v2('subscriptions.local.json').then(function(results){
+            return My._load('subscriptions.local.json');
+        }).then(function(results){
+            initAndLoadFeeds(results);
+        }).catch(function(error) {
+            window.alert(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
+        });
+        
+        My._file_exists_v2('subscriptions.feedly.json').then(function(results){
+            return My._load('subscriptions.feedly.json');
+        }).then(function(results){
+            initAndLoadFeeds(results);
+        }).catch(function(error) {
+            window.alert(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
+        });
+        
+        My._file_exists_v2('subscriptions.theoldreader.json').then(function(results){
+            return My._load('subscriptions.theoldreader.json');
+        }).then(function(results){
+            initAndLoadFeeds(results);
+        }).catch(function(error) {
+            window.alert(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
+        });
         
         // =================================
         // --- Button load subscriptions ---
@@ -1085,12 +1088,6 @@
         };
         
         // ---
-        
-        document.body.addEventListener('idb.open.onsuccess', function(event){
-        
-            _idb.select("mySubscriptions", "url", "*", initAndLoadFeeds); // Load feeds from indexedDb database then initAndLoadFeeds()
-            //_idb.deleteDatabase(_idbParams.databaseName);
-        });
     
         document.body.addEventListener('GoogleFeed.load.done', function(event){
             

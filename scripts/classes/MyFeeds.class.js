@@ -105,3 +105,25 @@ MyFeeds.prototype._file_exists = function(filename, callback) {
         callback(0);
     }
 }
+
+MyFeeds.prototype._file_exists_v2 = function(filename, callback) {
+    console.log('MyFeeds.prototype._file_exist', arguments);
+
+    return new Promise(function(resolve, reject) {
+        var sdcard  = navigator.getDeviceStorage("sdcard");
+        var request = sdcard.get('myFeeds/' + filename);
+    
+        request.onsuccess = function () {
+            console.log('_file_exist() = 1 "', this.result);
+            //callback(1);
+            resolve();
+        }
+
+        request.onerror = function () {
+            console.warn("_file_exist() = 0 ", this.error);
+            //callback(0);
+            reject(Error(0));
+        }
+        
+    });
+}
