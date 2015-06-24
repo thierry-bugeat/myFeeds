@@ -888,29 +888,35 @@
     // Callback from event "idb.open.onsuccess"
     // 1st feeds loading.
     
-    function initAndLoadFeeds(results) {
+    function initAndLoadFeeds(subscriptions) {
         console.log('initAndLoadFeeds()', arguments);
-
-        // Add feeds from subscription file
         
-        for (var i = 0; i < results.length; i++) {
-            var _account = results[i].account;
-            if (myFeedsSubscriptions[_account] === undefined) {
-                myFeedsSubscriptions[_account] = [];
+        // Add feeds from subscription(s) file(s)
+        // subscriptions.local.json
+        // subscriptions.feedly.json
+        // subscriptions.theoldreader.json
+        // ...
+        
+        for (var i = 0; i < subscriptions.length; i++) {
+            for (var j = 0; j < subscriptions[i].length; j++) {
+                var _account = subscriptions[i][j].account;
+                if (myFeedsSubscriptions[_account] === undefined) {
+                    myFeedsSubscriptions[_account] = [];
+                }
+                myFeedsSubscriptions[_account].push(subscriptions[i][j]);
             }
-            myFeedsSubscriptions[_account].push(results[i]);
-        }        
+        }      
         
         // No feeds sets.
         // Use default feeds ?
         
         var _nbFeedsSubscriptions = 0;
-        
+
         for (var _account in myFeedsSubscriptions) {
             _nbFeedsSubscriptions = _nbFeedsSubscriptions + myFeedsSubscriptions[_account].length;
         }
-        
-        if (myFeedsSubscriptions.local.length == 0) {
+
+        if (_nbFeedsSubscriptions == 0) {
             var _confirm = window.confirm(document.webL10n.get('confirm-populate-database'));
             if (_confirm) {
                 var _populateMySubscriptions = [
@@ -934,7 +940,7 @@
         console.log(myFeedsSubscriptions);
         console.log('========================');
         
-        if (myFeedsSubscriptions.local.length > 0) {
+        if (_nbFeedsSubscriptions > 0) {
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }
@@ -995,43 +1001,40 @@
         
         _swipe("");
 
-        // @todo 
-        // load subscriptions.feedly.json
-        // load subscriptions.theolsreader.json
+        // Promises V1
 
-        /*My._file_exists('subscriptions.local.json', function(exists){
-            if (exists) {
-                My._load('subscriptions.local.json').then(function(results) {
-                    initAndLoadFeeds(results);
-                }).catch(function(error) {
-                    window.alert(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
-                });
-            }
+        var promise1 = My._load('subscriptions.local.json').then(function(results) {return results;}
+        ).catch(function(error) {window.alert('ERROR subscriptions.local.json', error.message); return {};});
+        
+        var promise2 = My._load('subscriptions.feedly.json').then(function(results) {return results;}
+        ).catch(function(error) {window.alert('ERROR subscriptions.feedly.json', error.message); return {};});
+        
+        var promise3 = My._load('subscriptions.theoldreader.json').then(function(results) {return results;}
+        ).catch(function(error) {window.alert('ERROR subscriptions.theoldreader.json', error.message); return {};});
+        
+        var arrayPromises = [promise1, promise2, promise3];
+        
+        Promise.all(arrayPromises).then(function(arrayOfResults) {
+            initAndLoadFeeds(arrayOfResults);
+        }).catch(function(error) {
+            window.alert('KO all promises', error.message);
+        });
+        
+        // Promises V2
+        /*var arrayPromises = [];
+        var i = 0;
+        
+        for (var _account in myFeedsSubscriptions) {
+            arrayPromises[i] = My._load('subscriptions.' + _account + '.json').then(function(results) {return results;}
+            ).catch(function(error) {window.alert('ERROR subscriptions.' + _account + '.json', error.message); return {};});
+            i++;
+        }
+        
+        Promise.all(arrayPromises).then(function(arrayOfResults) {
+            initAndLoadFeeds(arrayOfResults);
+        }).catch(function(error) {
+            window.alert('KO all promises', error.message);
         });*/
-        
-        My._file_exists_v2('subscriptions.local.json').then(function(results){
-            return My._load('subscriptions.local.json');
-        }).then(function(results){
-            initAndLoadFeeds(results);
-        }).catch(function(error) {
-            window.alert(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
-        });
-        
-        My._file_exists_v2('subscriptions.feedly.json').then(function(results){
-            return My._load('subscriptions.feedly.json');
-        }).then(function(results){
-            initAndLoadFeeds(results);
-        }).catch(function(error) {
-            window.alert(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
-        });
-        
-        My._file_exists_v2('subscriptions.theoldreader.json').then(function(results){
-            return My._load('subscriptions.theoldreader.json');
-        }).then(function(results){
-            initAndLoadFeeds(results);
-        }).catch(function(error) {
-            window.alert(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
-        });
         
         // =================================
         // --- Button load subscriptions ---
