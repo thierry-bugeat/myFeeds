@@ -196,3 +196,16 @@ TheOldReader.prototype.post = function (url, params, callback) {
         xhr.send(params);
     });
 }
+
+/**
+ * _delete(url, callback)
+ * 
+ * @param {string} url Url to load.
+ * @param {string} callback.
+ * 
+ * */
+ 
+TheOldReader.prototype._delete = function (url, callback) {
+    console.log('TheOldReader.prototype._delete()', arguments);
+    window.alert('TheOldReader.prototype._delete() not yet implemented');
+}
