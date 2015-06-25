@@ -14,7 +14,7 @@ var Feedly = function() {
         "method"        : "GET",
         "code"          : "",
         "token"         : {},
-        "environment"   : "dev", // dev, prod
+        "environment"   : "prod", // dev, prod
         "environments"  : {
             "dev" : 
             {
