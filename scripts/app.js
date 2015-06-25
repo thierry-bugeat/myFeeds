@@ -237,10 +237,16 @@
 
             myFeedsSubscriptions[_account] = _tmp.slice();
             
-            // (3) Delete from Feedly
-            
+            // (3a) Delete from Feedly
+           
             if (_account == 'feedly') {
                 feedly.deleteSubscription(_feedUrl);
+            }
+            
+            // (3b) Delete from TheOldReader
+            
+            if (_account == 'theoldreader') {
+                theoldreader.deleteSubscription(_feedUrl);
             }
             
             // (4) Reload UI
@@ -469,7 +475,7 @@
             }
         }
         
-        // Feedly checkbox
+        // The Old Reader checkbox
         
         document.getElementById('theoldreaderLogin').onclick = function() {
             if (this.checked) {
