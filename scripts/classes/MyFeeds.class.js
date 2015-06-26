@@ -63,13 +63,11 @@ MyFeeds.prototype._save = function(filename, mimetype, content) {
     
     // Delete previous file
     
-    var request = sdcard.delete("myFeeds/" + filename);
-
-    request.onsuccess = function () {
+    var request = sdcard.delete("myFeeds/" + filename).then(function () {
         console.log("File deleted");
         
         // Save new file
-        
+    
         var request = sdcard.addNamed(file, "myFeeds/" + filename);
 
         request.onsuccess = function () {
@@ -80,11 +78,10 @@ MyFeeds.prototype._save = function(filename, mimetype, content) {
         request.onerror = function () {
             console.warn("Unable to write the file: ", this.error);
         }
-    }
-
-    request.onerror = function () {
+        
+    }).catch (function (error) {
         console.log("Unable to delete the file: ", this.error);
-    }
+    });
 
 }
 
