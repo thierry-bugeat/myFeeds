@@ -1202,6 +1202,7 @@
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
             My._save("subscriptions.feedly.json", "application/json", JSON.stringify(myFeedsSubscriptions.feedly));
+            My._save("cache/feedly/subscriptions.json", "application/json", JSON.stringify(_subscriptions));
         });
         
         document.body.addEventListener('Feedly.getSubscriptions.error', function(response) {
@@ -1241,6 +1242,7 @@
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
             My._save("subscriptions.theoldreader.json", "application/json", JSON.stringify(myFeedsSubscriptions.theoldreader));
+            My._save("cache/theoldreader/subscriptions.json", "application/json", JSON.stringify(_subscriptions));
         });
         
         document.body.addEventListener('TheOldReader.getSubscriptions.error', function(response) {
