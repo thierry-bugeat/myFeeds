@@ -1102,7 +1102,7 @@
             
             // Save feed as file
             
-                My._save('cache/feeds/' + btoa(event.detail.responseData.feed.feedUrl) + ".json", "application/json", JSON.stringify(event.detail.responseData.feed));
+                My._save('cache/google/feeds/' + btoa(event.detail.responseData.feed.feedUrl) + ".json", "application/json", JSON.stringify(event.detail.responseData.feed));
 
             // Add feed entries to array "unsortedEntries"
 
