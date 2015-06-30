@@ -110,3 +110,7 @@
     margin-right: var(--my-spacing);
     background: none;
 }
+
+#find-feeds-container form{
+    display: flex;
+}
