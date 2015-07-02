@@ -1052,9 +1052,11 @@
                 ui.echo("onLine", navigator.onLine, "");
                 _onLine = navigator.onLine;
                 document.body.dispatchEvent(new CustomEvent('networkConnection.change', {"detail": _onLine}));
-                // Disable sync button
+                // Disable / Enable sync button
                 if (!_onLine) {
                     ui._onclick(sync, 'disable');
+                } else {
+                    ui._onclick(sync, 'enable');
                 }
             }
         }, 1000);
