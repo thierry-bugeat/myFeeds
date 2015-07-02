@@ -53,15 +53,9 @@
     
     var _entriesUpdateInterval = '';
 
-    // Connection type : wifi, cellular, none
+    // Network Connection
 
-    /*var connectionType = "none";
-    var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    try {
-        connectionType = connection.type;
-    } catch(err) {
-        console.error(err.message);
-    }*/
+    var _onLine = '';
     
     // Load params from SDCard.
     // Save file if file doesn't exists.
@@ -413,7 +407,7 @@
         '</ul>                                                                                                                                              ',
         '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
         '<ul class="developper-menu">                                                                                                                       ',
-        '   <li><span data-icon="messages"></span>Connection<div id="connectionType">@todo</div></li>                                                       ',
+        '   <li><span data-icon="messages"></span>Connection<div id="onLine">NA</div></li>                                                                  ',
         '</ul>                                                                                                                                              '
         ].join(''); 
 
@@ -488,16 +482,6 @@
                 _saveParams();
             }
         }
-        
-        // Update connection type : wifi, cellular, none
-
-        /*function updateConnectionStatus() {
-            console.log("Connection type is change from " + connectionType + " to " + connection.type);
-            connectionType = connection.type;
-            echo("connectionType", connectionType, "");
-        }
-
-        connection.addEventListener('typechange', updateConnectionStatus);*/
         
         // ---
         
@@ -1065,6 +1049,17 @@
             }
         }, 500);*/
         
+        // ===============================================
+        // --- Network connection : online / offline ? ---
+        // ===============================================
+        
+        setInterval(function() {
+            if (_onLine != navigator.onLine) {
+                ui.echo("onLine", navigator.onLine, "");
+                _onLine = navigator.onLine;
+            }
+        }, 1000);
+        
         // ==============
         // --- Events ---
         // ==============
@@ -1096,7 +1091,9 @@
             });
         };
         
-        // ---
+        /* ===================== */
+        /* --- Google Events --- */
+        /* ===================== */
     
         document.body.addEventListener('GoogleFeed.load.done', function(event){
             
@@ -1170,7 +1167,9 @@
         
         document.body.addEventListener('GoogleFeed.find.done', findFeedsDisplayResults, true);
         
+        /* ===================== */
         /* --- Feedly Events --- */
+        /* ===================== */
         
         document.body.addEventListener('Feedly.login.done', function(response){
             console.log(feedly.getToken());
@@ -1210,7 +1209,9 @@
             window.alert('Feedly error');
         });
         
+        /* ============================= */
         /* --- The Old Reader Events --- */
+        /* ============================= */
         
         document.body.addEventListener('TheOldReader.login.done', function(response){
             console.log('TheOldReader.getToken()', tor.getToken());
