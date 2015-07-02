@@ -119,7 +119,13 @@
       //  tor.login(); // test a supprimer
         //feedly.deleteSubscription('http://linuxfr.org/news.atom');
     //}
-    sync.onclick            = function(event) { ui._onclick(this, 'disable'); ui.echo("feeds-list", "Loading...", ""); gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan); }
+    sync.onclick            = function(event) { 
+        if (navigator.onLine) {
+            ui._onclick(this, 'disable'); 
+            ui.echo("feeds-list", "Loading...", ""); 
+            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan); 
+        }
+    }
     menu.onclick            = function(event) { openWindow("feeds-list-container", "left"); }
     closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container", "right"); ui.echo("browser", "", ""); }
     closeFeedsList.onclick  = function(event) { closeWindow("feeds-list-container", "left"); }
@@ -1037,18 +1043,6 @@
             }
         });
         
-        // ======================================
-        // --- Button [sync] enable / disable ---
-        // ======================================
-        
-        /*setInterval(function() {
-            var _syncStatus = sync.style.pointerEvents;
-            if (((myFeedsSubscriptions.local.lenght > 0) || (myFeedsSubscriptions.feedly.length > 0)) && (_syncStatus != _previousSyncStatus)) {
-                ui._onclick(sync, 'enable');
-                _previousSyncStatus = _syncStatus;
-            }
-        }, 500);*/
-        
         // ===============================================
         // --- Network connection : online / offline ? ---
         // ===============================================
@@ -1057,6 +1051,11 @@
             if (_onLine != navigator.onLine) {
                 ui.echo("onLine", navigator.onLine, "");
                 _onLine = navigator.onLine;
+                document.body.dispatchEvent(new CustomEvent('networkConnection.change', {"detail": _onLine}));
+                // Disable sync button
+                if (!_onLine) {
+                    ui._onclick(sync, 'disable');
+                }
             }
         }, 1000);
         
@@ -1071,8 +1070,10 @@
         // Automatic update entries every N seconds :
         
         _entriesUpdateInterval = setInterval(function() {
-            ui._onclick(sync, 'disable');
-            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            if (navigator.onLine) {
+                ui._onclick(sync, 'disable');
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            }
         }, (params.entries.updateEvery * 1000));
         
         // Share entry :
