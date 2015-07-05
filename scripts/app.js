@@ -1058,6 +1058,16 @@
                 } else {
                     ui._onclick(sync, 'enable');
                 }
+                // Disable / Enable delete buttons
+                var _deletes = document.querySelectorAll(".delete");
+                for (var i = 0; i < _deletes.length; i++) {
+                    if (!_onLine) {
+                        ui._onclick(_deletes[i], 'disable');
+                    } else {
+                        ui._onclick(_deletes[i], 'enable');
+                    }
+                }
+                // ---
             }
         }, 1000);
         
