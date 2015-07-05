@@ -1049,24 +1049,29 @@
         
         setInterval(function() {
             if (_onLine != navigator.onLine) {
-                ui.echo("onLine", navigator.onLine, "");
-                _onLine = navigator.onLine;
+                var _status = navigator.onLine == true ? 'enable' : 'disable';
+
                 document.body.dispatchEvent(new CustomEvent('networkConnection.change', {"detail": _onLine}));
-                // Disable / Enable sync button
-                if (!_onLine) {
-                    ui._onclick(sync, 'disable');
-                } else {
-                    ui._onclick(sync, 'enable');
-                }
-                // Disable / Enable delete buttons
+                
+                // Update settings message
+                
+                ui.echo("onLine", _status, "");
+                
+                // Disable, enable "sync" button
+                
+                ui._onclick(sync, _status);
+                    
+                // Disable, enable "delete" buttons
+                
                 var _deletes = document.querySelectorAll(".delete");
                 for (var i = 0; i < _deletes.length; i++) {
-                    if (!_onLine) {
-                        ui._onclick(_deletes[i], 'disable');
-                    } else {
-                        ui._onclick(_deletes[i], 'enable');
-                    }
+                    ui._onclick(_deletes[i], _status);
                 }
+                
+                // Store current connection status
+                
+                _onLine = navigator.onLine;
+                
                 // ---
             }
         }, 1000);
