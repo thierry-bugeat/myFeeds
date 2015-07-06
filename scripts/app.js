@@ -522,7 +522,7 @@
                 ((_account == 'feedly') && (_feedlyAccessToken !== undefined)) || 
                 ((_account == 'theoldreader') && (_theoldreaderAuth !== undefined))
             ){
-                _deleteIcone = '<button class="delete" account="' + _account + '" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button>';
+                _deleteIcone = '<button class="delete ' + _account + '_delete" account="' + _account + '" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button>';
             }
             
             _html[_account] = _html[_account] + '<li><a href="#" class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
@@ -802,7 +802,6 @@
     /**
      * @param {null}
      * Update feeds pulsations once all feeds are loaded.
-     * Update array "myFeedsSubscriptions.local" & indexedDb database.
      * */
     function updateFeedsPulsations() {
         var _tmp = [];
@@ -1063,10 +1062,14 @@
                     
                 // Disable, enable "delete" buttons
                 
-                var _deletes = document.querySelectorAll(".delete");
+                var _deletes = document.querySelectorAll(".feedly_delete .theoldreader_delete");
                 for (var i = 0; i < _deletes.length; i++) {
                     ui._onclick(_deletes[i], _status);
                 }
+                
+                // @todo: Disable, enable online accounts connexion in settings screen
+                
+                // @todo: Disable, enable short news
                 
                 // Store current connection status
                 
