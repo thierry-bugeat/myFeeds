@@ -403,7 +403,7 @@
         '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-number-of-days') + _htmlMaxNbDays + '</li>                             ',
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-online-accounts') + '</h2>                                                                                  ',
-        '<ul>                                                                                                                                               ',
+        '<ul class="feedly theoldreader">                                                                                                                   ',
         '   <li><span data-icon="messages"></span>Feedly<div><label class="pack-switch"><input id="feedlyLogin" type="checkbox" ' + _feedlyAccount + '><span></span></label></div></li>',
         '   <li>',
         '       <span data-icon="messages"></span>The Old Reader<div><label class="pack-switch"><input id="theoldreaderLogin" type="checkbox" ' + _theoldreaderAccount + '><span></span></label></div>',
@@ -1055,22 +1055,27 @@
 
                 document.body.dispatchEvent(new CustomEvent('networkConnection.change', {"detail": _onLine}));
                 
-                // Update settings message
+                // Settings screen : Update settings message
                 
                 ui.echo("onLine", _status, "");
                 
-                // Disable, enable "sync" button
+                // Main screen : Disable, enable "sync" button
                 
                 ui._onclick(sync, _status);
                     
-                // Disable, enable "delete" buttons
+                // Feeds list : Disable, enable "delete" buttons
                 
                 var _deletes = document.querySelectorAll("ul.feedly button.delete, ul.theoldreader button.delete");
                 for (var i = 0; i < _deletes.length; i++) {
                     ui._onclick(_deletes[i], _status);
                 }
                 
-                // @todo: Disable, enable online accounts connexion in settings screen
+                // Settings screen : Disable, enable online accounts
+                
+                var _settings = document.querySelectorAll("#settings > ul.feedly > li, #settings > ul.theoldreader > li");
+                for (var i = 0; i < _settings.length; i++) {
+                    ui._onclick(_settings[i], _status);
+                }
                 
                 // @todo: Disable, enable short news
                 
