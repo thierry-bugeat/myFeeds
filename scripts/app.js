@@ -1065,7 +1065,7 @@
                     
                 // Disable, enable "delete" buttons
                 
-                var _deletes = document.querySelectorAll(".feedly_delete .theoldreader_delete");
+                var _deletes = document.querySelectorAll(".feedly_delete, .theoldreader_delete");
                 for (var i = 0; i < _deletes.length; i++) {
                     ui._onclick(_deletes[i], _status);
                 }
