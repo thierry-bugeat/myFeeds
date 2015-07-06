@@ -683,7 +683,7 @@
                         _nbEntriesDisplayed++;
                         
                     } else if (params.entries.displaySmallEntries) {
-                        _content = _content + '<div class="my-'+_theme+'-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
+                        _content = _content + '<div class="small my-'+_theme+'-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
                         _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                         _content = _content + _imageUrl;
@@ -1077,7 +1077,12 @@
                     ui._onclick(_settings[i], _status);
                 }
                 
-                // @todo: Disable, enable short news
+                // Main screen : Disable, enable short news
+                
+                var _small = document.querySelectorAll(".small");
+                for (var i = 0; i < _small.length; i++) {
+                    ui._onclick(_small[i], _status);
+                }
                 
                 // Store current connection status
                 
