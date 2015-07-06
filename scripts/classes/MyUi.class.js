@@ -105,6 +105,44 @@ MyUi.prototype._onclick = function(_this, pointerEvents) {
 }
 
 /**
+ * Enable disable ui elements. 
+ * Used when network connection change.
+ * param {string} _status "enable", "disable"
+ * */
+MyUi.prototype.toggle = function(_status) {
+    
+    // Settings screen : Update settings message
+                
+    _MyUi.echo("onLine", _status, "");
+    
+    // Main screen : Disable, enable "sync" button
+    
+    _MyUi._onclick(sync, _status);
+        
+    // Feeds list : Disable, enable "delete" buttons
+    
+    var _deletes = document.querySelectorAll("ul.feedly button.delete, ul.theoldreader button.delete");
+    for (var i = 0; i < _deletes.length; i++) {
+        _MyUi._onclick(_deletes[i], _status);
+    }
+    
+    // Settings screen : Disable, enable online accounts
+    
+    var _settings = document.querySelectorAll("#settings > ul.feedly > li, #settings > ul.theoldreader > li");
+    for (var i = 0; i < _settings.length; i++) {
+        _MyUi._onclick(_settings[i], _status);
+    }
+    
+    // Main screen : Disable, enable short news
+    // Short news requires network connection to display content.
+    
+    var _small = document.querySelectorAll(".small");
+    for (var i = 0; i < _small.length; i++) {
+        _MyUi._onclick(_small[i], _status);
+    }
+}
+
+/**
  * Output one html string in div element
  * 
  * param string divId    : Div id element

@@ -1055,34 +1055,7 @@
 
                 document.body.dispatchEvent(new CustomEvent('networkConnection.change', {"detail": _onLine}));
                 
-                // Settings screen : Update settings message
-                
-                ui.echo("onLine", _status, "");
-                
-                // Main screen : Disable, enable "sync" button
-                
-                ui._onclick(sync, _status);
-                    
-                // Feeds list : Disable, enable "delete" buttons
-                
-                var _deletes = document.querySelectorAll("ul.feedly button.delete, ul.theoldreader button.delete");
-                for (var i = 0; i < _deletes.length; i++) {
-                    ui._onclick(_deletes[i], _status);
-                }
-                
-                // Settings screen : Disable, enable online accounts
-                
-                var _settings = document.querySelectorAll("#settings > ul.feedly > li, #settings > ul.theoldreader > li");
-                for (var i = 0; i < _settings.length; i++) {
-                    ui._onclick(_settings[i], _status);
-                }
-                
-                // Main screen : Disable, enable short news
-                
-                var _small = document.querySelectorAll(".small");
-                for (var i = 0; i < _small.length; i++) {
-                    ui._onclick(_small[i], _status);
-                }
+                ui.toggle(_status);
                 
                 // Store current connection status
                 
