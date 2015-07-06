@@ -809,23 +809,26 @@
         var _pulsations;
         var _feed = '';
 
-        for (var i = 0 ; i < myFeedsSubscriptions.local.length; i++) {
-            
-            for (var j = 0 ; j < _feeds.length; j++) {
+        for (var _account in myFeedsSubscriptions) {
+    
+            for (var i = 0 ; i < myFeedsSubscriptions[_account].length; i++) {
                 
-                if (myFeedsSubscriptions.local[i].url == _feeds[j].feedUrl) {
+                for (var j = 0 ; j < _feeds.length; j++) {
+                    
+                    if (myFeedsSubscriptions[_account][i].url == _feeds[j].feedUrl) {
 
-                    _url        = _feeds[j].feedUrl;
-                    _pulsations = _feeds[j]._myPulsations;
-                    _account    = _feeds[j]._myAccount; // test
-                    
-                    if (isNaN(_pulsations)) {
-                        // do nothing
-                    } else {
-                        myFeedsSubscriptions.local[i].pulsations = _pulsations;
+                        _url        = _feeds[j].feedUrl;
+                        _pulsations = _feeds[j]._myPulsations;
+                        _account    = _feeds[j]._myAccount; // test
+                        
+                        if (isNaN(_pulsations)) {
+                            // do nothing
+                        } else {
+                            myFeedsSubscriptions[_account][i].pulsations = _pulsations;
+                        }
+                        
+                        break;
                     }
-                    
-                    break;
                 }
             }
         }
