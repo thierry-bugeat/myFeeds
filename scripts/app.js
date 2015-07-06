@@ -502,8 +502,8 @@
         
         var _html = { 
             'local': '<h2>Local</h2><ul>', 
-            'feedly': '<h2>Feedly</h2><ul>',
-            'theoldreader': '<h2>The Old Reader</h2><ul>'
+            'feedly': '<h2>Feedly</h2><ul class="feedly">',
+            'theoldreader': '<h2>The Old Reader</h2><ul class="theoldreader">'
         };
         var _htmlFeeds = "";
         var _feedlyAccessToken = feedly.getToken().access_token;
@@ -522,7 +522,7 @@
                 ((_account == 'feedly') && (_feedlyAccessToken !== undefined)) || 
                 ((_account == 'theoldreader') && (_theoldreaderAuth !== undefined))
             ){
-                _deleteIcone = '<button class="delete ' + _account + '_delete" account="' + _account + '" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button>';
+                _deleteIcone = '<button class="delete" account="' + _account + '" feedUrl="' + _feed.feedUrl + '"><span data-icon="delete"></span></button>';
             }
             
             _html[_account] = _html[_account] + '<li><a href="#" class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
@@ -1065,7 +1065,7 @@
                     
                 // Disable, enable "delete" buttons
                 
-                var _deletes = document.querySelectorAll(".feedly_delete, .theoldreader_delete");
+                var _deletes = document.querySelectorAll("ul.feedly button.delete, ul.theoldreader button.delete");
                 for (var i = 0; i < _deletes.length; i++) {
                     ui._onclick(_deletes[i], _status);
                 }
