@@ -111,35 +111,72 @@ MyUi.prototype._onclick = function(_this, pointerEvents) {
  * */
 MyUi.prototype.toggle = function(_status) {
     
-    // Settings screen : Update settings message
+    // =======================
+    // --- Settings screen ---
+    // =======================
+    
+    // 1) Update settings message
                 
     _MyUi.echo("onLine", _status, "");
     
-    // Main screen : Disable, enable "sync" button
-    
-    _MyUi._onclick(sync, _status);
-        
-    // Feeds list : Disable, enable "delete" buttons
-    
-    var _deletes = document.querySelectorAll("ul.feedly button.delete, ul.theoldreader button.delete");
-    for (var i = 0; i < _deletes.length; i++) {
-        _MyUi._onclick(_deletes[i], _status);
-    }
-    
-    // Settings screen : Disable, enable online accounts
+    // 2) Disable, enable online accounts
     
     var _settings = document.querySelectorAll("#settings > ul.feedly > li, #settings > ul.theoldreader > li");
     for (var i = 0; i < _settings.length; i++) {
         _MyUi._onclick(_settings[i], _status);
     }
     
-    // Main screen : Disable, enable short news
-    // Short news requires network connection to display content.
+    // ===================
+    // --- Main screen ---
+    // ===================
+    
+    // 1) Disable, enable "sync" button
+    
+    _MyUi._onclick(sync, _status);
+    
+    // 2) Disable, enable short news.
+    //    Short news requires network connection to display content.
     
     var _small = document.querySelectorAll(".small");
     for (var i = 0; i < _small.length; i++) {
         _MyUi._onclick(_small[i], _status);
     }
+    
+    // =========================    
+    // --- Feeds list screen ---
+    // =========================
+    
+    // 1) Disable, enable "delete" buttons
+    
+    var _deletes = document.querySelectorAll("ul.feedly button.delete, ul.theoldreader button.delete");
+    for (var i = 0; i < _deletes.length; i++) {
+        _MyUi._onclick(_deletes[i], _status);
+    }
+    
+    // 2) Disable, enable [+] button
+
+    _MyUi._onclick(findFeedsOpen, _status);
+    
+    // =====================
+    // --- Search screen ---
+    // =====================
+    
+    // 1) Disable, enable search form
+    
+    var _findFeeds = document.getElementById("findFeeds");
+    _MyUi._onclick(_findFeeds, _status);
+    
+    // =====================
+    // --- Display entry ---
+    // =====================
+    
+    // 1) Enable, disable links
+    // @todo: Doesn't works.
+    
+    /*var _a = document.querySelectorAll("main-entry-container a");
+    for (var i = 0; i < _a.length; i++) {
+        _MyUi._onclick(_a[i], _status);
+    }*/
 }
 
 /**
