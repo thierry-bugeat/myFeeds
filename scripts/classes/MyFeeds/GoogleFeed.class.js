@@ -315,7 +315,7 @@ GoogleFeed.prototype.get = function (url, myParams) {
         
         var xhr = new XMLHttpRequest({ mozSystem: true });
         
-        xhr.open('GET', url);
+        xhr.open('GET', url + "&rnd="+ Math.random());
 
         xhr.onload = function() {
             if (xhr.status == 200) {
