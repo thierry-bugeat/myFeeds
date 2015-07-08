@@ -1135,7 +1135,9 @@
                 
                 if (_nbFeedsLoaded >= _nbFeedsToLoad) {
                     ui._loading(100); ui.echo("loading", "", "");
-                    ui._onclick(sync, 'enable');
+                    if (navigator.onLine) {
+                        ui._onclick(sync, 'enable');
+                    }
                 }
             
             // ---
@@ -1167,7 +1169,9 @@
                 
                 if (_nbFeedsLoaded >= _nbFeedsToLoad) {
                     ui._loading(100); ui.echo("loading", "", "");
-                    ui._onclick(sync, 'enable');
+                    if (navigator.onLine) {
+                        ui._onclick(sync, 'enable');
+                    }
                 }
             
             // ---
