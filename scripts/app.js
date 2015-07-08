@@ -1108,8 +1108,10 @@
             
             // Save feed as file
             
+            if (navigator.onLine) {
                 My._save('cache/google/feeds/' + btoa(event.detail.responseData.feed.feedUrl) + ".json", "application/json", JSON.stringify(event.detail.responseData.feed));
-
+            }
+            
             // Add feed entries to array "unsortedEntries"
 
                 gf.addFeed(event.detail.responseData.feed);
