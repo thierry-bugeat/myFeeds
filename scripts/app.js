@@ -1004,13 +1004,13 @@
         // Promises V1
 
         var promise1 = My._load('subscriptions.local.json').then(function(results) {return results;}
-        ).catch(function(error) {window.alert('ERROR subscriptions.local.json', error.message); return {};});
+        ).catch(function(error) {return {};});
         
         var promise2 = My._load('subscriptions.feedly.json').then(function(results) {return results;}
-        ).catch(function(error) {window.alert('ERROR subscriptions.feedly.json', error.message); return {};});
+        ).catch(function(error) {return {};});
         
         var promise3 = My._load('subscriptions.theoldreader.json').then(function(results) {return results;}
-        ).catch(function(error) {window.alert('ERROR subscriptions.theoldreader.json', error.message); return {};});
+        ).catch(function(error) {return {};});
         
         var arrayPromises = [promise1, promise2, promise3];
         
@@ -1026,7 +1026,7 @@
         
         for (var _account in myFeedsSubscriptions) {
             arrayPromises[i] = My._load('subscriptions.' + _account + '.json').then(function(results) {return results;}
-            ).catch(function(error) {window.alert('ERROR subscriptions.' + _account + '.json', error.message); return {};});
+            ).catch(function(error) {return {};});
             i++;
         }
         
