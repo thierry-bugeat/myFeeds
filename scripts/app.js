@@ -55,7 +55,7 @@
 
     // Network Connection
 
-    var _onLine = '';
+    var _onLine = "NA";
     
     // Load params from SDCard.
     // Save file if file doesn't exists.
