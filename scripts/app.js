@@ -451,8 +451,10 @@
             clearInterval(_entriesUpdateInterval);
             
             _entriesUpdateInterval = setInterval(function() {
-                ui._onclick(sync, 'disable');
-                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                if (navigator.onLine) {
+                    ui._onclick(sync, 'disable');
+                    gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                }
             }, (params.entries.updateEvery * 1000));
             
         }
