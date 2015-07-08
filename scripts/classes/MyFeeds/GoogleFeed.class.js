@@ -250,7 +250,7 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
             
             console.log(_url);
             
-            var _params = {"nbFeeds": this.myFeedsSubscriptions.length, "account": _myFeed.account};
+            var _params = {"nbFeeds": this.myFeedsSubscriptions.length, "account": _myFeed.account, "url": _myFeed.url};
             
             var promise = this.get(_url, _params);
         
@@ -258,10 +258,18 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
                 response.responseData.feed._myAccount = response.responseData._myParams.account; // Add _myAccount value
                 document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": response}));
             }, function(error) {
-                error._myParams = _params;
-                error._myFeedUrl = _myFeed.url;
-                document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.error', {"detail": error}));
-                console.error("ERROR ", error);
+                // Network error then try to load feed from cache
+                var _message = JSON.parse(error.message);
+                My._load('cache/google/feeds/' + btoa(_message.responseData._myParams.url) + ".json").then(function(_cacheContent){
+                    _message.responseData.feed = _cacheContent;
+                    document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": _message}));
+                }).catch(function(error) {
+                    // @todo
+                    error._myParams = _params;
+                    error._myFeedUrl = _myFeed.url;
+                    document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.error', {"detail": error.message}));
+                });
+                // ---
             });
         }
     }
@@ -332,13 +340,17 @@ GoogleFeed.prototype.get = function (url, myParams) {
                 }
                 
             } else {
-                reject(Error(xhr.statusText));
+                //reject(Error(xhr.statusText)); 
+                var _response = {"responseData": {"_myParams": myParams}};
+                reject(Error(_response));
             }
         };
 
-        xhr.onerror = function() {
+        xhr.onerror = function(e) {
+            //console.error('bugeat 2c', xhr);
+            //console.error('bugeat 2c', e);
             var _response = {"responseData": {"_myParams": myParams}};
-            reject(Error(_response));
+            reject(Error(JSON.stringify(_response)));
         };
         
         xhr.send();
