@@ -259,7 +259,16 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
                 document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": response}));
             }, function(error) {
                 // Network error then try to load feed from cache
-                var _message = JSON.parse(error.message);
+                
+                try {
+                    var _message = JSON.parse(error.message);
+                } catch (e) {
+                    window.alert("ERROR: Loading from cache\n" + e.message + ' / ' + JSON.stringify(error));
+                    error._myParams = _params;
+                    error._myFeedUrl = _myFeed.url;
+                    document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.error', {"detail": error}));
+                }
+                
                 My._load('cache/google/feeds/' + btoa(_message.responseData._myParams.url) + ".json").then(function(_cacheContent){
                     _message.responseData.feed = _cacheContent;
                     document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": _message}));
@@ -267,7 +276,7 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
                     // @todo
                     error._myParams = _params;
                     error._myFeedUrl = _myFeed.url;
-                    document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.error', {"detail": error.message}));
+                    document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.error', {"detail": error}));
                 });
                 // ---
             });
@@ -336,13 +345,15 @@ GoogleFeed.prototype.get = function (url, myParams) {
                 } catch(err) {
                     //reject(Error(xhr.statusText));
                     var _response = {"responseData": {"_myParams": myParams}};
-                    reject(Error(_response));
+                    reject(Error(JSON.stringify(_response)));
+                    //reject(Error(_response));
                 }
                 
             } else {
                 //reject(Error(xhr.statusText)); 
                 var _response = {"responseData": {"_myParams": myParams}};
-                reject(Error(_response));
+                reject(Error(JSON.stringify(_response)));
+                //reject(Error(_response));
             }
         };
 
