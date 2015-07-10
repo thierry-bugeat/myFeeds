@@ -666,7 +666,7 @@
                     var _accountIcone = '';
                     
                     if (_entrie._myFeedInformations._myAccount != 'local') {
-                        _accountIcone = '<img src="images/' + _entrie._myFeedInformations._myAccount + '.png" />';
+                        _accountIcone = '<img src="images/' + _entrie._myFeedInformations._myAccount + '.' + _theme + '.png" />';
                     }
 
                     // Content ( Normal / Small )
