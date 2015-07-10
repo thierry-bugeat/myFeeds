@@ -673,7 +673,31 @@
                     
                     var _content = "";
                     
-                    if (_diff >= params.entries.maxLengthForSmallEntries) {
+                    if ((params.entries.theme == 'list') && (_diff >= params.entries.maxLengthForSmallEntries)) {
+                        _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
+                        _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
+                        _content = _content + '<span class="my-'+_theme+'-date">' + _date + '</span>';
+                        _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
+                        _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
+                        _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
+                        _content = _content + '<div class="my-'+_theme+'-footer"></div>';
+                        _content = _content + '</div>';
+                        
+                        _nbEntriesDisplayed++;
+                        
+                    } else if ((params.entries.theme == 'list') && (params.entries.displaySmallEntries)) {
+                        _content = _content + '<div class="my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '">';
+                        _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
+                        _content = _content + '<span class="my-'+_theme+'-date">' + _date + '</span>';
+                        _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
+                        _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
+                        _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
+                        _content = _content + '<div class="my-'+_theme+'-footer"></div>';
+                        _content = _content + '</div>';
+                        
+                        _nbEntriesDisplayed++;
+                        
+                    } else if (_diff >= params.entries.maxLengthForSmallEntries) {
                         _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
                         _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';

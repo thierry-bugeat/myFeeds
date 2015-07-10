@@ -15,18 +15,16 @@
     height: 0;
     overflow: hidden;
     
-    background: var(--fxos-white) linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.1) 100%);
+    /*background: var(--fxos-white) linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.1) 100%);*/
 }
 
 .my-list-title {
     line-height:2rem;
     max-height: 4rem;
     width: 100%;
-    overflow: hidden;
     text-overflow: ellipsis;
     font-weight: bold;
     margin-top: 1.7rem;
-    display:block;
 }
 
 .my-list-title img{
@@ -43,11 +41,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    position: absolute;
     top: 0;
     left:0;
-    padding: var(--my-spacing) var(--my-spacing) 0% var(--my-spacing);
+    padding: 0% var(--my-spacing) 0% 0%;
     box-sizing: border-box;
+    display:inline-block;
 }
 
 .my-list-date {
@@ -59,11 +57,11 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     color: var(--fxos-orange);
-    position: absolute;
     top: 0;
     left:60%;
-    padding: var(--my-spacing) var(--my-spacing) 0% 0%;
+    padding: 0% 0% 0% var(--my-spacing);
     box-sizing: border-box;
+    display:inline-block;
 }
 
 .my-list-snippet {
@@ -72,31 +70,55 @@
     width:100%;
     text-overflow: ellipsis;
     font-size: 1.7rem;
+    padding-left: var(--my-spacing);
+}
+
+.my-list-image-wrapper {
+    width: 22%;
+    float: right;
 }
 
 .my-list-image-container {
-    float: right;
+    position: relative;
     height: 0;
     overflow: hidden;
-    width: 30%;
-    display: inline-block;
+    display: block;
 }
 
 .my-list-image-container img{
-    position: relative;
+    position: absolute;
+    top: 0;
+    height:100%;
     left: 50%;
     transform: translate(-50%, 0);
-    width:100%;
+}
+
+.my-list-footer{
+    position: absolute;
+    top: 90%;
+    left: 0%;
+    width: 100%;
+    height: 10%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(255,255,255,1) 100%);
+    display: inline-block;
+    padding: 0;
+}
+
+/* --- S --- */
+
+.my-list-entry-s .my-list-date,
+.my-list-entry-s .my-list-feed-title {
+    display: none;
 }
 
 /* --- RATIOS --- */
 
-.list-ratio-image-s { padding-bottom:25%; }
-.list-ratio-image-l { padding-bottom:16%; }
+.list-ratio-image-s { padding-bottom:100%; }
+.list-ratio-image-l { padding-bottom:100%; }
 
-.list-ratio-entry-s { padding-bottom: 16%; }
-.list-ratio-entry-m { padding-bottom: 32%; }
-.list-ratio-entry-l { padding-bottom: 38%; }
+.list-ratio-entry-s { padding-bottom: 17%; }
+.list-ratio-entry-m { padding-bottom: 34%; }
+.list-ratio-entry-l { padding-bottom: 39%; }
 
 .list-ratio-16-10{
     padding-bottom:62.5%; /* 10/16*100 */
