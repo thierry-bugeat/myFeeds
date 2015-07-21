@@ -686,7 +686,7 @@
                         _nbEntriesDisplayed++;
                         
                     } else if ((params.entries.theme == 'list') && (params.entries.displaySmallEntries)) {
-                        _content = _content + '<div class="my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '">';
+                        _content = _content + '<div class="my-'+_theme+'-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-date">' + _date + '</span>';
                         _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
