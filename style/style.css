@@ -30,15 +30,23 @@ section[role="region"] {
     height: auto !important;
 }
 
+#main {
+    height: 100%;
+    width: 500%; /* 5 screens */
+    display: inline-flex;
+    /*transform: translateX(-200%);*/
+}
+
 /* Main Entry */
 
 #main-entry-container{
-    width:100%;
+    display:block;
+    width:20%;
     height:100%;
-    margin:0px auto;
-    position: fixed;
+    /*margin:0px auto;*/
+    /*position: fixed;*/
     top:0%;
-    left:100%;
+    left:400%;
     background: var(--fxos-ivory);
     z-index:10;
     box-sizing: border-box;
@@ -67,6 +75,7 @@ section[role="region"] {
 /* Loader */
 
 #loading {
+    left:200%;
     width:0%;
     height:0.5rem;
     display:block;

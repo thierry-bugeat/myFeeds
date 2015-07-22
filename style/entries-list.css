@@ -333,10 +333,11 @@
 
 #feeds-entries-container{
     display:block;
-    width: calc(100%);
+    width: 20%;
     height: calc(100%);
     background: var(--fxos-ivory);
-    position:fixed;
+    /*position:fixed;*/
+    left: 200%;
 }
 #feeds-entries{
     width:100%;

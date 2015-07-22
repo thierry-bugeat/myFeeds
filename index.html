@@ -30,11 +30,13 @@
 
     <div id="loading"></div>
     
+    <div id="main">
+    
     <!-- ================= -->
     <!-- Find feeds screen -->
     <!-- ================= -->
-         
-    <section role="region" data-type="sidebar" id="find-feeds-container">
+
+    <div role="region" data-type="sidebar" id="find-feeds-container">
         
         <section role="myHeader">
             <header class="mySystemHeader">
@@ -60,13 +62,13 @@
             </header>
         </section>
         
-    </section>
+    </div>
     
     <!-- ==================== -->
     <!-- Subscriptions screen -->
     <!-- ==================== -->
-         
-    <section role="region" data-type="sidebar" id="feeds-list-container">
+
+    <div role="region" data-type="sidebar" id="feeds-list-container">
         
         <section role="myHeader">
             <header class="mySystemHeader">
@@ -85,7 +87,7 @@
             </header>
         </section>
         
-    </section>
+    </div>
     
     <!-- =========== -->
     <!-- Main screen -->
@@ -125,6 +127,28 @@
     </div>
     
     <!-- =============== -->
+    <!-- Settings screen -->
+    <!-- =============== -->
+    
+    <div role="region" data-type="sidebar" id="settings-container">
+        
+        <section role="myHeader">
+            <header class="mySystemHeader">
+                <h1 data-l10n-id="my-settings">my Settings</h1>
+            </header>
+        </section>
+    
+        <div id="settings" class="scrollable"></div>
+        
+        <section role="myFooter" class="">
+            <header>
+                <button id="settingsClose"><span data-icon="close"></span></button>
+            </header>
+        </section>
+        
+    </div>
+    
+    <!-- =============== -->
     <!-- One news screen -->
     <!-- =============== -->
     
@@ -149,27 +173,7 @@
         
     </div>
     
-    <!-- =============== -->
-    <!-- Settings screen -->
-    <!-- =============== -->
-    
-    <section role="region" data-type="sidebar" id="settings-container">
-        
-        <section role="myHeader">
-            <header class="mySystemHeader">
-                <h1 data-l10n-id="my-settings">my Settings</h1>
-            </header>
-        </section>
-    
-        <div id="settings" class="scrollable"></div>
-        
-        <section role="myFooter" class="">
-            <header>
-                <button id="settingsClose"><span data-icon="close"></span></button>
-            </header>
-        </section>
-        
-    </section>
+    </div>
 
 </body>
 

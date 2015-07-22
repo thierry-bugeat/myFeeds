@@ -4,12 +4,13 @@
 }
 
 #settings-container{
-    width:100%;
+    display: block;
+    width:20%;
     height:100%;
-    margin:0px auto;
-    position: fixed;
+    /*margin:0px auto;*/
+    /*position: fixed;*/
     top:0%;
-    left:100%;
+    left:300%;
     z-index:10;
     box-sizing: border-box;
 }

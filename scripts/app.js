@@ -126,14 +126,14 @@
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan); 
         }
     }
-    menu.onclick            = function(event) { openWindow("feeds-list-container", "left"); }
-    closeMainEntry.onclick  = function(event) { closeWindow("main-entry-container", "right"); ui.echo("browser", "", ""); }
-    closeFeedsList.onclick  = function(event) { closeWindow("feeds-list-container", "left"); }
-    findFeedsOpen.onclick   = function(event) { openWindow("find-feeds-container", "left"); }
-    findFeedsClose.onclick  = function(event) { closeWindow("find-feeds-container", "left"); }
+    menu.onclick            = function(event) { _scrollTo(1); }
+    closeMainEntry.onclick  = function(event) { _scrollTo(2); ui.echo("browser", "", ""); }
+    closeFeedsList.onclick  = function(event) { _scrollTo(2); }
+    findFeedsOpen.onclick   = function(event) { _scrollTo(0); }
+    findFeedsClose.onclick  = function(event) { _scrollTo(1); }
     findFeedsSubmit.onclick = function(event) { var _keywords = document.getElementById("findFeedsText").value; if (_keywords) {ui.echo("find-feeds", "Loading...", ""); gf.findFeeds(_keywords);} }
-    settingsOpen.onclick    = function(event) { openWindow("settings-container", "right"); }
-    settingsClose.onclick   = function(event) { closeWindow("settings-container", "right"); }
+    settingsOpen.onclick    = function(event) { _scrollTo(3); }
+    settingsClose.onclick   = function(event) { _scrollTo(2); }
     displayGrid.onclick     = function(event) {
         params.entries.theme = "grid"; 
         dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
@@ -565,7 +565,7 @@
         
         for (var i = 0; i < _opens.length; i++) {
             _opens[i].onclick = function() { 
-                closeWindow("feeds-list-container", "left");
+                _scrollTo(2);
                 params.entries.nbDaysAgo = 0;
                 params.feeds.selectedFeed = this.getAttribute("feedUrl");
                 _saveParams();
@@ -823,8 +823,8 @@
         document.getElementById("browser").style.cssText = "display: block;";
         
         main_entry.scrollTop = 0;
-        
-        openWindow("main-entry-container", "right");
+
+        _scrollTo(4);
     }
     
     /**
@@ -861,39 +861,19 @@
             }
         }
     }
-        
-    /**
-     * Open window from left or right
-     * @param string divId Div identifiant
-     * @param string placement "left", "right" Initial window placement.
-     * */
-    function openWindow(divId, placement) {
-        document.body.style.cssText = "overflow: hidden;"; // Disable scroll in entries list.
-        
-        var _window = document.getElementById(divId);
-        
-        if (placement == "left") {
-            _window.style.cssText = "transform: translateX(100%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
-        } else {
-            _window.style.cssText = "transform: translateX(-100%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
-        }
-    }
     
     /**
-     * Close window from left or right
-     * @param string divId Div identifiant
-     * @param string placement "left", "right" Initial window placement.
+     * Scroll main div to specified screen.
+     * @param {screenX} int
+     * 0 : Search feed
+     * 1 : Feeds list
+     * 2 : Entries list
+     * 3 : Settings screen
+     * 4 : Entry
      * */
-    function closeWindow(divId, placement) {
-        document.body.style.cssText = "overflow: auto;"; // Re-enable scroll in entries list.
-        
-        var _window = document.getElementById(divId);
-        
-        if (placement == "left") {
-            _window.style.cssText = "transform: translateX(0%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
-        } else {
-            _window.style.cssText = "transform: translateX(100%); -webkit-transition-duration: 0.5s; transition-duration: 0.5s;";
-        }
+    function _scrollTo(screenX) {
+        _sw = window.innerWidth * (screenX);
+        window.scroll(_sw, 0);
     }
     
     /**
@@ -1297,4 +1277,5 @@
         // ============
         
         ui.init();
+        _scrollTo(2);
     };
