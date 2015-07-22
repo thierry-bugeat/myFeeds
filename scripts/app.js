@@ -125,8 +125,10 @@
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan); 
         }
     }
+    //menu.onclick            = function(event) { _smoothScrollTo(1, 300); }
     menu.onclick            = function(event) { _scrollTo(1); }
     closeMainEntry.onclick  = function(event) { _scrollTo(2); ui.echo("browser", "", ""); }
+    //closeFeedsList.onclick  = function(event) { _smoothScrollTo(2, 300); }
     closeFeedsList.onclick  = function(event) { _scrollTo(2); }
     findFeedsOpen.onclick   = function(event) { _scrollTo(0); }
     findFeedsClose.onclick  = function(event) { _scrollTo(1); }
@@ -878,6 +880,38 @@
         _sw = window.innerWidth * (screenX);
         window.scroll(_sw, 0);
     }
+    
+    // http://jsfiddle.net/DruwJ/92/
+    window._smoothScrollTo = (function () {
+        var timer, start, factor;
+
+        return function (screenX, duration) {
+            target = window.innerWidth * (screenX);
+            var offset = window.pageXOffset,
+                delta = target - window.pageXOffset; // X-offset difference
+            duration = duration || 1000; // default 1 sec animation
+            start = Date.now(); // get start time
+            factor = 0;
+
+            if (timer) {
+                clearInterval(timer); // stop any running animations
+            }
+
+            function step() {
+                var x;
+                factor = (Date.now() - start) / duration; // get interpolation factor
+                if (factor >= 1) {
+                    clearInterval(timer); // stop animation
+                    factor = 1; // clip to max 1.0
+                }
+                x = factor * delta + offset;
+                window.scrollBy(x - window.pageXOffset, 0);
+            }
+
+            timer = setInterval(step, 10);
+            return timer;
+        };
+    }());
     
     /**
      * Set start of day timestamp.
