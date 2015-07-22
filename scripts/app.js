@@ -1,6 +1,6 @@
     // Firefox OS 
     // Style Guide          : https://www.mozilla.org/en-US/styleguide/products/firefox-os/
-    // Icones               : http://buildingfirefoxos.com/downloads/
+    // Icones               : https://buildingfirefoxos.com/downloads/
     // APIs List            : https://developer.mozilla.org/fr/Apps/Reference/Firefox_OS_device_APIs
     // Device Storage API   : https://developer.mozilla.org/en-US/docs/Web/API/Device_Storage_API
     // Browser API          : https://developer.mozilla.org/fr/docs/WebAPI/Browser
@@ -40,6 +40,9 @@
         "accounts": {
             "feedly": false,
             "theoldreader": false
+        },
+        "ui": {
+            "animations": true                  // Use transitions animations
         }
     };
     
@@ -109,7 +112,9 @@
     var displayGrid             = document.getElementById("displayGrid");
     var displayCard             = document.getElementById("displayCard");
     var displayList             = document.getElementById("displayList");
-        
+    
+    var useAnimations           = document.getElementById("useAnimations");
+
     //var loadSubscriptions     = document.getElementById("loadSubscriptions");
     //var saveSubscriptions     = document.getElementById("saveSubscriptions");
     
@@ -125,10 +130,8 @@
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan); 
         }
     }
-    //menu.onclick            = function(event) { _smoothScrollTo(1, 300); }
     menu.onclick            = function(event) { _scrollTo(1); }
     closeMainEntry.onclick  = function(event) { _scrollTo(2); ui.echo("browser", "", ""); }
-    //closeFeedsList.onclick  = function(event) { _smoothScrollTo(2, 300); }
     closeFeedsList.onclick  = function(event) { _scrollTo(2); }
     findFeedsOpen.onclick   = function(event) { _scrollTo(0); }
     findFeedsClose.onclick  = function(event) { _scrollTo(1); }
@@ -352,6 +355,14 @@
             _theoldreaderAccount = "";
         }
         
+        // Use animations selector
+        
+        if (params.ui.animations) {
+            _useAnimations = 'checked=""';
+        } else {
+            _useAnimations = "";
+        }        
+        
         // Update every 
         
         var _every = settings.update.every;
@@ -415,6 +426,7 @@
         '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
         '<ul class="developper-menu">                                                                                                                       ',
         '   <li><span data-icon="messages"></span>Connection<div id="onLine">NA</div></li>                                                                  ',
+        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-use-animations') + '<div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
         '</ul>                                                                                                                                              '
         ].join(''); 
 
@@ -467,6 +479,13 @@
         var _selectMaxNbDays = document.getElementById('selectMaxNbDays');
         _selectMaxNbDays.onchange = function(e) {
             params.entries.dontDisplayEntriesOlderThan = _selectMaxNbDays.options[_selectMaxNbDays.selectedIndex].value;
+            _saveParams();
+        }
+        
+        // UI animations checkbox
+        
+        document.getElementById("useAnimations").onclick = function() {
+            params.ui.animations = !params.ui.animations;
             _saveParams();
         }
         
@@ -877,8 +896,12 @@
      * 4 : Entry
      * */
     function _scrollTo(screenX) {
-        _sw = window.innerWidth * (screenX);
-        window.scroll(_sw, 0);
+        if (params.ui.animations && (screenX < 4)) {
+            _smoothScrollTo(screenX, 300);
+        } else { 
+            _sw = window.innerWidth * (screenX);
+            window.scroll(_sw, 0);
+        } 
     }
     
     // http://jsfiddle.net/DruwJ/92/
