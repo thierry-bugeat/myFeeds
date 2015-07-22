@@ -122,7 +122,6 @@
     sync.onclick            = function(event) { 
         if (navigator.onLine) {
             ui._onclick(this, 'disable'); 
-            ui.echo("feeds-list", "Loading...", ""); 
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan); 
         }
     }
@@ -438,6 +437,10 @@
         document.getElementById('toggleDisplaySmallEntries').onclick = function(e) {
             params.entries.displaySmallEntries = !params.entries.displaySmallEntries;
             _saveParams();
+            if (navigator.onLine) {
+                ui._onclick(sync, 'disable'); 
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan); 
+            }
         }
         
         var _selectUpdateEvery = document.getElementById('selectUpdateEvery');
