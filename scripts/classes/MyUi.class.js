@@ -105,6 +105,14 @@ MyUi.prototype._onclick = function(_this, pointerEvents) {
 }
 
 /**
+ * Disable UI elements.
+ * Used when app is offline as startup.
+ * */
+MyUi.prototype._disable = function(_status) {
+    _MyUi.toggle('disable');
+}
+
+/**
  * Enable disable ui elements. 
  * Used when network connection change.
  * param {string} _status "enable", "disable"
