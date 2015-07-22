@@ -65,7 +65,6 @@ function _swipe(callback) {
         
         if ((myGesture._action == "sync") && (sync.style.pointerEvents == 'auto')) {
             ui._onclick(sync, 'disable');
-            ui.echo("feeds-list", "Loading...", ""); 
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }
         
