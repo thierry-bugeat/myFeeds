@@ -131,7 +131,7 @@
         }
     }
     menu.onclick            = function(event) { _scrollTo(1); }
-    closeMainEntry.onclick  = function(event) { _scrollTo(2); ui.echo("browser", "", ""); }
+    closeMainEntry.onclick  = function(event) { _quickScrollTo(2); ui.echo("browser", "", ""); }
     closeFeedsList.onclick  = function(event) { _scrollTo(2); }
     findFeedsOpen.onclick   = function(event) { _scrollTo(0); }
     findFeedsClose.onclick  = function(event) { _scrollTo(1); }
@@ -848,7 +848,7 @@
         
         main_entry.scrollTop = 0;
 
-        _scrollTo(4);
+        _quickScrollTo(4);
     }
     
     /**
@@ -896,13 +896,20 @@
      * 4 : Entry
      * */
     function _scrollTo(screenX) {
-        if (params.ui.animations && (screenX < 4)) {
-            _smoothScrollTo(screenX, 300);
+        if (params.ui.animations) {
+            _smoothScrollTo(screenX, 400);
         } else { 
             _sw = window.innerWidth * (screenX);
-            window.scroll(_sw, 0);
+            _quickScrollTo(_sw);
         } 
     }
+    
+    window._quickScrollTo = (function () {
+        return function (screenX) {
+            _sw = window.innerWidth * (screenX);
+            window.scroll(_sw, 0);
+        };
+    }());
     
     // http://jsfiddle.net/DruwJ/92/
     window._smoothScrollTo = (function () {
@@ -1337,5 +1344,5 @@
         // ============
         
         ui.init();
-        _scrollTo(2);
+        _quickScrollTo(2);
     };
