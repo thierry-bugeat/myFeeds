@@ -49,7 +49,7 @@
     var settings = {
         "developper_menu": true,               // Display or not developper menu in settings
         "update": {
-            "every": [60, 900, 1800, 3600]          // In seconds 5mn, 30mn, 60mn
+            "every": [900, 1800, 3600]          // In seconds 5mn, 30mn, 60mn
         },
         "days": [3, 5, 7, 10]
     }
