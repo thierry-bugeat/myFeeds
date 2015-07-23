@@ -42,7 +42,7 @@
             "theoldreader": false
         },
         "ui": {
-            "animations": true                  // Use transitions animations
+            "animations": false                 // Use transitions animations
         }
     };
     
@@ -993,12 +993,12 @@
             var _confirm = window.confirm(document.webL10n.get('confirm-populate-database'));
             if (_confirm) {
                 var _populateMySubscriptions = [
-                    {"url": "https://www.reddit.com/r/FireFoxOS/.rss",          "pulsations": 2,    "account": "local"},
-                    {"url": "http://www.webupd8.org/feeds/posts/default",       "pulsations": 2,    "account": "local"},
-                    {"url": "http://metro.co.uk/sport/football/feed/",          "pulsations": 5,    "account": "local"},
-                    {"url": "http://sourceforge.net/blog/feed/",                "pulsations": 2,    "account": "local"},
-                    {"url": "http://www.gorillavsbear.net/category/mp3/feed/",  "pulsations": 2,    "account": "local"},
-                    {"url": "http://www.wired.com/feed/",                       "pulsations": 5,    "account": "local"}
+                    {"url": "https://www.reddit.com/r/FireFoxOS/.rss",          "pulsations": 2,    "account": "local", "id": "https://www.reddit.com/r/FireFoxOS/.rss"},
+                    {"url": "http://www.webupd8.org/feeds/posts/default",       "pulsations": 2,    "account": "local", "id": "http://www.webupd8.org/feeds/posts/default"},
+                    {"url": "http://metro.co.uk/sport/football/feed/",          "pulsations": 5,    "account": "local", "id": "http://metro.co.uk/sport/football/feed/"},
+                    {"url": "http://sourceforge.net/blog/feed/",                "pulsations": 2,    "account": "local", "id": "http://sourceforge.net/blog/feed/"},
+                    {"url": "http://www.gorillavsbear.net/category/mp3/feed/",  "pulsations": 2,    "account": "local", "id": "http://www.gorillavsbear.net/category/mp3/feed/"},
+                    {"url": "http://www.wired.com/feed/",                       "pulsations": 5,    "account": "local", "id": "http://www.wired.com/feed/"}
                 ];
                 
                 for (var i = 0; i < _populateMySubscriptions.length; i++) {
@@ -1281,7 +1281,8 @@
                 _feed = {
                     'url': _subscriptions[i].id.substr(5, _subscriptions[i].id.length),
                     'pulsations': 20,
-                    'account': 'feedly'
+                    'account': 'feedly',
+                    'id': _subscriptions[i].id.substr(5, _subscriptions[i].id.length)
                 };
                 _newFeeds.push(_feed);
             }
@@ -1323,7 +1324,8 @@
                 _feed = {
                     'url': _subscriptions[i].url,
                     'pulsations': 20,
-                    'account': 'theoldreader'
+                    'account': 'theoldreader',
+                    'id': _subscriptions[i].id
                 };
                 _newFeeds.push(_feed);
             }
