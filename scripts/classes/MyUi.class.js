@@ -218,3 +218,57 @@ MyUi.prototype._loading = function(percentage) {
         loading.style.cssText = "width: " + percentage + "%";
     }
 }
+
+/**
+ * Scroll main div to specified screen.
+ * @param {screenX} int
+ * 0 : Search feed
+ * 1 : Feeds list
+ * 2 : Entries list
+ * 3 : Settings screen
+ * 4 : Entry
+ * */
+MyUi.prototype._scrollTo = function(screenX) {
+    if (params.ui.animations) {
+        _MyUi._smoothScrollTo(screenX, 400);
+    } else {
+        _MyUi._quickScrollTo(screenX);
+    }
+}
+
+MyUi.prototype._quickScrollTo = function(screenX) {
+    _sw = window.innerWidth * (screenX);
+    window.scroll(_sw, 0);
+}
+
+// http://jsfiddle.net/DruwJ/92/
+MyUi.prototype._smoothScrollTo = function (screenX, duration) {
+    var timer, start, factor;
+
+    target = window.innerWidth * (screenX);
+    var offset = window.pageXOffset,
+        delta = target - window.pageXOffset; // X-offset difference
+    duration = duration || 1000; // default 1 sec animation
+    start = Date.now(); // get start time
+    factor = 0;
+
+    if (timer) {
+        clearInterval(timer); // stop any running animations
+    }
+
+    function step() {
+        var x;
+        factor = (Date.now() - start) / duration; // get interpolation factor
+        if (factor >= 1) {
+            clearInterval(timer); // stop animation
+            factor = 1; // clip to max 1.0
+        }
+        x = factor * delta + offset;
+        window.scrollBy(x - window.pageXOffset, 0);
+    }
+
+    timer = setInterval(step, 10);
+    return timer;
+};
+
+    

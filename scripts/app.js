@@ -105,6 +105,7 @@
     var findFeedsOpen           = document.getElementById("findFeedsOpen");
     var findFeedsClose          = document.getElementById("findFeedsClose");
     var findFeedsSubmit         = document.getElementById("findFeedsSubmit");
+    var findFeedsReset          = document.getElementById("findFeedsReset");
     var share                   = document.getElementById("share");
     var feedsEntriesNbDaysAgo   = document.getElementById("feedsEntriesNbDaysAgo");
     var displayGrid             = document.getElementById("displayGrid");
@@ -128,14 +129,15 @@
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }
     }
-    menu.onclick            = function(event) { _scrollTo(1); }
-    closeMainEntry.onclick  = function(event) { _quickScrollTo(2); ui.echo("browser", "", ""); }
-    closeFeedsList.onclick  = function(event) { _scrollTo(2); }
-    findFeedsOpen.onclick   = function(event) { _scrollTo(0); }
-    findFeedsClose.onclick  = function(event) { _scrollTo(1); }
+    menu.onclick            = function(event) { ui._scrollTo(1); }
+    closeMainEntry.onclick  = function(event) { ui._quickScrollTo(2); ui.echo("browser", "", ""); }
+    closeFeedsList.onclick  = function(event) { ui._scrollTo(2); }
+    findFeedsOpen.onclick   = function(event) { ui._scrollTo(0); }
+    findFeedsClose.onclick  = function(event) { ui._scrollTo(1); }
     findFeedsSubmit.onclick = function(event) { var _keywords = document.getElementById("findFeedsText").value; if (_keywords) {ui.echo("find-feeds", "Loading...", ""); gf.findFeeds(_keywords);} }
-    settingsOpen.onclick    = function(event) { _scrollTo(3); }
-    settingsClose.onclick   = function(event) { _scrollTo(2); }
+    findFeedsReset.onclick  = function(event) { ui.echo('find-feeds', '', ''); }
+    settingsOpen.onclick    = function(event) { ui._scrollTo(3); }
+    settingsClose.onclick   = function(event) { ui._scrollTo(2); }
     displayGrid.onclick     = function(event) {
         params.entries.theme = "grid";
         dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
@@ -300,7 +302,7 @@
             var _htmlResults = "<ul>";
 
             for (var i = 0 ; i < _results.length; i++) {
-                _htmlResults = _htmlResults + '<li><a href="#"><p><button class="addNewFeed" feedUrl="' + _results[i].url + '" feedId="' + _results[i].url + '" ><span data-icon="add"></span></button>' + _results[i].title + '</p><p><time>' + _results[i].url + '</time></p></a></li>';
+                _htmlResults = _htmlResults + '<li><a href="#"><button class="addNewFeed" feedUrl="' + _results[i].url + '" feedId="' + _results[i].url + '" ><span data-icon="add"></span></button><p>' + _results[i].title + '</p><p><time>' + _results[i].url + '</time></p></a></li>';
             }
 
             _htmlResults = _htmlResults + "</ul>";
@@ -617,7 +619,7 @@
 
         for (var i = 0; i < _opens.length; i++) {
             _opens[i].onclick = function() {
-                _scrollTo(2);
+                ui._scrollTo(2);
                 params.entries.nbDaysAgo = 0;
                 params.feeds.selectedFeed = this.getAttribute("feedUrl");
                 _saveParams();
@@ -876,7 +878,7 @@
 
         main_entry.scrollTop = 0;
 
-        _quickScrollTo(4);
+        ui._quickScrollTo(4);
     }
 
     /**
@@ -913,62 +915,6 @@
             }
         }
     }
-
-    /**
-     * Scroll main div to specified screen.
-     * @param {screenX} int
-     * 0 : Search feed
-     * 1 : Feeds list
-     * 2 : Entries list
-     * 3 : Settings screen
-     * 4 : Entry
-     * */
-    function _scrollTo(screenX) {
-        if (params.ui.animations) {
-            _smoothScrollTo(screenX, 400);
-        } else {
-            _quickScrollTo(screenX);
-        }
-    }
-
-    window._quickScrollTo = (function () {
-        return function (screenX) {
-            _sw = window.innerWidth * (screenX);
-            window.scroll(_sw, 0);
-        };
-    }());
-
-    // http://jsfiddle.net/DruwJ/92/
-    window._smoothScrollTo = (function () {
-        var timer, start, factor;
-
-        return function (screenX, duration) {
-            target = window.innerWidth * (screenX);
-            var offset = window.pageXOffset,
-                delta = target - window.pageXOffset; // X-offset difference
-            duration = duration || 1000; // default 1 sec animation
-            start = Date.now(); // get start time
-            factor = 0;
-
-            if (timer) {
-                clearInterval(timer); // stop any running animations
-            }
-
-            function step() {
-                var x;
-                factor = (Date.now() - start) / duration; // get interpolation factor
-                if (factor >= 1) {
-                    clearInterval(timer); // stop animation
-                    factor = 1; // clip to max 1.0
-                }
-                x = factor * delta + offset;
-                window.scrollBy(x - window.pageXOffset, 0);
-            }
-
-            timer = setInterval(step, 10);
-            return timer;
-        };
-    }());
 
     /**
      * Set start of day timestamp.
@@ -1376,5 +1322,5 @@
         // ============
 
         ui.init();
-        _quickScrollTo(2);
+        ui._quickScrollTo(2);
     };

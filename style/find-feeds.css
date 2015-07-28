@@ -19,14 +19,14 @@
 }
 
 #find-feeds {
-    background-color: var(--fxos-black);
-    color: var(--fxos-white);
+    background-color: var(--fxos-ivory);
     border: 0px solid red;
     box-sizing: border-box;
     width: 100%;
     height: calc(100% - 13.5rem) !important;
     overflow-x:hidden;
     overflow-y:auto;
+    padding: var(--my-spacing);
 }
 
 #find-feeds > h2 {
@@ -49,21 +49,22 @@
 }
 
 #find-feeds > ul {
+    background-color: var(--fxos-white);
     overflow: auto;
-    padding: 0 1.5rem;
     list-style: none outside none;
     margin: 0;
     overflow: hidden;
-    padding: 0;
+    padding-left: var(--my-spacing);
+    padding-right: var(--my-spacing);
+    font-size:1.7rem;
 }
 
 #find-feeds > ul > li {
     width: 100%;
-    height: 6rem;
     box-sizing: border-box;
-    border-bottom: solid 0.1rem var(--fxos-grey);
+    border-bottom: solid 0.1rem var(--fxos-ivory);
     color: #333;
-    margin: 0;  
+    margin: var(--my-spacing) 0 var(--my-spacing) 0;  
     display: block;
     position: relative;
 }
@@ -80,6 +81,7 @@
     position: relative;
     border: none; 
     outline: none;
+    overflow: hidden;
 }
 
 #find-feeds > ul > li p {
@@ -95,21 +97,16 @@
 }
 
 #find-feeds > ul > li p:first-of-type {
-    padding-left: 1.5rem;
-    color: var(--fxos-ivory);
     font-size: 1.8rem;
     line-height: 2.2rem;
-    padding: 1rem 0 0;
 }
 
 #find-feeds button {
-    color: var(--fxos-orange);
-    line-height:0;
-    height:2rem;
-    float:left;
-    width: 45px;
+    width:4rem;
+    padding:0;
     margin-right: var(--my-spacing);
-    background: none;
+    float: left;
+    cursor: pointer;
 }
 
 #find-feeds-container form{
