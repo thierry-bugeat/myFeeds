@@ -101,15 +101,30 @@ TheOldReader.prototype.getSubscriptions = function () {
 }
 
 /**
- * @param   {feedId} String Feed url
- * @return  {CustomEvent} Feedly.deleteSubscription.done | TheOldReader.deleteSubscription.error
+ * @param   {feedId} String Feed id
+ * @return  {CustomEvent} TheOldReader.deleteSubscription.done | TheOldReader.deleteSubscription.error
  * */
 
 TheOldReader.prototype.deleteSubscription = function (feedId) {
     console.log('TheOldReader.prototype.deleteSubscription()', arguments);
-    console.log('TheOldReader.prototype.deleteSubscription()', _TheOldReader.tor.subscriptions);
-    //ac=unsubscribe
-    //s=feed/00157a17b192950b65be3791 # Stream Id
+    
+    return new Promise(function(resolve, reject) {
+        
+        var _url = _TheOldReader.tor.host + '/reader/api/0/subscription/edit';
+            
+        var _params = 'output=json' + 
+            '&ac=unsubscribe' + 
+            '&s=' + encodeURIComponent(feedId);
+        
+        var promise = _TheOldReader._delete(_url, _params, '');
+        
+        promise.then(function(response) {
+            resolve(response);
+        }).catch(function(error) {
+            reject(Error(JSON.stringify(error)));
+        });
+    
+    });
 }
 
 /**
@@ -183,9 +198,18 @@ TheOldReader.prototype.post = function (url, params, callback) {
         xhr.open('POST', url, true);
 
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        
+        if (_TheOldReader.tor.token) {
+            xhr.setRequestHeader("Authorization", "GoogleLogin auth=" + _TheOldReader.tor.token.Auth);
+        }
 
         xhr.onload = function() {
-            var _response = JSON.parse(xhr.response);
+            var _response;
+            try {
+                _response = JSON.parse(xhr.response);
+            } catch (e) {
+                _response = xhr.response;
+            }
             typeof callback === 'function' && callback(_response);
         };
 
@@ -197,15 +221,44 @@ TheOldReader.prototype.post = function (url, params, callback) {
     });
 }
 
-/**
- * _delete(url, callback)
- * 
- * @param {string} url Url to load.
- * @param {string} callback.
- * 
- * */
- 
-TheOldReader.prototype._delete = function (url, callback) {
-    console.log('TheOldReader.prototype._delete()', arguments);
-    window.alert('TheOldReader.prototype._delete() not yet implemented');
+
+TheOldReader.prototype._delete = function (url, params, callback) {
+    console.log('TheOldReader.prototype.post222()', arguments);
+    
+    return new Promise(function(resolve, reject) {
+
+        var xhr = new XMLHttpRequest({ mozSystem: true });
+
+        xhr.open('POST', url, true);
+
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        
+        if (_TheOldReader.tor.token) {
+            xhr.setRequestHeader("Authorization", "GoogleLogin auth=" + _TheOldReader.tor.token.Auth);
+        }
+
+        xhr.onload = function() {
+            
+            if (xhr.status == 200) {
+
+                //var _response = JSON.parse(xhr.response);
+                var _response = xhr.response;
+
+                try {
+                    resolve(_response);
+                } catch(err) {
+                    reject(Error(JSON.stringify(err)));
+                }
+                
+            } else {
+                reject(Error(xhr.statusText));
+            }
+        };
+
+        xhr.onerror = function(err) {
+            reject(Error(JSON.stringify(err)));
+        };
+        
+        xhr.send(params);
+    });
 }

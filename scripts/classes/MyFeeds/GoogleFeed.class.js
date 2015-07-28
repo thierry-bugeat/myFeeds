@@ -189,7 +189,7 @@ GoogleFeed.prototype.addFeed = function(feed) {
     _myNewfeed['_myLastPublishedDate']  = _myNewEntries[0].publishedDate;       // Non, les news ne sont pas ordonnées par date
     _myNewfeed['_myLastTimestamp']      = _myNewEntries[0]._myTimestamp;        // Non, les news ne sont pas ordonnées par date
     _myNewfeed['_myLastTimestampInMs']  = _myNewEntries[0]._myTimestampInMs;    // Non, les news ne sont pas ordonnées par date
-    _myNewfeed['_myFeedId']             = _MyFeeds.base64_encode(_myNewfeed.feedUrl);
+    //_myNewfeed['_myFeedId']             = _myNewfeed._myFeedId;
     
     // Pulsations ?
     
@@ -250,12 +250,13 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
             
             console.log(_url);
             
-            var _params = {"nbFeeds": this.myFeedsSubscriptions.length, "account": _myFeed.account, "url": _myFeed.url};
+            var _params = {"nbFeeds": this.myFeedsSubscriptions.length, "account": _myFeed.account, "url": _myFeed.url, "id": _myFeed.id};
             
             var promise = this.get(_url, _params);
         
             promise.then(function(response) {
                 response.responseData.feed._myAccount = response.responseData._myParams.account; // Add _myAccount value
+                response.responseData.feed._myFeedId = response.responseData._myParams.id; // Add __id value
                 document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": response}));
             }, function(error) {
                 // Network error then try to load feed from cache
