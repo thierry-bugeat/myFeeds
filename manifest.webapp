@@ -1,14 +1,14 @@
 {
     "name": "my Feeds",
     "description": "RSS & ATOM feeds reader",
-    "version": "1.0",
+    "version": "1.0.0",
     "launch_path": "/index.html",
     "icons": {
         "60": "/images/icon-60.png",
         "128": "/images/icon-128.png"
     },
     "developer": {
-        "name": "Thierry Bugeat",
+        "name": "Thierry BUGEAT",
         "url": "http://thierry.bugeat.com/myFeeds/"
     },
     "orientation": "portrait-primary",

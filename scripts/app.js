@@ -10,9 +10,10 @@
     // A voir :
     // http://imikado.developpez.com/tutoriels/firefoxOS/ma-premier-application/
     // http://toddmotto.com/is-it-time-to-drop-jquery-essentials-to-learning-javascript-from-a-jquery-background/
-
+    
     var My = new MyFeeds();
     var ui = new MyUi();
+    var myManifest = My._loadJSON('manifest.webapp');
 
     var theoldreader = new TheOldReader();
     var feedly = new Feedly();
@@ -302,7 +303,27 @@
             var _htmlResults = "<ul>";
 
             for (var i = 0 ; i < _results.length; i++) {
-                _htmlResults = _htmlResults + '<li><a><button class="addNewFeed" feedUrl="' + _results[i].url + '" feedId="' + _results[i].url + '" ><span data-icon="add"></span></button><p>' + _results[i].title + '</p><p><time>' + _results[i].url + '</time></p></a></li>';
+                
+                // Is feed already in subscriptions ?
+                
+                var _feedAlreadySubscribed = false;
+                
+                for (var _account in myFeedsSubscriptions) {
+                    for (var j = 0; j < myFeedsSubscriptions[_account].length; j++) {
+                        if (_results[i].url == myFeedsSubscriptions[_account][j]["url"]) {
+                            _feedAlreadySubscribed = true;
+                            break;
+                        }
+                    }
+                }
+                
+                // ---
+                
+                if (!_feedAlreadySubscribed) {
+                    _htmlResults = _htmlResults + '<li><a><button class="addNewFeed" feedUrl="' + _results[i].url + '" feedId="' + _results[i].url + '" ><span data-icon="add"></span></button><p>' + _results[i].title + '</p><p><time>' + _results[i].url + '</time></p></a></li>';
+                } else {
+                    _htmlResults = _htmlResults + '<li><a><p>' + _results[i].title + '</p><p><time>' + _results[i].url + '</time></p><p>' + document.webL10n.get('feed-already-subscribed') + '</p></a></li>';
+                }
             }
 
             _htmlResults = _htmlResults + "</ul>";
@@ -457,6 +478,13 @@
         '<ul class="developper-menu">                                                                                                                       ',
         '   <li><span data-icon="messages"></span>Connection<div id="onLine">NA</div></li>                                                                  ',
         '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-use-animations') + '<div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
+        '</ul>                                                                                                                                              ',
+        '<h2 class="developper-menu">' + document.webL10n.get('about') + '</h2>                                                                             ',
+        '<ul class="developper-menu">                                                                                                                       ',
+        '   <li><span data-icon="messages"></span>' + document.webL10n.get('app-title') + '<div>' + myManifest.version + '</div></li>                                        ',
+        '   <li><span data-icon="messages"></span>' + document.webL10n.get('author') + '<div>' + myManifest.developer.name + '</div></li>                                         ',
+        '   <li><span data-icon="messages"></span>' + document.webL10n.get('website') + '<div><a href="' + myManifest.developer.url + '" target="_blank">url</a></div></li>',
+        '   <li><span data-icon="messages"></span>' + document.webL10n.get('git-repository') + '<div><a href="' + document.webL10n.get('git-url') + '" target="_blank">url</a></div></li>                                 ',
         '</ul>                                                                                                                                              '
         ].join('');
 

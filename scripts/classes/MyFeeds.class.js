@@ -51,6 +51,22 @@ MyFeeds.prototype._load = function(filename, callback) {
     });
 }
 
+MyFeeds.prototype._loadJSON = function(filename) {   
+
+    var xhr = new XMLHttpRequest();
+        
+    xhr.open('GET', filename, false);
+    xhr.send(null);
+
+    if (xhr.status === 200) {
+        try {
+            return (JSON.parse(xhr.response));
+        } catch(err) {
+             return "{}";
+        }
+    }
+}
+
 /**
  * @param {string} filename
  * @param {string} mimetype "text/plain" "application/json"
