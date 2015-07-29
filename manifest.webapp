@@ -9,7 +9,7 @@
     },
     "developer": {
         "name": "Thierry Bugeat",
-        "url": "http://www.bugeat.com"
+        "url": "http://thierry.bugeat.com/myFeeds/"
     },
     "orientation": "portrait-primary",
     "default_locale": "en",
@@ -26,7 +26,7 @@
     "type": "privileged",
     "csp": "default-src *; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'",
     "redirects": [
-        {"from": "http://localhost/",            "to": "/scripts/feedly/loginCallback.html"}
+        {"from": "http://localhost/", "to": "/scripts/feedly/loginCallback.html"}
     ],
     "permissions": {
         "desktop-notification": {
