@@ -109,10 +109,13 @@ GoogleFeed.prototype._sortFeeds = function() {
     this.sortedFeeds.sort(function(a, b){ return b.title < a.title });
 }
 
-GoogleFeed.prototype._setNum = function(num)     { 
-    if (isNaN(num) || !Number.isInteger(num)) {
+GoogleFeed.prototype._setNum = function(num) { 
+    if (num == "Infinity") {
+        this.gf.num = 1;
+        console.warn("_setNum : incorrect value " + num + " => Set to 1");
+    } else if (isNaN(num) || !Number.isInteger(num)) {
         this.gf.num = 20;
-        console.warn('_setNum : incorrect value ' + num);
+        console.warn("_setNum : incorrect value " + num + " => Set to 20");
     } else {
         this.gf.num = num;
     }
@@ -232,7 +235,7 @@ GoogleFeed.prototype.addFeed = function(feed) {
  * */
 GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
     
-    console.log('GoogleFeed.prototype.loadFeeds()');
+    console.log('GoogleFeed.prototype.loadFeeds()', this.myFeedsSubscriptions);
 
     this.nbFeedsLoaded = 0;
     this.gf_unsortedEntries = [];
@@ -246,18 +249,20 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
             var _myFeed = this.myFeedsSubscriptions[i];
             this._setUrl(_myFeed.url);
 
-            this._setNum(Math.floor(1 + (_myFeed.pulsations * nbDaysToLoad))); // Pulsations = Estimation of news per day.
+            this._setNum(1 + Math.floor(_myFeed.pulsations * nbDaysToLoad)); // Pulsations = Estimation of news per day.
 
             var _urlParams = '&output=' + this.gf.output + '&num=' + this.gf.num + '&scoring=' + this.gf.scoring + '&q=' + encodeURIComponent(this.gf.q) + '&key=' + this.gf.key + '&v=' + this.gf.v;
             var _url    = this.gf.ServiceBase + _urlParams;
             
-            console.log(_url);
+            //console.log("GoogleFeed.load.done" + _url);
+            //console.log("GoogleFeed.load.done", _myFeed);
             
             var _params = {"nbFeeds": this.myFeedsSubscriptions.length, "account": _myFeed.account, "url": _myFeed.url, "id": _myFeed.id};
             
             var promise = this.get(_url, _params);
         
             promise.then(function(response) {
+                //console.log("GoogleFeed.load.done", response);
                 response.responseData.feed._myAccount = response.responseData._myParams.account; // Add _myAccount value
                 response.responseData.feed._myFeedId = response.responseData._myParams.id; // Add __id value
                 document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": response}));

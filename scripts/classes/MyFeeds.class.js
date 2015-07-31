@@ -24,7 +24,7 @@ MyFeeds.prototype._load = function(filename, callback) {
 
         request.onsuccess = function () {
             var file = this.result;
-            console.log("Get the file: ", file);
+            console.log("MyFeeds.prototype._load()", file);
             var _fr = new FileReader();
             
             _fr.onloadend = function(event) {
@@ -37,6 +37,7 @@ MyFeeds.prototype._load = function(filename, callback) {
                         console.log(event.target.result);
                     }
                     //callback(results);
+                    console.log("MyFeeds.prototype._load() " + filename, results);
                     resolve(results);
                 }
             };

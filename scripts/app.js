@@ -199,6 +199,11 @@
         for (var i = 0 ; i < _feeds.length; i++) {
             if ( _feeds[i]._myAccount == _account) {
                 _url = _feeds[i].feedUrl;
+                
+                if ((isNaN(_feeds[i]._myPulsations)) || (_feeds[i]._myPulsations == "Infinity")){
+                    _feeds[i]._myPulsations = "0.1";
+                }
+                
                 _feed = {"url": _url, "pulsations": _feeds[i]._myPulsations, "account": _feeds[i]._myAccount, "id": _feeds[i]._myFeedId};
                 _output.push(_feed);
             }
@@ -1011,6 +1016,7 @@
 
         for (var i = 0; i < subscriptions.length; i++) {
             for (var j = 0; j < subscriptions[i].length; j++) {
+                console.log('initAndLoadFeeds()', subscriptions[i][j]);
                 var _account = subscriptions[i][j].account;
                 if (myFeedsSubscriptions[_account] === undefined) {
                     myFeedsSubscriptions[_account] = [];
