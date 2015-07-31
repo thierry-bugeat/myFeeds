@@ -45,6 +45,7 @@ GoogleFeed.prototype.getFeeds           = function()        { this._sortFeeds();
 GoogleFeed.prototype.getNbFeedsLoaded   = function()        { return this.nbFeedsLoaded;    }
 
 GoogleFeed.prototype._setUrl            = function(q)       { this.gf.q = q;                }
+
 GoogleFeed.prototype._sortEntries       = function() {
     
     // Sort entries by "_myTimestampInMs" 
@@ -91,7 +92,7 @@ GoogleFeed.prototype._sortEntries       = function() {
     _tmp.sort().reverse();
     
     for (var i = 0; i < _tmp.length; i++) {
-        //console.log(_tmp[i]);
+
         for (var j = 0; j < this.gf_unsortedEntries.length; j++) {
             if (_tmp[i] == this.gf_unsortedEntries[j]._myTimestampInMs) {
                 this.gf_sortedEntries.push(this.gf_unsortedEntries[j]);
@@ -103,12 +104,13 @@ GoogleFeed.prototype._sortEntries       = function() {
     //console.log(this.gf_sortedEntries);
 }
 
-GoogleFeed.prototype._sortFeeds         = function() { 
+GoogleFeed.prototype._sortFeeds = function() { 
     this.sortedFeeds = this.unsortedFeeds;
     this.sortedFeeds.sort(function(a, b){ return b.title < a.title });
 }
-GoogleFeed.prototype._setNum            = function(num)     { 
-    if (isNaN(num)) {
+
+GoogleFeed.prototype._setNum = function(num)     { 
+    if (isNaN(num) || !Number.isInteger(num)) {
         this.gf.num = 20;
         console.warn('_setNum : incorrect value ' + num);
     } else {
@@ -174,7 +176,7 @@ GoogleFeed.prototype.addEntries = function(entries) {
 
 GoogleFeed.prototype.addFeed = function(feed) {
     console.log('GoogleFeed.prototype.addFeed()', arguments);
-    
+
     var _myNewfeed = feed;
     var _myNewEntries = feed.entries;
     
@@ -243,8 +245,9 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
 
             var _myFeed = this.myFeedsSubscriptions[i];
             this._setUrl(_myFeed.url);
+
             this._setNum(Math.floor(1 + (_myFeed.pulsations * nbDaysToLoad))); // Pulsations = Estimation of news per day.
-            
+
             var _urlParams = '&output=' + this.gf.output + '&num=' + this.gf.num + '&scoring=' + this.gf.scoring + '&q=' + encodeURIComponent(this.gf.q) + '&key=' + this.gf.key + '&v=' + this.gf.v;
             var _url    = this.gf.ServiceBase + _urlParams;
             
@@ -298,23 +301,25 @@ GoogleFeed.prototype.findFeeds = function(keywords) {
     
     console.log('GoogleFeed.prototype.findFeeds()', arguments);
     
-    var _params = {};
-    var _urlParams = '&q=' + encodeURIComponent(keywords) + '&v=' + this.gf.v;
-    var _url    = this.gf.ServiceFind + _urlParams;
-    
-    console.log(_url);
-    
-    var promise = this.get(_url, _params);
+    return new Promise(function(resolve, reject) {
+        
+        var _params     = {};
+        var _urlParams  = '&q=' + encodeURIComponent(keywords) + '&v=' + _GoogleFeed.gf.v;
+        var _url        = _GoogleFeed.gf.ServiceFind + _urlParams;
+        var promise     = _GoogleFeed.get(_url, _params);
 
-    promise.then(function(response) {
-        console.log(response);
-        document.body.dispatchEvent(new CustomEvent('GoogleFeed.find.done', {"detail": response}));
-    }, function(error) {
-        error._myParams = _params;
-        document.body.dispatchEvent(new CustomEvent('GoogleFeed.find.error', {"detail": error}));
-        console.error("ERROR ", error);
+        promise.then(function(response) {
+            console.log(response);
+            document.body.dispatchEvent(new CustomEvent('GoogleFeed.find.done', {"detail": response}));
+            resolve(response);
+        }).catch(function(error) {
+            error._myParams = _params;
+            document.body.dispatchEvent(new CustomEvent('GoogleFeed.find.error', {"detail": error}));
+            console.error("ERROR ", error);
+            reject(Error(JSON.stringify(error)));
+        });
+
     });
-
 }
 
 /**
@@ -344,23 +349,20 @@ GoogleFeed.prototype.get = function (url, myParams) {
                     _response.responseData._myParams = myParams; // Add extra values
                     resolve(_response);
                 } catch(err) {
-                    //reject(Error(xhr.statusText));
                     var _response = {"responseData": {"_myParams": myParams}};
                     reject(Error(JSON.stringify(_response)));
-                    //reject(Error(_response));
                 }
                 
             } else {
-                //reject(Error(xhr.statusText)); 
+                console.error('ERROR ' + url);
                 var _response = {"responseData": {"_myParams": myParams}};
                 reject(Error(JSON.stringify(_response)));
-                //reject(Error(_response));
             }
         };
 
         xhr.onerror = function(e) {
-            //console.error('bugeat 2c', xhr);
-            //console.error('bugeat 2c', e);
+            console.error('ERROR ' + url);
+            console.error(e);
             var _response = {"responseData": {"_myParams": myParams}};
             reject(Error(JSON.stringify(_response)));
         };

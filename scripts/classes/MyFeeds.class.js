@@ -74,29 +74,36 @@ MyFeeds.prototype._loadJSON = function(filename) {
  * */
 MyFeeds.prototype._save = function(filename, mimetype, content) {
 
-    var sdcard = navigator.getDeviceStorage("sdcard");
-    var file   = new Blob([content], {type: mimetype});
-    
-    // Delete previous file
-    
-    var request = sdcard.delete("myFeeds/" + filename).then(function () {
-        console.log("File deleted");
+    return new Promise(function(resolve, reject) {
         
-        // Save new file
-    
-        var request = sdcard.addNamed(file, "myFeeds/" + filename);
-
-        request.onsuccess = function () {
-            console.log('File "' + this.result);
+        var sdcard = navigator.getDeviceStorage("sdcard");
+        var file   = new Blob([content], {type: mimetype});
+        
+        // Delete previous file
+        
+        var request = sdcard.delete("myFeeds/" + filename).then(function () {
+            console.log("File deleted");
             
-        }
-
-        request.onerror = function () {
-            console.warn("Unable to write the file: ", this.error);
-        }
+            // Save new file
         
-    }).catch (function (error) {
-        console.log("Unable to delete the file: ", this.error);
+            var request = sdcard.addNamed(file, "myFeeds/" + filename);
+
+            request.onsuccess = function () {
+                resolve(this.result);
+            }
+
+            request.onerror = function (error) {
+                var _myError = {
+                    "filename": filename,
+                    "message": "Unable to write the file"
+                };
+                reject(Error(JSON.stringify(_myError)));
+            }
+            
+        }).catch (function (error) {
+            reject(Error(JSON.stringify(error)));
+        });
+        
     });
 
 }

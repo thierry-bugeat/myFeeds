@@ -135,7 +135,19 @@
     closeFeedsList.onclick  = function(event) { ui._scrollTo(2); }
     findFeedsOpen.onclick   = function(event) { ui._scrollTo(0); }
     findFeedsClose.onclick  = function(event) { ui._scrollTo(1); }
-    findFeedsSubmit.onclick = function(event) { var _keywords = document.getElementById("findFeedsText").value; if (_keywords) {ui.echo("find-feeds", "Loading...", ""); gf.findFeeds(_keywords);} }
+    
+    findFeedsSubmit.onclick = function(event) { 
+        var _keywords = document.getElementById("findFeedsText").value; 
+        if (_keywords) {
+            ui.echo("find-feeds", "Loading...", ""); 
+            gf.findFeeds(_keywords).then(function(results) {
+                console.log("Find feed ok", results);
+            }).catch(function(error) {
+                window.alert(document.webL10n.get("error-finding-feed") + JSON.stringify(error));
+            });
+        }
+    }
+    
     findFeedsReset.onclick  = function(event) { ui.echo('find-feeds', '', ''); }
     settingsOpen.onclick    = function(event) { ui._scrollTo(3); }
     settingsClose.onclick   = function(event) { ui._scrollTo(2); }
@@ -192,7 +204,13 @@
             }
         }
 
-        My._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(_output));
+        My._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(_output)).then(function(results) {
+            console.log('Save subscriptions.' + _account + '.json');
+            window.alert('Backup completed for account : ' + _account);
+        }).catch(function(error) {
+            console.error("ERROR saving file " + error.filename);
+            window.alert("ERROR saving file " + error.filename);
+        });
     }
 
     nextDay.onclick = function(event) {
@@ -251,7 +269,12 @@
             // (3a) Delete from Local
             
             if (_account == 'local') {
-                My._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions.local));
+                My._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions.local)).then(function(results) {
+                    window.alert(document.webL10n.get('feed-has-been-deleted'));
+                }).catch(function(error) {
+                    console.error("ERROR saving file " + error.filename);
+                    window.alert("ERROR saving file " + error.filename);
+                });
             }
 
             // (3b) Delete from Feedly
@@ -259,7 +282,12 @@
             if (_account == 'feedly') {
                 feedly.deleteSubscription(_feedId).then(function(response){
                     window.alert(document.webL10n.get('feed-has-been-deleted'));
-                    My._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account]));
+                    My._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
+                        console.log('Save subscriptions.' + _account + '.json');
+                    }).catch(function(error) {
+                        console.error("ERROR saving file " + error.filename);
+                        window.alert("ERROR saving file " + error.filename);
+                    });
                 }).catch(function(error) {
                     window.alert(document.webL10n.get('error-cant-delete-this-feed'));
                     console.error(error);
@@ -271,7 +299,12 @@
             if (_account == 'theoldreader') {
                 theoldreader.deleteSubscription(_feedId).then(function(response){
                     window.alert(document.webL10n.get('feed-has-been-deleted'));
-                    My._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account]));
+                    My._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
+                        console.log('Save subscriptions.' + _account + '.json');
+                    }).catch(function(error) {
+                        console.error("ERROR saving file " + error.filename);
+                        window.alert("ERROR saving file " + error.filename);
+                    });
                 }).catch(function(error) {
                     window.alert(document.webL10n.get('error-cant-delete-this-feed'));
                     console.error(error);
@@ -370,7 +403,12 @@
             
             // (3) Save subscriptions.local.json
             
-            My._save("subscriptions.local.json", "application/json", JSON.stringify(myFeedsSubscriptions.local));
+            My._save("subscriptions.local.json", "application/json", JSON.stringify(myFeedsSubscriptions.local)).then(function(results) {
+                window.alert(document.webL10n.get('feed-subscription-was-added'));
+            }).catch(function(error) {
+                console.error("ERROR saving file " + error.filename);
+                window.alert("ERROR saving file " + error.filename);
+            });
         }
     }
 
@@ -1007,7 +1045,12 @@
                     _nbFeedsSubscriptions++;
                 }
 
-                My._save("subscriptions.local.json", "application/json", JSON.stringify(myFeedsSubscriptions.local));
+                My._save("subscriptions.local.json", "application/json", JSON.stringify(myFeedsSubscriptions.local)).then(function(results) {
+                    console.log('Save file subscriptions.local.json');
+                }).catch(function(error) {
+                    console.error("ERROR saving file " + error.filename);
+                    window.alert("ERROR saving file " + error.filename);
+                });
             }
         }
 
@@ -1031,7 +1074,12 @@
         var _nbDaysAgo = params.entries.nbDaysAgo;
         params.entries.nbDaysAgo = 0;   // Reset nbDaysAgo value before saving file.
                                         // Reset affect "params" object !!!!!
-        My._save("params.json", "application/json", JSON.stringify(params));
+        My._save("params.json", "application/json", JSON.stringify(params)).then(function(results) {
+            console.log("Save file params.json");
+        }).catch(function(error) {
+            console.error("ERROR saving file params.json");
+            window.alert('ERROR saving file params.json');
+        });
         params.entries.nbDaysAgo = _nbDaysAgo;
     }
 
@@ -1186,7 +1234,12 @@
             // Save feed as file
 
             if (navigator.onLine) {
-                My._save('cache/google/feeds/' + btoa(event.detail.responseData.feed.feedUrl) + ".json", "application/json", JSON.stringify(event.detail.responseData.feed));
+                My._save('cache/google/feeds/' + btoa(event.detail.responseData.feed.feedUrl) + ".json", "application/json", JSON.stringify(event.detail.responseData.feed)).then(function(results) {
+                    console.log('Saving feed in cache ok : ' + event.detail.responseData.feed.feedUrl + ' ('+btoa(event.detail.responseData.feed.feedUrl)+')');
+                }).catch(function(error) {
+                    console.error("ERROR saving feed in cache : " + event.detail.responseData.feed.feedUrl + ' ('+btoa(event.detail.responseData.feed.feedUrl)+')');
+                    window.alert("ERROR saving feed in cache :\n" + event.detail.responseData.feed.feedUrl);
+                });
             }
 
             // Add feed entries to array "unsortedEntries"
@@ -1293,8 +1346,18 @@
             addNewSubscriptions(_newFeeds);
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
-            My._save("subscriptions.feedly.json", "application/json", JSON.stringify(myFeedsSubscriptions.feedly));
-            My._save("cache/feedly/subscriptions.json", "application/json", JSON.stringify(_subscriptions));
+            My._save("subscriptions.feedly.json", "application/json", JSON.stringify(myFeedsSubscriptions.feedly)).then(function(results) {
+                console.log("Save file subscriptions.feedly.json");
+            }).catch(function(error) {
+                console.error("ERROR saving file subscriptions.feedly.json");
+                window.alert("ERROR saving file subscriptions.feedly.json");
+            });
+            My._save("cache/feedly/subscriptions.json", "application/json", JSON.stringify(_subscriptions)).then(function(results) {
+                console.log("Save file cache/feedly/subscriptions.json");
+            }).catch(function(error) {
+                console.error("ERROR saving file cache/feedly/subscriptions.json");
+                window.alert("ERROR saving file cache/feedly/subscriptions.json");
+            });
         });
 
         document.body.addEventListener('Feedly.getSubscriptions.error', function(response) {
@@ -1336,8 +1399,18 @@
             addNewSubscriptions(_newFeeds);
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
-            My._save("subscriptions.theoldreader.json", "application/json", JSON.stringify(myFeedsSubscriptions.theoldreader));
-            My._save("cache/theoldreader/subscriptions.json", "application/json", JSON.stringify(_subscriptions));
+            My._save("subscriptions.theoldreader.json", "application/json", JSON.stringify(myFeedsSubscriptions.theoldreader)).then(function(results) {
+                console.log("Save file subscriptions.theoldreader.json");
+            }).catch(function(error) {
+                console.error("ERROR saving file subscriptions.theoldreader.json");
+                window.alert("ERROR saving file subscriptions.theoldreader.json");
+            });
+            My._save("cache/theoldreader/subscriptions.json", "application/json", JSON.stringify(_subscriptions)).then(function(results) {
+                console.log("Save file cache/theoldreader/subscriptions.json");
+            }).catch(function(error) {
+                console.error("ERROR saving file cache/theoldreader/subscriptions.json");
+                window.alert("ERROR saving file cache/theoldreader/subscriptions.json");
+            });
         });
 
         document.body.addEventListener('TheOldReader.getSubscriptions.error', function(response) {
