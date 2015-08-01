@@ -500,8 +500,8 @@
         var _htmlSettings = [
         '<h2>' + document.webL10n.get('settings-feeds') + '</h2>                                                                                            ',
         '<ul>                                                                                                                                               ',
-        '   <li><span data-icon="reload"></span>' + document.webL10n.get('settings-last-update') + _now.getHours() + ':' + _minutes + '</li>                ',
-        '   <li><span data-icon="sync"></span>' + document.webL10n.get('settings-update-every') + _htmlSelectUpdateEvery + '</li>                           ',
+        '   <li class="_online_"><span data-icon="reload"></span>' + document.webL10n.get('settings-last-update') + _now.getHours() + ':' + _minutes + '</li>                ',
+        '   <li class="_online_"><span data-icon="sync"></span>' + document.webL10n.get('settings-update-every') + _htmlSelectUpdateEvery + '</li>                           ',
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-news') + '</h2>                                                                                             ',
         '<ul>                                                                                                                                               ',
@@ -510,8 +510,8 @@
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-online-accounts') + '</h2>                                                                                  ',
         '<ul class="feedly theoldreader">                                                                                                                   ',
-        '   <li><span data-icon="messages"></span>Feedly<div><label class="pack-switch"><input id="feedlyLogin" type="checkbox" ' + _feedlyAccount + '><span></span></label></div></li>',
-        '   <li>',
+        '   <li class="_online_"><span data-icon="messages"></span>Feedly<div><label class="pack-switch"><input id="feedlyLogin" type="checkbox" ' + _feedlyAccount + '><span></span></label></div></li>',
+        '   <li class="_online_">',
         '       <span data-icon="messages"></span>The Old Reader<div><label class="pack-switch"><input id="theoldreaderLogin" type="checkbox" ' + _theoldreaderAccount + '><span></span></label></div>',
         '       <p><input id="theoldreaderEmail" required="" placeholder="Email" name="theoldreaderEmail" type="email" value=""></p>                         ',
         '       <p><input id="theoldreaderPasswd" required="" placeholder="Password" name="theoldreaderPasswd" type="password" value=""><p>                     ',
@@ -526,8 +526,8 @@
         '<ul class="developper-menu">                                                                                                                       ',
         '   <li><span data-icon="messages"></span>' + document.webL10n.get('app-title') + '<div>' + myManifest.version + '</div></li>                                        ',
         '   <li><span data-icon="messages"></span>' + document.webL10n.get('author') + '<div>' + myManifest.developer.name + '</div></li>                                         ',
-        '   <li class="about"><span data-icon="messages"></span>' + document.webL10n.get('website') + '<div><a href="' + myManifest.developer.url + '" target="_blank">url</a></div></li>',
-        '   <li class="about"><span data-icon="messages"></span>' + document.webL10n.get('git-repository') + '<div><a href="' + document.webL10n.get('git-url') + '" target="_blank">url</a></div></li>                                 ',
+        '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('website') + '<div><a href="' + myManifest.developer.url + '" target="_blank">url</a></div></li>',
+        '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('git-repository') + '<div><a href="' + document.webL10n.get('git-url') + '" target="_blank">url</a></div></li>                                 ',
         '</ul>                                                                                                                                              '
         ].join('');
 
@@ -657,7 +657,9 @@
                 ((_account == 'feedly') && (_feedlyAccessToken !== undefined)) ||
                 ((_account == 'theoldreader') && (_theoldreaderAuth !== undefined))
             ){
-                _deleteIcone = '<button class="delete" account="' + _account + '" feedId="' + _feed._myFeedId + '"><span data-icon="delete"></span></button>';
+                var _class = (_account == 'local') ? "delete" : "delete _online_";
+                    
+                _deleteIcone = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed._myFeedId + '"><span data-icon="delete"></span></button>';
             }
 
             _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
@@ -827,7 +829,7 @@
                         _nbEntriesDisplayed++;
 
                     } else if ((params.entries.theme == 'list') && (params.entries.displaySmallEntries)) {
-                        _content = _content + '<div class="my-'+_theme+'-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
+                        _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-date">' + _date + '</span>';
                         _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
@@ -850,7 +852,7 @@
                         _nbEntriesDisplayed++;
 
                     } else if (params.entries.displaySmallEntries) {
-                        _content = _content + '<div class="small my-'+_theme+'-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
+                        _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
                         _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                         _content = _content + _imageUrl;
