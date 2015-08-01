@@ -526,8 +526,8 @@
         '<ul class="developper-menu">                                                                                                                       ',
         '   <li><span data-icon="messages"></span>' + document.webL10n.get('app-title') + '<div>' + myManifest.version + '</div></li>                                        ',
         '   <li><span data-icon="messages"></span>' + document.webL10n.get('author') + '<div>' + myManifest.developer.name + '</div></li>                                         ',
-        '   <li><span data-icon="messages"></span>' + document.webL10n.get('website') + '<div><a href="' + myManifest.developer.url + '" target="_blank">url</a></div></li>',
-        '   <li><span data-icon="messages"></span>' + document.webL10n.get('git-repository') + '<div><a href="' + document.webL10n.get('git-url') + '" target="_blank">url</a></div></li>                                 ',
+        '   <li class="about"><span data-icon="messages"></span>' + document.webL10n.get('website') + '<div><a href="' + myManifest.developer.url + '" target="_blank">url</a></div></li>',
+        '   <li class="about"><span data-icon="messages"></span>' + document.webL10n.get('git-repository') + '<div><a href="' + document.webL10n.get('git-url') + '" target="_blank">url</a></div></li>                                 ',
         '</ul>                                                                                                                                              '
         ].join('');
 
@@ -615,6 +615,14 @@
                 _saveParams();
             }
         }
+        
+        // =========================
+        // --- App start offline ---
+        // =========================
+        
+        if (!navigator.onLine) {
+            ui._disable();
+        }
 
         // ---
 
@@ -696,6 +704,14 @@
                 _saveParams();
                 dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             }
+        }
+        
+        // =========================
+        // --- App start offline ---
+        // =========================
+
+        if (!navigator.onLine) {
+            ui._disable();
         }
     }
 
@@ -893,6 +909,14 @@
 
         for (var i = 0; i < _entries.length; i++) {
             _entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }
+        }
+        
+        // =========================
+        // --- App start offline ---
+        // =========================
+        
+        if (!navigator.onLine) {
+            ui._disable();
         }
 
     }

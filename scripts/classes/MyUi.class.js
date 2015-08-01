@@ -165,6 +165,13 @@ MyUi.prototype.toggle = function(_status) {
 
     _MyUi._onclick(findFeedsOpen, _status);
     
+    // 3) Disable, enable about
+
+    var _items = document.querySelectorAll(".about");
+    for (var i = 0; i < _items.length; i++) {
+        _MyUi._onclick(_items[i], _status);
+    }
+    
     // =====================
     // --- Search screen ---
     // =====================
