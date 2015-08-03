@@ -173,6 +173,7 @@
                 function (_mySubscriptions) {
                     try{
                         addNewSubscriptions(_mySubscriptions);
+                        window.alert(document.webL10n.get('loading-subscriptions-done'));
                     } catch (err) {
                         window.alert(err.message);
                     }
