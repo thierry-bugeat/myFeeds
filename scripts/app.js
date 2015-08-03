@@ -831,7 +831,7 @@
                         _nbEntriesDisplayed++;
 
                     } else if ((params.entries.theme == 'list') && (params.entries.displaySmallEntries)) {
-                        _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
+                        _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-date">' + _date + '</span>';
                         _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
@@ -854,7 +854,7 @@
                         _nbEntriesDisplayed++;
 
                     } else if (params.entries.displaySmallEntries) {
-                        _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" entry_link="' + _entrie.link + '">';
+                        _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
                         _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                         _content = _content + _imageUrl;
@@ -904,7 +904,7 @@
         var _small_entries = document.querySelectorAll(".my-"+_theme+"-entry-s");
 
         for (var i = 0; i < _small_entries.length; i++) {
-            _small_entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(null, this.getAttribute("entry_link")); }
+            _small_entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); }
         }
 
         // onclick Normal Entries :
@@ -947,14 +947,16 @@
     function mainEntryOpenInBrowser(entryId, url) {
         console.log('mainEntryOpenInBrowser()', arguments);
         document.body.style.cssText = "overflow: hidden;";  // Disable scroll in entries list.
+        
+        share.setAttribute("i", entryId);
 
-        if (entryId !== null) {
+        if (url != "" ) {
+            ui.echo("browser", '<iframe src="' + url + '" sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
+        } else {
             var _entry = sortedEntries[entryId];
             var _srcDoc = "";
             var _regex = new RegExp("'", "g");
             var _author = "";
-
-            share.setAttribute("i", entryId);
 
             if (_entry.author !== "") {
                 _author = '<div class="entrie-author">' + myExtraTranslations['by'] + ' ' + _entry.author + '</div>';
@@ -969,8 +971,6 @@
             _srcDoc = _srcDoc + '<div class="entrie-visit-website"><a href="' + _entry.link + '">' + document.webL10n.get('entry-visit-website') + '</a></div>';
 
             ui.echo("browser", '<iframe srcdoc=\'' + _srcDoc + '\' sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
-        } else {
-            ui.echo("browser", '<iframe src="' + url + '" sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
         }
 
         document.getElementById("browser").style.cssText = "display: block;";
