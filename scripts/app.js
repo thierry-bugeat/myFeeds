@@ -1244,6 +1244,7 @@
         }, (params.entries.updateEvery * 1000));
 
         // Share entry :
+        // https://developer.mozilla.org/fr/docs/Web/API/Web_Activities
 
         share.onclick = function() {
             console.log(this);
@@ -1251,10 +1252,12 @@
             var _entry = sortedEntries[_entryId];
             console.log(_entry);
             new MozActivity({
-                name: "share",
+                name: "new",
                 data: {
-                    number: 1,
-                    url: "mailto:?subject=" + encodeURIComponent(_entry.title) + "&body=" + encodeURIComponent(_entry.link)
+                    type: ["websms/sms", "mail"],
+                    number: 0,
+                    url: "mailto:?subject=" + encodeURIComponent(_entry.title) + "&body=" + encodeURIComponent(_entry.link),
+                    body: _entry.title + "\n" + _entry.link
                 }
             });
         };
