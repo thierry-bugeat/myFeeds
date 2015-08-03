@@ -701,6 +701,8 @@
         for (var i = 0; i < _opens.length; i++) {
             _opens[i].onclick = function() {
                 ui._scrollTo(2);
+                ui._onclick(nextDay, 'disable');
+                ui._onclick(previousDay, 'enable');
                 params.entries.nbDaysAgo = 0;
                 params.feeds.selectedFeed = this.getAttribute("feedUrl");
                 _saveParams();
