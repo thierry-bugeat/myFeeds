@@ -64,7 +64,8 @@
     box-sizing: border-box;
     border-bottom: solid 0.1rem var(--fxos-ivory);
     color: #333;
-    margin: var(--my-spacing) 0 var(--my-spacing) 0;  
+    margin: var(--my-spacing) 0 0 0;
+    padding: 0 0 var(--my-spacing) 0;
     display: block;
     position: relative;
 }
@@ -89,7 +90,7 @@
     color: #858585;
     display: block;
     font-size: 1.5rem;
-    line-height: 2rem;
+    line-height: 1.9rem;
     margin: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -107,6 +108,11 @@
     margin-right: var(--my-spacing);
     float: left;
     cursor: pointer;
+    margin-bottom: 2rem;
+}
+
+#find-feeds button.cantAddNewFeed{
+    line-height: 5rem;
 }
 
 #find-feeds-container form{

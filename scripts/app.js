@@ -361,7 +361,7 @@
                 if (!_feedAlreadySubscribed) {
                     _htmlResults = _htmlResults + '<li><a><button class="addNewFeed" feedUrl="' + _results[i].url + '" feedId="' + _results[i].url + '" ><span data-icon="add"></span></button><p>' + _results[i].title + '</p><p><time>' + _results[i].url + '</time></p></a></li>';
                 } else {
-                    _htmlResults = _htmlResults + '<li><a><p>' + _results[i].title + '</p><p><time>' + _results[i].url + '</time></p><p>' + document.webL10n.get('feed-already-subscribed') + '</p></a></li>';
+                    _htmlResults = _htmlResults + '<li><a><button class="cantAddNewFeed warning"><span class="fa fa-ban fa-2x"></span></button><p>' + _results[i].title + '</p><p><time>' + _results[i].url + '</time></p><p class="warning">' + document.webL10n.get('feed-already-subscribed') + '</p></a></li>';
                 }
             }
 
@@ -410,6 +410,7 @@
             // (3) Save subscriptions.local.json
             
             My._save("subscriptions.local.json", "application/json", JSON.stringify(myFeedsSubscriptions.local)).then(function(results) {
+                ui.echo("find-feeds", "", "");
                 window.alert(document.webL10n.get('feed-subscription-was-added'));
             }).catch(function(error) {
                 console.error("ERROR saving file " + error.filename);
@@ -514,8 +515,8 @@
         '   <li class="_online_"><span data-icon="messages"></span>Feedly<div><label class="pack-switch"><input id="feedlyLogin" type="checkbox" ' + _feedlyAccount + '><span></span></label></div></li>',
         '   <li class="_online_">',
         '       <span data-icon="messages"></span>The Old Reader<div><label class="pack-switch"><input id="theoldreaderLogin" type="checkbox" ' + _theoldreaderAccount + '><span></span></label></div>',
-        '       <p><input id="theoldreaderEmail" required="" placeholder="Email" name="theoldreaderEmail" type="email" value=""></p>                         ',
-        '       <p><input id="theoldreaderPasswd" required="" placeholder="Password" name="theoldreaderPasswd" type="password" value=""><p>                     ',
+        '       <p><input id="theoldreaderEmail" required="" placeholder="Email" name="theoldreaderEmail" type="email" value=""></p>                        ',
+        '       <p><input id="theoldreaderPasswd" required="" placeholder="Password" name="theoldreaderPasswd" type="password" value=""><p>                 ',
         '   </li>                                                                                                                                           ',
         '</ul>                                                                                                                                              ',
         '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',

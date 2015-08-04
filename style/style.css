@@ -37,6 +37,10 @@ section[role="region"] {
     /*transform: translateX(-200%);*/
 }
 
+.warning {
+    color: red !important;
+}
+
 /* Main Entry */
 
 #main-entry-container{
