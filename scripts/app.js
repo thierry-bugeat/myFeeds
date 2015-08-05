@@ -600,6 +600,7 @@
                 feedly.login();
             } else {
                 params.accounts.feedly = false;
+                _disableAccount('feedly');
                 _saveParams();
             }
         }
@@ -613,7 +614,8 @@
                 var _passwd = document.getElementById("theoldreaderPasswd").value;
                 theoldreader.login(_email, _passwd);
             } else {
-                params.accounts.feedly = false;
+                params.accounts.theoldreader = false;
+                _disableAccount('theoldreader');
                 _saveParams();
             }
         }
@@ -638,7 +640,7 @@
         console.log(feeds.length + ' feeds');
 
         var _html = {
-            'local': '<h2>Local</h2><ul>',
+            'local': '<h2>Local</h2><ul class="local">',
             'feedly': '<h2>Feedly</h2><ul class="feedly">',
             'theoldreader': '<h2>The Old Reader</h2><ul class="theoldreader">'
         };
@@ -1051,7 +1053,9 @@
                 if (myFeedsSubscriptions[_account] === undefined) {
                     myFeedsSubscriptions[_account] = [];
                 }
-                myFeedsSubscriptions[_account].push(subscriptions[i][j]);
+                if (_account == "local" || params.accounts[_account]) {
+                    myFeedsSubscriptions[_account].push(subscriptions[i][j]);
+                }
             }
         }
 
@@ -1118,6 +1122,18 @@
         });
         params.entries.nbDaysAgo = _nbDaysAgo;
     }
+    
+    /**
+     * Disable online account
+     * @param {string} feedly, theoldreader
+     * */
+     
+     function _disableAccount(_account) {
+        console.log('_disableAccount', arguments);
+        myFeedsSubscriptions[_account] = [];
+        gf.setFeedsSubscriptions(myFeedsSubscriptions);
+        gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+     }
 
     /**
      * Add new feeds in array myFeedsSubscriptions
