@@ -597,14 +597,13 @@
                 params.entries.nbDaysAgo = params.entries.dontDisplayEntriesOlderThan;
                 ui._onclick(nextDay, 'enable');         // [<]
                 ui._onclick(previousDay, 'disable');    // [>]
+                feeds_entries.scrollTop = 0;
+                dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             }
             
             if (params.entries.nbDaysAgo < params.entries.dontDisplayEntriesOlderThan) {
                 ui._onclick(previousDay, 'enable');     // [>]
             }
-            
-            dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
-            feeds_entries.scrollTop = 0;
             
             _saveParams();
         }
