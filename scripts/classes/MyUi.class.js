@@ -180,7 +180,7 @@ MyUi.prototype._loading = function(percentage) {
  * */
 MyUi.prototype._scrollTo = function(screenX) {
     if (params.ui.animations) {
-        _MyUi._smoothScrollTo(screenX, 400);
+        _MyUi._smoothScrollTo(screenX, 250);
     } else {
         _MyUi._quickScrollTo(screenX);
     }
@@ -217,7 +217,7 @@ MyUi.prototype._smoothScrollTo = function (screenX, duration) {
         window.scrollBy(x - window.pageXOffset, 0);
     }
 
-    timer = setInterval(step, 10);
+    timer = setInterval(step, 5);
     return timer;
 };
 
