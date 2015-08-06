@@ -517,7 +517,7 @@
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-news') + '</h2>                                                                                             ',
         '<ul>                                                                                                                                               ',
-        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-small-news') + '<div><label class="pack-switch"><input id="toggleDisplaySmallEntries" type="checkbox" ' + _displaySmallEntriesChecked + '><span></span></label></div></li>',
+        '   <li class="_online_"><span data-icon="messages"></span>' + document.webL10n.get('settings-small-news') + '<div><label class="pack-switch"><input id="toggleDisplaySmallEntries" type="checkbox" ' + _displaySmallEntriesChecked + '><span></span></label></div></li>',
         '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-number-of-days') + _htmlMaxNbDays + '</li>                             ',
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-online-accounts') + '</h2>                                                                                  ',
@@ -592,6 +592,20 @@
         var _selectMaxNbDays = document.getElementById('selectMaxNbDays');
         _selectMaxNbDays.onchange = function(e) {
             params.entries.dontDisplayEntriesOlderThan = _selectMaxNbDays.options[_selectMaxNbDays.selectedIndex].value;
+            
+            if (params.entries.nbDaysAgo > params.entries.dontDisplayEntriesOlderThan) {
+                params.entries.nbDaysAgo = params.entries.dontDisplayEntriesOlderThan;
+                ui._onclick(nextDay, 'enable');         // [<]
+                ui._onclick(previousDay, 'disable');    // [>]
+            }
+            
+            if (params.entries.nbDaysAgo < params.entries.dontDisplayEntriesOlderThan) {
+                ui._onclick(previousDay, 'enable');     // [>]
+            }
+            
+            dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+            feeds_entries.scrollTop = 0;
+            
             _saveParams();
         }
 
