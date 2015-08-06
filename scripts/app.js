@@ -34,11 +34,21 @@
             "dontDisplayEntriesOlderThan": "7", // In days
             "displaySmallEntries": false,       // Display small entries. true, false
             "updateEvery": 900,                 // Update entries every N seconds
-            "theme": "grid"                     // card (default), grid
+            "theme": "card"                     // card (default), grid
         },
         "accounts": {
-            "feedly": false,
-            "theoldreader": false
+            "local": {
+                "title": "Local",
+                "logged": true
+            },
+            "feedly": {
+                "title": "Feedly",
+                "logged": false
+            },
+            "theoldreader": {
+                "title": "The Old Reader",
+                "logged": false
+            }
         },
         "ui": {
             "animations": false                 // Use transitions animations
@@ -66,7 +76,7 @@
         console.log('loading params from file params.json ...', _myParams);
         params = _myParams;
         // Get and set Feedly token from cache
-        if (params.accounts.feedly) {
+        if (params.accounts.feedly.logged) {
             My._load('cache/feedly/access_token.json').then(function(_token){
                 feedly.setToken(_token);
             }).catch(function(error) {
@@ -74,7 +84,7 @@
             });
         }
         // Get and set The Old Reader token from cache
-        if (params.accounts.theoldreader) {
+        if (params.accounts.theoldreader.logged) {
             My._load('cache/theoldreader/access_token.json').then(function(_token){
                 theoldreader.setToken(_token);
             }).catch(function(error) {
@@ -437,7 +447,7 @@
 
         // Feedly selector
 
-        if (params.accounts.feedly) {
+        if (params.accounts.feedly.logged) {
             _feedlyAccount = 'checked=""';
         } else {
             _feedlyAccount = "";
@@ -445,7 +455,7 @@
 
         // The Old Reader selector
 
-        if (params.accounts.theoldreader) {
+        if (params.accounts.theoldreader.logged) {
             _theoldreaderAccount = 'checked=""';
         } else {
             _theoldreaderAccount = "";
@@ -599,7 +609,7 @@
                 this.checked = false; // False until CustomEvent Feedly.login.done
                 feedly.login();
             } else {
-                params.accounts.feedly = false;
+                params.accounts.feedly.logged = false;
                 _disableAccount('feedly');
                 _saveParams();
             }
@@ -614,7 +624,7 @@
                 var _passwd = document.getElementById("theoldreaderPasswd").value;
                 theoldreader.login(_email, _passwd);
             } else {
-                params.accounts.theoldreader = false;
+                params.accounts.theoldreader.logged = false;
                 _disableAccount('theoldreader');
                 _saveParams();
             }
@@ -640,9 +650,9 @@
         console.log(feeds.length + ' feeds');
 
         var _html = {
-            'local': '<h2>Local</h2><ul class="local">',
-            'feedly': '<h2>Feedly</h2><ul class="feedly">',
-            'theoldreader': '<h2>The Old Reader</h2><ul class="theoldreader">'
+            'local': '',
+            'feedly': '',
+            'theoldreader': ''
         };
         var _htmlFeeds = "";
         var _feedlyAccessToken = feedly.getToken().access_token;
@@ -673,10 +683,13 @@
             '<ul>' +
             '<li><a class="open" feedUrl=""><p><button><span data-icon="forward"></span></button>' + document.webL10n.get('all-feeds') + '</p></a></li>' +
             '</ul>' +
-            _html['local'] + '</ul>' +
-            _html['feedly'] + '</ul>' +
-            _html['theoldreader'] + '</ul>' +
             '';
+        
+        for (var _account in _html) {
+            if (_html[_account] != "") {
+                _htmlFeeds = _htmlFeeds + '<h2>' + params.accounts[_account].title + '</h2><ul class="' + _account + '">' + _html[_account] + '</ul>';
+            }
+        }
 
         // --- Display ---
 
@@ -1053,7 +1066,7 @@
                 if (myFeedsSubscriptions[_account] === undefined) {
                     myFeedsSubscriptions[_account] = [];
                 }
-                if (_account == "local" || params.accounts[_account]) {
+                if (_account == "local" || params.accounts[_account].logged) {
                     myFeedsSubscriptions[_account].push(subscriptions[i][j]);
                 }
             }
@@ -1373,7 +1386,7 @@
 
         document.body.addEventListener('Feedly.login.done', function(response){
             console.log(feedly.getToken());
-            params.accounts.feedly = true;
+            params.accounts.feedly.logged = true;
             _saveParams();
             document.getElementById('feedlyLogin').checked = true; // Enable settings checkbox
             feedly.getSubscriptions(); // CustomEvent Feedly.getSubscriptions.done, Feedly.getSubscriptions.error
@@ -1426,7 +1439,7 @@
 
         document.body.addEventListener('TheOldReader.login.done', function(response){
             console.log('TheOldReader.getToken()', theoldreader.getToken());
-            params.accounts.theoldreader = true;
+            params.accounts.theoldreader.logged = true;
             _saveParams();
             document.getElementById('theoldreaderLogin').checked = true; // Enable settings checkbox
             theoldreader.getSubscriptions(); // CustomEvent TheOldReader.getSubscriptions.done, TheOldReader.getSubscriptions.error
