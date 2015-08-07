@@ -517,7 +517,7 @@
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-news') + '</h2>                                                                                             ',
         '<ul>                                                                                                                                               ',
-        '   <li class="_online_"><span data-icon="messages"></span>' + document.webL10n.get('settings-small-news') + '<div><label class="pack-switch"><input id="toggleDisplaySmallEntries" type="checkbox" ' + _displaySmallEntriesChecked + '><span></span></label></div></li>',
+        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-small-news') + '<div><label class="pack-switch"><input id="toggleDisplaySmallEntries" type="checkbox" ' + _displaySmallEntriesChecked + '><span></span></label></div></li>',
         '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-number-of-days') + _htmlMaxNbDays + '</li>                             ',
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-online-accounts') + '</h2>                                                                                  ',
@@ -564,10 +564,9 @@
         document.getElementById('toggleDisplaySmallEntries').onclick = function(e) {
             params.entries.displaySmallEntries = !params.entries.displaySmallEntries;
             _saveParams();
-            if (navigator.onLine) {
-                ui._onclick(sync, 'disable');
-                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
-            }
+            
+            params.entries.displaySmallEntries ?
+                ui._smallEntries('show') : ui._smallEntries('hide');
         }
 
         var _selectUpdateEvery = document.getElementById('selectUpdateEvery');
@@ -860,7 +859,7 @@
 
                         _nbEntriesDisplayed++;
 
-                    } else if ((params.entries.theme == 'list') && (params.entries.displaySmallEntries)) {
+                    } else if (params.entries.theme == 'list') {
                         _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-date">' + _date + '</span>';
@@ -883,7 +882,7 @@
 
                         _nbEntriesDisplayed++;
 
-                    } else if (params.entries.displaySmallEntries) {
+                    } else {
                         _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
                         _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
@@ -915,7 +914,7 @@
 
         ui.echo('feedsEntriesNbDaysAgo', _daySeparator, '');
 
-        // Display entries
+        // Display entries:
 
         if (_nbEntriesDisplayed > 0) {
             ui.echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
@@ -924,6 +923,11 @@
         } else {
             ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('no-news-today') + '</div>', "");
         }
+        
+        // Hide/show small entries:
+        
+        params.entries.displaySmallEntries ?
+            ui._smallEntries('show') : ui._smallEntries('hide');
 
         // ==================
         // --- Add Events ---

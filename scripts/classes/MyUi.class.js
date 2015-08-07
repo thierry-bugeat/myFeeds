@@ -221,4 +221,20 @@ MyUi.prototype._smoothScrollTo = function (screenX, duration) {
     return timer;
 };
 
+/**
+ * Show/Hide small entries
+ * @param {string} status "hide" "show"
+ * */
+MyUi.prototype._smallEntries = function (status) {
+    
+    var _small_entries = document.querySelectorAll(".small");
+    var _css = "";
+    
+    status == "show" ?
+        _css = "display : block;" : _css = "display : none;";
+
+    for (var i = 0; i < _small_entries.length; i++) {
+        _small_entries[i].style.cssText = _css; 
+    }
+};
     
