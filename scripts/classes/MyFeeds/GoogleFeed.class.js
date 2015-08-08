@@ -231,6 +231,7 @@ GoogleFeed.prototype.addFeed = function(feed) {
 }
 
 /**
+ * Load all feeds
  * @param {int} nbDaysToLoad Limit loading to N days.
  * */
 GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
@@ -295,10 +296,9 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
 }
 
 /**
- * findFeeds(keywords, callback)
+ * findFeeds(keywords)
  * 
  * @param {string} keywords
- * @param {string} callback
  * 
  * Documentation : https://developers.google.com/feed/v1/jsondevguide
  * */
@@ -330,8 +330,8 @@ GoogleFeed.prototype.findFeeds = function(keywords) {
 /**
  * get(url, myParams)
  * 
- * @param string url Url to load.
- * @param object myParams You can retrieve this object in response.
+ * @param {string} url Url to load.
+ * @param {object} myParams You can retrieve this object in response.
  * 
  * */
  
