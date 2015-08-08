@@ -87,7 +87,10 @@ MyUi.prototype.bind = function() {
 };
 
 /**
- *
+ * Enable or disable UI element.
+ * Change opacity and enable or disable click event.
+ * @param {string} DOM ID element
+ * @param {string} "enable", "disable"
  * https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events
  * */
 MyUi.prototype._onclick = function(_this, pointerEvents) {
@@ -107,25 +110,31 @@ MyUi.prototype._onclick = function(_this, pointerEvents) {
 /**
  * Disable UI elements.
  * Used when app is offline as startup.
+ * @param {sting} _status "disable"
  * */
 MyUi.prototype._disable = function(_status) {
     _MyUi.toggle('disable');
 }
 
 /**
- * Enable disable ui elements. 
- * Used when network connection change.
- * param {string} _status "enable", "disable"
+ * Change opacity of UI elements when network connection change.
+ * @param {string} _status "enable", "disable"
  * */
 MyUi.prototype.toggle = function(_status) {
     
-    // ========================
-    // -- CSS class _online_ --
-    // ========================
+    // ==========================
+    // --- CSS class _online_ ---
+    // ==========================
     
     var _items = document.querySelectorAll("._online_");
     for (var i = 0; i < _items.length; i++) {
         _MyUi._onclick(_items[i], _status);
+    }
+    
+    // Small entries :
+                
+    if (!params.entries.displaySmallEntries) {
+        _MyUi._smallEntries('hide');
     }
     
     // =======================
@@ -140,9 +149,9 @@ MyUi.prototype.toggle = function(_status) {
 /**
  * Output one html string in div element
  * 
- * param string divId    : Div id element
- * param string msg      : Html string to write
- * param string placement: "append", "prepend", ""
+ * @param {string} divId    : Div id element
+ * @param {string} msg      : Html string to write
+ * @param {string} placement: "append", "prepend", ""
  * */
 MyUi.prototype.echo = function(divId, msg, placement) {
     var _out = document.getElementById(divId);
@@ -235,6 +244,16 @@ MyUi.prototype._smallEntries = function (status) {
 
     for (var i = 0; i < _small_entries.length; i++) {
         _small_entries[i].style.cssText = _css; 
+    }
+    
+    // From status hide (unchecked) to status show (checked)
+    // => Reset small entries opacity
+    
+    if (status == "show") {
+        var _tmp = (navigator.onLine) ? "enable" : "disable";
+        for (var i = 0; i < _small_entries.length; i++) {
+            _MyUi._onclick(_small_entries[i], _tmp); 
+        }
     }
 };
     
