@@ -562,6 +562,7 @@
         // ==================
 
         document.getElementById('toggleDisplaySmallEntries').onclick = function(e) {
+            document.body.dispatchEvent(new CustomEvent('settingsSmallNews.change', {"detail": ""}));
             params.entries.displaySmallEntries = !params.entries.displaySmallEntries;
             _saveParams();
             
@@ -918,11 +919,11 @@
 
         if (_nbEntriesDisplayed > 0) {
             ui.echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
-        } else if (navigator.onLine == false) {
-            ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
-        } else {
+        } else if (_nbEntriesDisplayed == 0) {
             ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('no-news-today') + '</div>', "");
-        }
+        } else {
+            ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
+        } 
         
         // Hide/show small entries:
         
