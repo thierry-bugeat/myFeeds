@@ -50,10 +50,10 @@
                 "logged": false
             }
         },
-        "ui": {
-            "animations": false                 // Use transitions animations
-        },  
         "settings": {
+            "ui": {
+                "animations": false             // Use transitions animations
+            },
             "developper_menu": {
                 "visible": true,                // Display or not developper menu in settings
                 "logs": {
@@ -469,7 +469,7 @@
 
         // Use animations selector
 
-        if (params.ui.animations) {
+        if (params.settings.ui.animations) {
             _useAnimations = 'checked=""';
         } else {
             _useAnimations = "";
@@ -627,7 +627,7 @@
         // UI animations checkbox
 
         document.getElementById("useAnimations").onclick = function() {
-            params.ui.animations = !params.ui.animations;
+            params.settings.ui.animations = !params.settings.ui.animations;
             _saveParams();
         }
 

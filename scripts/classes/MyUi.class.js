@@ -188,7 +188,7 @@ MyUi.prototype._loading = function(percentage) {
  * 4 : Entry
  * */
 MyUi.prototype._scrollTo = function(screenX) {
-    if (params.ui.animations) {
+    if (params.settings.ui.animations) {
         _MyUi._smoothScrollTo(screenX, 250);
     } else {
         _MyUi._quickScrollTo(screenX);
