@@ -79,6 +79,14 @@ MyFeeds.prototype._save = function(filename, mimetype, content) {
         
         var sdcard = navigator.getDeviceStorage("sdcard");
         var file   = new Blob([content], {type: mimetype});
+
+        // test
+        
+        sdcard.onchange = function (change) {
+            console.log('The file has been ', change);
+        }
+        // test
+        // https://developer.mozilla.org/en-US/docs/Web/API/DeviceStorage/getEditable
         
         // Delete previous file
         
@@ -96,7 +104,8 @@ MyFeeds.prototype._save = function(filename, mimetype, content) {
             request.onerror = function (error) {
                 var _myError = {
                     "filename": filename,
-                    "message": "Unable to write the file"
+                    "message": "Unable to write the file",
+                    "error": error
                 };
                 reject(Error(JSON.stringify(_myError)));
             }
@@ -146,4 +155,53 @@ MyFeeds.prototype._file_exists_v2 = function(filename, callback) {
         }
         
     });
+}
+
+/**
+ * @param {string} message Message to display on screen for user.
+ * */ 
+MyFeeds.prototype.message = function (message) {
+    window.alert(message);
+}
+
+/**
+ * @param {string} message Message to display on screen for developper.
+ * */ 
+MyFeeds.prototype.alert = function (message) {
+    if (settings.developper_menu.logs.screen) {
+        window.alert(message);
+    }
+}
+
+/**
+ * @param {string} message Message to display in console.
+ * @param {string|array|object} arguments
+ * */ 
+MyFeeds.prototype.log = function (message, arguments) {
+    if (settings.developper_menu.logs.console) {
+        var _arguments = arguments || "";
+        window.console && console.log(message, _arguments);
+    }
+}
+
+/**
+ * @param {string} message Warn message to display in console.
+ * @param {string|array|object} arguments
+ * */ 
+MyFeeds.prototype.warn = function (message, arguments) {
+    if (settings.developper_menu.logs.console) {
+        var _arguments = arguments || "";
+        window.console && console.warn(message, _arguments);
+    }
+}
+
+/**
+ * @param {string} message Error message to display in console.
+ * @param {string|array|object} arguments
+ * */ 
+MyFeeds.prototype.error = function (message, arguments) {
+    if (settings.developper_menu.logs.console) {
+        var _arguments = arguments || "";
+        window.console && console.error(message, _arguments);
+    }
 }
