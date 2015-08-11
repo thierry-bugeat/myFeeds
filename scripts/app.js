@@ -52,21 +52,20 @@
         },
         "ui": {
             "animations": false                 // Use transitions animations
+        },  
+        "settings": {
+            "developper_menu": {
+                "visible": true,                // Display or not developper menu in settings
+                "logs": {
+                    "console": true,            // Developper logs in console
+                    "screen": true              // Developper logs on screen
+                }
+            },
+            "update": {
+                "every": [900, 1800, 3600]      // In seconds 5mn, 30mn, 60mn
+            },
+            "days": [3, 5, 7, 10]
         }
-    };
-
-    var settings = {
-        "developper_menu": {
-            "visible": true,                    // Display or not developper menu in settings
-            "logs": {
-                "console": true,                // Developper logs in console
-                "screen": true                  // Developper logs on screen
-            }
-        },
-        "update": {
-            "every": [900, 1800, 3600]          // In seconds 5mn, 30mn, 60mn
-        },
-        "days": [3, 5, 7, 10]
     }
 
     var _entriesUpdateInterval = '';
@@ -478,7 +477,7 @@
 
         // Update every
 
-        var _every = settings.update.every;
+        var _every = params.settings.update.every;
         var _htmlSelectUpdateEvery = "";
         var _selected = "";
 
@@ -497,7 +496,7 @@
 
         // Max nb Days
 
-        var _days = settings.days;
+        var _days = params.settings.days;
         var _htmlMaxNbDays = "";
         var _selected = "";
 
@@ -566,7 +565,7 @@
         // --- Show developper menu ---
         // ============================
 
-        if (settings.developper_menu.visible == true) {
+        if (params.settings.developper_menu.visible == true) {
             var dm = document.getElementsByClassName("developper-menu");
             var i;
             for (i = 0; i < dm.length; i++) {

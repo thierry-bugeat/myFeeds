@@ -168,7 +168,7 @@ MyFeeds.prototype.message = function (message) {
  * @param {string} message Message to display on screen for developper.
  * */ 
 MyFeeds.prototype.alert = function (message) {
-    if (settings.developper_menu.logs.screen) {
+    if (params.settings.developper_menu.logs.screen) {
         window.alert(message);
     }
 }
@@ -178,7 +178,7 @@ MyFeeds.prototype.alert = function (message) {
  * @param {string|array|object} arguments
  * */ 
 MyFeeds.prototype.log = function (message, arguments) {
-    if (settings.developper_menu.logs.console) {
+    if (params.settings.developper_menu.logs.console) {
         var _arguments = arguments || "";
         window.console && console.log(message, _arguments);
     }
@@ -189,7 +189,7 @@ MyFeeds.prototype.log = function (message, arguments) {
  * @param {string|array|object} arguments
  * */ 
 MyFeeds.prototype.warn = function (message, arguments) {
-    if (settings.developper_menu.logs.console) {
+    if (params.settings.developper_menu.logs.console) {
         var _arguments = arguments || "";
         window.console && console.warn(message, _arguments);
     }
@@ -200,7 +200,7 @@ MyFeeds.prototype.warn = function (message, arguments) {
  * @param {string|array|object} arguments
  * */ 
 MyFeeds.prototype.error = function (message, arguments) {
-    if (settings.developper_menu.logs.console) {
+    if (params.settings.developper_menu.logs.console) {
         var _arguments = arguments || "";
         window.console && console.error(message, _arguments);
     }
