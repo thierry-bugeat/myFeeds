@@ -14,7 +14,7 @@ MyFeeds.prototype.base64_encode = function(str) { return btoa(str); }
 MyFeeds.prototype.base64_decode = function(str) { return atob(str); }
 
 MyFeeds.prototype._load = function(filename, callback) {
-    console.log("MyFeeds.prototype._load()", arguments);
+    _MyFeeds.log("MyFeeds.prototype._load()", arguments);
     
     return new Promise(function(resolve, reject) {
         var sdcard      = navigator.getDeviceStorage('sdcard');
@@ -24,20 +24,20 @@ MyFeeds.prototype._load = function(filename, callback) {
 
         request.onsuccess = function () {
             var file = this.result;
-            console.log("MyFeeds.prototype._load()", file);
+            _MyFeeds.log("MyFeeds.prototype._load()", file);
             var _fr = new FileReader();
             
             _fr.onloadend = function(event) {
                 if (event.target.readyState == FileReader.DONE) {
                     if (dataType == "json") {
                         results = JSON.parse(event.target.result);
-                        console.log(JSON.parse(event.target.result));
+                        _MyFeeds.log(JSON.parse(event.target.result));
                     } else {
                         results = event.target.result;
-                        console.log(event.target.result);
+                        _MyFeeds.log(event.target.result);
                     }
                     //callback(results);
-                    console.log("MyFeeds.prototype._load() " + filename, results);
+                    _MyFeeds.log("MyFeeds.prototype._load() " + filename, results);
                     resolve(results);
                 }
             };
@@ -46,7 +46,7 @@ MyFeeds.prototype._load = function(filename, callback) {
         }
 
         request.onerror = function () {
-            console.warn("Unable to get file: " + filename, this.error);
+            _MyFeeds.warn("Unable to get file: " + filename, this.error);
             reject(Error());
         }
     });
@@ -80,18 +80,10 @@ MyFeeds.prototype._save = function(filename, mimetype, content) {
         var sdcard = navigator.getDeviceStorage("sdcard");
         var file   = new Blob([content], {type: mimetype});
 
-        // test
-        
-        sdcard.onchange = function (change) {
-            console.log('The file has been ', change);
-        }
-        // test
-        // https://developer.mozilla.org/en-US/docs/Web/API/DeviceStorage/getEditable
-        
         // Delete previous file
         
         var request = sdcard.delete("myFeeds/" + filename).then(function () {
-            console.log("File deleted");
+            _MyFeeds.log("File deleted");
             
             // Save new file
         
@@ -119,37 +111,37 @@ MyFeeds.prototype._save = function(filename, mimetype, content) {
 }
 
 MyFeeds.prototype._file_exists = function(filename, callback) {
-    console.log('MyFeeds.prototype._file_exist', arguments);
+    _MyFeeds.log('MyFeeds.prototype._file_exist', arguments);
     
     var sdcard  = navigator.getDeviceStorage("sdcard");
     var request = sdcard.get('myFeeds/' + filename);
 
     request.onsuccess = function () {
-        console.log('_file_exist() = 1 "', this.result);
+        _MyFeeds.log('_file_exist() = 1 "', this.result);
         callback(1);
     }
 
     request.onerror = function () {
-        console.warn("_file_exist() = 0 ", this.error);
+        _MyFeeds.warn("_file_exist() = 0 ", this.error);
         callback(0);
     }
 }
 
 MyFeeds.prototype._file_exists_v2 = function(filename, callback) {
-    console.log('MyFeeds.prototype._file_exist', arguments);
+    _MyFeeds.log('MyFeeds.prototype._file_exist', arguments);
 
     return new Promise(function(resolve, reject) {
         var sdcard  = navigator.getDeviceStorage("sdcard");
         var request = sdcard.get('myFeeds/' + filename);
     
         request.onsuccess = function () {
-            console.log('_file_exist() = 1 "', this.result);
+            _MyFeeds.log('_file_exist() = 1 "', this.result);
             //callback(1);
             resolve();
         }
 
         request.onerror = function () {
-            console.warn("_file_exist() = 0 ", this.error);
+            _MyFeeds.warn("_file_exist() = 0 ", this.error);
             //callback(0);
             reject(Error(0));
         }

@@ -28,7 +28,7 @@ TheOldReader.prototype = new MyFeeds();
 /* =============== */
 
 TheOldReader.prototype.setToken = function(token) {
-    console.log('TheOldReader.prototype.setToken()', arguments);
+    _MyFeeds.log('TheOldReader.prototype.setToken()', arguments);
     if (typeof token['Auth'] !== 'undefined') {
         this.tor.token = token;
         return 1;
@@ -40,7 +40,7 @@ TheOldReader.prototype.setToken = function(token) {
 }
 
 TheOldReader.prototype.getToken = function() {
-    console.log('TheOldReader.prototype.getToken()');
+    _MyFeeds.log('TheOldReader.prototype.getToken()');
     return this.tor.token;
 }
 
@@ -51,7 +51,7 @@ TheOldReader.prototype.getToken = function() {
  * */
 
 TheOldReader.prototype.login = function(email, password) {
-    console.log('TheOldReader.prototype.login()', arguments);
+    _MyFeeds.log('TheOldReader.prototype.login()', arguments);
     
     _TheOldReader.tor.email = email;
     _TheOldReader.tor.password = password;
@@ -68,10 +68,10 @@ TheOldReader.prototype.login = function(email, password) {
         if (_TheOldReader.setToken(response)) {
             _TheOldReader._save('cache/theoldreader/access_token.json', 'application/json', JSON.stringify(response));
             document.body.dispatchEvent(new CustomEvent('TheOldReader.login.done', {"detail": response}));
-            console.log('CustomEvent : TheOldReader.login.done');
+            _MyFeeds.log('CustomEvent : TheOldReader.login.done');
         } else {
             document.body.dispatchEvent(new CustomEvent('TheOldReader.login.error', {"detail": response}));
-            console.log('CustomEvent : TheOldReader.login.error');
+            _MyFeeds.log('CustomEvent : TheOldReader.login.error');
         }
     });
 
@@ -83,7 +83,7 @@ TheOldReader.prototype.login = function(email, password) {
  * */
 
 TheOldReader.prototype.getSubscriptions = function () {
-    console.log('TheOldReader.prototype.getSubscriptions()');
+    _MyFeeds.log('TheOldReader.prototype.getSubscriptions()');
     
     var _url = _TheOldReader.tor.host + '/reader/api/0/subscription/list' + 
             '?output=json';
@@ -93,10 +93,10 @@ TheOldReader.prototype.getSubscriptions = function () {
     promise.then(function(response) {
         _TheOldReader.tor.subscriptions = response;
         document.body.dispatchEvent(new CustomEvent('TheOldReader.getSubscriptions.done', {"detail": response}));
-        console.log("CustomEvent : TheOldReader.getSubscriptions.done");
+        _MyFeeds.log("CustomEvent : TheOldReader.getSubscriptions.done");
     }, function(error) {
         document.body.dispatchEvent(new CustomEvent('TheOldReader.getSubscriptions.error', {"detail": error}));
-        console.error("CustomEvent : TheOldReader.getSubscriptions.error", error);
+        _MyFeeds.error("CustomEvent : TheOldReader.getSubscriptions.error", error);
     });
 }
 
@@ -106,7 +106,7 @@ TheOldReader.prototype.getSubscriptions = function () {
  * */
 
 TheOldReader.prototype.deleteSubscription = function (feedId) {
-    console.log('TheOldReader.prototype.deleteSubscription()', arguments);
+    _MyFeeds.log('TheOldReader.prototype.deleteSubscription()', arguments);
     
     return new Promise(function(resolve, reject) {
         
@@ -136,7 +136,7 @@ TheOldReader.prototype.deleteSubscription = function (feedId) {
  * */
  
 TheOldReader.prototype.get = function (url, myParams) {
-    console.log('TheOldReader.prototype.get()', arguments);
+    _MyFeeds.log('TheOldReader.prototype.get()', arguments);
     
     return new Promise(function(resolve, reject) {
         
@@ -189,7 +189,7 @@ TheOldReader.prototype.get = function (url, myParams) {
  * */
  
 TheOldReader.prototype.post = function (url, params, callback) {
-    console.log('TheOldReader.prototype.post()', arguments);
+    _MyFeeds.log('TheOldReader.prototype.post()', arguments);
     
     return new Promise(function(resolve, reject) {
 
@@ -223,7 +223,7 @@ TheOldReader.prototype.post = function (url, params, callback) {
 
 
 TheOldReader.prototype._delete = function (url, params, callback) {
-    console.log('TheOldReader.prototype.post222()', arguments);
+    _MyFeeds.log('TheOldReader.prototype.post222()', arguments);
     
     return new Promise(function(resolve, reject) {
 

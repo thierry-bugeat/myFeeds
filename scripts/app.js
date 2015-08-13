@@ -55,10 +55,10 @@
                 "animations": false             // Use transitions animations
             },
             "developper_menu": {
-                "visible": true,                // Display or not developper menu in settings
+                "visible": false,               // Display or not developper menu in settings
                 "logs": {
-                    "console": true,            // Developper logs in console
-                    "screen": true              // Developper logs on screen
+                    "console": false,           // Developper logs in console
+                    "screen": false             // Developper logs on screen
                 }
             },
             "update": {
@@ -474,6 +474,18 @@
         } else {
             _useAnimations = "";
         }
+        
+        // Logs console selector
+
+        params.settings.developper_menu.logs.console ?
+            _logsConsole = 'checked=""':
+            _logsConsole = "";
+            
+        // Logs screen selector
+
+        params.settings.developper_menu.logs.screen ?
+            _logsScreen = 'checked=""':
+            _logsScreen = "";
 
         // Update every
 
@@ -537,17 +549,19 @@
         '       </divn>                                                                                                                                     ',
         '   </li>                                                                                                                                           ',
         '</ul>                                                                                                                                              ',
+        '<h2>' + document.webL10n.get('about') + '</h2>                                                                                                     ',
+        '<ul>                                                                                                                                               ',
+        '   <li id="appVersion"><span data-icon="messages"></span>' + document.webL10n.get('app-title') + '<div>' + myManifest.version + '</div></li>                       ',
+        '   <li><span data-icon="messages"></span>' + document.webL10n.get('author') + '<div>' + myManifest.developer.name + '</div></li>                   ',
+        '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('website') + '<div><a href="' + myManifest.developer.url + '" target="_blank">url</a></div></li>',
+        '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('git-repository') + '<div><a href="' + document.webL10n.get('git-url') + '" target="_blank">url</a></div></li>',
+        '</ul>                                                                                                                                              ',
         '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
         '<ul class="developper-menu">                                                                                                                       ',
         '   <li><span data-icon="messages"></span>Connection<div id="onLine">NA</div></li>                                                                  ',
         '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-use-animations') + '<div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
-        '</ul>                                                                                                                                              ',
-        '<h2 class="developper-menu">' + document.webL10n.get('about') + '</h2>                                                                             ',
-        '<ul class="developper-menu">                                                                                                                       ',
-        '   <li><span data-icon="messages"></span>' + document.webL10n.get('app-title') + '<div>' + myManifest.version + '</div></li>                                        ',
-        '   <li><span data-icon="messages"></span>' + document.webL10n.get('author') + '<div>' + myManifest.developer.name + '</div></li>                                         ',
-        '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('website') + '<div><a href="' + myManifest.developer.url + '" target="_blank">url</a></div></li>',
-        '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('git-repository') + '<div><a href="' + document.webL10n.get('git-url') + '" target="_blank">url</a></div></li>                                 ',
+        '   <li><span data-icon="bug"></span>Console<div><label class="pack-switch"><input id="logsConsole" type="checkbox" ' + _logsConsole + '><span></span></label></div></li>',
+        '   <li><span data-icon="bug"></span>Screen<div><label class="pack-switch"><input id="logsScreen" type="checkbox" ' + _logsScreen + '><span></span></label></div></li>',
         '</ul>                                                                                                                                              '
         ].join('');
 
@@ -560,6 +574,18 @@
         params.accounts.theoldreader.logged ?
             document.getElementById('theoldreaderForm').style.cssText = 'display: none':
             document.getElementById('theoldreaderForm').style.cssText = 'display: block';
+        
+        // ============================
+        // --- Show developper menu ---
+        // ============================
+        
+        document.getElementById('appVersion').ondblclick = function(e) {
+            params.settings.developper_menu.visible = !params.settings.developper_menu.visible;
+            dspSettings();
+            window.alert('Developper menu : ' + params.settings.developper_menu.visible);
+            _saveParams();
+        }
+        
 
         // ============================
         // --- Show developper menu ---
@@ -628,6 +654,20 @@
 
         document.getElementById("useAnimations").onclick = function() {
             params.settings.ui.animations = !params.settings.ui.animations;
+            _saveParams();
+        }
+        
+        // Logs console checkbox
+
+        document.getElementById("logsConsole").onclick = function() {
+            params.settings.developper_menu.logs.console = !params.settings.developper_menu.logs.console;
+            _saveParams();
+        }
+        
+        // Logs console screen
+
+        document.getElementById("logsScreen").onclick = function() {
+            params.settings.developper_menu.logs.screen = !params.settings.developper_menu.logs.screen;
             _saveParams();
         }
 

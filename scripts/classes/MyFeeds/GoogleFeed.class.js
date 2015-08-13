@@ -63,7 +63,7 @@ GoogleFeed.prototype._sortEntries       = function() {
     
     this.gf_sortedEntries.reverse();
     
-    console.log(this.gf_sortedEntries);*/
+    _MyFeeds.log(this.gf_sortedEntries);*/
     
     // ==========================================
     // --- Sort using "underscore.js" library ---
@@ -101,7 +101,7 @@ GoogleFeed.prototype._sortEntries       = function() {
         }
     }
 
-    //console.log(this.gf_sortedEntries);
+    //_MyFeeds.log(this.gf_sortedEntries);
 }
 
 GoogleFeed.prototype._sortFeeds = function() { 
@@ -112,17 +112,17 @@ GoogleFeed.prototype._sortFeeds = function() {
 GoogleFeed.prototype._setNum = function(num) { 
     if (num == "Infinity") {
         this.gf.num = 1;
-        console.warn("_setNum : incorrect value " + num + " => Set to 1");
+        _MyFeeds.warn("_setNum : incorrect value " + num + " => Set to 1");
     } else if (isNaN(num) || !Number.isInteger(num)) {
         this.gf.num = 20;
-        console.warn("_setNum : incorrect value " + num + " => Set to 20");
+        _MyFeeds.warn("_setNum : incorrect value " + num + " => Set to 20");
     } else {
         this.gf.num = num;
     }
 }
 
 GoogleFeed.prototype.setFeedsSubscriptions = function(myFeedsSubscriptions) { 
-    console.log('GoogleFeed.prototype.setFeedsSubscriptions()', arguments);
+    _MyFeeds.log('GoogleFeed.prototype.setFeedsSubscriptions()', arguments);
     
     var _tmp = [];
     
@@ -178,7 +178,7 @@ GoogleFeed.prototype.addEntries = function(entries) {
 }
 
 GoogleFeed.prototype.addFeed = function(feed) {
-    console.log('GoogleFeed.prototype.addFeed()', arguments);
+    _MyFeeds.log('GoogleFeed.prototype.addFeed()', arguments);
 
     var _myNewfeed = feed;
     var _myNewEntries = feed.entries;
@@ -236,7 +236,7 @@ GoogleFeed.prototype.addFeed = function(feed) {
  * */
 GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
     
-    console.log('GoogleFeed.prototype.loadFeeds()', this.myFeedsSubscriptions);
+    _MyFeeds.log('GoogleFeed.prototype.loadFeeds()', this.myFeedsSubscriptions);
 
     this.nbFeedsLoaded = 0;
     this.gf_unsortedEntries = [];
@@ -255,15 +255,15 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
             var _urlParams = '&output=' + this.gf.output + '&num=' + this.gf.num + '&scoring=' + this.gf.scoring + '&q=' + encodeURIComponent(this.gf.q) + '&key=' + this.gf.key + '&v=' + this.gf.v;
             var _url    = this.gf.ServiceBase + _urlParams;
             
-            //console.log("GoogleFeed.load.done" + _url);
-            //console.log("GoogleFeed.load.done", _myFeed);
+            //_MyFeeds.log("GoogleFeed.load.done" + _url);
+            //_MyFeeds.log("GoogleFeed.load.done", _myFeed);
             
             var _params = {"nbFeeds": this.myFeedsSubscriptions.length, "account": _myFeed.account, "url": _myFeed.url, "id": _myFeed.id};
             
             var promise = this.get(_url, _params);
         
             promise.then(function(response) {
-                //console.log("GoogleFeed.load.done", response);
+                //_MyFeeds.log("GoogleFeed.load.done", response);
                 response.responseData.feed._myAccount = response.responseData._myParams.account; // Add _myAccount value
                 response.responseData.feed._myFeedId = response.responseData._myParams.id; // Add __id value
                 document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": response}));
@@ -304,7 +304,7 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
  * */
 GoogleFeed.prototype.findFeeds = function(keywords) {
     
-    console.log('GoogleFeed.prototype.findFeeds()', arguments);
+    _MyFeeds.log('GoogleFeed.prototype.findFeeds()', arguments);
     
     return new Promise(function(resolve, reject) {
         
@@ -314,13 +314,13 @@ GoogleFeed.prototype.findFeeds = function(keywords) {
         var promise     = _GoogleFeed.get(_url, _params);
 
         promise.then(function(response) {
-            console.log(response);
+            _MyFeeds.log(response);
             document.body.dispatchEvent(new CustomEvent('GoogleFeed.find.done', {"detail": response}));
             resolve(response);
         }).catch(function(error) {
             error._myParams = _params;
             document.body.dispatchEvent(new CustomEvent('GoogleFeed.find.error', {"detail": error}));
-            console.error("ERROR ", error);
+            _MyFeeds.error("ERROR ", error);
             reject(Error(JSON.stringify(error)));
         });
 
@@ -337,7 +337,7 @@ GoogleFeed.prototype.findFeeds = function(keywords) {
  
 GoogleFeed.prototype.get = function (url, myParams) {
     
-    console.log('GoogleFeed.prototype.get()', arguments);
+    _MyFeeds.log('GoogleFeed.prototype.get()', arguments);
     
     return new Promise(function(resolve, reject) {
         
@@ -359,15 +359,15 @@ GoogleFeed.prototype.get = function (url, myParams) {
                 }
                 
             } else {
-                console.error('ERROR ' + url);
+                _MyFeeds.error('ERROR ' + url);
                 var _response = {"responseData": {"_myParams": myParams}};
                 reject(Error(JSON.stringify(_response)));
             }
         };
 
         xhr.onerror = function(e) {
-            console.error('ERROR ' + url);
-            console.error(e);
+            _MyFeeds.error('ERROR ' + url);
+            _MyFeeds.error(e);
             var _response = {"responseData": {"_myParams": myParams}};
             reject(Error(JSON.stringify(_response)));
         };
