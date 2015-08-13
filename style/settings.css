@@ -37,7 +37,9 @@
     font-weight:normal;
 }
 
-#settings > h3 {
+#settings h3 {
+    font-size:1.7rem;
+    font-weight:normal;
     overflow: auto;
     list-style: none outside none;
     margin: 0;

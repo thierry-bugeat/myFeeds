@@ -44,7 +44,7 @@ Feedly.prototype = new MyFeeds();
 /* =============== */
 
 Feedly.prototype.setToken = function(token) {
-    console.log('Feedly.prototype.setToken()', arguments);
+    _MyFeeds.log('Feedly.prototype.setToken()', arguments);
     if (typeof token['access_token'] !== 'undefined') {
         this.feedly.token = token;
         return 1;
@@ -56,7 +56,7 @@ Feedly.prototype.setToken = function(token) {
 }
 
 Feedly.prototype.getToken = function() {
-    console.log('Feedly.prototype.getToken()');
+    _MyFeeds.log('Feedly.prototype.getToken()');
     return this.feedly.token;
 }
 
@@ -77,7 +77,7 @@ Feedly.prototype.login = function() {
 };
 
 Feedly.prototype._loginCallback = function(url) {
-    console.log('Feedly.prototype._loginCallback()', arguments);
+    _MyFeeds.log('Feedly.prototype._loginCallback()', arguments);
 
     var params = [];
     
@@ -98,17 +98,17 @@ Feedly.prototype._loginCallback = function(url) {
             if (_Feedly.setToken(response)) {
                 _Feedly._save('cache/feedly/access_token.json', 'application/json', JSON.stringify(response));
                 document.body.dispatchEvent(new CustomEvent('Feedly.login.done', {"detail": response}));
-                console.log('CustomEvent : Feedly.login.done');
+                _MyFeeds.log('CustomEvent : Feedly.login.done');
             } else {
                 document.body.dispatchEvent(new CustomEvent('Feedly.login.error', {"detail": response}));
-                console.log('CustomEvent : Feedly.login.error');
+                _MyFeeds.log('CustomEvent : Feedly.login.error');
             }
         });
         
     } else {
         window.alert('Feedly login error');
         document.body.dispatchEvent(new CustomEvent('Feedly.login.error', {"detail": "Feedly login error"}));
-        console.log('CustomEvent : Feedly.login.error');
+        _MyFeeds.log('CustomEvent : Feedly.login.error');
     }
 }
 
@@ -118,7 +118,7 @@ Feedly.prototype._loginCallback = function(url) {
  * */
 
 Feedly.prototype.getSubscriptions = function () {
-    console.log('Feedly.prototype.getSubscriptions()');
+    _MyFeeds.log('Feedly.prototype.getSubscriptions()');
     
     var _url = _Feedly.feedly.host + '/v3/subscriptions' + 
             '?output=json';
@@ -126,12 +126,12 @@ Feedly.prototype.getSubscriptions = function () {
     var promise = this.get(_url, '');
     
     promise.then(function(response) {
-        console.log(response);
+        _MyFeeds.log(response);
         document.body.dispatchEvent(new CustomEvent('Feedly.getSubscriptions.done', {"detail": response}));
-        console.log("CustomEvent : Feedly.getSubscriptions.done");
+        _MyFeeds.log("CustomEvent : Feedly.getSubscriptions.done");
     }, function(error) {
         document.body.dispatchEvent(new CustomEvent('Feedly.getSubscriptions.error', {"detail": error}));
-        console.error("CustomEvent : Feedly.getSubscriptions.error", error);
+        _MyFeeds.error("CustomEvent : Feedly.getSubscriptions.error", error);
     });
 }
 
@@ -141,7 +141,7 @@ Feedly.prototype.getSubscriptions = function () {
  * */
 
 Feedly.prototype.deleteSubscription = function (feedId) {
-    console.log('Feedly.prototype.deleteSubscription()', arguments);
+    _MyFeeds.log('Feedly.prototype.deleteSubscription()', arguments);
     
     return new Promise(function(resolve, reject) {
         
@@ -151,11 +151,11 @@ Feedly.prototype.deleteSubscription = function (feedId) {
 
         promise.then(function(response) {
             document.body.dispatchEvent(new CustomEvent('Feedly.deleteSubscription.done', {"detail": response}));
-            console.log("CustomEvent : Feedly.deleteSubscription.done");
+            _MyFeeds.log("CustomEvent : Feedly.deleteSubscription.done");
             resolve(response);
         }).catch(function(error) {
             document.body.dispatchEvent(new CustomEvent('Feedly.deleteSubscription.error', {"detail": error}));
-            console.error("CustomEvent : Feedly.deleteSubscription.error", error);
+            _MyFeeds.error("CustomEvent : Feedly.deleteSubscription.error", error);
             reject(Error(JSON.stringify(error)));
         });
     
@@ -171,7 +171,7 @@ Feedly.prototype.deleteSubscription = function (feedId) {
  * */
  
 Feedly.prototype.get = function (url, myParams) {
-    console.log('Feedly.prototype.get()', arguments);
+    _MyFeeds.log('Feedly.prototype.get()', arguments);
     
     return new Promise(function(resolve, reject) {
         
@@ -224,7 +224,7 @@ Feedly.prototype.get = function (url, myParams) {
  * */
  
 Feedly.prototype.post = function (url, params, callback) {
-    console.log('Feedly.prototype.post()', arguments);
+    _MyFeeds.log('Feedly.prototype.post()', arguments);
     
     return new Promise(function(resolve, reject) {
 
@@ -256,7 +256,7 @@ Feedly.prototype.post = function (url, params, callback) {
  * */
  
 Feedly.prototype._delete = function (url, callback) {
-    console.log('Feedly.prototype._delete()', arguments);
+    _MyFeeds.log('Feedly.prototype._delete()', arguments);
     
     return new Promise(function(resolve, reject) {
 
