@@ -169,6 +169,17 @@ MyFeeds.prototype.alert = function (message) {
  * @param {string} message Message to display in console.
  * @param {string|array|object} arguments
  * */ 
+MyFeeds.prototype.group = function (message, arguments) {
+    if (params.settings.developper_menu.logs.console) {
+        var _arguments = arguments || "";
+        window.console && console.group(message, _arguments);
+    }
+}
+
+/**
+ * @param {string} message Message to display in console.
+ * @param {string|array|object} arguments
+ * */ 
 MyFeeds.prototype.log = function (message, arguments) {
     if (params.settings.developper_menu.logs.console) {
         var _arguments = arguments || "";
