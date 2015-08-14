@@ -558,10 +558,10 @@
         '</ul>                                                                                                                                              ',
         '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
         '<ul class="developper-menu">                                                                                                                       ',
-        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-connection') + '<div id="onLine">NA</div></li>                                                                  ',
-        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-use-animations') + '<div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
-        '   <li><span data-icon="bug"></span>Console<div><label class="pack-switch"><input id="logsConsole" type="checkbox" ' + _logsConsole + '><span></span></label></div></li>',
-        '   <li><span data-icon="bug"></span>Screen<div><label class="pack-switch"><input id="logsScreen" type="checkbox" ' + _logsScreen + '><span></span></label></div></li>',
+        '   <li><span data-icon="bug"></span>' + document.webL10n.get('settings-connection') + '<div id="onLine">NA</div></li>                                                                  ',
+        '   <li><span data-icon="bug"></span>' + document.webL10n.get('settings-use-animations') + '<div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
+        '   <li><span data-icon="bug"></span>Logs console<div><label class="pack-switch"><input id="logsConsole" type="checkbox" ' + _logsConsole + '><span></span></label></div></li>',
+        '   <li><span data-icon="bug"></span>Logs screen<div><label class="pack-switch"><input id="logsScreen" type="checkbox" ' + _logsScreen + '><span></span></label></div></li>',
         '</ul>                                                                                                                                              '
         ].join('');
 
@@ -579,7 +579,7 @@
         // --- Show developper menu ---
         // ============================
         
-        document.getElementById('appVersion').ondblclick = function(e) {
+        document.getElementById('appVersion').onclick = function(e) {
             params.settings.developper_menu.visible = !params.settings.developper_menu.visible;
             dspSettings();
             window.alert('Developper menu : ' + params.settings.developper_menu.visible);
@@ -1271,7 +1271,7 @@
     // ======================
 
     window.onload = function () {
-
+        
         _swipe("");
 
         // Promises V1
@@ -1386,7 +1386,7 @@
 
             if (navigator.onLine) {
                 My._save('cache/google/feeds/' + btoa(event.detail.responseData.feed.feedUrl) + ".json", "application/json", JSON.stringify(event.detail.responseData.feed)).then(function(results) {
-                    My.log('Saving feed in cache ok : ' + event.detail.responseData.feed.feedUrl + ' ('+btoa(event.detail.responseData.feed.feedUrl)+')');
+                    My.log('GoogleFeed.load.done > Saving feed in cache ok : ' + event.detail.responseData.feed.feedUrl + ' ('+btoa(event.detail.responseData.feed.feedUrl)+')');
                 }).catch(function(error) {
                     My.error("ERROR saving feed in cache : " + event.detail.responseData.feed.feedUrl + ' ('+btoa(event.detail.responseData.feed.feedUrl)+')');
                     My.alert("ERROR saving feed in cache :\n" + event.detail.responseData.feed.feedUrl);
