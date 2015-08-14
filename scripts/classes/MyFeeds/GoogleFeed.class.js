@@ -26,7 +26,7 @@ var GoogleFeed = function() {
     this.gf_sortedEntries = [];
     this.sortedFeeds = [];
     this.gf_unsortedEntries = [];
-    this.gf_mySha256 = [];          // Store sha256 sum for each news(entry), based on _entry.feedId + _entry.title
+    this.gf_mySha256 = [];          // Store sha256 sum for each news(entry), based on _entry.feedId + _entry.link
     this.unsortedFeeds = [];
     this.nbFeedsLoaded = 0;
 
@@ -175,7 +175,7 @@ GoogleFeed.prototype.addEntries = function(entries) {
         _entry['_myTimestampInMs']      = Math.round(new Date(_entry.publishedDate).getTime()) + (Math.floor(Math.random()*500));
         
         _entry['_myPublishedDateUTC']   = new Date(_entry.publishedDate).toUTCString();
-        _entry['_mySha256']             = CryptoJS.SHA256(_entry['_myFeedInformations']['_myFeedId'] + _entry['title']).toString(CryptoJS.enc.Hex);
+        _entry['_mySha256']             = CryptoJS.SHA256(_entry['_myFeedInformations']['_myFeedId'] + _entry['link']).toString(CryptoJS.enc.Hex);
         
         if (this.gf_mySha256.contains(_entry['_mySha256'])) {
             // Old news : Do nothing.
