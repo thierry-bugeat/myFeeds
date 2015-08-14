@@ -26,6 +26,7 @@ var GoogleFeed = function() {
     this.gf_sortedEntries = [];
     this.sortedFeeds = [];
     this.gf_unsortedEntries = [];
+    this.gf_mySha256 = [];          // Store sha256 sum for each news(entry), based on _entry.feedId + _entry.title
     this.unsortedFeeds = [];
     this.nbFeedsLoaded = 0;
 
@@ -139,6 +140,8 @@ GoogleFeed.prototype.setFeedsSubscriptions = function(myFeedsSubscriptions) {
 GoogleFeed.prototype.setNbFeedsLoaded   = function()        { this.nbFeedsLoaded++;         }
 
 GoogleFeed.prototype.addEntries = function(entries) {
+    _MyFeeds.log('GoogleFeed.prototype.addEntries', arguments);
+    
     for (var i = 0; i < entries.length; i++) {
         var _entry = entries[i];
         
@@ -172,13 +175,23 @@ GoogleFeed.prototype.addEntries = function(entries) {
         _entry['_myTimestampInMs']      = Math.round(new Date(_entry.publishedDate).getTime()) + (Math.floor(Math.random()*500));
         
         _entry['_myPublishedDateUTC']   = new Date(_entry.publishedDate).toUTCString();
+        _entry['_mySha256']             = CryptoJS.SHA256(_entry['_myFeedInformations']['_myFeedId'] + _entry['title']).toString(CryptoJS.enc.Hex);
         
-        this.gf_unsortedEntries.push(_entry);
+        if (this.gf_mySha256.contains(_entry['_mySha256'])) {
+            // Old news : Do nothing.
+        } else {
+            this.gf_mySha256.push(_entry['_mySha256']);
+            this.gf_unsortedEntries.push(_entry);
+        }
     }
+    _MyFeeds.log(this.gf_mySha256);
 }
 
 GoogleFeed.prototype.addFeed = function(feed) {
+    _MyFeeds.group('GoogleFeed.prototype.addFeed()', feed.title);
     _MyFeeds.log('GoogleFeed.prototype.addFeed()', arguments);
+    _MyFeeds.log('GoogleFeed.prototype.addFeed()', feed.entries);
+    console.groupEnd();
 
     var _myNewfeed = feed;
     var _myNewEntries = feed.entries;
@@ -239,7 +252,7 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
     _MyFeeds.log('GoogleFeed.prototype.loadFeeds()', this.myFeedsSubscriptions);
 
     this.nbFeedsLoaded = 0;
-    this.gf_unsortedEntries = [];
+    //this.gf_unsortedEntries = []; // Store all entries of all feeds
     this.unsortedFeeds = [];
     
     //var _params = {"nbFeeds": this.myFeedsSubscriptions.length};
@@ -255,17 +268,17 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
             var _urlParams = '&output=' + this.gf.output + '&num=' + this.gf.num + '&scoring=' + this.gf.scoring + '&q=' + encodeURIComponent(this.gf.q) + '&key=' + this.gf.key + '&v=' + this.gf.v;
             var _url    = this.gf.ServiceBase + _urlParams;
             
-            //_MyFeeds.log("GoogleFeed.load.done" + _url);
-            //_MyFeeds.log("GoogleFeed.load.done", _myFeed);
+            //_MyFeeds.log("GoogleFeed.load.done : " + _url);
+            //_MyFeeds.log("GoogleFeed.load.done : ", _myFeed);
             
             var _params = {"nbFeeds": this.myFeedsSubscriptions.length, "account": _myFeed.account, "url": _myFeed.url, "id": _myFeed.id};
             
             var promise = this.get(_url, _params);
         
             promise.then(function(response) {
-                //_MyFeeds.log("GoogleFeed.load.done", response);
                 response.responseData.feed._myAccount = response.responseData._myParams.account; // Add _myAccount value
                 response.responseData.feed._myFeedId = response.responseData._myParams.id; // Add __id value
+                _MyFeeds.log("GoogleFeed.prototype.loadFeeds() > get > response : ", response);
                 document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": response}));
             }, function(error) {
                 // Network error then try to load feed from cache
