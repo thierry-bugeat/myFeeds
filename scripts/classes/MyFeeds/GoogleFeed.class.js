@@ -175,12 +175,16 @@ GoogleFeed.prototype.addEntries = function(entries) {
         _entry['_myTimestampInMs']      = Math.round(new Date(_entry.publishedDate).getTime()) + (Math.floor(Math.random()*500));
         
         _entry['_myPublishedDateUTC']   = new Date(_entry.publishedDate).toUTCString();
-        _entry['_mySha256']             = CryptoJS.SHA256(_entry['_myFeedInformations']['_myFeedId'] + _entry['link']).toString(CryptoJS.enc.Hex);
+        _entry['_mySha256_title']       = CryptoJS.SHA256(_entry['_myFeedInformations']['_myFeedId'] + _entry['title']).toString(CryptoJS.enc.Hex);
+        _entry['_mySha256_link']        = CryptoJS.SHA256(_entry['_myFeedInformations']['_myFeedId'] + _entry['link']).toString(CryptoJS.enc.Hex);
         
-        if (this.gf_mySha256.contains(_entry['_mySha256'])) {
-            // Old news : Do nothing.
+        if (this.gf_mySha256.contains(_entry['_mySha256_link'])) {
+            // Old news same link: Do nothing.
+        } else if (this.gf_mySha256.contains(_entry['_mySha256_title'])) {
+            // Old news same title: Do nothing.
         } else {
-            this.gf_mySha256.push(_entry['_mySha256']);
+            this.gf_mySha256.push(_entry['_mySha256_link']);
+            this.gf_mySha256.push(_entry['_mySha256_title']);
             this.gf_unsortedEntries.push(_entry);
         }
     }
