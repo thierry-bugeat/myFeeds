@@ -182,31 +182,6 @@
         dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
         _saveParams();
     }
-
-    loadSubscriptions.onclick   = function(event) {
-        if (window.confirm(document.webL10n.get('confirm-load-subscriptions'))) {
-            My._load('subscriptions.local.json').then(
-                function (_mySubscriptions) {
-                    try{
-                        addNewSubscriptions(_mySubscriptions);
-                        My.message(document.webL10n.get('loading-subscriptions-done'));
-                    } catch (err) {
-                        My.alert(err.message);
-                    }
-                    gf.setFeedsSubscriptions(myFeedsSubscriptions);
-                    gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
-                }
-            ).catch(function(error) {
-                My.message(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
-            });
-        }
-    }
-
-    saveSubscriptions.onclick = function(event) {
-        if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
-            _saveSubscriptions("local");
-        }
-    }
     
     function _saveSubscriptions(_account) {
         var _output = [];
@@ -558,8 +533,10 @@
         '</ul>                                                                                                                                              ',
         '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
         '<ul class="developper-menu">                                                                                                                       ',
-        '   <li><span data-icon="bug"></span>' + document.webL10n.get('settings-connection') + '<div id="onLine">NA</div></li>                                                                  ',
-        '   <li><span data-icon="bug"></span>' + document.webL10n.get('settings-use-animations') + '<div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
+        '   <li><span data-icon="wifi-4"></span>' + document.webL10n.get('settings-connection') + '<div id="onLine">NA</div></li>                                                                  ',
+        '   <li><span data-icon="play-circle"></span>' + document.webL10n.get('settings-use-animations') + '<div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
+        '   <li><span data-icon="sd-card"></span>' + document.webL10n.get('my-subscriptions') + '<div><button id="loadSubscriptions"><span data-l10n-id="load">load</span></button></div></li>',
+        '   <li><span data-icon="sd-card"></span>' + document.webL10n.get('my-subscriptions') + '<div><button id="saveSubscriptions"><span data-l10n-id="save">save</span></button></div></li>',
         '   <li><span data-icon="bug"></span>Logs console<div><label class="pack-switch"><input id="logsConsole" type="checkbox" ' + _logsConsole + '><span></span></label></div></li>',
         '   <li><span data-icon="bug"></span>Logs screen<div><label class="pack-switch"><input id="logsScreen" type="checkbox" ' + _logsScreen + '><span></span></label></div></li>',
         '</ul>                                                                                                                                              '
@@ -655,6 +632,37 @@
         document.getElementById("useAnimations").onclick = function() {
             params.settings.ui.animations = !params.settings.ui.animations;
             _saveParams();
+        }
+        
+        // Load subscriptions
+        
+        document.getElementById("loadSubscriptions").onclick = function(event) {
+            if (window.confirm(document.webL10n.get('confirm-load-subscriptions'))) {
+                My._load('subscriptions.local.json').then(
+                    function (_mySubscriptions) {
+                        try{
+                            addNewSubscriptions(_mySubscriptions);
+                            My.message(document.webL10n.get('loading-subscriptions-done'));
+                        } catch (err) {
+                            My.alert(err.message);
+                        }
+                        gf.setFeedsSubscriptions(myFeedsSubscriptions);
+                        gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                    }
+                ).catch(function(error) {
+                    My.message(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
+                });
+            }
+        }
+        
+        // Save subscriptions
+
+        document.getElementById("saveSubscriptions").onclick = function(event) {
+            if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
+                _saveSubscriptions("local");
+                _saveSubscriptions("feedly");
+                _saveSubscriptions("theoldreader");
+            }
         }
         
         // Logs console checkbox
