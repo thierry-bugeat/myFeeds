@@ -1054,7 +1054,8 @@
         My.log('mainEntryOpenInBrowser()', arguments);
         document.body.style.cssText = "overflow: hidden;";  // Disable scroll in entries list.
         
-        share.setAttribute("i", entryId);
+        share.setAttribute("_mySha256_link", sortedEntries[entryId]['_mySha256_link']);
+        share.setAttribute("_mySha256_title", sortedEntries[entryId]['_mySha256_title']);
 
         if (url != "" ) {
             ui.echo("browser", '<iframe src="' + url + '" sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
@@ -1370,7 +1371,18 @@
 
         share.onclick = function() {
             My.log(this);
-            var _entryId = this.getAttribute("i");
+            var _entryId = 0;
+            var _mySha256_title = this.getAttribute("_mySha256_title");
+            var _mySha256_link  = this.getAttribute("_mySha256_link");
+            
+            for (var i = 0; i < sortedEntries.length; i++) {
+                if ((sortedEntries[i]['_mySha256_title']== _mySha256_title) ||
+                    (sortedEntries[i]['_mySha256_link'] == _mySha256_link)) {
+                    var _entryId = i;
+                    break;
+                }
+            }
+            
             var _entry = sortedEntries[_entryId];
             My.log(_entry);
             new MozActivity({
