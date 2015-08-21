@@ -641,6 +641,7 @@
                 My._load('subscriptions.local.json').then(
                     function (_mySubscriptions) {
                         try{
+                            myFeedsSubscriptions['local'] = [];
                             addNewSubscriptions(_mySubscriptions);
                             My.message(document.webL10n.get('loading-subscriptions-done'));
                         } catch (err) {
@@ -722,9 +723,7 @@
 
     function dspFeeds(feeds) {
 
-        My.log('dspFeeds()');
-
-        My.log(feeds);
+        My.log('dspFeeds()', arguments);
         My.log(feeds.length + ' feeds');
 
         var _html = {
