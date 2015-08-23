@@ -875,7 +875,11 @@
                     // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Date/toLocaleString
                     // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/DateTimeFormat
 
+                    // Time
+                    
                     var _date = new Date(_entrie.publishedDate);
+                    var _minutes = (_date.getMinutes() < 10) ? '0' + _date.getMinutes() : _date.getMinutes();
+                    var _time = _date.getHours() + ':' + _minutes;
 
                     // Diff between "contentSnippet" et "content" ?
                     // Small article or not ?
@@ -921,7 +925,7 @@
                     if ((params.entries.theme == 'list') && (_diff >= params.entries.maxLengthForSmallEntries)) {
                         _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                        _content = _content + '<span class="my-'+_theme+'-date">' + _date + '</span>';
+                        _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
                         _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
                         _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
@@ -933,7 +937,7 @@
                     } else if (params.entries.theme == 'list') {
                         _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                        _content = _content + '<span class="my-'+_theme+'-date">' + _date + '</span>';
+                        _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
                         _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
                         _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
@@ -947,7 +951,7 @@
                         _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                         _content = _content + _imageUrl;
-                        _content = _content + '<span class="my-'+_theme+'-date">' + _date + '</span>';
+                        _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
                         _content = _content + '</div>';
 
@@ -958,7 +962,7 @@
                         _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                         _content = _content + _imageUrl;
-                        _content = _content + '<span class="my-'+_theme+'-date">' + _date + '</span>';
+                        _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
                         _content = _content + '</div>';
 
                         _nbEntriesDisplayed++;
