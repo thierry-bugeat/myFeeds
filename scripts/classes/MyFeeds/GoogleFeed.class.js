@@ -223,7 +223,7 @@ GoogleFeed.prototype.addFeed = function(feed) {
     
     var _timestampMin = Math.min.apply(Math, _timestamps);
     var _timestampMax = Math.max.apply(Math, _timestamps);
-    var _nbDaysInFeed = (_timestampMax - _timestampMin) / 86400;
+    var _nbDaysInFeed = (_timestampMax - _timestampMin) / 86400; if (_nbDaysInFeed <= 0) { _nbDaysInFeed = 1; }
     var _myPulsations = (_myNewEntries.length / _nbDaysInFeed).toFixed(2);
     
     _myNewfeed['_myPulsations'] = _myPulsations; // Estimation of news number per day
@@ -271,11 +271,11 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
 
             var _urlParams = '&output=' + this.gf.output + '&num=' + this.gf.num + '&scoring=' + this.gf.scoring + '&q=' + encodeURIComponent(this.gf.q) + '&key=' + this.gf.key + '&v=' + this.gf.v;
             var _url    = this.gf.ServiceBase + _urlParams;
-            
+
             //_MyFeeds.log("GoogleFeed.load.done : " + _url);
             //_MyFeeds.log("GoogleFeed.load.done : ", _myFeed);
             
-            var _params = {"nbFeeds": this.myFeedsSubscriptions.length, "account": _myFeed.account, "url": _myFeed.url, "id": _myFeed.id};
+            var _params = {"nbFeeds": this.myFeedsSubscriptions.length, "account": _myFeed.account, "url": _myFeed.url, "id": _myFeed.id, "pulsations": _myFeed.pulsations};
             
             var promise = this.get(_url, _params);
         
