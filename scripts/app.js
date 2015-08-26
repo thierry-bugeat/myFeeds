@@ -1065,7 +1065,7 @@
         } else {
             var _entry = sortedEntries[entryId];
             var _srcDoc = "";
-            var _regex = new RegExp(/\'/, 'g');
+            var _regex = new RegExp('\'', 'g');
             var _author = "";
             
             //My.log('mainEntryOpenInBrowser()', _entry.content);
