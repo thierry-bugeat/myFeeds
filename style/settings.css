@@ -69,6 +69,8 @@
     display: block;
     position: relative;
 }
+
+#settings > ul > li > ul { line-height: 3rem; }
  
 #settings > ul > li:last-child {
     border: none;

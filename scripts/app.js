@@ -531,6 +531,7 @@
         '   <li><span data-icon="messages"></span>' + document.webL10n.get('author') + '<div>' + myManifest.developer.name + '</div></li>                   ',
         '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('website') + '<div><a href="' + myManifest.developer.url + '" target="_blank">url</a></div></li>',
         '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('git-repository') + '<div><a href="' + document.webL10n.get('git-url') + '" target="_blank">url</a></div></li>',
+        '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('settings-translations') + '<ul><a href="https://github.com/Sergio-Muriel" target="_blank">Sergio Muriel (es)</a><br><a href="https://github.com/evertton" target="_blank">Evertton de Lima (pt-BR)</a><br></ul></li>',
         '</ul>                                                                                                                                              ',
         '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
         '<ul class="developper-menu">                                                                                                                       ',
