@@ -13,6 +13,11 @@ var myDynamicsLocales = {
     "fr": {
         "nb-days-ago": "Il y a {{n}} jours", 
         "by": "par"
+    },
+    
+    "pt-BR": {
+        "nb-days-ago": "{{n}} dias atrás", 
+        "by": "por"
     }
 
 };
