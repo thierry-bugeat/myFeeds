@@ -328,7 +328,7 @@
         My.log('findFeedsDisplayResults()', arguments);
         My.log(event);
 
-        if (event.detail.responseStatus == 200) {
+        if ((event.detail.responseStatus == 200) && (event.detail.responseData.entries.length > 0)) {
             var _results = event.detail.responseData.entries;
             var _htmlResults = "<ul>";
 
@@ -371,7 +371,8 @@
             for (var i = 0; i < _adds.length; i++) {
                 _adds[i].onclick = function() { findFeedsAddNewFeed(this);}
             }
-
+        } else if (event.detail.responseData.entries.length == 0) {
+            ui.echo("find-feeds", document.webL10n.get('find-feeds-no-results'), "");
         } else {
             ui.echo("find-feeds", "Find feeds : Network error", "prepend");
         }
@@ -889,6 +890,14 @@
                     // 1st image
 
                     var _imageUrl = "";
+                    
+                    // Try to detect broken image
+                    /*var _img = new Image(); 
+                    _img.src = _entrie._myFirstImageUrl; 
+
+                    if (!_img.complete) {
+                        _entrie._myFirstImageUrl = "";
+                    }*/
 
                     if (_entrie._myFirstImageUrl) {
                         if (_diff < params.entries.maxLengthForSmallEntries) {
