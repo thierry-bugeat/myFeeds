@@ -82,7 +82,8 @@ MyFeeds.prototype._save = function(filename, mimetype, content) {
 
         // Delete previous file
         
-        var request = sdcard.delete("myFeeds/" + filename).then(function () {
+        var request = sdcard.delete("myFeeds/" + filename);
+        request.onsuccess = function() {
             _MyFeeds.log("File deleted");
             
             // Save new file
@@ -102,10 +103,8 @@ MyFeeds.prototype._save = function(filename, mimetype, content) {
                 reject(Error(JSON.stringify(_myError)));
             }
             
-        }).catch (function (error) {
-            reject(Error(JSON.stringify(error)));
-        });
-        
+        };
+        request.onerror = function() { reject(Error(JSON.stringify(error))); };
     });
 
 }
