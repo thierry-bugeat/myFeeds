@@ -307,8 +307,12 @@
                     My.error(error);
                 });
             }
+            
+            // (4) Delete entries
+            
+            gf.deleteEntries(_account, _feedId);
 
-            // (4) Reload UI
+            // (5) Reload UI
 
             if ((myFeedsSubscriptions.local.length > 0) ||
                 (myFeedsSubscriptions.feedly.length > 0) ||

@@ -191,6 +191,29 @@ GoogleFeed.prototype.addEntries = function(entries) {
     _MyFeeds.log(this.gf_mySha256);
 }
 
+/**
+ * Delete entries for specified account & feed
+ * @param {string} account "local", "feedly", "theoldreader"...
+ * @param {string} feedId
+ * */
+GoogleFeed.prototype.deleteEntries = function(account, feedId) {
+    _MyFeeds.log('deleteEntries(' + account + ', ' + feedId + ')');
+
+    var _tmp = [];
+    
+    for (var i = 0; i < this.gf_unsortedEntries.length; i++) {
+        if ((this.gf_unsortedEntries[i]['_myFeedInformations']['_myAccount'] == account)
+            && (this.gf_unsortedEntries[i]['_myFeedInformations']['_myFeedId'] == feedId)
+        ){
+            // Don't keep this entry.
+        } else {
+            _tmp.push(this.gf_unsortedEntries[i]);
+        }
+    }
+    
+    this.gf_unsortedEntries = _tmp;
+}
+
 GoogleFeed.prototype.addFeed = function(feed) {
     _MyFeeds.group('GoogleFeed.prototype.addFeed()', feed.title);
     _MyFeeds.log('GoogleFeed.prototype.addFeed()', arguments);
