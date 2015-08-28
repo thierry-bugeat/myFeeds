@@ -155,6 +155,7 @@ MyUi.prototype.toggle = function(_status) {
  * */
 MyUi.prototype.echo = function(divId, msg, placement) {
     var _out = document.getElementById(divId);
+    if(!_out) { return; }
     
     if (placement == 'prepend') {
         _out.innerHTML = msg + _out.innerHTML;
