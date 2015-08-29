@@ -183,31 +183,45 @@
         _saveParams();
     }
     
-    function _saveSubscriptions(_account) {
-        var _output = [];
-        var _feeds = gf.getFeeds();
-        var _feed = "";
+    /**
+     * Save subscriptions for specified account
+     * @param {boolean} _logsOnScreen Display or not logs on screen.
+     *                                Overwrite settings.
+     * */
+    function _saveSubscriptions(_logsOnScreen) {
         
-        for (var i = 0 ; i < _feeds.length; i++) {
-            if ( _feeds[i]._myAccount == _account) {
-                _url = _feeds[i].feedUrl;
-                
-                if ((isNaN(_feeds[i]._myPulsations)) || (_feeds[i]._myPulsations == "Infinity")){
-                    _feeds[i]._myPulsations = "0.1";
-                }
-                
-                _feed = {"url": _url, "pulsations": _feeds[i]._myPulsations, "account": _feeds[i]._myAccount, "id": _feeds[i]._myFeedId};
-                _output.push(_feed);
-            }
-        }
+        for (var _account in myFeedsSubscriptions) {
 
-        My._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(_output)).then(function(results) {
-            My.log('Save subscriptions.' + _account + '.json');
-            My.message('Backup completed for account : ' + _account);
-        }).catch(function(error) {
-            My.error("ERROR saving file ", error);
-            My.alert("ERROR saving file " + error.filename);
-        });
+            var _output = [];
+            var _feeds = gf.getFeeds();
+            var _feed = "";
+            
+            for (var i = 0 ; i < _feeds.length; i++) {
+                if ( _feeds[i]._myAccount == _account) {
+                    _url = _feeds[i].feedUrl;
+                    
+                    if ((isNaN(_feeds[i]._myPulsations)) || (_feeds[i]._myPulsations == "Infinity")){
+                        _feeds[i]._myPulsations = "0.1";
+                    }
+                    
+                    _feed = {"url": _url, "pulsations": _feeds[i]._myPulsations, "account": _feeds[i]._myAccount, "id": _feeds[i]._myFeedId};
+                    _output.push(_feed);
+                }
+            }
+
+            My._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(_output)).then(function(results) {
+                My.log('Save subscriptions : ' + results);
+                if (_logsOnScreen) {
+                    My.message('Backup completed : ' + results);
+                }
+            }).catch(function(error) {
+                My.error("ERROR saving file ", error);
+                if (_logsOnScreen) {
+                    My.alert("ERROR saving file " + error.filename);
+                }
+            });
+            
+        }
     }
 
     nextDay.onclick = function(event) {
@@ -666,9 +680,7 @@
 
         document.getElementById("saveSubscriptions").onclick = function(event) {
             if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
-                _saveSubscriptions("local");
-                _saveSubscriptions("feedly");
-                _saveSubscriptions("theoldreader");
+                _saveSubscriptions(true);
             }
         }
         
@@ -774,8 +786,9 @@
             }
         }
         
-        // @todo test. Voir ci-dessous @todo suivant
+        // @todo test.
         //_htmlFeeds = _htmlFeeds +'<li id="feedlyGetSubscriptions">feedly get subscriptions</li>';
+        //document.getElementById('feedlyGetSubscriptions').onclick = function() {feedly.getSubscriptions();}
 
         // --- Display ---
 
@@ -784,9 +797,6 @@
         // ==================
         // --- Add Events ---
         // ==================
-
-        // @todo test
-        //document.getElementById('feedlyGetSubscriptions').onclick = function() {feedly.getSubscriptions();}
 
         // onclick delete button :
 
