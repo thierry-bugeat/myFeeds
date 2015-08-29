@@ -1473,6 +1473,7 @@
                     dspFeeds(gf.getFeeds());
                     dspSettings();
                     updateFeedsPulsations();
+                    _saveSubscriptions(false);
                 }
 
                 if (_nbFeedsLoaded >= _nbFeedsToLoad) {
@@ -1507,6 +1508,7 @@
                     dspFeeds(gf.getFeeds());
                     dspSettings();
                     updateFeedsPulsations();
+                    _saveSubscriptions(false);
                 }
 
                 if (_nbFeedsLoaded >= _nbFeedsToLoad) {
