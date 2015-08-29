@@ -1384,7 +1384,7 @@
         
         setInterval(function() {
             var _maxNbDaysAgo = params.settings.days.last();
-            var _timestampMax = _myTimestamp - (86400 * _maxNbDaysAgo) + 86400;
+            var _timestampMax = _myTimestamp - (86400 * _maxNbDaysAgo);
             gf.deleteOldEntries(_timestampMax);
         }, 15000);
 
