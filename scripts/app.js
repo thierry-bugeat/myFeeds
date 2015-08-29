@@ -1365,6 +1365,18 @@
                 // ---
             }
         }, 1000);
+        
+        // ======================
+        // --- Memory cleanup ---
+        // ======================
+        
+        // Remove old entries
+        
+        setInterval(function() {
+            var _maxNbDaysAgo = params.settings.days.last();
+            var _timestampMax = _myTimestamp - (86400 * _maxNbDaysAgo) + 86400;
+            gf.deleteOldEntries(_timestampMax);
+        }, 15000);
 
         // ==============
         // --- Events ---

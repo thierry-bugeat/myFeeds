@@ -189,6 +189,7 @@ GoogleFeed.prototype.addEntries = function(entries) {
         }
     }
     _MyFeeds.log(this.gf_mySha256);
+    _MyFeeds.log('GoogleFeed.prototype.addEntries : ' + this.gf_unsortedEntries.length + ' entrie(s)');
 }
 
 /**
@@ -212,6 +213,30 @@ GoogleFeed.prototype.deleteEntries = function(account, feedId) {
     }
     
     this.gf_unsortedEntries = _tmp;
+}
+
+/**
+ * Delete entries older than specified timestamp
+ * @param {int} timestamp 
+ * @return {null}
+ * */
+GoogleFeed.prototype.deleteOldEntries = function(timestamp) {
+    _MyFeeds.log('deleteOldEntries(' + timestamp + ')');
+
+    var _tmp = [];
+    var _oldEntries = 0;
+    
+    for (var i = 0; i < this.gf_unsortedEntries.length; i++) {
+        if (this.gf_unsortedEntries[i]['_myTimestamp'] > timestamp) {
+            _tmp.push(this.gf_unsortedEntries[i]);
+        } else {
+            _oldEntries++ ;
+        }
+    }
+    
+    this.gf_unsortedEntries = _tmp;
+    
+    _MyFeeds.log('deleteOldEntries(' + timestamp + ') => ' + _oldEntries + ' old entrie(s) has been deleted');
 }
 
 GoogleFeed.prototype.addFeed = function(feed) {

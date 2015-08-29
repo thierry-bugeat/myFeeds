@@ -13,3 +13,8 @@ Array.prototype.contains = function(obj) {
     }
     return false;
 }
+
+Array.prototype.last = function() {
+    var i = -1 + this.length;
+    return this[i];
+}
