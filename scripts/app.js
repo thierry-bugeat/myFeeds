@@ -7,20 +7,20 @@
     // CSP                  : https://developer.mozilla.org/fr/Apps/PSC
     // <iframe> : https://developer.mozilla.org/fr/docs/Web/HTML/Element/iframe
 
-    // A voir :
+    // To see :
     // http://imikado.developpez.com/tutoriels/firefoxOS/ma-premier-application/
     // http://toddmotto.com/is-it-time-to-drop-jquery-essentials-to-learning-javascript-from-a-jquery-background/
     
-    var My = new MyFeeds();
+    var my = new MyFeeds();
     var ui = new MyUi();
-    var myManifest = My._loadJSON('manifest.webapp');
+    var myManifest = my._loadJSON('manifest.webapp');
 
     var theoldreader = new TheOldReader();
     var feedly = new Feedly();
 
     var gf = new GoogleFeed();
 
-    var _myTimestamp;       // Value set by function "_setMyTimestamp()"
+    var _myTimestamp;                           // Value set by function "_setMyTimestamp()"
 
     var myFeedsSubscriptions = {'local': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
 
@@ -75,26 +75,26 @@
     var _onLine = "NA";
 
     // Load params from SDCard.
-    // Save file if file doesn't exists.
+    // Create file if doesn't exists.
 
-    My._load('params.json').then(function(_myParams) {
-        My.log('loading params from file params.json ...', _myParams);
+    my._load('params.json').then(function(_myParams) {
+        my.log('loading params from file params.json ...', _myParams);
         params = _myParams;
         // Get and set Feedly token from cache
         if (params.accounts.feedly.logged) {
-            My._load('cache/feedly/access_token.json').then(function(_token){
+            my._load('cache/feedly/access_token.json').then(function(_token){
                 feedly.setToken(_token);
             }).catch(function(error) {
-                My.alert("Can't load and set Feedly token");
+                my.alert("Can't load and set Feedly token");
             });
         }
         // Get and set The Old Reader token from cache
         if (params.accounts.theoldreader.logged) {
-            My._load('cache/theoldreader/access_token.json').then(function(_token){
+            my._load('cache/theoldreader/access_token.json').then(function(_token){
                 theoldreader.setToken(_token);
                 document.getElementById('theoldreaderForm').style.cssText = 'display: none';
             }).catch(function(error) {
-                My.alert("Can't load and set T.O.R. token");
+                my.alert("Can't load and set T.O.R. token");
             });
         }
     }).catch(function(error) {
@@ -157,9 +157,9 @@
         if (_keywords) {
             ui.echo("find-feeds", "Loading...", ""); 
             gf.findFeeds(_keywords).then(function(results) {
-                My.log("Find feed ok", results);
+                my.log("Find feed ok", results);
             }).catch(function(error) {
-                My.message(document.webL10n.get("error-finding-feed") + JSON.stringify(error));
+                my.message(document.webL10n.get("error-finding-feed") + JSON.stringify(error));
             });
         }
     }
@@ -209,15 +209,15 @@
                 }
             }
 
-            My._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(_output)).then(function(results) {
-                My.log('Save subscriptions : ' + results);
+            my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(_output)).then(function(results) {
+                my.log('Save subscriptions : ' + results);
                 if (_logsOnScreen) {
-                    My.message('Backup completed : ' + results);
+                    my.message('Backup completed : ' + results);
                 }
             }).catch(function(error) {
-                My.error("ERROR saving file ", error);
+                my.error("ERROR saving file ", error);
                 if (_logsOnScreen) {
-                    My.alert("ERROR saving file " + error.filename);
+                    my.alert("ERROR saving file " + error.filename);
                 }
             });
             
@@ -253,7 +253,7 @@
     }
 
     function deleteFeed(_this) {
-        My.log('deleteFeed() ', arguments);
+        my.log('deleteFeed() ', arguments);
 
         var _feedId = _this.getAttribute("feedId");
         var _account = _this.getAttribute("account");
@@ -280,11 +280,11 @@
             // (3a) Delete from Local
             
             if (_account == 'local') {
-                My._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions.local)).then(function(results) {
-                    My.message(document.webL10n.get('feed-has-been-deleted'));
+                my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions.local)).then(function(results) {
+                    my.message(document.webL10n.get('feed-has-been-deleted'));
                 }).catch(function(error) {
-                    My.error("ERROR saving file ", error);
-                    My.alert("ERROR saving file " + error.filename);
+                    my.error("ERROR saving file ", error);
+                    my.alert("ERROR saving file " + error.filename);
                 });
             }
 
@@ -292,16 +292,16 @@
 
             if (_account == 'feedly') {
                 feedly.deleteSubscription(_feedId).then(function(response){
-                    My.message(document.webL10n.get('feed-has-been-deleted'));
-                    My._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
-                        My.log('Save subscriptions.' + _account + '.json');
+                    my.message(document.webL10n.get('feed-has-been-deleted'));
+                    my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
+                        my.log('Save subscriptions.' + _account + '.json');
                     }).catch(function(error) {
-                        My.error("ERROR saving file ", error);
-                        My.alert("ERROR saving file " + error.filename);
+                        my.error("ERROR saving file ", error);
+                        my.alert("ERROR saving file " + error.filename);
                     });
                 }).catch(function(error) {
-                    My.message(document.webL10n.get('error-cant-delete-this-feed'));
-                    My.error(error);
+                    my.message(document.webL10n.get('error-cant-delete-this-feed'));
+                    my.error(error);
                 });
             }
 
@@ -309,16 +309,16 @@
 
             if (_account == 'theoldreader') {
                 theoldreader.deleteSubscription(_feedId).then(function(response){
-                    My.message(document.webL10n.get('feed-has-been-deleted'));
-                    My._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
-                        My.log('Save subscriptions.' + _account + '.json');
+                    my.message(document.webL10n.get('feed-has-been-deleted'));
+                    my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
+                        my.log('Save subscriptions.' + _account + '.json');
                     }).catch(function(error) {
-                        My.error("ERROR saving file ", error);
-                        My.alert("ERROR saving file " + error.filename);
+                        my.error("ERROR saving file ", error);
+                        my.alert("ERROR saving file " + error.filename);
                     });
                 }).catch(function(error) {
-                    My.message(document.webL10n.get('error-cant-delete-this-feed'));
-                    My.error(error);
+                    my.message(document.webL10n.get('error-cant-delete-this-feed'));
+                    my.error(error);
                 });
             }
             
@@ -343,8 +343,8 @@
     }
 
     function findFeedsDisplayResults(event) {
-        My.log('findFeedsDisplayResults()', arguments);
-        My.log(event);
+        my.log('findFeedsDisplayResults()', arguments);
+        my.log(event);
 
         if ((event.detail.responseStatus == 200) && (event.detail.responseData.entries.length > 0)) {
             var _results = event.detail.responseData.entries;
@@ -397,7 +397,7 @@
     }
 
     function findFeedsAddNewFeed(_this) {
-        My.log('findFeedsAddNewFeed() ', arguments);
+        my.log('findFeedsAddNewFeed() ', arguments);
 
         var _feedUrl = _this.getAttribute("feedUrl");
         var _feedId  = _this.getAttribute("feedId");
@@ -419,12 +419,12 @@
             
             // (3) Save subscriptions.local.json
             
-            My._save("subscriptions.local.json", "application/json", JSON.stringify(myFeedsSubscriptions.local)).then(function(results) {
+            my._save("subscriptions.local.json", "application/json", JSON.stringify(myFeedsSubscriptions.local)).then(function(results) {
                 ui.echo("find-feeds", "", "");
-                My.message(document.webL10n.get('feed-subscription-was-added'));
+                my.message(document.webL10n.get('feed-subscription-was-added'));
             }).catch(function(error) {
-                My.error("ERROR saving file ", error);
-                My.alert("ERROR saving file " + error.filename);
+                my.error("ERROR saving file ", error);
+                my.alert("ERROR saving file " + error.filename);
             });
         }
     }
@@ -658,20 +658,20 @@
         
         document.getElementById("loadSubscriptions").onclick = function(event) {
             if (window.confirm(document.webL10n.get('confirm-load-subscriptions'))) {
-                My._load('subscriptions.local.json').then(
+                my._load('subscriptions.local.json').then(
                     function (_mySubscriptions) {
                         try{
                             myFeedsSubscriptions['local'] = [];
                             addNewSubscriptions(_mySubscriptions);
-                            My.message(document.webL10n.get('loading-subscriptions-done'));
+                            my.message(document.webL10n.get('loading-subscriptions-done'));
                         } catch (err) {
-                            My.alert(err.message);
+                            my.alert(err.message);
                         }
                         gf.setFeedsSubscriptions(myFeedsSubscriptions);
                         gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
                     }
                 ).catch(function(error) {
-                    My.message(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
+                    my.message(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
                 });
             }
         }
@@ -741,8 +741,8 @@
 
     function dspFeeds(feeds) {
 
-        My.log('dspFeeds()', arguments);
-        My.log(feeds.length + ' feeds');
+        my.log('dspFeeds()', arguments);
+        my.log(feeds.length + ' feeds');
 
         var _html = {
             'local': '',
@@ -837,8 +837,8 @@
 
     function dspEntries(entries, nbDaysAgo, feedUrl) {
 
-        My.log("dspEntries()", arguments);
-        My.log(entries);
+        my.log("dspEntries()", arguments);
+        my.log(entries);
 
         sortedEntries = entries;
 
@@ -883,7 +883,7 @@
 
                 if ((_myTimestamp - _entrie._myTimestamp) < (params.entries.dontDisplayEntriesOlderThan * 86400)) {
 
-                    //My.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+_myTimestamp+' (' + (new Date(_myTimestamp*1000)).toUTCString() + ') ==> Diff = ' + (_myTimestamp - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
+                    //my.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+_myTimestamp+' (' + (new Date(_myTimestamp*1000)).toUTCString() + ') ==> Diff = ' + (_myTimestamp - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
 
                     // ---
 
@@ -1069,16 +1069,16 @@
 
         request.onsuccess = function () {
             var file = this.result;
-            My.log("Get the file: ", file);
+            my.log("Get the file: ", file);
         }
 
         request.onerror = function () {
-            My.warn("Unable to get the file: " + this.error);
+            my.warn("Unable to get the file: " + this.error);
         }
     }
 
     function mainEntryOpenInBrowser(entryId, url) {
-        My.log('mainEntryOpenInBrowser()', arguments);
+        my.log('mainEntryOpenInBrowser()', arguments);
         document.body.style.cssText = "overflow: hidden;";  // Disable scroll in entries list.
         
         share.setAttribute("_mySha256_link", sortedEntries[entryId]['_mySha256_link']);
@@ -1092,7 +1092,7 @@
             var _regex = new RegExp('\'', 'g');
             var _author = "";
             
-            //My.log('mainEntryOpenInBrowser()', _entry.content);
+            //my.log('mainEntryOpenInBrowser()', _entry.content);
 
             if (_entry.author !== "") {
                 _author = '<div class="entrie-author">' + myExtraTranslations['by'] + ' ' + _entry.author + '</div>';
@@ -1170,7 +1170,7 @@
     // 1st feeds loading.
 
     function initAndLoadFeeds(subscriptions) {
-        My.log('initAndLoadFeeds()', arguments);
+        my.log('initAndLoadFeeds()', arguments);
 
         // Add feeds from subscription(s) file(s)
         // subscriptions.local.json
@@ -1180,7 +1180,7 @@
 
         for (var i = 0; i < subscriptions.length; i++) {
             for (var j = 0; j < subscriptions[i].length; j++) {
-                My.log('initAndLoadFeeds()', subscriptions[i][j]);
+                my.log('initAndLoadFeeds()', subscriptions[i][j]);
                 var _account = subscriptions[i][j].account;
                 if (myFeedsSubscriptions[_account] === undefined) {
                     myFeedsSubscriptions[_account] = [];
@@ -1217,20 +1217,20 @@
                     _nbFeedsSubscriptions++;
                 }
 
-                My._save("subscriptions.local.json", "application/json", JSON.stringify(myFeedsSubscriptions.local)).then(function(results) {
-                    My.log('Save file subscriptions.local.json');
+                my._save("subscriptions.local.json", "application/json", JSON.stringify(myFeedsSubscriptions.local)).then(function(results) {
+                    my.log('Save file subscriptions.local.json');
                 }).catch(function(error) {
-                    My.error("ERROR saving file ", error);
-                    My.alert("ERROR saving file " + error.filename);
+                    my.error("ERROR saving file ", error);
+                    my.alert("ERROR saving file " + error.filename);
                 });
             }
         }
 
         // 1st feeds loading
 
-        My.log('========================');
-        My.log(myFeedsSubscriptions);
-        My.log('========================');
+        my.log('========================');
+        my.log(myFeedsSubscriptions);
+        my.log('========================');
 
         if (_nbFeedsSubscriptions > 0) {
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
@@ -1246,11 +1246,11 @@
         var _nbDaysAgo = params.entries.nbDaysAgo;
         params.entries.nbDaysAgo = 0;   // Reset nbDaysAgo value before saving file.
                                         // Reset affect "params" object !!!!!
-        My._save("params.json", "application/json", JSON.stringify(params)).then(function(results) {
-            My.log("Save file params.json");
+        my._save("params.json", "application/json", JSON.stringify(params)).then(function(results) {
+            my.log("Save file params.json");
         }).catch(function(error) {
-            My.error("ERROR saving file params.json", error);
-            My.alert('ERROR saving file params.json');
+            my.error("ERROR saving file params.json", error);
+            my.alert('ERROR saving file params.json');
         });
         params.entries.nbDaysAgo = _nbDaysAgo;
     }
@@ -1261,7 +1261,7 @@
      * */
      
      function _disableAccount(_account) {
-        My.log('_disableAccount', arguments);
+        my.log('_disableAccount', arguments);
         myFeedsSubscriptions[_account] = [];
         gf.setFeedsSubscriptions(myFeedsSubscriptions);
         gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
@@ -1273,14 +1273,14 @@
      * @param {_feeds} array
      * */
     function addNewSubscriptions(_feeds) {
-        My.log('addNewSubscriptions()', arguments);
+        my.log('addNewSubscriptions()', arguments);
         for (var i = 0; i < _feeds.length; i++) {
             _addNewSubscription(_feeds[i]);
         }
     }
 
     function _addNewSubscription(_feed) {
-        My.log('_addNewSubscription()', arguments);
+        my.log('_addNewSubscription()', arguments);
 
         var _insertNewFeed = true;
         var _account = _feed.account;
@@ -1312,13 +1312,13 @@
 
         // Promises V1
 
-        var promise1 = My._load('subscriptions.local.json').then(function(results) {return results;}
+        var promise1 = my._load('subscriptions.local.json').then(function(results) {return results;}
         ).catch(function(error) {return {};});
 
-        var promise2 = My._load('subscriptions.feedly.json').then(function(results) {return results;}
+        var promise2 = my._load('subscriptions.feedly.json').then(function(results) {return results;}
         ).catch(function(error) {return {};});
 
-        var promise3 = My._load('subscriptions.theoldreader.json').then(function(results) {return results;}
+        var promise3 = my._load('subscriptions.theoldreader.json').then(function(results) {return results;}
         ).catch(function(error) {return {};});
 
         var arrayPromises = [promise1, promise2, promise3];
@@ -1326,7 +1326,7 @@
         Promise.all(arrayPromises).then(function(arrayOfResults) {
             initAndLoadFeeds(arrayOfResults);
         }).catch(function(error) {
-            My.alert('KO all promises', error.message);
+            my.alert('KO all promises', error.message);
         });
 
         // Promises V2
@@ -1334,7 +1334,7 @@
         var i = 0;
 
         for (var _account in myFeedsSubscriptions) {
-            arrayPromises[i] = My._load('subscriptions.' + _account + '.json').then(function(results) {return results;}
+            arrayPromises[i] = my._load('subscriptions.' + _account + '.json').then(function(results) {return results;}
             ).catch(function(error) {return {};});
             i++;
         }
@@ -1342,7 +1342,7 @@
         Promise.all(arrayPromises).then(function(arrayOfResults) {
             initAndLoadFeeds(arrayOfResults);
         }).catch(function(error) {
-            My.alert('KO all promises', error.message);
+            my.alert('KO all promises', error.message);
         });*/
 
         // =================================
@@ -1350,7 +1350,7 @@
         // =================================
         // Disable button if subscriptions file doesn't exists.
 
-        My._file_exists('subscriptions.local.json', function(exists){
+        my._file_exists('subscriptions.local.json', function(exists){
             if (!exists) {
                 ui._onclick(loadSubscriptions, 'disable');
             }
@@ -1409,7 +1409,7 @@
         // https://developer.mozilla.org/fr/docs/Web/API/Web_Activities
 
         share.onclick = function() {
-            My.log(this);
+            my.log(this);
             var _entryId = 0;
             var _mySha256_title = this.getAttribute("_mySha256_title");
             var _mySha256_link  = this.getAttribute("_mySha256_link");
@@ -1423,7 +1423,7 @@
             }
             
             var _entry = sortedEntries[_entryId];
-            My.log(_entry);
+            my.log(_entry);
             new MozActivity({
                 name: "new",
                 data: {
@@ -1444,11 +1444,11 @@
             // Save feed as file
 
             if (navigator.onLine) {
-                My._save('cache/google/feeds/' + btoa(event.detail.responseData.feed.feedUrl) + ".json", "application/json", JSON.stringify(event.detail.responseData.feed)).then(function(results) {
-                    My.log('GoogleFeed.load.done > Saving feed in cache ok : ' + event.detail.responseData.feed.feedUrl + ' ('+btoa(event.detail.responseData.feed.feedUrl)+')');
+                my._save('cache/google/feeds/' + btoa(event.detail.responseData.feed.feedUrl) + ".json", "application/json", JSON.stringify(event.detail.responseData.feed)).then(function(results) {
+                    my.log('GoogleFeed.load.done > Saving feed in cache ok : ' + event.detail.responseData.feed.feedUrl + ' ('+btoa(event.detail.responseData.feed.feedUrl)+')');
                 }).catch(function(error) {
-                    My.error("ERROR saving feed in cache : " + event.detail.responseData.feed.feedUrl + ' ('+btoa(event.detail.responseData.feed.feedUrl)+')');
-                    My.alert("ERROR saving feed in cache :\n" + event.detail.responseData.feed.feedUrl);
+                    my.error("ERROR saving feed in cache : " + event.detail.responseData.feed.feedUrl + ' ('+btoa(event.detail.responseData.feed.feedUrl)+')');
+                    my.alert("ERROR saving feed in cache :\n" + event.detail.responseData.feed.feedUrl);
                 });
             }
 
@@ -1491,7 +1491,7 @@
 
             // Check if all feeds were loaded
 
-                My.error(event);
+                my.error(event);
 
                 var _nbFeedsToLoad = event.detail._myParams.nbFeeds; // different de "done"
                 var _nbFeedsLoaded = gf.getNbFeedsLoaded();
@@ -1529,7 +1529,7 @@
         /* ===================== */
 
         document.body.addEventListener('Feedly.login.done', function(response){
-            My.log(feedly.getToken());
+            my.log(feedly.getToken());
             params.accounts.feedly.logged = true;
             _saveParams();
             document.getElementById('feedlyLogin').checked = true; // Enable settings checkbox
@@ -1537,12 +1537,12 @@
         });
 
         document.body.addEventListener('Feedly.login.error', function(response){
-            My.log('CustomEvent : Feedly.login.error', arguments);
-            My.message('Feedly login error');
+            my.log('CustomEvent : Feedly.login.error', arguments);
+            my.message('Feedly login error');
         });
 
         document.body.addEventListener('Feedly.getSubscriptions.done', function(response){
-            My.log('CustomEvent : Feedly.getSubscriptions.done');
+            my.log('CustomEvent : Feedly.getSubscriptions.done');
             var _subscriptions = response.detail;
             var _feed = '';
             var _newFeeds = [];
@@ -1558,23 +1558,23 @@
             addNewSubscriptions(_newFeeds);
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
-            My._save("subscriptions.feedly.json", "application/json", JSON.stringify(myFeedsSubscriptions.feedly)).then(function(results) {
-                My.log("Save file subscriptions.feedly.json");
+            my._save("subscriptions.feedly.json", "application/json", JSON.stringify(myFeedsSubscriptions.feedly)).then(function(results) {
+                my.log("Save file subscriptions.feedly.json");
             }).catch(function(error) {
-                My.error("ERROR saving file subscriptions.feedly.json", error);
-                My.alert("ERROR saving file subscriptions.feedly.json");
+                my.error("ERROR saving file subscriptions.feedly.json", error);
+                my.alert("ERROR saving file subscriptions.feedly.json");
             });
-            My._save("cache/feedly/subscriptions.json", "application/json", JSON.stringify(_subscriptions)).then(function(results) {
-                My.log("Save file cache/feedly/subscriptions.json");
+            my._save("cache/feedly/subscriptions.json", "application/json", JSON.stringify(_subscriptions)).then(function(results) {
+                my.log("Save file cache/feedly/subscriptions.json");
             }).catch(function(error) {
-                My.error("ERROR saving file cache/feedly/subscriptions.json", error);
-                My.alert("ERROR saving file cache/feedly/subscriptions.json");
+                my.error("ERROR saving file cache/feedly/subscriptions.json", error);
+                my.alert("ERROR saving file cache/feedly/subscriptions.json");
             });
         });
 
         document.body.addEventListener('Feedly.getSubscriptions.error', function(response) {
-            My.log('CustomEvent : Feedly.getSubscriptions.error', arguments);
-            My.message('Feedly error');
+            my.log('CustomEvent : Feedly.getSubscriptions.error', arguments);
+            my.message('Feedly error');
         });
 
         /* ============================= */
@@ -1582,7 +1582,7 @@
         /* ============================= */
 
         document.body.addEventListener('TheOldReader.login.done', function(response){
-            My.log('TheOldReader.getToken()', theoldreader.getToken());
+            my.log('TheOldReader.getToken()', theoldreader.getToken());
             params.accounts.theoldreader.logged = true;
             _saveParams();
             document.getElementById('theoldreaderCheckbox').checked = true; // Enable settings checkbox
@@ -1591,12 +1591,12 @@
         });
 
         document.body.addEventListener('TheOldReader.login.error', function(response){
-            My.log('CustomEvent : TheOldReader.login.error', arguments);
-            My.message('The Old Reader login error');
+            my.log('CustomEvent : TheOldReader.login.error', arguments);
+            my.message('The Old Reader login error');
         });
 
         document.body.addEventListener('TheOldReader.getSubscriptions.done', function(response){
-            My.log('CustomEvent : TheOldReader.getSubscriptions.done', response);
+            my.log('CustomEvent : TheOldReader.getSubscriptions.done', response);
             var _subscriptions = response.detail.subscriptions;
             var _feed = '';
             var _newFeeds = [];
@@ -1612,23 +1612,23 @@
             addNewSubscriptions(_newFeeds);
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
-            My._save("subscriptions.theoldreader.json", "application/json", JSON.stringify(myFeedsSubscriptions.theoldreader)).then(function(results) {
-                My.log("Save file subscriptions.theoldreader.json");
+            my._save("subscriptions.theoldreader.json", "application/json", JSON.stringify(myFeedsSubscriptions.theoldreader)).then(function(results) {
+                my.log("Save file subscriptions.theoldreader.json");
             }).catch(function(error) {
-                My.error("ERROR saving file subscriptions.theoldreader.json", error);
-                My.alert("ERROR saving file subscriptions.theoldreader.json");
+                my.error("ERROR saving file subscriptions.theoldreader.json", error);
+                my.alert("ERROR saving file subscriptions.theoldreader.json");
             });
-            My._save("cache/theoldreader/subscriptions.json", "application/json", JSON.stringify(_subscriptions)).then(function(results) {
-                My.log("Save file cache/theoldreader/subscriptions.json");
+            my._save("cache/theoldreader/subscriptions.json", "application/json", JSON.stringify(_subscriptions)).then(function(results) {
+                my.log("Save file cache/theoldreader/subscriptions.json");
             }).catch(function(error) {
-                My.error("ERROR saving file cache/theoldreader/subscriptions.json", error);
-                My.alert("ERROR saving file cache/theoldreader/subscriptions.json");
+                my.error("ERROR saving file cache/theoldreader/subscriptions.json", error);
+                my.alert("ERROR saving file cache/theoldreader/subscriptions.json");
             });
         });
 
         document.body.addEventListener('TheOldReader.getSubscriptions.error', function(response) {
-            My.log('CustomEvent : TheOldReader.getSubscriptions.error', arguments);
-            My.message('The Old Reader error');
+            my.log('CustomEvent : TheOldReader.getSubscriptions.error', arguments);
+            my.message('The Old Reader error');
         });
 
         // ============

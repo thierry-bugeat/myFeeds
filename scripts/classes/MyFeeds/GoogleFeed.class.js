@@ -344,7 +344,7 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
                     document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.error', {"detail": error}));
                 }
                 
-                My._load('cache/google/feeds/' + btoa(_message.responseData._myParams.url) + ".json").then(function(_cacheContent){
+                my._load('cache/google/feeds/' + btoa(_message.responseData._myParams.url) + ".json").then(function(_cacheContent){
                     _message.responseData.feed = _cacheContent;
                     document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": _message}));
                 }).catch(function(error) {
