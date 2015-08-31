@@ -26,7 +26,7 @@
 
     var params = {
         "feeds": {
-            "selectedFeed": ""                  // Display all feeds if empty otherwise display specified feed url
+            "selectedFeed": "",                 // Display all feeds if empty otherwise display specified feed url
             "defaultPulsations": 5              // Default feed pulsations
         },
         "entries": {
