@@ -27,6 +27,7 @@
     var params = {
         "feeds": {
             "selectedFeed": ""                  // Display all feeds if empty otherwise display specified feed url
+            "defaultPulsations": 5              // Default feed pulsations
         },
         "entries": {
             "nbDaysAgo": 0,                     // Display only today's entries
@@ -405,8 +406,8 @@
 
         if (_confirm) {
 
-            var _myNewFeed = {"url": _feedUrl, "pulsations": 20, "account": "local", "id": _feedId};
-            var _myNewFeed = {"url": _feedUrl, "pulsations": 20, "account": "local", "id": _feedUrl};
+            var _myNewFeed = {"url": _feedUrl, "pulsations": params['feeds']['defaultPulsations'], "account": "local", "id": _feedId};
+            var _myNewFeed = {"url": _feedUrl, "pulsations": params['feeds']['defaultPulsations'], "account": "local", "id": _feedUrl};
 
             // (1) Add feedUrl to array "myFeedsSubscriptions.local"
 
@@ -1549,7 +1550,7 @@
             for (var i = 0; i < _subscriptions.length; i++) {
                 _feed = {
                     'url': _subscriptions[i].id.substr(5, _subscriptions[i].id.length),
-                    'pulsations': 20,
+                    'pulsations': params['feeds']['defaultPulsations'],
                     'account': 'feedly',
                     'id': _subscriptions[i].id
                 };
@@ -1603,7 +1604,7 @@
             for (var i = 0; i < _subscriptions.length; i++) {
                 _feed = {
                     'url': _subscriptions[i].url,
-                    'pulsations': 20,
+                    'pulsations': params['feeds']['defaultPulsations'],
                     'account': 'theoldreader',
                     'id': _subscriptions[i].id
                 };
