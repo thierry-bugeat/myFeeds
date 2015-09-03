@@ -29,6 +29,11 @@ var MyUi = function() {
     var displayList             = document.getElementById("displayList");
 
 }
+MyUi.prototype = new MyFeeds();
+
+/* =============== */
+/* --- Methods --- */
+/* =============== */
 
 MyUi.prototype.init = function() {
 
@@ -133,7 +138,7 @@ MyUi.prototype.toggle = function(_status) {
     
     // Small entries :
                 
-    if (!params.entries.displaySmallEntries) {
+    if (!MyFeeds.params.entries.displaySmallEntries) {
         _MyUi._smallEntries('hide');
     }
     
@@ -189,7 +194,7 @@ MyUi.prototype._loading = function(percentage) {
  * 4 : Entry
  * */
 MyUi.prototype._scrollTo = function(screenX) {
-    if (params.settings.ui.animations) {
+    if (MyFeeds.params.settings.ui.animations) {
         _MyUi._smoothScrollTo(screenX, 250);
     } else {
         _MyUi._quickScrollTo(screenX);

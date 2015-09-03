@@ -10,6 +10,8 @@ var MyFeeds = function() {
 /* --- Methods --- */
 /* =============== */
 
+MyFeeds.params;
+
 MyFeeds.prototype.base64_encode = function(str) { return btoa(str); }
 MyFeeds.prototype.base64_decode = function(str) { return atob(str); }
 
@@ -159,7 +161,7 @@ MyFeeds.prototype.message = function (message) {
  * @param {string} message Message to display on screen for developper.
  * */ 
 MyFeeds.prototype.alert = function (message) {
-    if (params.settings.developper_menu.logs.screen) {
+    if (MyFeeds.params.settings.developper_menu.logs.screen) {
         window.alert(message);
     }
 }
@@ -169,9 +171,9 @@ MyFeeds.prototype.alert = function (message) {
  * @param {string|array|object} arguments
  * */ 
 MyFeeds.prototype.group = function (message, arguments) {
-    if (params.settings.developper_menu.logs.console) {
+    if (MyFeeds.params.settings.developper_menu.logs.console) {
         var _arguments = arguments || "";
-        window.console && console.group(message, _arguments);
+        console.group(message, _arguments);
     }
 }
 
@@ -180,9 +182,9 @@ MyFeeds.prototype.group = function (message, arguments) {
  * @param {string|array|object} arguments
  * */ 
 MyFeeds.prototype.log = function (message, arguments) {
-    if (params.settings.developper_menu.logs.console) {
+    if (MyFeeds.params.settings.developper_menu.logs.console) {
         var _arguments = arguments || "";
-        window.console && console.log(message, _arguments);
+        console.log(message, _arguments);
     }
 }
 
@@ -191,9 +193,9 @@ MyFeeds.prototype.log = function (message, arguments) {
  * @param {string|array|object} arguments
  * */ 
 MyFeeds.prototype.warn = function (message, arguments) {
-    if (params.settings.developper_menu.logs.console) {
+    if (MyFeeds.params.settings.developper_menu.logs.console) {
         var _arguments = arguments || "";
-        window.console && console.warn(message, _arguments);
+        console.warn(message, _arguments);
     }
 }
 
@@ -202,8 +204,8 @@ MyFeeds.prototype.warn = function (message, arguments) {
  * @param {string|array|object} arguments
  * */ 
 MyFeeds.prototype.error = function (message, arguments) {
-    if (params.settings.developper_menu.logs.console) {
+    if (MyFeeds.params.settings.developper_menu.logs.console) {
         var _arguments = arguments || "";
-        window.console && console.error(message, _arguments);
+        console.error(message, _arguments);
     }
 }

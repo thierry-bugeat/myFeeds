@@ -43,6 +43,7 @@ GoogleFeed.prototype.getOuput           = function()        { return this.gf.out
 GoogleFeed.prototype.getNum             = function()        { return this.gf.num;           }
 GoogleFeed.prototype.getEntries         = function()        { this._sortEntries();  return this.gf_sortedEntries;   }
 GoogleFeed.prototype.getFeeds           = function()        { this._sortFeeds();    return this.sortedFeeds;        }
+GoogleFeed.prototype.getNbFeeds         = function()        { return this.myFeedsSubscriptions.length;              }
 GoogleFeed.prototype.getNbFeedsLoaded   = function()        { return this.nbFeedsLoaded;    }
 
 GoogleFeed.prototype._setUrl            = function(q)       { this.gf.q = q;                }
@@ -123,7 +124,7 @@ GoogleFeed.prototype._setNum = function(num) {
 }
 
 GoogleFeed.prototype.setFeedsSubscriptions = function(myFeedsSubscriptions) { 
-    _MyFeeds.log('GoogleFeed.prototype.setFeedsSubscriptions()', arguments);
+    _MyFeeds.log('GoogleFeed.prototype.setFeedsSubscriptions()', myFeedsSubscriptions);
     
     var _tmp = [];
     
@@ -331,7 +332,16 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
                 response.responseData.feed._myAccount = response.responseData._myParams.account; // Add _myAccount value
                 response.responseData.feed._myFeedId = response.responseData._myParams.id; // Add __id value
                 _MyFeeds.log("GoogleFeed.prototype.loadFeeds() > get > response : ", response);
-                document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": response}));
+                
+                try {
+                    document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": response}));
+                } catch (e) {
+                    // --- For worker ---
+                    // It's not possible to use CustomEvent in worker 
+                    // so new feed content are added from here.
+                    self.dispatchEvent(new Event('GoogleFeed.load.done'));
+                    try { _GoogleFeed.addFeed(response.responseData.feed); } catch (e) {console.error(e.message);}
+                }
             }, function(error) {
                 // Network error then try to load feed from cache
                 

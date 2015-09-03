@@ -24,7 +24,7 @@
 
     var myFeedsSubscriptions = {'local': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
 
-    var params = {
+    MyFeeds.params = {
         "feeds": {
             "selectedFeed": "",                 // Display all feeds if empty otherwise display specified feed url
             "defaultPulsations": 5              // Default feed pulsations
@@ -80,9 +80,9 @@
 
     my._load('params.json').then(function(_myParams) {
         my.log('loading params from file params.json ...', _myParams);
-        params = _myParams;
+        MyFeeds.params = _myParams;
         // Get and set Feedly token from cache
-        if (params.accounts.feedly.logged) {
+        if (MyFeeds.params.accounts.feedly.logged) {
             my._load('cache/feedly/access_token.json').then(function(_token){
                 feedly.setToken(_token);
             }).catch(function(error) {
@@ -90,7 +90,7 @@
             });
         }
         // Get and set The Old Reader token from cache
-        if (params.accounts.theoldreader.logged) {
+        if (MyFeeds.params.accounts.theoldreader.logged) {
             my._load('cache/theoldreader/access_token.json').then(function(_token){
                 theoldreader.setToken(_token);
                 document.getElementById('theoldreaderForm').style.cssText = 'display: none';
@@ -144,7 +144,7 @@
     sync.onclick            = function(event) {
         if (navigator.onLine) {
             ui._onclick(this, 'disable');
-            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
         }
     }
     menu.onclick            = function(event) { ui._scrollTo(1); }
@@ -169,18 +169,18 @@
     settingsOpen.onclick    = function(event) { ui._scrollTo(3); }
     settingsClose.onclick   = function(event) { ui._scrollTo(2); }
     displayGrid.onclick     = function(event) {
-        params.entries.theme = "grid";
-        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+        MyFeeds.params.entries.theme = "grid";
+        dspEntries(gf.getEntries(), MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
         _saveParams();
     }
     displayCard.onclick     = function(event) {
-        params.entries.theme = "card";
-        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+        MyFeeds.params.entries.theme = "card";
+        dspEntries(gf.getEntries(), MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
         _saveParams();
     }
     displayList.onclick     = function(event) {
-        params.entries.theme = "list";
-        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+        MyFeeds.params.entries.theme = "list";
+        dspEntries(gf.getEntries(), MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
         _saveParams();
     }
     
@@ -226,30 +226,30 @@
     }
 
     nextDay.onclick = function(event) {
-        if (params.entries.nbDaysAgo > 0 ) {
-            params.entries.nbDaysAgo--;
+        if (MyFeeds.params.entries.nbDaysAgo > 0 ) {
+            MyFeeds.params.entries.nbDaysAgo--;
         }
         ui._onclick(previousDay, 'enable');
-        if (params.entries.nbDaysAgo == 0) {
+        if (MyFeeds.params.entries.nbDaysAgo == 0) {
             ui._onclick(nextDay, 'disable');
         } else {
             ui._onclick(nextDay, 'enable');
         }
-        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+        dspEntries(gf.getEntries(), MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
         feeds_entries.scrollTop = 0;
     }
 
     previousDay.onclick = function(event) {
-        if (params.entries.nbDaysAgo < params.entries.dontDisplayEntriesOlderThan) {
-            params.entries.nbDaysAgo++;
+        if (MyFeeds.params.entries.nbDaysAgo < MyFeeds.params.entries.dontDisplayEntriesOlderThan) {
+            MyFeeds.params.entries.nbDaysAgo++;
         }
         ui._onclick(nextDay, 'enable');
-        if (params.entries.nbDaysAgo == params.entries.dontDisplayEntriesOlderThan) {
+        if (MyFeeds.params.entries.nbDaysAgo == MyFeeds.params.entries.dontDisplayEntriesOlderThan) {
             ui._onclick(previousDay, 'disable');
         } else {
             ui._onclick(previousDay, 'enable');
         }
-        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+        dspEntries(gf.getEntries(), MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
         feeds_entries.scrollTop = 0;
     }
 
@@ -334,7 +334,7 @@
                 (myFeedsSubscriptions.theoldreader.length > 0)
             ){
                 gf.setFeedsSubscriptions(myFeedsSubscriptions);
-                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
             } else {
                 ui.echo("feeds-list", "", "");
                 ui.echo("feeds-entries", "", "");
@@ -406,8 +406,8 @@
 
         if (_confirm) {
 
-            var _myNewFeed = {"url": _feedUrl, "pulsations": params['feeds']['defaultPulsations'], "account": "local", "id": _feedId};
-            var _myNewFeed = {"url": _feedUrl, "pulsations": params['feeds']['defaultPulsations'], "account": "local", "id": _feedUrl};
+            var _myNewFeed = {"url": _feedUrl, "pulsations": MyFeeds.params['feeds']['defaultPulsations'], "account": "local", "id": _feedId};
+            var _myNewFeed = {"url": _feedUrl, "pulsations": MyFeeds.params['feeds']['defaultPulsations'], "account": "local", "id": _feedUrl};
 
             // (1) Add feedUrl to array "myFeedsSubscriptions.local"
 
@@ -416,7 +416,7 @@
             // (2) Reload UI
 
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
-            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
             
             // (3) Save subscriptions.local.json
             
@@ -440,7 +440,7 @@
 
         // Small entries selector
 
-        if (params.entries.displaySmallEntries) {
+        if (MyFeeds.params.entries.displaySmallEntries) {
             _displaySmallEntriesChecked = 'checked=""';
         } else {
             _displaySmallEntriesChecked = "";
@@ -448,7 +448,7 @@
 
         // Feedly selector
 
-        if (params.accounts.feedly.logged) {
+        if (MyFeeds.params.accounts.feedly.logged) {
             _feedlyAccount = 'checked=""';
         } else {
             _feedlyAccount = "";
@@ -456,7 +456,7 @@
 
         // The Old Reader selector
 
-        if (params.accounts.theoldreader.logged) {
+        if (MyFeeds.params.accounts.theoldreader.logged) {
             _theoldreaderAccount = 'checked=""';
         } else {
             _theoldreaderAccount = "";
@@ -464,7 +464,7 @@
 
         // Use animations selector
 
-        if (params.settings.ui.animations) {
+        if (MyFeeds.params.settings.ui.animations) {
             _useAnimations = 'checked=""';
         } else {
             _useAnimations = "";
@@ -472,26 +472,26 @@
         
         // Logs console selector
 
-        params.settings.developper_menu.logs.console ?
+        MyFeeds.params.settings.developper_menu.logs.console ?
             _logsConsole = 'checked=""':
             _logsConsole = "";
             
         // Logs screen selector
 
-        params.settings.developper_menu.logs.screen ?
+        MyFeeds.params.settings.developper_menu.logs.screen ?
             _logsScreen = 'checked=""':
             _logsScreen = "";
 
         // Update every
 
-        var _every = params.settings.update.every;
+        var _every = MyFeeds.params.settings.update.every;
         var _htmlSelectUpdateEvery = "";
         var _selected = "";
 
         _htmlSelectUpdateEvery = _htmlSelectUpdateEvery + '<select id="selectUpdateEvery">';
 
         for (var i = 0; i < _every.length; i++) {
-            if (params.entries.updateEvery == _every[i]) {
+            if (MyFeeds.params.entries.updateEvery == _every[i]) {
                 _selected = "selected";
             } else {
                 _selected = "";
@@ -503,14 +503,14 @@
 
         // Max nb Days
 
-        var _days = params.settings.days;
+        var _days = MyFeeds.params.settings.days;
         var _htmlMaxNbDays = "";
         var _selected = "";
 
         _htmlMaxNbDays = _htmlMaxNbDays + '<select id="selectMaxNbDays">';
 
         for (var i = 0; i < _days.length; i++) {
-            if (params.entries.dontDisplayEntriesOlderThan == _days[i]) {
+            if (MyFeeds.params.entries.dontDisplayEntriesOlderThan == _days[i]) {
                 _selected = "selected";
             } else {
                 _selected = "";
@@ -569,7 +569,7 @@
         // --- Hide / show The old reader form ---
         // =======================================
         
-        params.accounts.theoldreader.logged ?
+        MyFeeds.params.accounts.theoldreader.logged ?
             document.getElementById('theoldreaderForm').style.cssText = 'display: none':
             document.getElementById('theoldreaderForm').style.cssText = 'display: block';
         
@@ -578,9 +578,9 @@
         // ============================
         
         document.getElementById('appVersion').onclick = function(e) {
-            params.settings.developper_menu.visible = !params.settings.developper_menu.visible;
+            MyFeeds.params.settings.developper_menu.visible = !MyFeeds.params.settings.developper_menu.visible;
             dspSettings();
-            window.alert('Developper menu : ' + params.settings.developper_menu.visible);
+            window.alert('Developper menu : ' + MyFeeds.params.settings.developper_menu.visible);
             _saveParams();
         }
         
@@ -589,7 +589,7 @@
         // --- Show developper menu ---
         // ============================
 
-        if (params.settings.developper_menu.visible == true) {
+        if (MyFeeds.params.settings.developper_menu.visible == true) {
             var dm = document.getElementsByClassName("developper-menu");
             var i;
             for (i = 0; i < dm.length; i++) {
@@ -603,16 +603,16 @@
 
         document.getElementById('toggleDisplaySmallEntries').onclick = function(e) {
             document.body.dispatchEvent(new CustomEvent('settingsSmallNews.change', {"detail": ""}));
-            params.entries.displaySmallEntries = !params.entries.displaySmallEntries;
+            MyFeeds.params.entries.displaySmallEntries = !MyFeeds.params.entries.displaySmallEntries;
             _saveParams();
             
-            params.entries.displaySmallEntries ?
+            MyFeeds.params.entries.displaySmallEntries ?
                 ui._smallEntries('show') : ui._smallEntries('hide');
         }
 
         var _selectUpdateEvery = document.getElementById('selectUpdateEvery');
         _selectUpdateEvery.onchange = function(e) {
-            params.entries.updateEvery = _selectUpdateEvery.options[_selectUpdateEvery.selectedIndex].value;
+            MyFeeds.params.entries.updateEvery = _selectUpdateEvery.options[_selectUpdateEvery.selectedIndex].value;
             _saveParams();
 
             // Automatic update entries every N seconds :
@@ -623,25 +623,25 @@
             _entriesUpdateInterval = setInterval(function() {
                 if (navigator.onLine) {
                     ui._onclick(sync, 'disable');
-                    gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                    gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
                 }
-            }, (params.entries.updateEvery * 1000));
+            }, (MyFeeds.params.entries.updateEvery * 1000));
 
         }
 
         var _selectMaxNbDays = document.getElementById('selectMaxNbDays');
         _selectMaxNbDays.onchange = function(e) {
-            params.entries.dontDisplayEntriesOlderThan = _selectMaxNbDays.options[_selectMaxNbDays.selectedIndex].value;
+            MyFeeds.params.entries.dontDisplayEntriesOlderThan = _selectMaxNbDays.options[_selectMaxNbDays.selectedIndex].value;
             
-            if (params.entries.nbDaysAgo > params.entries.dontDisplayEntriesOlderThan) {
-                params.entries.nbDaysAgo = params.entries.dontDisplayEntriesOlderThan;
+            if (MyFeeds.params.entries.nbDaysAgo > MyFeeds.params.entries.dontDisplayEntriesOlderThan) {
+                MyFeeds.params.entries.nbDaysAgo = MyFeeds.params.entries.dontDisplayEntriesOlderThan;
                 ui._onclick(nextDay, 'enable');         // [<]
                 ui._onclick(previousDay, 'disable');    // [>]
                 feeds_entries.scrollTop = 0;
-                dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                dspEntries(gf.getEntries(), MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
             }
             
-            if (params.entries.nbDaysAgo < params.entries.dontDisplayEntriesOlderThan) {
+            if (MyFeeds.params.entries.nbDaysAgo < MyFeeds.params.entries.dontDisplayEntriesOlderThan) {
                 ui._onclick(previousDay, 'enable');     // [>]
             }
             
@@ -651,7 +651,7 @@
         // UI animations checkbox
 
         document.getElementById("useAnimations").onclick = function() {
-            params.settings.ui.animations = !params.settings.ui.animations;
+            MyFeeds.params.settings.ui.animations = !MyFeeds.params.settings.ui.animations;
             _saveParams();
         }
         
@@ -669,7 +669,7 @@
                             my.alert(err.message);
                         }
                         gf.setFeedsSubscriptions(myFeedsSubscriptions);
-                        gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                        gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
                     }
                 ).catch(function(error) {
                     my.message(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
@@ -688,14 +688,14 @@
         // Logs console checkbox
 
         document.getElementById("logsConsole").onclick = function() {
-            params.settings.developper_menu.logs.console = !params.settings.developper_menu.logs.console;
+            MyFeeds.params.settings.developper_menu.logs.console = !MyFeeds.params.settings.developper_menu.logs.console;
             _saveParams();
         }
         
         // Logs console screen
 
         document.getElementById("logsScreen").onclick = function() {
-            params.settings.developper_menu.logs.screen = !params.settings.developper_menu.logs.screen;
+            MyFeeds.params.settings.developper_menu.logs.screen = !MyFeeds.params.settings.developper_menu.logs.screen;
             _saveParams();
         }
 
@@ -706,7 +706,7 @@
                 this.checked = false; // False until CustomEvent Feedly.login.done
                 feedly.login();
             } else {
-                params.accounts.feedly.logged = false;
+                MyFeeds.params.accounts.feedly.logged = false;
                 _disableAccount('feedly');
                 _saveParams();
             }
@@ -721,7 +721,7 @@
                 var _passwd = document.getElementById("theoldreaderPasswd").value;
                 theoldreader.login(_email, _passwd);
             } else {
-                params.accounts.theoldreader.logged = false;
+                MyFeeds.params.accounts.theoldreader.logged = false;
                 _disableAccount('theoldreader');
                 _saveParams();
                 document.getElementById('theoldreaderForm').style.cssText = 'display: block';
@@ -783,7 +783,7 @@
         
         for (var _account in _html) {
             if (_html[_account] != "") {
-                _htmlFeeds = _htmlFeeds + '<h2>' + params.accounts[_account].title + '</h2><ul class="' + _account + '">' + _html[_account] + '</ul>';
+                _htmlFeeds = _htmlFeeds + '<h2>' + MyFeeds.params.accounts[_account].title + '</h2><ul class="' + _account + '">' + _html[_account] + '</ul>';
             }
         }
         
@@ -820,10 +820,10 @@
                 ui._scrollTo(2);
                 ui._onclick(nextDay, 'disable');
                 ui._onclick(previousDay, 'enable');
-                params.entries.nbDaysAgo = 0;
-                params.feeds.selectedFeed = this.getAttribute("feedUrl");
+                MyFeeds.params.entries.nbDaysAgo = 0;
+                MyFeeds.params.feeds.selectedFeed = this.getAttribute("feedUrl");
                 _saveParams();
-                dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                dspEntries(gf.getEntries(), MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
             }
         }
         
@@ -860,7 +860,7 @@
         var _htmlEntries = "";
         var _htmlFeedTitle = "";
         var _firstEntrie = true;
-        var _theme = params.entries.theme;
+        var _theme = MyFeeds.params.entries.theme;
 
         for (var i = 0; i < sortedEntries.length; i++) {
 
@@ -882,7 +882,7 @@
 
             if ((_entrie._myTimestamp >= _timestampMin) && (_entrie._myTimestamp < _timestampMax)) {
 
-                if ((_myTimestamp - _entrie._myTimestamp) < (params.entries.dontDisplayEntriesOlderThan * 86400)) {
+                if ((_myTimestamp - _entrie._myTimestamp) < (MyFeeds.params.entries.dontDisplayEntriesOlderThan * 86400)) {
 
                     //my.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+_myTimestamp+' (' + (new Date(_myTimestamp*1000)).toUTCString() + ') ==> Diff = ' + (_myTimestamp - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
 
@@ -916,7 +916,7 @@
                     }*/
 
                     if (_entrie._myFirstImageUrl) {
-                        if (_diff < params.entries.maxLengthForSmallEntries) {
+                        if (_diff < MyFeeds.params.entries.maxLengthForSmallEntries) {
                             _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="' + _entrie._myFirstImageUrl + '"/></span>';
                         } else {
                             _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="' + _entrie._myFirstImageUrl + '"/></span>';
@@ -927,11 +927,11 @@
 
                     var _ratioClass = _theme + '-ratio-entry-l';
 
-                    if ((_diff <= params.entries.maxLengthForSmallEntries) && (!_entrie._myFirstImageUrl)) {
+                    if ((_diff <= MyFeeds.params.entries.maxLengthForSmallEntries) && (!_entrie._myFirstImageUrl)) {
                         _ratioClass = _theme + '-ratio-entry-s';
                     }
 
-                    else if ((_diff <= params.entries.maxLengthForSmallEntries) || (!_entrie._myFirstImageUrl)) {
+                    else if ((_diff <= MyFeeds.params.entries.maxLengthForSmallEntries) || (!_entrie._myFirstImageUrl)) {
                         _ratioClass = _theme + '-ratio-entry-m';
                     }
 
@@ -947,7 +947,7 @@
 
                     var _content = "";
 
-                    if ((params.entries.theme == 'list') && (_diff >= params.entries.maxLengthForSmallEntries)) {
+                    if ((MyFeeds.params.entries.theme == 'list') && (_diff >= MyFeeds.params.entries.maxLengthForSmallEntries)) {
                         _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
@@ -959,7 +959,7 @@
 
                         _nbEntriesDisplayed++;
 
-                    } else if (params.entries.theme == 'list') {
+                    } else if (MyFeeds.params.entries.theme == 'list') {
                         _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
@@ -971,7 +971,7 @@
 
                         _nbEntriesDisplayed++;
 
-                    } else if (_diff >= params.entries.maxLengthForSmallEntries) {
+                    } else if (_diff >= MyFeeds.params.entries.maxLengthForSmallEntries) {
                         _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
                         _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                         _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
@@ -1026,7 +1026,7 @@
         
         // Hide/show small entries:
         
-        params.entries.displaySmallEntries ?
+        MyFeeds.params.entries.displaySmallEntries ?
             ui._smallEntries('show') : ui._smallEntries('hide');
 
         // ==================
@@ -1186,7 +1186,7 @@
                 if (myFeedsSubscriptions[_account] === undefined) {
                     myFeedsSubscriptions[_account] = [];
                 }
-                if (_account == "local" || params.accounts[_account].logged) {
+                if (_account == "local" || MyFeeds.params.accounts[_account].logged) {
                     myFeedsSubscriptions[_account].push(subscriptions[i][j]);
                 }
             }
@@ -1235,7 +1235,7 @@
 
         if (_nbFeedsSubscriptions > 0) {
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
-            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
         }
 
         // ---
@@ -1244,16 +1244,16 @@
     }
 
     function _saveParams() {
-        var _nbDaysAgo = params.entries.nbDaysAgo;
-        params.entries.nbDaysAgo = 0;   // Reset nbDaysAgo value before saving file.
+        var _nbDaysAgo = MyFeeds.params.entries.nbDaysAgo;
+        MyFeeds.params.entries.nbDaysAgo = 0;   // Reset nbDaysAgo value before saving file.
                                         // Reset affect "params" object !!!!!
-        my._save("params.json", "application/json", JSON.stringify(params)).then(function(results) {
+        my._save("params.json", "application/json", JSON.stringify(MyFeeds.params)).then(function(results) {
             my.log("Save file params.json");
         }).catch(function(error) {
             my.error("ERROR saving file params.json", error);
             my.alert('ERROR saving file params.json');
         });
-        params.entries.nbDaysAgo = _nbDaysAgo;
+        MyFeeds.params.entries.nbDaysAgo = _nbDaysAgo;
     }
     
     /**
@@ -1265,7 +1265,7 @@
         my.log('_disableAccount', arguments);
         myFeedsSubscriptions[_account] = [];
         gf.setFeedsSubscriptions(myFeedsSubscriptions);
-        gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+        gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
      }
 
     /**
@@ -1384,7 +1384,7 @@
         // Remove old entries
         
         setInterval(function() {
-            var _maxNbDaysAgo = params.settings.days.last();
+            var _maxNbDaysAgo = MyFeeds.params.settings.days.last();
             var _timestampMax = _myTimestamp - (86400 * _maxNbDaysAgo);
             gf.deleteOldEntries(_timestampMax);
         }, 15000);
@@ -1402,9 +1402,9 @@
         _entriesUpdateInterval = setInterval(function() {
             if (navigator.onLine) {
                 ui._onclick(sync, 'disable');
-                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
             }
-        }, (params.entries.updateEvery * 1000));
+        }, (MyFeeds.params.entries.updateEvery * 1000));
 
         // Share entry :
         // https://developer.mozilla.org/fr/docs/Web/API/Web_Activities
@@ -1470,7 +1470,7 @@
                 // ---
 
                 if (_nbFeedsLoaded == _nbFeedsToLoad) {
-                    dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                    dspEntries(gf.getEntries(), MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
                     dspFeeds(gf.getFeeds());
                     dspSettings();
                     updateFeedsPulsations();
@@ -1505,7 +1505,7 @@
                 // ---
 
                 if (_nbFeedsLoaded == _nbFeedsToLoad) {
-                    dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                    dspEntries(gf.getEntries(), MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
                     dspFeeds(gf.getFeeds());
                     dspSettings();
                     updateFeedsPulsations();
@@ -1531,7 +1531,7 @@
 
         document.body.addEventListener('Feedly.login.done', function(response){
             my.log(feedly.getToken());
-            params.accounts.feedly.logged = true;
+            MyFeeds.params.accounts.feedly.logged = true;
             _saveParams();
             document.getElementById('feedlyLogin').checked = true; // Enable settings checkbox
             feedly.getSubscriptions(); // CustomEvent Feedly.getSubscriptions.done, Feedly.getSubscriptions.error
@@ -1550,7 +1550,7 @@
             for (var i = 0; i < _subscriptions.length; i++) {
                 _feed = {
                     'url': _subscriptions[i].id.substr(5, _subscriptions[i].id.length),
-                    'pulsations': params['feeds']['defaultPulsations'],
+                    'pulsations': MyFeeds.params['feeds']['defaultPulsations'],
                     'account': 'feedly',
                     'id': _subscriptions[i].id
                 };
@@ -1558,7 +1558,7 @@
             }
             addNewSubscriptions(_newFeeds);
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
-            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
             my._save("subscriptions.feedly.json", "application/json", JSON.stringify(myFeedsSubscriptions.feedly)).then(function(results) {
                 my.log("Save file subscriptions.feedly.json");
             }).catch(function(error) {
@@ -1584,7 +1584,7 @@
 
         document.body.addEventListener('TheOldReader.login.done', function(response){
             my.log('TheOldReader.getToken()', theoldreader.getToken());
-            params.accounts.theoldreader.logged = true;
+            MyFeeds.params.accounts.theoldreader.logged = true;
             _saveParams();
             document.getElementById('theoldreaderCheckbox').checked = true; // Enable settings checkbox
             document.getElementById('theoldreaderForm').style.cssText = 'display: none';
@@ -1604,7 +1604,7 @@
             for (var i = 0; i < _subscriptions.length; i++) {
                 _feed = {
                     'url': _subscriptions[i].url,
-                    'pulsations': params['feeds']['defaultPulsations'],
+                    'pulsations': MyFeeds.params['feeds']['defaultPulsations'],
                     'account': 'theoldreader',
                     'id': _subscriptions[i].id
                 };
@@ -1612,7 +1612,7 @@
             }
             addNewSubscriptions(_newFeeds);
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
-            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
             my._save("subscriptions.theoldreader.json", "application/json", JSON.stringify(myFeedsSubscriptions.theoldreader)).then(function(results) {
                 my.log("Save file subscriptions.theoldreader.json");
             }).catch(function(error) {
@@ -1631,6 +1631,45 @@
             my.log('CustomEvent : TheOldReader.getSubscriptions.error', arguments);
             my.message('The Old Reader error');
         });
+        
+        // ===============
+        // --- Workers ---
+        // ===============
+        
+        document.getElementById('workerSync').onclick = function(event) {
+            if (navigator.onLine) {
+                //ui._onclick(this, 'disable'); // todo a decommenter
+                myWorker.postMessage({'cmd': 'loadFeeds', 'params': MyFeeds.params, 'myFeedsSubscriptions': myFeedsSubscriptions});
+            }
+        }
+        
+        if (window.Worker) { // Check if browser supports Worker API
+            var myWorker = new Worker('scripts/workers/gf.js');
+
+            myWorker.addEventListener('message', function(e) {
+                my.log('WORKER >>> ', e.data);
+                
+                switch (e.data.cmd) {
+                    case 'updateLoading':
+                        ui._loading(e.data.data.percentage);
+                        break;
+                    case 'load.done':
+                        my.log('WORKER load.done > ', e.data);
+                        break;
+                    case 'end':
+                        if (navigator.onLine) { ui._onclick(workerSync, 'enable'); }
+                        dspEntries(e.data.entries, MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
+                        dspFeeds(e.data.feeds);
+                    /*dspSettings();
+                    updateFeedsPulsations();
+                    _saveSubscriptions(false);*/
+                        break;
+                    default:
+                        my.log('WORKER > unknown cmd');
+                }
+                
+            }, false);
+        }
 
         // ============
         // --- Main ---
