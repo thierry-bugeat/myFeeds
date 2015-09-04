@@ -13,7 +13,7 @@ var MyUi = function() {
     var loading                 = document.getElementById("loading");
     var feeds_entries           = document.getElementById("feeds-entries");
 
-    var sync                    = document.getElementById("sync");
+    var workerSync              = document.getElementById("workerSync");
     var menu                    = document.getElementById("menu");
     var topup                   = document.getElementById("topup");
     var search                  = document.getElementById("search");
@@ -38,7 +38,7 @@ MyUi.prototype = new MyFeeds();
 MyUi.prototype.init = function() {
 
     _MyUi._onclick(topup, 'disable');     // Disable "topup" button when application start
-    _MyUi._onclick(sync, 'disable');      // Disable "sync" button when application start
+    _MyUi._onclick(workerSync, 'disable');// Disable "workerSync" button when application start
     _MyUi._onclick(nextDay, 'disable');
     
     _MyUi._onclick(search, 'disable');    // Not yet implemented

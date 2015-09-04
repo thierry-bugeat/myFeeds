@@ -19,6 +19,8 @@
     var feedly = new Feedly();
 
     var gf = new GoogleFeed();
+    
+    var myWorker;
 
     var _myTimestamp;                           // Value set by function "_setMyTimestamp()"
 
@@ -115,7 +117,7 @@
     var loading                 = document.getElementById("loading");
     var feeds_entries           = document.getElementById("feeds-entries");
 
-    var sync                    = document.getElementById("sync");
+    var workerSync              = document.getElementById("workerSync")
     var menu                    = document.getElementById("menu");
     var search                  = document.getElementById("search");
     var settingsOpen            = document.getElementById("settingsOpen");
@@ -141,12 +143,7 @@
         //theoldreader.login(); // test a supprimer
         //feedly.deleteSubscription('http://linuxfr.org/news.atom');
     //}
-    sync.onclick            = function(event) {
-        if (navigator.onLine) {
-            ui._onclick(this, 'disable');
-            gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
-        }
-    }
+
     menu.onclick            = function(event) { ui._scrollTo(1); }
     closeMainEntry.onclick  = function(event) { ui._quickScrollTo(2); ui.echo("browser", "", ""); }
     closeFeedsList.onclick  = function(event) { ui._scrollTo(2); }
@@ -186,10 +183,41 @@
     
     /**
      * Save subscriptions for specified account
+     * @param {string} _account "local", "feedly", "theoldreader"
+     * */
+    function _saveSubscriptions_v1(_account) {
+        var _output = [];
+        var _feeds = gf.getFeeds();
+        var _feed = "";
+        
+        for (var i = 0 ; i < _feeds.length; i++) {
+            if ( _feeds[i]._myAccount == _account) {
+                _url = _feeds[i].feedUrl;
+                
+                if ((isNaN(_feeds[i]._myPulsations)) || (_feeds[i]._myPulsations == "Infinity")){
+                    _feeds[i]._myPulsations = "0.1";
+                }
+                
+                _feed = {"url": _url, "pulsations": _feeds[i]._myPulsations, "account": _feeds[i]._myAccount, "id": _feeds[i]._myFeedId};
+                _output.push(_feed);
+            }
+        }
+
+        my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(_output)).then(function(results) {
+            my.log('Save subscriptions.' + _account + '.json');
+            my.message('Backup completed for account : ' + _account);
+        }).catch(function(error) {
+            my.error("ERROR saving file ", error);
+            my.alert("ERROR saving file " + error.filename);
+        });
+    }
+    
+    /**
+     * Save subscriptions for specified account
      * @param {boolean} _logsOnScreen Display or not logs on screen.
      *                                Overwrite settings.
      * */
-    function _saveSubscriptions(_logsOnScreen) {
+    function _saveSubscriptions_v2(_logsOnScreen) {
         
         for (var _account in myFeedsSubscriptions) {
 
@@ -333,12 +361,13 @@
                 (myFeedsSubscriptions.feedly.length > 0) ||
                 (myFeedsSubscriptions.theoldreader.length > 0)
             ){
-                gf.setFeedsSubscriptions(myFeedsSubscriptions);
-                gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
+                //gf.setFeedsSubscriptions(myFeedsSubscriptions);
+                //gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
+                myWorker.postMessage({'cmd': 'loadFeeds', 'params': MyFeeds.params, 'myFeedsSubscriptions': myFeedsSubscriptions});
             } else {
                 ui.echo("feeds-list", "", "");
                 ui.echo("feeds-entries", "", "");
-                ui._onclick(sync, 'disable');
+                ui._onclick(workerSync, 'disable');
             }
         }
     }
@@ -415,8 +444,9 @@
 
             // (2) Reload UI
 
-            gf.setFeedsSubscriptions(myFeedsSubscriptions);
-            gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
+            //gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            //gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
+            myWorker.postMessage({'cmd': 'loadFeeds', 'params': MyFeeds.params, 'myFeedsSubscriptions': myFeedsSubscriptions});
             
             // (3) Save subscriptions.local.json
             
@@ -622,8 +652,8 @@
 
             _entriesUpdateInterval = setInterval(function() {
                 if (navigator.onLine) {
-                    ui._onclick(sync, 'disable');
-                    gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
+                    ui._onclick(workerSync, 'disable');
+                    myWorker.postMessage({'cmd': 'loadFeeds', 'params': MyFeeds.params, 'myFeedsSubscriptions': myFeedsSubscriptions});
                 }
             }, (MyFeeds.params.entries.updateEvery * 1000));
 
@@ -668,8 +698,9 @@
                         } catch (err) {
                             my.alert(err.message);
                         }
-                        gf.setFeedsSubscriptions(myFeedsSubscriptions);
-                        gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
+                        //gf.setFeedsSubscriptions(myFeedsSubscriptions);
+                        //gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
+                        myWorker.postMessage({'cmd': 'loadFeeds', 'params': MyFeeds.params, 'myFeedsSubscriptions': myFeedsSubscriptions});
                     }
                 ).catch(function(error) {
                     my.message(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
@@ -681,7 +712,10 @@
 
         document.getElementById("saveSubscriptions").onclick = function(event) {
             if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
-                _saveSubscriptions(true);
+                //_saveSubscriptions_v1("local");
+                //_saveSubscriptions_v1("feedly");
+                //_saveSubscriptions_v1("theoldreader");
+                _saveSubscriptions_v2(true);
             }
         }
         
@@ -1234,8 +1268,9 @@
         my.log('========================');
 
         if (_nbFeedsSubscriptions > 0) {
-            gf.setFeedsSubscriptions(myFeedsSubscriptions);
-            gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
+            //gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            //gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
+            myWorker.postMessage({'cmd': 'loadFeeds', 'params': MyFeeds.params, 'myFeedsSubscriptions': myFeedsSubscriptions});
         }
 
         // ---
@@ -1264,8 +1299,9 @@
      function _disableAccount(_account) {
         my.log('_disableAccount', arguments);
         myFeedsSubscriptions[_account] = [];
-        gf.setFeedsSubscriptions(myFeedsSubscriptions);
-        gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
+        //gf.setFeedsSubscriptions(myFeedsSubscriptions);
+        //gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
+        myWorker.postMessage({'cmd': 'loadFeeds', 'params': MyFeeds.params, 'myFeedsSubscriptions': myFeedsSubscriptions});
      }
 
     /**
@@ -1308,6 +1344,59 @@
     // ======================
 
     window.onload = function () {
+        
+        // ==============
+        // --- Worker ---
+        // ==============
+        
+        document.getElementById('workerSync').onclick = function(event) {
+            if (navigator.onLine) {
+                ui._onclick(this, 'disable');
+                myWorker.postMessage({'cmd': 'loadFeeds', 'params': MyFeeds.params, 'myFeedsSubscriptions': myFeedsSubscriptions});
+            }
+        }
+        
+        if (window.Worker) { // Check if browser supports Worker API
+            myWorker = new Worker('scripts/workers/gf.js');
+
+            myWorker.addEventListener('message', function(e) {
+                my.log('WORKER >>> ', e.data);
+                
+                switch (e.data.cmd) {
+                    case 'updateLoading':
+                        ui._loading(e.data.data.percentage);
+                        break;
+                    case 'enableWorkerSync':
+                        if (navigator.onLine) { ui._onclick(workerSync, 'enable'); }
+                        break;
+                    case 'end':
+                        if (navigator.onLine) { ui._onclick(workerSync, 'enable'); }
+                        gf.workerAddFeeds(e.data.feeds);
+                        gf.addEntries(e.data.entries);
+                        dspEntries(e.data.entries, MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
+                        dspFeeds(e.data.feeds);
+                        dspSettings();
+                        updateFeedsPulsations();
+                        //_saveSubscriptions_v1("local");
+                        //_saveSubscriptions_v1("feedly");
+                        //_saveSubscriptions_v1("theoldreader");
+                        _saveSubscriptions_v2(false);
+                        break;
+                    default:
+                        my.log('WORKER > unknown cmd');
+                }
+                
+            }, false);
+
+            myWorker.addEventListener('error', function(e) {
+                my.log('WORKER ERROR >>> ' + e.message + ' filename: ' + e.filename + ' line: ' + e.lineno);
+            }, false);
+
+        }
+        
+        // ==================
+        // --- Gesture(s) ---
+        // ==================
         
         _swipe("");
 
@@ -1401,8 +1490,8 @@
 
         _entriesUpdateInterval = setInterval(function() {
             if (navigator.onLine) {
-                ui._onclick(sync, 'disable');
-                gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
+                ui._onclick(workerSync, 'disable');
+                myWorker.postMessage({'cmd': 'loadFeeds', 'params': MyFeeds.params, 'myFeedsSubscriptions': myFeedsSubscriptions});
             }
         }, (MyFeeds.params.entries.updateEvery * 1000));
 
@@ -1440,89 +1529,6 @@
         /* --- Google Events --- */
         /* ===================== */
 
-        document.body.addEventListener('GoogleFeed.load.done', function(event){
-
-            // Save feed as file
-
-            if (navigator.onLine) {
-                my._save('cache/google/feeds/' + btoa(event.detail.responseData.feed.feedUrl) + ".json", "application/json", JSON.stringify(event.detail.responseData.feed)).then(function(results) {
-                    my.log('GoogleFeed.load.done > Saving feed in cache ok : ' + event.detail.responseData.feed.feedUrl + ' ('+btoa(event.detail.responseData.feed.feedUrl)+')');
-                }).catch(function(error) {
-                    my.error("ERROR saving feed in cache : " + event.detail.responseData.feed.feedUrl + ' ('+btoa(event.detail.responseData.feed.feedUrl)+')');
-                    my.alert("ERROR saving feed in cache :\n" + event.detail.responseData.feed.feedUrl);
-                });
-            }
-
-            // Add feed entries to array "unsortedEntries"
-
-                gf.addFeed(event.detail.responseData.feed);
-
-            // Check if all feeds were loaded
-
-                var _nbFeedsToLoad = event.detail.responseData._myParams.nbFeeds;
-                var _nbFeedsLoaded = gf.getNbFeedsLoaded();
-                gf.setNbFeedsLoaded(++_nbFeedsLoaded);
-
-                // Percentage of loading ?
-
-                ui._loading(Math.round((100 * _nbFeedsLoaded) / _nbFeedsToLoad));
-
-                // ---
-
-                if (_nbFeedsLoaded == _nbFeedsToLoad) {
-                    dspEntries(gf.getEntries(), MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
-                    dspFeeds(gf.getFeeds());
-                    dspSettings();
-                    updateFeedsPulsations();
-                    _saveSubscriptions(false);
-                }
-
-                if (_nbFeedsLoaded >= _nbFeedsToLoad) {
-                    ui._loading(100); ui.echo("loading", "", "");
-                    if (navigator.onLine) {
-                        ui._onclick(sync, 'enable');
-                    }
-                }
-
-            // ---
-
-        }, true);
-
-        document.body.addEventListener('GoogleFeed.load.error', function(event){
-
-            // Check if all feeds were loaded
-
-                my.error(event);
-
-                var _nbFeedsToLoad = event.detail._myParams.nbFeeds; // different de "done"
-                var _nbFeedsLoaded = gf.getNbFeedsLoaded();
-                gf.setNbFeedsLoaded(++_nbFeedsLoaded);
-
-                // Percentage of loading ?
-
-                ui._loading(Math.round((100 * _nbFeedsLoaded) / _nbFeedsToLoad));
-
-                // ---
-
-                if (_nbFeedsLoaded == _nbFeedsToLoad) {
-                    dspEntries(gf.getEntries(), MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
-                    dspFeeds(gf.getFeeds());
-                    dspSettings();
-                    updateFeedsPulsations();
-                    _saveSubscriptions(false);
-                }
-
-                if (_nbFeedsLoaded >= _nbFeedsToLoad) {
-                    ui._loading(100); ui.echo("loading", "", "");
-                    if (navigator.onLine) {
-                        ui._onclick(sync, 'enable');
-                    }
-                }
-
-            // ---
-
-        }, true);
-
         document.body.addEventListener('GoogleFeed.find.done', findFeedsDisplayResults, true);
 
         /* ===================== */
@@ -1557,8 +1563,9 @@
                 _newFeeds.push(_feed);
             }
             addNewSubscriptions(_newFeeds);
-            gf.setFeedsSubscriptions(myFeedsSubscriptions);
-            gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
+            //gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            //gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
+            myWorker.postMessage({'cmd': 'loadFeeds', 'params': MyFeeds.params, 'myFeedsSubscriptions': myFeedsSubscriptions});
             my._save("subscriptions.feedly.json", "application/json", JSON.stringify(myFeedsSubscriptions.feedly)).then(function(results) {
                 my.log("Save file subscriptions.feedly.json");
             }).catch(function(error) {
@@ -1611,8 +1618,9 @@
                 _newFeeds.push(_feed);
             }
             addNewSubscriptions(_newFeeds);
-            gf.setFeedsSubscriptions(myFeedsSubscriptions);
-            gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
+            //gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            //gf.loadFeeds(MyFeeds.params.entries.dontDisplayEntriesOlderThan);
+            myWorker.postMessage({'cmd': 'loadFeeds', 'params': MyFeeds.params, 'myFeedsSubscriptions': myFeedsSubscriptions});
             my._save("subscriptions.theoldreader.json", "application/json", JSON.stringify(myFeedsSubscriptions.theoldreader)).then(function(results) {
                 my.log("Save file subscriptions.theoldreader.json");
             }).catch(function(error) {
@@ -1631,45 +1639,6 @@
             my.log('CustomEvent : TheOldReader.getSubscriptions.error', arguments);
             my.message('The Old Reader error');
         });
-        
-        // ===============
-        // --- Workers ---
-        // ===============
-        
-        document.getElementById('workerSync').onclick = function(event) {
-            if (navigator.onLine) {
-                //ui._onclick(this, 'disable'); // todo a decommenter
-                myWorker.postMessage({'cmd': 'loadFeeds', 'params': MyFeeds.params, 'myFeedsSubscriptions': myFeedsSubscriptions});
-            }
-        }
-        
-        if (window.Worker) { // Check if browser supports Worker API
-            var myWorker = new Worker('scripts/workers/gf.js');
-
-            myWorker.addEventListener('message', function(e) {
-                my.log('WORKER >>> ', e.data);
-                
-                switch (e.data.cmd) {
-                    case 'updateLoading':
-                        ui._loading(e.data.data.percentage);
-                        break;
-                    case 'load.done':
-                        my.log('WORKER load.done > ', e.data);
-                        break;
-                    case 'end':
-                        if (navigator.onLine) { ui._onclick(workerSync, 'enable'); }
-                        dspEntries(e.data.entries, MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
-                        dspFeeds(e.data.feeds);
-                    /*dspSettings();
-                    updateFeedsPulsations();
-                    _saveSubscriptions(false);*/
-                        break;
-                    default:
-                        my.log('WORKER > unknown cmd');
-                }
-                
-            }, false);
-        }
 
         // ============
         // --- Main ---
