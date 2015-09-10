@@ -431,6 +431,8 @@
     }
 
     function dspSettings() {
+        var start = performance.now();
+        
         var _now = new Date();
         var _minutes = _now.getMinutes();
 
@@ -738,10 +740,13 @@
 
         // ---
 
+        var end = performance.now();
+        my.log("dspSettings() " + (end - start) + " milliseconds.");
     }
 
     function dspFeeds(feeds) {
-
+        var start = performance.now();
+        
         my.log('dspFeeds()', arguments);
         my.log(feeds.length + ' feeds');
 
@@ -834,9 +839,13 @@
         if (!navigator.onLine) {
             ui._disable();
         }
+        
+        var end = performance.now();
+        my.log("dspFeeds() " + (end - start) + " milliseconds.");
     }
 
     function dspEntries(entries, nbDaysAgo, feedUrl) {
+        var start = performance.now();
 
         my.log("dspEntries()", arguments);
         my.log(entries);
@@ -1056,7 +1065,9 @@
         if (!navigator.onLine) {
             ui._disable();
         }
-
+        
+        var end = performance.now();
+        my.log("dspEntries() " + (end - start) + " milliseconds.");
     }
 
     function entryFade(_this) {
@@ -1274,10 +1285,15 @@
      * @param {_feeds} array
      * */
     function addNewSubscriptions(_feeds) {
+        var start = performance.now();
+        
         my.log('addNewSubscriptions()', arguments);
         for (var i = 0; i < _feeds.length; i++) {
             _addNewSubscription(_feeds[i]);
         }
+        
+        var end = performance.now();
+        my.log("addNewSubscriptions() " + (end - start) + " milliseconds.");
     }
 
     function _addNewSubscription(_feed) {
