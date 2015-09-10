@@ -1380,7 +1380,7 @@
                         //_saveSubscriptions_v1("local");
                         //_saveSubscriptions_v1("feedly");
                         //_saveSubscriptions_v1("theoldreader");
-                        _saveSubscriptions_v2(false);
+                        //_saveSubscriptions_v2(false); // efface les souscriptions si erreur reseau et lecture cache impossible
                         break;
                     default:
                         my.log('WORKER > unknown cmd');
