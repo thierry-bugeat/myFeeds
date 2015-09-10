@@ -63,7 +63,7 @@ function _swipe(callback) {
         
         // Sync : Launch a sync if no synchro is in progress
         
-        if ((myGesture._action == "sync") && (sync.style.pointerEvents == 'auto')) {
+        if ((myGesture._action == "sync") && (workerSync.style.pointerEvents == 'auto')) {
             ui._onclick(workerSync, 'disable');
             myWorker.postMessage({'cmd': 'loadFeeds', 'params': MyFeeds.params, 'myFeedsSubscriptions': myFeedsSubscriptions});
         }
