@@ -1476,7 +1476,7 @@
             var _maxNbDaysAgo = MyFeeds.params.settings.days.last();
             var _timestampMax = _myTimestamp - (86400 * _maxNbDaysAgo);
             gf.deleteOldEntries(_timestampMax);
-        }, 15000);
+        }, 60000);
 
         // ==============
         // --- Events ---
