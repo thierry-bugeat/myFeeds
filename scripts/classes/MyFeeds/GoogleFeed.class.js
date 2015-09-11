@@ -309,10 +309,7 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
     _MyFeeds.log('GoogleFeed.prototype.loadFeeds()', this.myFeedsSubscriptions);
 
     this.nbFeedsLoaded = 0;
-    //this.gf_unsortedEntries = []; // Store all entries of all feeds
     this.unsortedFeeds = [];
-    
-    //var _params = {"nbFeeds": this.myFeedsSubscriptions.length};
 
     if (this.myFeedsSubscriptions.length > 0) {
         for (var i = 0; i < this.myFeedsSubscriptions.length; i++) {
@@ -329,87 +326,37 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
             //_MyFeeds.log("GoogleFeed.load.done : ", _myFeed);
             
             var _params = {"nbFeeds": this.myFeedsSubscriptions.length, "account": _myFeed.account, "url": _myFeed.url, "id": _myFeed.id, "pulsations": _myFeed.pulsations};
-            
+
             var promise = this.get(_url, _params);
-        
+
             promise.then(function(response) {
                 response.responseData.feed._myAccount = response.responseData._myParams.account; // Add _myAccount value
                 response.responseData.feed._myFeedId = response.responseData._myParams.id; // Add __id value
                 _MyFeeds.log("GoogleFeed.prototype.loadFeeds() > get > response : ", response);
                 
-                try {
-                    document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": response}));
-                } catch (e) {
-                    // ==================
-                    // --- For worker ---
-                    // ==================
-                    // It's not possible to use CustomEvent in worker 
-                    // so new feed content are added from here.
-                    self.dispatchEvent(new Event('GoogleFeed.load.done'));
-                    try { _GoogleFeed.addFeed(response.responseData.feed); } catch (e) {console.error(e.message);}
-                    // Save feed as file
-                    /*if (navigator.onLine) {
-                        _MyFeeds._save('cache/google/feeds/' + btoa(response.responseData.feed.feedUrl) + ".json", "application/json", JSON.stringify(response.responseData.feed)).then(function(results) {
-                            _MyFeeds.log('GoogleFeed.load.done > Saving feed in cache ok : ' + response.responseData.feed.feedUrl + ' ('+btoa(response.responseData.feed.feedUrl)+')');
-                        }).catch(function(error) {
-                            _MyFeeds.error("> ERROR saving feed in cache : " + response.responseData.feed.feedUrl + ' ('+btoa(response.responseData.feed.feedUrl)+')');
-                            _MyFeeds.error("> ERROR saving feed in cache : ", error);
-                            _MyFeeds.alert("> ERROR saving feed in cache :\n" + response.responseData.feed.feedUrl);
-                        });
-                    }*/
-                    // --- Worker end ---
-                }
+                // ==================
+                // --- For worker ---
+                // ==================
+                // It's not possible to use CustomEvent in worker 
+                // so new feed content are added from here.
+                self.dispatchEvent(new Event('GoogleFeed.load.done'));
+                try { _GoogleFeed.addFeed(response.responseData.feed); } catch (e) {console.error(e.message);}
+                // --- Worker end ---
+
             }, function(error) {
-                // Network error then try to load feed from cache
-                
-                try {
-                    var _message = JSON.parse(error.message);
-                } catch (e) {
-                    window.alert("ERROR: Loading from cache\n" + e.message + ' / ' + JSON.stringify(error));
-                    error._myParams = _params;
-                    error._myFeedUrl = _myFeed.url;
-                    try {
-                        document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.error', {"detail": error}));
-                    } catch (e) {
-                        // ==================
-                        // --- For worker ---
-                        // ==================
-                        // It's not possible to use CustomEvent in worker.
-                        self.dispatchEvent(new Event('GoogleFeed.load.error'));
-                    }
-                }
-                
-                my._load('cache/google/feeds/' + btoa(_message.responseData._myParams.url) + ".json").then(function(_cacheContent){
-                    _MyFeeds.log("Loading feed from cache...", _cacheContent);
-                    _message.responseData.feed = _cacheContent;
-                    try {
-                        document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": _message}));
-                    } catch (e) {
-                        // ==================
-                        // --- For worker ---
-                        // ==================
-                        self.dispatchEvent(new Event('GoogleFeed.load.done'));
-                        try { _GoogleFeed.addFeed(_cacheContent); } catch (e) {console.error(e.message);}
-                    }
-                }).catch(function(error) {
-                    // @todo
-                    error._myParams = _params;
-                    error._myFeedUrl = _myFeed.url;
-                    try {
-                        document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.error', {"detail": error}));
-                    } catch (e) {
-                        // ==================
-                        // --- For worker ---
-                        // ==================
-                        // It's not possible to use CustomEvent in worker.
-                        self.dispatchEvent(new Event('GoogleFeed.load.error'));
-                    }
-                });
+
+                // Network error 
+
+                // ==================
+                // --- For worker ---
+                // ==================
+                // It's not possible to use CustomEvent in worker.
+                self.dispatchEvent(new Event('GoogleFeed.load.error'));
+
                 // ---
             });
         }
     }
-
 }
 
 /**
