@@ -21,6 +21,7 @@
     var gf = new GoogleFeed();
     
     var myWorker;
+    var myWorkerEntries;
 
     var _myTimestamp;                           // Value set by function "_setMyTimestamp()"
 
@@ -875,6 +876,67 @@
     }
 
     function dspEntries(entries, nbDaysAgo, feedUrl) {
+        try {
+            ui.echo("feeds-entries", "loading...", "");
+            myWorkerEntries.postMessage({'cmd': 'dspEntries', 'entries': entries, 'nbDaysAgo': nbDaysAgo, 'feedUrl': feedUrl, "theme": MyFeeds.params.entries.theme, "dontDisplayEntriesOlderThan": MyFeeds.params.entries.dontDisplayEntriesOlderThan});
+        } catch (e) {
+            my.log('dspEntries error : ', e);
+        }
+    }
+    function dspEntriesEnd(nbDaysAgo, theme) {
+
+        var start = performance.now();
+        
+        // --- Display Today / Yesterday / Nb days ago ---
+
+        if (nbDaysAgo == 0) {
+            _daySeparator = document.webL10n.get('nb-days-ago-today');
+        } else if (nbDaysAgo == 1) {
+            _daySeparator = document.webL10n.get('nb-days-ago-yesterday');
+        } else {
+            _daySeparator = myExtraTranslations['nb-days-ago'].replace('{{n}}', nbDaysAgo);
+        }
+
+        ui.echo('feedsEntriesNbDaysAgo', _daySeparator, '');
+        
+        // Hide/show small entries:
+        
+        MyFeeds.params.entries.displaySmallEntries ?
+            ui._smallEntries('show') : ui._smallEntries('hide');
+
+        // ==================
+        // --- Add Events ---
+        // ==================
+
+        // onclick Small Entries:
+
+        var _small_entries = document.querySelectorAll(".my-"+theme+"-entry-s");
+
+        for (var i = 0; i < _small_entries.length; i++) {
+            _small_entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); }
+        }
+
+        // onclick Normal Entries :
+
+        var _entries = document.querySelectorAll(".my-"+theme+"-entry-l");
+
+        for (var i = 0; i < _entries.length; i++) {
+            _entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }
+        }
+        
+        // =========================
+        // --- App start offline ---
+        // =========================
+        
+        if (!navigator.onLine) {
+            ui._disable();
+        }
+        
+        var end = performance.now();
+        my.log("dspEntriesEnd() " + (end - start) + " milliseconds.")
+    }
+    
+    function dspEntries_v1(entries, nbDaysAgo, feedUrl) {
         var start = performance.now();
         my.log("dspEntries()", arguments);
         my.log(entries);
@@ -1356,9 +1418,9 @@
 
     window.onload = function () {
         
-        // ==============
-        // --- Worker ---
-        // ==============
+        // =================
+        // --- Worker(s) ---
+        // =================
         
         document.getElementById('workerSync').onclick = function(event) {
             if (navigator.onLine) {
@@ -1401,6 +1463,28 @@
 
             myWorker.addEventListener('error', function(e) {
                 my.log('WORKER ERROR >>> ' + e.message + ' filename: ' + e.filename + ' line: ' + e.lineno);
+            }, false);
+            
+            // Worker entries
+            
+            myWorkerEntries = new Worker('scripts/workers/entries.js');
+            
+            myWorkerEntries.addEventListener('message', function(e) {
+                my.log('WORKER ENTRIES>>> ', e.data);
+                
+                switch (e.data.cmd) {
+                    case 'end':
+                        ui.echo("feeds-entries", e.data.html, ""); // e.data.html
+                        dspEntriesEnd(e.data.params.nbDaysAgo, e.data.params.theme);
+                        break;
+                    default:
+                        my.log('WORKER > unknown cmd');
+                }
+                
+            }, false);
+
+            myWorkerEntries.addEventListener('error', function(e) {
+                my.log('WORKER ENTRIES ERROR >>> ' + e.message + ' filename: ' + e.filename + ' line: ' + e.lineno);
             }, false);
 
         }
@@ -1483,11 +1567,11 @@
         
         // Remove old entries
         
-        setInterval(function() {
+        /*setInterval(function() {
             var _maxNbDaysAgo = MyFeeds.params.settings.days.last();
             var _timestampMax = _myTimestamp - (86400 * _maxNbDaysAgo);
             gf.deleteOldEntries(_timestampMax);
-        }, 60000);
+        }, 60000);*/ /*todo*/
 
         // ==============
         // --- Events ---
