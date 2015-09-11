@@ -209,14 +209,6 @@
         return rect.bottom > 0 && rect.top < windowHeight && rect.right > 0 && rect.left < windowWidth
     }
     
-    function isInViewport_v2(element) {
-        var rect = element.getBoundingClientRect()
-        var windowHeight = window.innerHeight || document.documentElement.clientHeight
-        var windowWidth = window.innerWidth || document.documentElement.clientWidth
-
-        return rect.bottom > feeds_entries.scrollTop && rect.top < (feeds_entries.scrollTop + windowHeight) && rect.right > 0 && rect.left < windowWidth
-    }
-    
     /**
      * Save subscriptions for specified account
      * @param {string} _account "local", "feedly", "theoldreader"
@@ -1514,7 +1506,7 @@
                     case 'end':
                         ui.echo("feeds-entries", e.data.html, ""); // e.data.html
                         dspEntriesEnd(e.data.params.nbDaysAgo, e.data.params.theme);
-                        loadImages();
+                        //loadImages();
                         break;
                     default:
                         my.log('WORKER > unknown cmd');
@@ -1622,7 +1614,11 @@
         
         // Load visibles images
         
-        document.getElementById("feeds-entries").addEventListener("scroll", loadImages);
+        //document.getElementById("feeds-entries").addEventListener("scroll", loadImages);
+        
+        setInterval(function() {
+            loadImages();
+        }, 200);
 
         // Automatic update entries every N seconds :
 
