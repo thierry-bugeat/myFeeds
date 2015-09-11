@@ -65,7 +65,6 @@ function _setMyTimestamp() {
 }
     
 function dspEntries(entries, nbDaysAgo, feedUrl, _theme) {
-    var start = performance.now();
 
     _setMyTimestamp();
 
@@ -140,9 +139,9 @@ function dspEntries(entries, nbDaysAgo, feedUrl, _theme) {
 
                 if (_entrie._myFirstImageUrl) {
                     if (_diff < maxLengthForSmallEntries) {
-                        _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="' + _entrie._myFirstImageUrl + '"/></span>';
+                        _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="images/loading.png" data-src="' + _entrie._myFirstImageUrl + '"/></span>';
                     } else {
-                        _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="' + _entrie._myFirstImageUrl + '"/></span>';
+                        _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="images/loading.png" data-src="' + _entrie._myFirstImageUrl + '"/></span>';
                     }
                 }
 
@@ -265,9 +264,5 @@ function dspEntries(entries, nbDaysAgo, feedUrl, _theme) {
             }
         });
         
-    } 
-
-
-    var end = performance.now();
-    console.log("dspEntries() " + (end - start) + " milliseconds.")
+    }
 }

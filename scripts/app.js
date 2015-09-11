@@ -183,6 +183,41 @@
     }
     
     /**
+     * Load images who are visibles in viewport
+     * */
+    function loadImages() {
+        if (navigator.onLine) {
+            var images = document.getElementsByTagName('img');
+            for (var i = 0; i < images.length; i++) {
+                if (isInViewport(images[i]) && (images[i].getAttribute('data-src') != images[i].getAttribute('src'))) {
+                    images[i].setAttribute('src', images[i].getAttribute('data-src'));
+                }
+            }
+        }
+    }
+    
+    /**
+     * Check if element is visible in viewport
+     * @param {object} elem DOM element
+     * @return {boolean} true / false
+     * */
+    function isInViewport(element) {
+        var rect = element.getBoundingClientRect()
+        var windowHeight = window.innerHeight || document.documentElement.clientHeight
+        var windowWidth = window.innerWidth || document.documentElement.clientWidth
+
+        return rect.bottom > 0 && rect.top < windowHeight && rect.right > 0 && rect.left < windowWidth
+    }
+    
+    function isInViewport_v2(element) {
+        var rect = element.getBoundingClientRect()
+        var windowHeight = window.innerHeight || document.documentElement.clientHeight
+        var windowWidth = window.innerWidth || document.documentElement.clientWidth
+
+        return rect.bottom > feeds_entries.scrollTop && rect.top < (feeds_entries.scrollTop + windowHeight) && rect.right > 0 && rect.left < windowWidth
+    }
+    
+    /**
      * Save subscriptions for specified account
      * @param {string} _account "local", "feedly", "theoldreader"
      * */
@@ -264,7 +299,8 @@
         } else {
             ui._onclick(nextDay, 'enable');
         }
-        dspEntries(gf.getEntries(), MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
+        //dspEntries(gf.getEntries(), MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
+        dspEntries(sortedEntries, MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
         feeds_entries.scrollTop = 0;
     }
 
@@ -278,7 +314,8 @@
         } else {
             ui._onclick(previousDay, 'enable');
         }
-        dspEntries(gf.getEntries(), MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
+        //dspEntries(gf.getEntries(), MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
+        dspEntries(sortedEntries, MyFeeds.params.entries.nbDaysAgo, MyFeeds.params.feeds.selectedFeed);
         feeds_entries.scrollTop = 0;
     }
 
@@ -877,6 +914,7 @@
 
     function dspEntries(entries, nbDaysAgo, feedUrl) {
         try {
+            sortedEntries = entries;
             ui.echo("feeds-entries", "loading...", "");
             myWorkerEntries.postMessage({'cmd': 'dspEntries', 'entries': entries, 'nbDaysAgo': nbDaysAgo, 'feedUrl': feedUrl, "theme": MyFeeds.params.entries.theme, "dontDisplayEntriesOlderThan": MyFeeds.params.entries.dontDisplayEntriesOlderThan});
         } catch (e) {
@@ -1476,6 +1514,7 @@
                     case 'end':
                         ui.echo("feeds-entries", e.data.html, ""); // e.data.html
                         dspEntriesEnd(e.data.params.nbDaysAgo, e.data.params.theme);
+                        loadImages();
                         break;
                     default:
                         my.log('WORKER > unknown cmd');
@@ -1580,6 +1619,10 @@
         browser.addEventListener('mozbrowsererror', function (event) {
             console.dir("Moz Browser loading error : " + event.detail);
         });
+        
+        // Load visibles images
+        
+        document.getElementById("feeds-entries").addEventListener("scroll", loadImages);
 
         // Automatic update entries every N seconds :
 
