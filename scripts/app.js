@@ -850,6 +850,7 @@
         var start = performance.now();
         
         ui.echo('feedsEntriesNbDaysAgo', document.webL10n.get('loading'), '');
+        ui.echo('feeds-entries', '', '');
         
         clearTimeout(_dspEntriesTimeout);
         
