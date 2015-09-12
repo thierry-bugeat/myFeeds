@@ -406,37 +406,41 @@ GoogleFeed.prototype.get = function (url, myParams) {
     
     return new Promise(function(resolve, reject) {
         
-        var xhr = new XMLHttpRequest({ mozSystem: true });
-        
-        xhr.open('GET', url + "&rnd="+ Math.random());
+        window.setTimeout(function() {
+            
+            var xhr = new XMLHttpRequest({ mozSystem: true });
+            
+            xhr.open('GET', url + "&rnd="+ Math.random());
 
-        xhr.onload = function() {
-            if (xhr.status == 200) {
+            xhr.onload = function() {
+                if (xhr.status == 200) {
 
-                var _response = JSON.parse(xhr.response);
+                    var _response = JSON.parse(xhr.response);
 
-                try {
-                    _response.responseData._myParams = myParams; // Add extra values
-                    resolve(_response);
-                } catch(err) {
+                    try {
+                        _response.responseData._myParams = myParams; // Add extra values
+                        resolve(_response);
+                    } catch(err) {
+                        var _response = {"responseData": {"_myParams": myParams}};
+                        reject(Error(JSON.stringify(_response)));
+                    }
+                    
+                } else {
+                    _MyFeeds.error('ERROR ' + url);
                     var _response = {"responseData": {"_myParams": myParams}};
                     reject(Error(JSON.stringify(_response)));
                 }
-                
-            } else {
+            };
+
+            xhr.onerror = function(e) {
                 _MyFeeds.error('ERROR ' + url);
+                _MyFeeds.error(e);
                 var _response = {"responseData": {"_myParams": myParams}};
                 reject(Error(JSON.stringify(_response)));
-            }
-        };
-
-        xhr.onerror = function(e) {
-            _MyFeeds.error('ERROR ' + url);
-            _MyFeeds.error(e);
-            var _response = {"responseData": {"_myParams": myParams}};
-            reject(Error(JSON.stringify(_response)));
-        };
-        
-        xhr.send();
+            };
+            
+            xhr.send();
+            
+        }); // Schedule the execution for later
     });
 }
