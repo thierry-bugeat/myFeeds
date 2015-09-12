@@ -70,6 +70,8 @@
     }
 
     var _entriesUpdateInterval = '';
+    
+    var _dspEntriesTimeout = '';
 
     // Network Connection
 
@@ -846,225 +848,233 @@
 
     function dspEntries(entries, nbDaysAgo, feedUrl) {
         var start = performance.now();
+        
+        ui.echo('feedsEntriesNbDaysAgo', document.webL10n.get('loading'), '');
+        
+        clearTimeout(_dspEntriesTimeout);
+        
+        _dspEntriesTimeout = window.setTimeout(function() {
 
-        my.log("dspEntries()", arguments);
-        my.log(entries);
+            my.log("dspEntries()", arguments);
+            my.log(entries);
 
-        sortedEntries = entries;
+            sortedEntries = entries;
 
-        _setMyTimestamp();
+            _setMyTimestamp();
 
-        var _timestampMin = _myTimestamp - (86400 * nbDaysAgo);
-        var _timestampMax = _myTimestamp - (86400 * nbDaysAgo) + 86400;
+            var _timestampMin = _myTimestamp - (86400 * nbDaysAgo);
+            var _timestampMax = _myTimestamp - (86400 * nbDaysAgo) + 86400;
 
-        var _previousDaysAgo    = -1; // Count days to groups entries by day.
-        var _entrieNbDaysAgo    = 0;
+            var _previousDaysAgo    = -1; // Count days to groups entries by day.
+            var _entrieNbDaysAgo    = 0;
 
-        var _nbEntriesDisplayed = 0;
+            var _nbEntriesDisplayed = 0;
 
-        // =======================
-        // --- Display entries ---
-        // =======================
+            // =======================
+            // --- Display entries ---
+            // =======================
 
-        var _htmlEntries = "";
-        var _htmlFeedTitle = "";
-        var _firstEntrie = true;
-        var _theme = params.entries.theme;
+            var _htmlEntries = "";
+            var _htmlFeedTitle = "";
+            var _firstEntrie = true;
+            var _theme = params.entries.theme;
 
-        for (var i = 0; i < sortedEntries.length; i++) {
+            for (var i = 0; i < sortedEntries.length; i++) {
 
-            // Get entries of specific feed or get all entries.
+                // Get entries of specific feed or get all entries.
 
-            var _entrie = "";
+                var _entrie = "";
 
-            if ((feedUrl !== "") && (feedUrl == sortedEntries[i]._myFeedInformations.feedUrl)) {
-                var _entrie = sortedEntries[i];
-                if (_firstEntrie) {
-                    _htmlFeedTitle = _htmlFeedTitle + '<h2>' + _entrie._myFeedInformations.title + '</h2>'; // Specific feed title
-                    _firstEntrie = false;
+                if ((feedUrl !== "") && (feedUrl == sortedEntries[i]._myFeedInformations.feedUrl)) {
+                    var _entrie = sortedEntries[i];
+                    if (_firstEntrie) {
+                        _htmlFeedTitle = _htmlFeedTitle + '<h2>' + _entrie._myFeedInformations.title + '</h2>'; // Specific feed title
+                        _firstEntrie = false;
+                    }
+                } else if (feedUrl == "") {
+                    var _entrie = sortedEntries[i];
                 }
-            } else if (feedUrl == "") {
-                var _entrie = sortedEntries[i];
-            }
 
-            // ---
+                // ---
 
-            if ((_entrie._myTimestamp >= _timestampMin) && (_entrie._myTimestamp < _timestampMax)) {
+                if ((_entrie._myTimestamp >= _timestampMin) && (_entrie._myTimestamp < _timestampMax)) {
 
-                if ((_myTimestamp - _entrie._myTimestamp) < (params.entries.dontDisplayEntriesOlderThan * 86400)) {
+                    if ((_myTimestamp - _entrie._myTimestamp) < (params.entries.dontDisplayEntriesOlderThan * 86400)) {
 
-                    //my.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+_myTimestamp+' (' + (new Date(_myTimestamp*1000)).toUTCString() + ') ==> Diff = ' + (_myTimestamp - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
+                        //my.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+_myTimestamp+' (' + (new Date(_myTimestamp*1000)).toUTCString() + ') ==> Diff = ' + (_myTimestamp - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
 
-                    // ---
+                        // ---
 
-                    // Date analyse
-                    // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Date/toLocaleString
-                    // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/DateTimeFormat
+                        // Date analyse
+                        // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Date/toLocaleString
+                        // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/DateTimeFormat
 
-                    // Time
-                    
-                    var _date = new Date(_entrie.publishedDate);
-                    var _minutes = (_date.getMinutes() < 10) ? '0' + _date.getMinutes() : _date.getMinutes();
-                    var _time = _date.getHours() + ':' + _minutes;
+                        // Time
+                        
+                        var _date = new Date(_entrie.publishedDate);
+                        var _minutes = (_date.getMinutes() < 10) ? '0' + _date.getMinutes() : _date.getMinutes();
+                        var _time = _date.getHours() + ':' + _minutes;
 
-                    // Diff between "contentSnippet" et "content" ?
-                    // Small article or not ?
+                        // Diff between "contentSnippet" et "content" ?
+                        // Small article or not ?
 
-                    var _diff = _entrie.content.length - _entrie.contentSnippet.length;
+                        var _diff = _entrie.content.length - _entrie.contentSnippet.length;
 
-                    // 1st image
+                        // 1st image
 
-                    var _imageUrl = "";
-                    
-                    // Try to detect broken image
-                    /*var _img = new Image(); 
-                    _img.src = _entrie._myFirstImageUrl; 
+                        var _imageUrl = "";
+                        
+                        // Try to detect broken image
+                        /*var _img = new Image(); 
+                        _img.src = _entrie._myFirstImageUrl; 
 
-                    if (!_img.complete) {
-                        _entrie._myFirstImageUrl = "";
-                    }*/
+                        if (!_img.complete) {
+                            _entrie._myFirstImageUrl = "";
+                        }*/
 
-                    if (_entrie._myFirstImageUrl) {
-                        if (_diff < params.entries.maxLengthForSmallEntries) {
-                            _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="' + _entrie._myFirstImageUrl + '"/></span>';
-                        } else {
-                            _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="' + _entrie._myFirstImageUrl + '"/></span>';
+                        if (_entrie._myFirstImageUrl) {
+                            if (_diff < params.entries.maxLengthForSmallEntries) {
+                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="' + _entrie._myFirstImageUrl + '"/></span>';
+                            } else {
+                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="' + _entrie._myFirstImageUrl + '"/></span>';
+                            }
                         }
-                    }
 
-                    // Entry class ratio ?
+                        // Entry class ratio ?
 
-                    var _ratioClass = _theme + '-ratio-entry-l';
+                        var _ratioClass = _theme + '-ratio-entry-l';
 
-                    if ((_diff <= params.entries.maxLengthForSmallEntries) && (!_entrie._myFirstImageUrl)) {
-                        _ratioClass = _theme + '-ratio-entry-s';
-                    }
+                        if ((_diff <= params.entries.maxLengthForSmallEntries) && (!_entrie._myFirstImageUrl)) {
+                            _ratioClass = _theme + '-ratio-entry-s';
+                        }
 
-                    else if ((_diff <= params.entries.maxLengthForSmallEntries) || (!_entrie._myFirstImageUrl)) {
-                        _ratioClass = _theme + '-ratio-entry-m';
-                    }
+                        else if ((_diff <= params.entries.maxLengthForSmallEntries) || (!_entrie._myFirstImageUrl)) {
+                            _ratioClass = _theme + '-ratio-entry-m';
+                        }
 
-                    // Account icone ?
+                        // Account icone ?
 
-                    var _accountIcone = '';
+                        var _accountIcone = '';
 
-                    if (_entrie._myFeedInformations._myAccount != 'local') {
-                        _accountIcone = '<img src="images/' + _entrie._myFeedInformations._myAccount + '.' + _theme + '.png" />';
-                    }
+                        if (_entrie._myFeedInformations._myAccount != 'local') {
+                            _accountIcone = '<img src="images/' + _entrie._myFeedInformations._myAccount + '.' + _theme + '.png" />';
+                        }
 
-                    // Content ( Normal / Small )
+                        // Content ( Normal / Small )
 
-                    var _content = "";
+                        var _content = "";
 
-                    if ((params.entries.theme == 'list') && (_diff >= params.entries.maxLengthForSmallEntries)) {
-                        _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
-                        _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                        _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
-                        _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
-                        _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
-                        _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
-                        _content = _content + '<div class="my-'+_theme+'-footer"></div>';
-                        _content = _content + '</div>';
+                        if ((params.entries.theme == 'list') && (_diff >= params.entries.maxLengthForSmallEntries)) {
+                            _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
+                            _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
+                            _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
+                            _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
+                            _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
+                            _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
+                            _content = _content + '<div class="my-'+_theme+'-footer"></div>';
+                            _content = _content + '</div>';
 
-                        _nbEntriesDisplayed++;
+                            _nbEntriesDisplayed++;
 
-                    } else if (params.entries.theme == 'list') {
-                        _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
-                        _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                        _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
-                        _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
-                        _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
-                        _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
-                        _content = _content + '<div class="my-'+_theme+'-footer"></div>';
-                        _content = _content + '</div>';
+                        } else if (params.entries.theme == 'list') {
+                            _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
+                            _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
+                            _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
+                            _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
+                            _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
+                            _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
+                            _content = _content + '<div class="my-'+_theme+'-footer"></div>';
+                            _content = _content + '</div>';
 
-                        _nbEntriesDisplayed++;
+                            _nbEntriesDisplayed++;
 
-                    } else if (_diff >= params.entries.maxLengthForSmallEntries) {
-                        _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
-                        _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
-                        _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                        _content = _content + _imageUrl;
-                        _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
-                        _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
-                        _content = _content + '</div>';
+                        } else if (_diff >= params.entries.maxLengthForSmallEntries) {
+                            _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
+                            _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
+                            _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
+                            _content = _content + _imageUrl;
+                            _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
+                            _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
+                            _content = _content + '</div>';
 
-                        _nbEntriesDisplayed++;
+                            _nbEntriesDisplayed++;
 
-                    } else {
-                        _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
-                        _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
-                        _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                        _content = _content + _imageUrl;
-                        _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
-                        _content = _content + '</div>';
+                        } else {
+                            _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
+                            _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
+                            _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
+                            _content = _content + _imageUrl;
+                            _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
+                            _content = _content + '</div>';
 
-                        _nbEntriesDisplayed++;
-                    }
+                            _nbEntriesDisplayed++;
+                        }
 
-                    // Add to html entries
+                        // Add to html entries
 
-                    _htmlEntries = _htmlEntries + _content;
+                        _htmlEntries = _htmlEntries + _content;
 
-                } else { break; }
+                    } else { break; }
+                }
+
             }
 
-        }
+            // --- Display Today / Yesterday / Nb days ago ---
 
-        // --- Display Today / Yesterday / Nb days ago ---
+            if (nbDaysAgo == 0) {
+                _daySeparator = document.webL10n.get('nb-days-ago-today');
+            } else if (nbDaysAgo == 1) {
+                _daySeparator = document.webL10n.get('nb-days-ago-yesterday');
+            } else {
+                _daySeparator = myExtraTranslations['nb-days-ago'].replace('{{n}}', nbDaysAgo);
+            }
 
-        if (nbDaysAgo == 0) {
-            _daySeparator = document.webL10n.get('nb-days-ago-today');
-        } else if (nbDaysAgo == 1) {
-            _daySeparator = document.webL10n.get('nb-days-ago-yesterday');
-        } else {
-            _daySeparator = myExtraTranslations['nb-days-ago'].replace('{{n}}', nbDaysAgo);
-        }
+            ui.echo('feedsEntriesNbDaysAgo', _daySeparator, '');
 
-        ui.echo('feedsEntriesNbDaysAgo', _daySeparator, '');
+            // Display entries:
 
-        // Display entries:
+            if (_nbEntriesDisplayed > 0) {
+                ui.echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
+            } else if (_nbEntriesDisplayed == 0) {
+                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('no-news-today') + '</div>', "");
+            } else {
+                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
+            } 
+            
+            // Hide/show small entries:
+            
+            params.entries.displaySmallEntries ?
+                ui._smallEntries('show') : ui._smallEntries('hide');
 
-        if (_nbEntriesDisplayed > 0) {
-            ui.echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
-        } else if (_nbEntriesDisplayed == 0) {
-            ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('no-news-today') + '</div>', "");
-        } else {
-            ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
-        } 
+            // ==================
+            // --- Add Events ---
+            // ==================
+
+            // onclick Small Entries:
+
+            var _small_entries = document.querySelectorAll(".my-"+_theme+"-entry-s");
+
+            for (var i = 0; i < _small_entries.length; i++) {
+                _small_entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); }
+            }
+
+            // onclick Normal Entries :
+
+            var _entries = document.querySelectorAll(".my-"+_theme+"-entry-l");
+
+            for (var i = 0; i < _entries.length; i++) {
+                _entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }
+            }
+            
+            // =========================
+            // --- App start offline ---
+            // =========================
+            
+            if (!navigator.onLine) {
+                ui._disable();
+            }
         
-        // Hide/show small entries:
-        
-        params.entries.displaySmallEntries ?
-            ui._smallEntries('show') : ui._smallEntries('hide');
-
-        // ==================
-        // --- Add Events ---
-        // ==================
-
-        // onclick Small Entries:
-
-        var _small_entries = document.querySelectorAll(".my-"+_theme+"-entry-s");
-
-        for (var i = 0; i < _small_entries.length; i++) {
-            _small_entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); }
-        }
-
-        // onclick Normal Entries :
-
-        var _entries = document.querySelectorAll(".my-"+_theme+"-entry-l");
-
-        for (var i = 0; i < _entries.length; i++) {
-            _entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }
-        }
-        
-        // =========================
-        // --- App start offline ---
-        // =========================
-        
-        if (!navigator.onLine) {
-            ui._disable();
-        }
+        }, 250); // Schedule the execution for later
         
         var end = performance.now();
         my.log("dspEntries() " + (end - start) + " milliseconds.");
