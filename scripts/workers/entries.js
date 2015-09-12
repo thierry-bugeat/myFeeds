@@ -220,8 +220,7 @@ function dspEntries(entries, nbDaysAgo, feedUrl, _theme) {
                 _htmlEntries = _htmlEntries + _content;
 
             } else { break; }
-        }
-
+        } else if (_nbEntriesDisplayed > 0) { break; }
     }
 
     // =========================

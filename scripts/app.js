@@ -915,7 +915,7 @@
             
             try {
                 sortedEntries = entries;
-                ui.echo("feeds-entries", "loading...", "");
+                ui.echo("feeds-entries", "", "");
                 myWorkerEntries.postMessage({'cmd': 'dspEntries', 'entries': entries, 'nbDaysAgo': nbDaysAgo, 'feedUrl': feedUrl, "theme": MyFeeds.params.entries.theme, "dontDisplayEntriesOlderThan": MyFeeds.params.entries.dontDisplayEntriesOlderThan});
             } catch (e) {
                 my.log('dspEntries error : ', e);
