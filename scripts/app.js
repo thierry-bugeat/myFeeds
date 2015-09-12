@@ -73,6 +73,8 @@
     }
 
     var _entriesUpdateInterval = '';
+    
+    var _dspEntriesTimeout = '';
 
     // Network Connection
 
@@ -905,13 +907,21 @@
     }
 
     function dspEntries(entries, nbDaysAgo, feedUrl) {
-        try {
-            sortedEntries = entries;
-            ui.echo("feeds-entries", "loading...", "");
-            myWorkerEntries.postMessage({'cmd': 'dspEntries', 'entries': entries, 'nbDaysAgo': nbDaysAgo, 'feedUrl': feedUrl, "theme": MyFeeds.params.entries.theme, "dontDisplayEntriesOlderThan": MyFeeds.params.entries.dontDisplayEntriesOlderThan});
-        } catch (e) {
-            my.log('dspEntries error : ', e);
-        }
+        ui.echo('feedsEntriesNbDaysAgo', document.webL10n.get('loading'), '');
+        
+        clearTimeout(_dspEntriesTimeout);
+        
+        _dspEntriesTimeout = window.setTimeout(function() {
+            
+            try {
+                sortedEntries = entries;
+                ui.echo("feeds-entries", "loading...", "");
+                myWorkerEntries.postMessage({'cmd': 'dspEntries', 'entries': entries, 'nbDaysAgo': nbDaysAgo, 'feedUrl': feedUrl, "theme": MyFeeds.params.entries.theme, "dontDisplayEntriesOlderThan": MyFeeds.params.entries.dontDisplayEntriesOlderThan});
+            } catch (e) {
+                my.log('dspEntries error : ', e);
+            }
+        
+        }, 250);
     }
     function dspEntriesEnd(nbDaysAgo, theme) {
 
