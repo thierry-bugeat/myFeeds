@@ -1015,8 +1015,7 @@
                         _htmlEntries = _htmlEntries + _content;
 
                     } else { break; }
-                }
-
+                } else if (_nbEntriesDisplayed > 0) { break; }
             }
 
             // --- Display Today / Yesterday / Nb days ago ---
