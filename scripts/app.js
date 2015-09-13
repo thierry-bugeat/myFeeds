@@ -1054,7 +1054,7 @@
 
             // onclick Small Entries:
 
-            var _small_entries = document.querySelectorAll(".my-"+_theme+"-entry-s");
+            var _small_entries = document.getElementsByClassName(".my-"+_theme+"-entry-s");
             
             _nb = _small_entries.length;
 
@@ -1064,14 +1064,14 @@
 
             // onclick Normal Entries :
 
-            var _entries = document.querySelectorAll(".my-"+_theme+"-entry-l");
+            var _entries = document.getElementsByClassName(".my-"+_theme+"-entry-l");
 
             _nb = _entries.length;
 
             for (var i = 0; i < _nb; i++) {
                 _entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }
             }
-            
+
             // =========================
             // --- App start offline ---
             // =========================
