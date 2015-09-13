@@ -879,8 +879,10 @@
             var _htmlFeedTitle = "";
             var _firstEntrie = true;
             var _theme = params.entries.theme;
+            
+            var _nb = sortedEntries.length;
 
-            for (var i = 0; i < sortedEntries.length; i++) {
+            for (var i = 0; i < _nb; i++) {
 
                 // Get entries of specific feed or get all entries.
 
@@ -1053,8 +1055,10 @@
             // onclick Small Entries:
 
             var _small_entries = document.querySelectorAll(".my-"+_theme+"-entry-s");
+            
+            _nb = _small_entries.length;
 
-            for (var i = 0; i < _small_entries.length; i++) {
+            for (var i = 0; i < _nb; i++) {
                 _small_entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); }
             }
 
@@ -1062,7 +1066,9 @@
 
             var _entries = document.querySelectorAll(".my-"+_theme+"-entry-l");
 
-            for (var i = 0; i < _entries.length; i++) {
+            _nb = _entries.length;
+
+            for (var i = 0; i < _nb; i++) {
                 _entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }
             }
             
