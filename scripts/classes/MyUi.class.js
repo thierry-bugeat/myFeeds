@@ -37,6 +37,24 @@ MyUi.prototype.init = function() {
     _MyUi._onclick(nextDay, 'disable');
     
     _MyUi._onclick(search, 'disable');    // Not yet implemented
+    
+    // =======================================
+    // --- Buttons themes enable / disable ---
+    // =======================================
+    
+    if (params.entries.theme == 'grid') {
+        ui._onclick(displayGrid, 'disable');
+        ui._onclick(displayCard, 'enable');
+        ui._onclick(displayList, 'enable');
+    } else if (params.entries.theme == 'card') {
+        ui._onclick(displayGrid, 'enable');
+        ui._onclick(displayCard, 'disable');
+        ui._onclick(displayList, 'enable');
+    } else {
+        ui._onclick(displayGrid, 'enable');
+        ui._onclick(displayCard, 'enable');
+        ui._onclick(displayList, 'disable');
+    }
         
     // =======================================
     // --- Button [topup] enable / disable ---

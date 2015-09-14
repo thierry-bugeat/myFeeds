@@ -171,19 +171,34 @@
     settingsOpen.onclick    = function(event) { ui._scrollTo(3); }
     settingsClose.onclick   = function(event) { ui._scrollTo(2); }
     displayGrid.onclick     = function(event) {
-        params.entries.theme = "grid";
-        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
-        _saveParams();
+        if (params.entries.theme != 'grid') {
+            params.entries.theme = "grid";
+            ui._onclick(displayGrid, 'disable');
+            ui._onclick(displayCard, 'enable');
+            ui._onclick(displayList, 'enable');
+            dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+            _saveParams();
+        }
     }
     displayCard.onclick     = function(event) {
-        params.entries.theme = "card";
-        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
-        _saveParams();
+        if (params.entries.theme != 'card') {
+            params.entries.theme = "card";
+            ui._onclick(displayGrid, 'enable');
+            ui._onclick(displayCard, 'disable');
+            ui._onclick(displayList, 'enable');
+            dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+            _saveParams();
+        }
     }
     displayList.onclick     = function(event) {
-        params.entries.theme = "list";
-        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
-        _saveParams();
+        if (params.entries.theme != 'list') {
+            params.entries.theme = "list";
+            ui._onclick(displayGrid, 'enable');
+            ui._onclick(displayCard, 'enable');
+            ui._onclick(displayList, 'disable');
+            dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+            _saveParams();
+        }
     }
     
     /**
