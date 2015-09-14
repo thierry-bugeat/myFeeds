@@ -405,7 +405,7 @@ GoogleFeed.prototype.get = function (url, myParams) {
     
     return new Promise(function(resolve, reject) {
         
-        window.setTimeout(function() {
+        //window.setTimeout(function() {
         
             var xhr = new XMLHttpRequest({ mozSystem: true });
             
@@ -440,6 +440,6 @@ GoogleFeed.prototype.get = function (url, myParams) {
             
             xhr.send();
         
-        }); // Schedule the execution for later
+        //}); // Schedule the execution for later
     });
 }
