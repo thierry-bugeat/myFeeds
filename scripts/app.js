@@ -1176,16 +1176,20 @@
         // onclick Small Entries:
 
         var _small_entries = document.querySelectorAll(".my-"+_theme+"-entry-s");
+        
+        var _nb = _small_entries.length;
 
-        for (var i = 0; i < _small_entries.length; i++) {
+        for (var i = 0; i < _nb; i++) {
             _small_entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); }
         }
 
         // onclick Normal Entries :
 
         var _entries = document.querySelectorAll(".my-"+_theme+"-entry-l");
+        
+        _nb = _entries.length;
 
-        for (var i = 0; i < _entries.length; i++) {
+        for (var i = 0; i < _nb; i++) {
             _entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }
         }
         

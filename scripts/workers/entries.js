@@ -83,8 +83,10 @@ function dspEntries(entries, nbDaysAgo, feedUrl, _theme) {
     var _htmlEntries = "";
     var _htmlFeedTitle = "";
     var _firstEntrie = true;
+    
+    var _nb = entries.length;
 
-    for (var i = 0; i < entries.length; i++) {
+    for (var i = 0; i < _nb; i++) {
 
         // Get entries of specific feed or get all entries.
 
