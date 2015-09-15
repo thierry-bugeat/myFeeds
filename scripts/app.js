@@ -89,7 +89,7 @@
                 feedly.setToken(_token);
             }).catch(function(error) {
                 my.alert("Can't load and set Feedly token");
-                params.accounts.feedly.logged = false;
+                _disableAccount('feedly');
             });
         }
         // Get and set The Old Reader token from cache
@@ -99,8 +99,7 @@
                 document.getElementById('theoldreaderForm').style.cssText = 'display: none';
             }).catch(function(error) {
                 my.alert("Can't load and set T.O.R. token");
-                params.accounts.theoldreader.logged = false;
-                _saveParams();
+                _disableAccount('theoldreader');
             });
         }
     }).catch(function(error) {
@@ -136,9 +135,6 @@
     var displayList             = document.getElementById("displayList");
 
     var useAnimations           = document.getElementById("useAnimations");
-
-    //var loadSubscriptions     = document.getElementById("loadSubscriptions");
-    //var saveSubscriptions     = document.getElementById("saveSubscriptions");
 
     // DOM clicks :
 
@@ -730,7 +726,7 @@
             } else {
                 params.accounts.feedly.logged = false;
                 _disableAccount('feedly');
-                _saveParams();
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
             }
         }
 
@@ -745,7 +741,7 @@
             } else {
                 params.accounts.theoldreader.logged = false;
                 _disableAccount('theoldreader');
-                _saveParams();
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
                 document.getElementById('theoldreaderForm').style.cssText = 'display: block';
             }
         }
@@ -1289,9 +1285,11 @@
      
      function _disableAccount(_account) {
         my.log('_disableAccount', arguments);
+        params.accounts[_account].logged = false
         myFeedsSubscriptions[_account] = [];
         gf.setFeedsSubscriptions(myFeedsSubscriptions);
-        gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+        gf.deleteEntries(_account, '');
+        _saveParams();
      }
 
     /**
@@ -1345,13 +1343,13 @@
         // Promises V1
 
         var promise1 = my._load('subscriptions.local.json').then(function(results) {return results;}
-        ).catch(function(error) {params.accounts.local.logged = false; _saveParams(); return {};});
+        ).catch(function(error) {_disableAccount('local'); return {};});
 
         var promise2 = my._load('subscriptions.feedly.json').then(function(results) {return results;}
-        ).catch(function(error) {params.accounts.feedly.logged = false; _saveParams(); return {};});
+        ).catch(function(error) {_disableAccount('feedly'); return {};});
 
         var promise3 = my._load('subscriptions.theoldreader.json').then(function(results) {return results;}
-        ).catch(function(error) {params.accounts.theoldreader.logged = false; _saveParams(); return {};});
+        ).catch(function(error) {_disableAccount('theoldreader'); return {};});
 
         var arrayPromises = [promise1, promise2, promise3];
 

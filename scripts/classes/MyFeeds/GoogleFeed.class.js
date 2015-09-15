@@ -195,24 +195,34 @@ GoogleFeed.prototype.addEntries = function(entries) {
 /**
  * Delete entries for specified account & feed
  * @param {string} account "local", "feedly", "theoldreader"...
- * @param {string} feedId
+ * @param {string} feedId or empty value "" for all feeds
  * */
 GoogleFeed.prototype.deleteEntries = function(account, feedId) {
     _MyFeeds.log('deleteEntries(' + account + ', ' + feedId + ')');
+    
+    var start = performance.now();
 
     var _tmp = [];
+    var _tmpSha256 = [];
     
     for (var i = 0; i < this.gf_unsortedEntries.length; i++) {
-        if ((this.gf_unsortedEntries[i]['_myFeedInformations']['_myAccount'] == account)
-            && (this.gf_unsortedEntries[i]['_myFeedInformations']['_myFeedId'] == feedId)
+        if (((this.gf_unsortedEntries[i]['_myFeedInformations']['_myAccount'] == account)
+            && (this.gf_unsortedEntries[i]['_myFeedInformations']['_myFeedId'] == feedId))
+            || ((feedId == "") && (this.gf_unsortedEntries[i]['_myFeedInformations']['_myAccount'] == account))
         ){
             // Don't keep this entry.
         } else {
             _tmp.push(this.gf_unsortedEntries[i]);
+            _tmpSha256.push(this.gf_unsortedEntries[i]['_mySha256_link']);
+            _tmpSha256.push(this.gf_unsortedEntries[i]['_mySha256_title']);
         }
     }
     
     this.gf_unsortedEntries = _tmp;
+    this.gf_mySha256 = _tmpSha256;
+    
+    var end = performance.now();
+    _MyFeeds.log("deleteEntries() " + (end - start) + " milliseconds.");
 }
 
 /**
