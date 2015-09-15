@@ -89,6 +89,7 @@
                 feedly.setToken(_token);
             }).catch(function(error) {
                 my.alert("Can't load and set Feedly token");
+                params.accounts.feedly.logged = false;
             });
         }
         // Get and set The Old Reader token from cache
@@ -98,6 +99,8 @@
                 document.getElementById('theoldreaderForm').style.cssText = 'display: none';
             }).catch(function(error) {
                 my.alert("Can't load and set T.O.R. token");
+                params.accounts.theoldreader.logged = false;
+                _saveParams();
             });
         }
     }).catch(function(error) {
@@ -281,7 +284,7 @@
 
             var _tmp = [];
 
-            entryFade(_this);
+            ui.fade(_this);
 
             // (1) Delete feedId from array "myFeedsSubscriptions[_account]"
 
@@ -1074,7 +1077,7 @@
             _nb = _small_entries.length;
 
             for (var i = 0; i < _nb; i++) {
-                _small_entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); }
+                _small_entries[i].onclick = function() { ui.fade(this); mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); }
             }
 
             // onclick Normal Entries :
@@ -1084,7 +1087,7 @@
             _nb = _entries.length;
 
             for (var i = 0; i < _nb; i++) {
-                _entries[i].onclick = function() { entryFade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }
+                _entries[i].onclick = function() { ui.fade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }
             }
             
             // =========================
@@ -1099,25 +1102,6 @@
         
         var end = performance.now();
         my.log("dspEntries() " + (end - start) + " milliseconds.");
-    }
-
-    function entryFade(_this) {
-        _this.style.cssText = "opacity : 0.4;";
-    }
-
-    function _file_informations(filename) {
-        var sdcard = navigator.getDeviceStorage('sdcard');
-
-        var request = sdcard.get("myFeeds/" + filename);
-
-        request.onsuccess = function () {
-            var file = this.result;
-            my.log("Get the file: ", file);
-        }
-
-        request.onerror = function () {
-            my.warn("Unable to get the file: " + this.error);
-        }
     }
 
     function mainEntryOpenInBrowser(entryId, url) {
@@ -1361,13 +1345,13 @@
         // Promises V1
 
         var promise1 = my._load('subscriptions.local.json').then(function(results) {return results;}
-        ).catch(function(error) {return {};});
+        ).catch(function(error) {params.accounts.local.logged = false; _saveParams(); return {};});
 
         var promise2 = my._load('subscriptions.feedly.json').then(function(results) {return results;}
-        ).catch(function(error) {return {};});
+        ).catch(function(error) {params.accounts.feedly.logged = false; _saveParams(); return {};});
 
         var promise3 = my._load('subscriptions.theoldreader.json').then(function(results) {return results;}
-        ).catch(function(error) {return {};});
+        ).catch(function(error) {params.accounts.theoldreader.logged = false; _saveParams(); return {};});
 
         var arrayPromises = [promise1, promise2, promise3];
 
@@ -1383,7 +1367,7 @@
 
         for (var _account in myFeedsSubscriptions) {
             arrayPromises[i] = my._load('subscriptions.' + _account + '.json').then(function(results) {return results;}
-            ).catch(function(error) {return {};});
+            ).catch(function(error) {params.accounts[_account].logged = false; _saveParams(); return {};});
             i++;
         }
 
@@ -1521,7 +1505,7 @@
                     dspFeeds(gf.getFeeds());
                     dspSettings();
                     updateFeedsPulsations();
-                    _saveSubscriptions(false);
+                    //_saveSubscriptions(false);
                 }
 
                 if (_nbFeedsLoaded >= _nbFeedsToLoad) {
@@ -1556,7 +1540,7 @@
                     dspFeeds(gf.getFeeds());
                     dspSettings();
                     updateFeedsPulsations();
-                    _saveSubscriptions(false);
+                    //_saveSubscriptions(false);
                 }
 
                 if (_nbFeedsLoaded >= _nbFeedsToLoad) {

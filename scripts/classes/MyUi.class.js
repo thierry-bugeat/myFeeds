@@ -276,3 +276,11 @@ MyUi.prototype._smallEntries = function (status) {
     }
 };
     
+/**
+ * Change element opacity
+ * @param {string} _this DOM element
+ * @return {null}
+ * */
+MyUi.prototype.fade = function (_this) {
+    _this.style.cssText = "opacity : 0.4;";
+}
