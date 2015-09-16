@@ -1051,7 +1051,7 @@
             
             if (params.entries.displaySmallEntries && ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0)) {
                 ui.echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
-            } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large']) > 0) {
+            } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] > 0)) {
                 ui.echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
             } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] == 0)) {
                 ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('no-news-today') + '</div>', "");
