@@ -883,7 +883,7 @@
             var _previousDaysAgo    = -1; // Count days to groups entries by day.
             var _entrieNbDaysAgo    = 0;
 
-            var _nbEntriesDisplayed = 0;
+            var _nbEntriesDisplayed = {'small': 0, 'large': 0};
 
             // =======================
             // --- Display entries ---
@@ -991,7 +991,7 @@
                             _content = _content + '<div class="my-'+_theme+'-footer"></div>';
                             _content = _content + '</div>';
 
-                            _nbEntriesDisplayed++;
+                            _nbEntriesDisplayed['large']++;
 
                         } else if (params.entries.theme == 'list') {
                             _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
@@ -1003,7 +1003,7 @@
                             _content = _content + '<div class="my-'+_theme+'-footer"></div>';
                             _content = _content + '</div>';
 
-                            _nbEntriesDisplayed++;
+                            _nbEntriesDisplayed['small']++;
 
                         } else if (_diff >= params.entries.maxLengthForSmallEntries) {
                             _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
@@ -1014,7 +1014,7 @@
                             _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
                             _content = _content + '</div>';
 
-                            _nbEntriesDisplayed++;
+                            _nbEntriesDisplayed['large']++;
 
                         } else {
                             _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
@@ -1032,7 +1032,7 @@
                         _htmlEntries = _htmlEntries + _content;
 
                     } else { break; }
-                } else if (_nbEntriesDisplayed > 0) { break; }
+                } else if ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0) { break; }
             }
 
             // --- Display Today / Yesterday / Nb days ago ---
@@ -1048,10 +1048,14 @@
             ui.echo('feedsEntriesNbDaysAgo', _daySeparator, '');
 
             // Display entries:
-
-            if (_nbEntriesDisplayed > 0) {
+            
+            if (params.entries.displaySmallEntries && ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0)) {
                 ui.echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
-            } else if (_nbEntriesDisplayed == 0) {
+            } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large']) > 0) {
+                ui.echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
+            } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] == 0)) {
+                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('no-news-today') + '</div>', "");
+            } else if ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) == 0) {
                 ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('no-news-today') + '</div>', "");
             } else {
                 ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
