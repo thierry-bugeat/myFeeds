@@ -140,9 +140,12 @@ GoogleFeed.prototype.setFeedsSubscriptions = function(myFeedsSubscriptions) {
 GoogleFeed.prototype.setNbFeedsLoaded   = function()        { this.nbFeedsLoaded++;         }
 
 GoogleFeed.prototype.addEntries = function(entries) {
+    var start = performance.now();
     _MyFeeds.log('GoogleFeed.prototype.addEntries', arguments);
     
-    for (var i = 0; i < entries.length; i++) {
+    var _nb = entries.length;
+    
+    for (var i = 0; i < _nb; i++) {
         var _entry = entries[i];
         
         // Detect & update bad images urls in content
@@ -175,8 +178,8 @@ GoogleFeed.prototype.addEntries = function(entries) {
         _entry['_myTimestampInMs']      = Math.round(new Date(_entry.publishedDate).getTime()) + (Math.floor(Math.random()*500));
         
         _entry['_myPublishedDateUTC']   = new Date(_entry.publishedDate).toUTCString();
-        _entry['_mySha256_title']       = CryptoJS.SHA256(_entry['_myFeedInformations']['_myFeedId'] + _entry['title']).toString(CryptoJS.enc.Hex);
-        _entry['_mySha256_link']        = CryptoJS.SHA256(_entry['_myFeedInformations']['_myFeedId'] + _entry['link']).toString(CryptoJS.enc.Hex);
+        _entry['_mySha256_title']       = (_entry['_myFeedInformations']['_myFeedId'] + _entry['title']).toString();
+        _entry['_mySha256_link']        = (_entry['_myFeedInformations']['_myFeedId'] + _entry['link']).toString();
         
         if (this.gf_mySha256.contains(_entry['_mySha256_link'])) {
             // Old news same link: Do nothing.
@@ -190,6 +193,9 @@ GoogleFeed.prototype.addEntries = function(entries) {
     }
     _MyFeeds.log(this.gf_mySha256);
     _MyFeeds.log('GoogleFeed.prototype.addEntries : ' + this.gf_unsortedEntries.length + ' entrie(s)');
+    
+    var end = performance.now();
+    _MyFeeds.log("GoogleFeed.prototype.addEntries() " + (end - start) + " milliseconds.");
 }
 
 /**
@@ -250,6 +256,7 @@ GoogleFeed.prototype.deleteOldEntries = function(timestamp) {
 }
 
 GoogleFeed.prototype.addFeed = function(feed) {
+    var start = performance.now();
     _MyFeeds.group('GoogleFeed.prototype.addFeed()', feed.title);
     _MyFeeds.log('GoogleFeed.prototype.addFeed()', arguments);
     _MyFeeds.log('GoogleFeed.prototype.addFeed()', feed.entries);
@@ -303,6 +310,9 @@ GoogleFeed.prototype.addFeed = function(feed) {
     // Store feed
     
     this.unsortedFeeds.push(_myNewfeed);
+    
+    var end = performance.now();
+    _MyFeeds.log("addFeed() " + (end - start) + " milliseconds.");
 }
 
 /**
