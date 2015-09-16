@@ -161,7 +161,7 @@
             gf.findFeeds(_keywords).then(function(results) {
                 my.log("Find feed ok", results);
             }).catch(function(error) {
-                my.message(document.webL10n.get("error-finding-feed") + JSON.stringify(error));
+                my.message(document.webL10n.get("find-feeds-error") + JSON.stringify(error));
             });
         }
     }
