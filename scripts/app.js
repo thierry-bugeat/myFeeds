@@ -25,6 +25,7 @@
     var myFeedsSubscriptions = {'local': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
 
     var params = {
+        "version": 0,
         "feeds": {
             "selectedFeed": "",                 // Display all feeds if empty otherwise display specified feed url
             "defaultPulsations": 5              // Default feed pulsations
@@ -63,7 +64,7 @@
                 }
             },
             "update": {
-                "every": [900, 1800, 3600]      // In seconds 5mn, 30mn, 60mn
+                "every": [300, 900, 1800, 3600]      // In seconds 5mn, 15mn, 30mn, 60mn
             },
             "days": [3, 5, 7, 10]
         }
@@ -84,7 +85,14 @@
 
     my._load('params.json').then(function(_myParams) {
         my.log('loading params from file params.json ...', _myParams);
-        params = _myParams;
+        
+        if (params.version > _myParams.version) {
+            params.accounts = _myParams.accounts; // Keep user accounts
+            _saveParams();
+        } else {
+            params = _myParams;
+        }
+        
         // Get and set Feedly token from cache
         if (params.accounts.feedly.logged) {
             my._load('cache/feedly/access_token.json').then(function(_token){
