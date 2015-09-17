@@ -72,6 +72,8 @@
     var _entriesUpdateInterval = '';
     
     var _dspEntriesTimeout = '';
+    
+    var _loginInProgress = {"local": false, "feedly": false, "theoldreader": false}
 
     // Network Connection
 
@@ -87,6 +89,9 @@
         if (params.accounts.feedly.logged) {
             my._load('cache/feedly/access_token.json').then(function(_token){
                 feedly.setToken(_token);
+                if (navigator.onLine) {
+                    feedly.getSubscriptions();
+                }
             }).catch(function(error) {
                 my.alert("Can't load and set Feedly token");
                 _disableAccount('feedly');
@@ -96,6 +101,9 @@
         if (params.accounts.theoldreader.logged) {
             my._load('cache/theoldreader/access_token.json').then(function(_token){
                 theoldreader.setToken(_token);
+                if (navigator.onLine) {
+                    theoldreader.getSubscriptions();
+                }
                 document.getElementById('theoldreaderForm').style.cssText = 'display: none';
             }).catch(function(error) {
                 my.alert("Can't load and set T.O.R. token");
@@ -1024,7 +1032,7 @@
                             _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
                             _content = _content + '</div>';
 
-                            _nbEntriesDisplayed++;
+                            _nbEntriesDisplayed['small']++;
                         }
 
                         // Add to html entries
@@ -1563,6 +1571,7 @@
         /* ===================== */
 
         document.body.addEventListener('Feedly.login.done', function(response){
+            _loginInProgress['feedly'] = true;
             my.log(feedly.getToken());
             params.accounts.feedly.logged = true;
             _saveParams();
@@ -1591,7 +1600,12 @@
             }
             addNewSubscriptions(_newFeeds);
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
-            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            
+            if (_loginInProgress['feedly'] == true ) {
+                _loginInProgress['feedly'] = false;
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            }
+            
             my._save("subscriptions.feedly.json", "application/json", JSON.stringify(myFeedsSubscriptions.feedly)).then(function(results) {
                 my.log("Save file subscriptions.feedly.json");
             }).catch(function(error) {
@@ -1616,6 +1630,7 @@
         /* ============================= */
 
         document.body.addEventListener('TheOldReader.login.done', function(response){
+            _loginInProgress['theoldreader'] = true;
             my.log('TheOldReader.getToken()', theoldreader.getToken());
             params.accounts.theoldreader.logged = true;
             _saveParams();
@@ -1645,7 +1660,12 @@
             }
             addNewSubscriptions(_newFeeds);
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
-            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            
+            if (_loginInProgress['theoldreader'] == true ) {
+                _loginInProgress['theoldreader'] = false;
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            }
+            
             my._save("subscriptions.theoldreader.json", "application/json", JSON.stringify(myFeedsSubscriptions.theoldreader)).then(function(results) {
                 my.log("Save file subscriptions.theoldreader.json");
             }).catch(function(error) {
