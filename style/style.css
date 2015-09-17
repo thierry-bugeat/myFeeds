@@ -31,9 +31,12 @@ section[role="region"] {
 }
 
 #main {
+    /* will-change: transform; GPU acceleration */
     height: 100%;
     width: 500%; /* 5 screens */
     display: inline-flex;
+    position: absolute; 
+    left: 0;
     /*transform: translateX(-200%);*/
 }
 
@@ -79,7 +82,8 @@ section[role="region"] {
 /* Loader */
 
 #loading {
-    left:200%;
+    /*left:200%;*/
+    left:0%;
     width:0%;
     height:0.5rem;
     display:block;

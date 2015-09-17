@@ -215,38 +215,23 @@ MyUi.prototype._scrollTo = function(screenX) {
 }
 
 MyUi.prototype._quickScrollTo = function(screenX) {
-    _sw = window.innerWidth * (screenX);
-    window.scroll(_sw, 0);
+    window.setTimeout(function() {
+        
+        var _x = ('-' + (screenX * 20) + '%').toString();
+
+        document.getElementById('main').style.cssText = 'transform: translateX('+_x+');';
+        
+    }); // Schedule the execution for later
 }
 
-// http://jsfiddle.net/DruwJ/92/
 MyUi.prototype._smoothScrollTo = function (screenX, duration) {
-    var timer, start, factor;
+    window.setTimeout(function() {
+        
+        var _x = ('-' + (screenX * 20) + '%').toString();
 
-    target = window.innerWidth * (screenX);
-    var offset = window.pageXOffset,
-        delta = target - window.pageXOffset; // X-offset difference
-    duration = duration || 1000; // default 1 sec animation
-    start = Date.now(); // get start time
-    factor = 0;
-
-    if (timer) {
-        clearInterval(timer); // stop any running animations
-    }
-
-    function step() {
-        var x;
-        factor = (Date.now() - start) / duration; // get interpolation factor
-        if (factor >= 1) {
-            clearInterval(timer); // stop animation
-            factor = 1; // clip to max 1.0
-        }
-        x = factor * delta + offset;
-        window.scrollBy(x - window.pageXOffset, 0);
-    }
-
-    timer = setInterval(step, 5);
-    return timer;
+        document.getElementById('main').style.cssText = 'transition: all 0.25s ease 0s; transform: translateX('+_x+');';
+        
+    }); // Schedule the execution for later
 };
 
 /**
