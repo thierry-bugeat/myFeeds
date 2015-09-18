@@ -99,7 +99,7 @@
     left: 0%;
     width: 100%;
     height: 10%;
-    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(255,255,255,1) 100%);
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
     display: inline-block;
     padding: 0;
 }
@@ -332,6 +332,7 @@
 /* =============== */
 
 #feeds-entries-container{
+    will-change: transform; /* GPU acceleration */
     display:block;
     width: 20%;
     height: calc(100%);
