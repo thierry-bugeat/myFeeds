@@ -33,15 +33,19 @@ function _swipe(callback) {
     
     _element.addEventListener('touchmove', function(event) {
 
-        myGesture._direction = _getDirection(myGesture);
         var t = event.touches[0];
         
         myGesture._endX = t.screenX;
         myGesture._endY = t.screenY;
         
+        myGesture._direction = _getDirection(myGesture);
+        
         var _deltaX = myGesture._startX - myGesture._endX;
         var _deltaY = myGesture._endY - myGesture._startY;
+        if (_deltaX > 80) {_deltaX = 80;}
+        if (_deltaX < -80) {_deltaX = -80;}
         if (_deltaY > 40) {_deltaY = 40;}
+        if (_deltaY < -40) {_deltaY = -40;}
         
         // Sync animation
         
@@ -83,6 +87,8 @@ function _swipe(callback) {
             if (params.settings.ui.animations) {ui._scrollTo(2);}
             myGesture._action = '';
         }
+        
+        my.log('startX,Y = ' + myGesture._startX + ',' + myGesture._startY + ' / endX,Y = ' + myGesture._endX + ',' + myGesture._endY + ' / delta X,Y = ' + _deltaX + ',' + _deltaY);
         
     }, false);
     
