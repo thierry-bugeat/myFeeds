@@ -332,7 +332,7 @@
 /* =============== */
 
 #feeds-entries-container{
-    will-change: transform; /* GPU acceleration */
+    /*will-change: transform; GPU acceleration */
     display:block;
     width: 20%;
     height: calc(100%);
