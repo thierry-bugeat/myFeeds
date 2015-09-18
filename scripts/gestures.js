@@ -47,10 +47,12 @@ function _swipe(callback) {
         
         if ((_deltaY >= 0) && (myGesture._scrollTop)) {
             if (navigator.onLine) {
-                sync.style.cssText = 'pointer-events: '+sync.style.pointerEvents+'; transform-origin: 50% 50%; transform: rotate('+(_deltaY*2).toString()+'deg);';
+                ui._loading(1);
+                sync.style.cssText = 'transform-origin: 50% 50%; transform: rotate('+(_deltaY*2).toString()+'deg);';
             }
         } else {
-            sync.style.cssText = 'pointer-events: '+sync.style.pointerEvents+'; transform-origin: 50% 50%; transform: rotate(0deg);';
+            ui._loading(0);
+            sync.style.cssText = 'transform-origin: 50% 50%; transform: rotate(0deg);';
         }
        
         // (1) Sync
@@ -89,7 +91,7 @@ function _swipe(callback) {
         my.log('scrollTop = ' + myGesture._scrollTop + " / direction = " + myGesture._direction + " / gesture = " + myGesture._action + " / pointerEvents = " + sync.style.pointerEvents); 
         
         ui._loading(0);
-        sync.style.cssText = 'pointer-events: '+sync.style.pointerEvents+'; transform-origin: 50% 50%; transform: rotate(0deg);';
+        sync.style.cssText = 'transform-origin: 50% 50%; transform: rotate(0deg);';
         
         // ===============
         // --- Results ---
@@ -97,7 +99,7 @@ function _swipe(callback) {
         
         // Sync : Launch a sync if no synchro is in progress
         
-        if ((myGesture._action == "sync") && (sync.style.pointerEvents == 'auto')) {
+        if ((myGesture._action == "sync") && sync.classList.contains("enable")) {
             ui._onclick(sync, 'disable');
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }

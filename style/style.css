@@ -132,3 +132,15 @@ section[role="region"] {
     height: calc(100% - 5rem);
     top: 5rem;
 }
+
+/* --- Enable / Disable element(s) --- */
+
+.enable{
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.disable{
+    opacity: 0.3;
+    pointer-events: none;
+}

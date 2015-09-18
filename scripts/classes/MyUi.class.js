@@ -116,11 +116,11 @@ MyUi.prototype._onclick = function(_this, pointerEvents) {
     
     if (_this !== null) {
         if (pointerEvents == 'enable') {
-            _this.style.cssText = "opacity: 1";
-            _this.style.pointerEvents = 'auto';
+            _this.classList.remove("disable");
+            _this.classList.add("enable");
         } else {
-            _this.style.cssText = "opacity: 0.3";
-            _this.style.pointerEvents = 'none';
+            _this.classList.remove("enable");
+            _this.classList.add("disable");
         }
     }
 }
