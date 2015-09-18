@@ -33,29 +33,63 @@ function _swipe(callback) {
     
     _element.addEventListener('touchmove', function(event) {
 
-        var direction = _getDirection(myGesture);
+        myGesture._direction = _getDirection(myGesture);
         var t = event.touches[0];
         
         myGesture._endX = t.screenX;
         myGesture._endY = t.screenY;
         
+        var _deltaX = myGesture._startX - myGesture._endX;
+        var _deltaY = myGesture._endY - myGesture._startY;
+        if (_deltaY > 40) {_deltaY = 40;}
+        
+        // Sync animation
+        
+        if ((_deltaY >= 0) && (myGesture._scrollTop)) {
+            if (navigator.onLine) {
+                sync.style.cssText = 'pointer-events: '+sync.style.pointerEvents+'; transform-origin: 50% 50%; transform: rotate('+(_deltaY*2).toString()+'deg);';
+            }
+        } else {
+            sync.style.cssText = 'pointer-events: '+sync.style.pointerEvents+'; transform-origin: 50% 50%; transform: rotate(0deg);';
+        }
+       
         // (1) Sync
         
-        if ((direction == "down") && (myGesture._scrollTop)) {
-            var _top = 3 + (Math.abs(myGesture._startY - myGesture._endY) / 15);
-            if (_top >= 10) { 
-                _top = 10; 
-                myGesture._action = 'sync';
-            } else {
-                myGesture._action = '';
+        if ((myGesture._direction == "down") && (myGesture._scrollTop)) {
+
+            myGesture._action = 'sync';
+            
+            if ((myGesture._startY - myGesture._endY) <= -40) {
+                myGesture._startY -= ((myGesture._startY - myGesture._endY) + 40); // Move _startY
+            } else if ((myGesture._startY - myGesture._endY) >= 40) {
+                myGesture._startY -= ((myGesture._startY - myGesture._endY) - 40); // Move _startY
             }
+        }
+        
+        // (2) Open feeds
+        // (3) Open settings
+        
+        else if ((myGesture._startX - myGesture._endX) <= -80) {
+            myGesture._startX -= ((myGesture._startX - myGesture._endX) + 80); // Move _startX
+            if (params.settings.ui.animations) {ui._scrollTo(1.9);}
+            myGesture._action = 'openFeeds';
+        } else if ((myGesture._startX - myGesture._endX) >= 80) {
+            myGesture._startX -= ((myGesture._startX - myGesture._endX) - 80); // Move _startX
+            if (params.settings.ui.animations) {ui._scrollTo(2.1);}
+            myGesture._action = 'openSettings';
+        } else {
+            if (params.settings.ui.animations) {ui._scrollTo(2);}
+            myGesture._action = '';
         }
         
     }, false);
     
     _element.addEventListener('touchend', function(event) {
         
-        direction = _getDirection(myGesture);
+        my.log('scrollTop = ' + myGesture._scrollTop + " / direction = " + myGesture._direction + " / gesture = " + myGesture._action + " / pointerEvents = " + sync.style.pointerEvents); 
+        
+        ui._loading(0);
+        sync.style.cssText = 'pointer-events: '+sync.style.pointerEvents+'; transform-origin: 50% 50%; transform: rotate(0deg);';
         
         // ===============
         // --- Results ---
@@ -68,14 +102,23 @@ function _swipe(callback) {
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }
         
+        // Open feeds from entries screen
+        
+        if ((myGesture._action = 'openFeeds') && (myGesture._direction == 'right')) {
+            ui._scrollTo(1);
+        } 
+        
+        // Open Settings from entries screen
+        
+        if ((myGesture._action = 'openSettings') && (myGesture._direction == 'left')) {
+            ui._scrollTo(3);
+        } 
+
         // ---
 
-        if (direction != "") {
-            
-            console.log("Direction : " + direction);
-
+        if (myGesture._direction != "") {
             if (typeof callback == 'function') {
-                callback(_element, direction);
+                callback(_element, myGesture._direction);
             }
         }
         
@@ -85,8 +128,7 @@ function _swipe(callback) {
         myGesture._endY         = 0;
         myGesture._action       = "";
         myGesture._scrollTop    = false;
-
-        direction   = "";
+        myGesture._direction    = "";
         
     }, false); 
     
@@ -94,8 +136,8 @@ function _swipe(callback) {
 
 function _getDirection(_myGesture) {
     
-    var _minX = 40;  // Min X swipe for horizontal swipe
-    var _minY = 30;  // Min Y swipe for vertical swipe
+    var _minX = 75;  // Min X swipe for horizontal swipe
+    var _minY = 35;  // Min Y swipe for vertical swipe
     
     var _distanceX = 0;
     var _distanceY = 0;

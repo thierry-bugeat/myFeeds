@@ -7,6 +7,7 @@ var MyUi = function() {
     
     // DOM elements :
 
+    var main                    = document.getElementById('main');
     var main_entry_container    = document.getElementById("main-entry-container");
     var main_entry              = document.getElementById("main-entry");
     var browser                 = document.getElementById("browser");
@@ -27,7 +28,6 @@ var MyUi = function() {
     var displayGrid             = document.getElementById("displayGrid");
     var displayCard             = document.getElementById("displayCard");
     var displayList             = document.getElementById("displayList");
-
 }
 
 MyUi.prototype.init = function() {
@@ -219,17 +219,18 @@ MyUi.prototype._quickScrollTo = function(screenX) {
         
         var _x = ('-' + (screenX * 20) + '%').toString();
 
-        document.getElementById('main').style.cssText = 'transform: translateX('+_x+');';
+        main.style.cssText = 'transform: translateX('+_x+');';
         
     }); // Schedule the execution for later
 }
 
 MyUi.prototype._smoothScrollTo = function (screenX, duration) {
+    
     window.setTimeout(function() {
         
         var _x = ('-' + (screenX * 20) + '%').toString();
 
-        document.getElementById('main').style.cssText = 'transition: all 0.25s ease 0s; transform: translateX('+_x+');';
+        main.style.cssText = 'transition: transform 0.25s linear; transform: translateX('+_x+');';
         
     }); // Schedule the execution for later
 };
