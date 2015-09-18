@@ -42,21 +42,21 @@ function _swipe(callback) {
         
         var _deltaX = myGesture._startX - myGesture._endX;
         var _deltaY = myGesture._endY - myGesture._startY;
-        if (_deltaX > 80) {_deltaX = 80;}
-        if (_deltaX < -80) {_deltaX = -80;}
-        if (_deltaY > 40) {_deltaY = 40;}
-        if (_deltaY < -40) {_deltaY = -40;}
+        if (_deltaX > 60) {_deltaX = 60;}
+        if (_deltaX < -60) {_deltaX = -60;}
+        if (_deltaY > 60) {_deltaY = 60;}
+        if (_deltaY < -60) {_deltaY = -60;}
         
         // Sync animation
         
         if ((_deltaY >= 0) && (myGesture._scrollTop)) {
             if (navigator.onLine) {
                 ui._loading(1);
-                sync.style.cssText = 'transform-origin: 50% 50%; transform: rotate('+(_deltaY*2).toString()+'deg);';
+                sync.classList.add("rotation");
             }
         } else {
             ui._loading(0);
-            sync.style.cssText = 'transform-origin: 50% 50%; transform: rotate(0deg);';
+            sync.classList.remove("rotation");
         }
        
         // (1) Sync
@@ -65,22 +65,22 @@ function _swipe(callback) {
 
             myGesture._action = 'sync';
             
-            if ((myGesture._startY - myGesture._endY) <= -40) {
-                myGesture._startY -= ((myGesture._startY - myGesture._endY) + 40); // Move _startY
-            } else if ((myGesture._startY - myGesture._endY) >= 40) {
-                myGesture._startY -= ((myGesture._startY - myGesture._endY) - 40); // Move _startY
+            if ((myGesture._startY - myGesture._endY) <= -60) {
+                myGesture._startY -= ((myGesture._startY - myGesture._endY) + 60); // Move _startY
+            } else if ((myGesture._startY - myGesture._endY) >= 60) {
+                myGesture._startY -= ((myGesture._startY - myGesture._endY) - 60); // Move _startY
             }
         }
         
         // (2) Open feeds
         // (3) Open settings
         
-        else if ((myGesture._startX - myGesture._endX) <= -80) {
-            myGesture._startX -= ((myGesture._startX - myGesture._endX) + 80); // Move _startX
+        else if ((myGesture._startX - myGesture._endX) <= -60) {
+            myGesture._startX -= ((myGesture._startX - myGesture._endX) + 60); // Move _startX
             if (params.settings.ui.animations) {ui._scrollTo(1.9);}
             myGesture._action = 'openFeeds';
-        } else if ((myGesture._startX - myGesture._endX) >= 80) {
-            myGesture._startX -= ((myGesture._startX - myGesture._endX) - 80); // Move _startX
+        } else if ((myGesture._startX - myGesture._endX) >= 60) {
+            myGesture._startX -= ((myGesture._startX - myGesture._endX) - 60); // Move _startX
             if (params.settings.ui.animations) {ui._scrollTo(2.1);}
             myGesture._action = 'openSettings';
         } else {
@@ -97,7 +97,6 @@ function _swipe(callback) {
         my.log('scrollTop = ' + myGesture._scrollTop + " / direction = " + myGesture._direction + " / gesture = " + myGesture._action + " / pointerEvents = " + sync.style.pointerEvents); 
         
         ui._loading(0);
-        sync.style.cssText = 'transform-origin: 50% 50%; transform: rotate(0deg);';
         
         // ===============
         // --- Results ---
@@ -144,8 +143,8 @@ function _swipe(callback) {
 
 function _getDirection(_myGesture) {
     
-    var _minX = 75;  // Min X swipe for horizontal swipe
-    var _minY = 35;  // Min Y swipe for vertical swipe
+    var _minX = 55;  // Min X swipe for horizontal swipe
+    var _minY = 55;  // Min Y swipe for vertical swipe
     
     var _distanceX = 0;
     var _distanceY = 0;
