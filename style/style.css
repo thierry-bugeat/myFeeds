@@ -144,3 +144,12 @@ section[role="region"] {
     opacity: 0.3;
     pointer-events: none;
 }
+
+.rotation {
+    transform-origin: 50% 50%;
+    animation: rot-inf 3s infinite linear;
+}
+@keyframes rot-inf {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(360deg);}
+}

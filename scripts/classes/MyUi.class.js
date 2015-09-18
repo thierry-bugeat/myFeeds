@@ -118,9 +118,11 @@ MyUi.prototype._onclick = function(_this, pointerEvents) {
         if (pointerEvents == 'enable') {
             _this.classList.remove("disable");
             _this.classList.add("enable");
+            if (_this.id == 'sync') {sync.classList.remove("rotation");}
         } else {
             _this.classList.remove("enable");
             _this.classList.add("disable");
+            if (_this.id == 'sync') {sync.classList.add("rotation");}
         }
     }
 }
