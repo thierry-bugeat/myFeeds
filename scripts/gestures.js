@@ -5,20 +5,18 @@
 function _swipe(callback) {
     myGesture = new Object();
     
-    myGesture._startX       = 0;
-    myGesture._startY       = 0;
-    myGesture._endX         = 0;
-    myGesture._endY         = 0;
-    myGesture._action       = "";
-    myGesture._scrollTop    = false;
-    
     var _element = document.getElementById("feeds-entries");
     
-    var direction = "";
-    
     _element.addEventListener("touchstart", function(event) {
-        //event.preventDefault();
-        direction = "";
+        
+        myGesture._startX       = 0;
+        myGesture._startY       = 0;
+        myGesture._endX         = 0;
+        myGesture._endY         = 0;
+        myGesture._action       = "";
+        myGesture._scrollTop    = false;
+        myGesture._direction    = "";
+        
         var _t = event.touches[0];
         myGesture._startX = _t.screenX;
         myGesture._startY = _t.screenY;
@@ -27,6 +25,8 @@ function _swipe(callback) {
         
         if (document.getElementById('feeds-entries').scrollTop == 0) {
             myGesture._scrollTop = true;
+        } else {
+            myGesture._scrollTop = false;
         }
         
     }, false);
@@ -49,7 +49,7 @@ function _swipe(callback) {
         
         // Sync animation
         
-        if ((_deltaY >= 0) && (myGesture._scrollTop)) {
+        if ((_deltaY >= 60) && (myGesture._scrollTop)) {
             if (navigator.onLine) {
                 ui._loading(1);
                 sync.classList.add("rotation");
