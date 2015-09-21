@@ -12,6 +12,14 @@ html {
     font-size: 62.5%;
 }
 
+@media screen and (max-width: 320px) {
+    html {font-size: 51.5%;}
+}
+
+@media screen and (min-width: 321px) and (max-width: 480px) {
+    html {font-size: 57.0%;}
+}
+
 body {
     width: 100%;
     height: inherit;
@@ -143,6 +151,14 @@ section[role="region"] {
 .disable{
     opacity: 0.3;
     pointer-events: none;
+}
+
+._show{
+    display:block;
+}
+
+._hide{
+    display:none;
 }
 
 .rotation {
