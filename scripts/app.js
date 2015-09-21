@@ -648,19 +648,6 @@
         _selectUpdateEvery.onchange = function(e) {
             params.entries.updateEvery = _selectUpdateEvery.options[_selectUpdateEvery.selectedIndex].value;
             _saveParams();
-
-            // Automatic update entries every N seconds :
-            // Clear and reset interval
-
-            clearInterval(_entriesUpdateInterval);
-
-            _entriesUpdateInterval = setInterval(function() {
-                if (navigator.onLine) {
-                    ui._onclick(sync, 'disable');
-                    gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
-                }
-            }, (params.entries.updateEvery * 1000));
-
         }
 
         var _selectMaxNbDays = document.getElementById('selectMaxNbDays');
@@ -1448,13 +1435,17 @@
 
         // Automatic update entries every N seconds :
 
-        _entriesUpdateInterval = setInterval(function() {
-            if (navigator.onLine) {
+        var _startInterval = performance.now();
+        
+        _entriesUpdateInterval = window.setInterval(function() {
+            var _nowInterval = performance.now();
+            if (navigator.onLine && ((_nowInterval - _startInterval) >= (params.entries.updateEvery * 1000))) {
+                _startInterval = _nowInterval;
                 ui._onclick(sync, 'disable');
                 gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
             }
-        }, (params.entries.updateEvery * 1000));
-
+        }, 59000); // 59s Less than minimal Firefox OS sleep time (60s)
+        
         // Share entry :
         // https://developer.mozilla.org/fr/docs/Web/API/Web_Activities
 
