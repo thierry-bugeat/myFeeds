@@ -216,6 +216,26 @@
         }
     }
     
+    var searchEntries = function(string) {
+
+        //if ((string.length > 4) || (string === '')) {
+            var _divs = document.querySelectorAll("div.my-list-entry-s, div.my-list-entry-m, div.my-list-entry-l");
+            
+            _nb = _divs.length;
+            
+            for (var i = 0; i < _nb; i++) {
+                var _text = _divs[i].textContent.toLowerCase();
+                if ((string == '') || (_text.indexOf(string.toLowerCase()) >= 0)) {
+                    _divs[i].classList.remove('_hide')
+                    _divs[i].classList.add('_show');
+                } else {
+                    _divs[i].classList.remove('_show');
+                    _divs[i].classList.add('_hide');
+                }
+            }
+        //}
+    }
+    
     /**
      * Save subscriptions for specified account
      * @param {boolean} _logsOnScreen Display or not logs on screen.
