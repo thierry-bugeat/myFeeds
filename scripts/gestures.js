@@ -21,17 +21,15 @@ function _swipe(callback) {
         myGesture._startX = _t.screenX;
         myGesture._startY = _t.screenY;
         
-        // (1) Sync
+    }, false);
+    
+    _element.addEventListener('touchmove', function(event) {
         
         if (document.getElementById('feeds-entries').scrollTop == 0) {
             myGesture._scrollTop = true;
         } else {
             myGesture._scrollTop = false;
         }
-        
-    }, false);
-    
-    _element.addEventListener('touchmove', function(event) {
 
         var t = event.touches[0];
         
