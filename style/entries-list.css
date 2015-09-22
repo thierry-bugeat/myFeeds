@@ -181,6 +181,10 @@
     display: none;
 }
 
+.my-card-entry-s > .my-card-date{
+    display: none;
+}
+
 .my-card-date{
     font-size:1.5rem;
     height:2.5rem;
@@ -190,7 +194,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     color: var(--fxos-orange);
-    display: block;
+    padding-right:1rem;
 }
 
 .my-card-snippet{
@@ -201,7 +205,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 1.7rem;
-    display: block;
 }
 
 .my-card-image-container {
@@ -223,9 +226,9 @@
 .card-ratio-image-s { padding-bottom:25%; }
 .card-ratio-image-l { padding-bottom:45%; }
 
-.card-ratio-entry-s { padding-bottom: 12%; }
-.card-ratio-entry-m { padding-bottom: 36%; }
-.card-ratio-entry-l { padding-bottom: 76%; }
+.card-ratio-entry-s { padding-bottom: 6%; }
+.card-ratio-entry-m { padding-bottom: 30%; }
+.card-ratio-entry-l { padding-bottom: 68%; }
 
 .card-ratio-16-10{
     padding-bottom:62.5%; /* 10/16*100 */
