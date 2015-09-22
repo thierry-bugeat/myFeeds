@@ -41,23 +41,7 @@ MyUi.prototype.init = function() {
     
     _MyUi._onclick(search, 'disable');    // Not yet implemented
     
-    // =======================================
-    // --- Buttons themes enable / disable ---
-    // =======================================
-    
-    if (params.entries.theme == 'grid') {
-        ui._onclick(displayGrid, 'disable');
-        ui._onclick(displayCard, 'enable');
-        ui._onclick(displayList, 'enable');
-    } else if (params.entries.theme == 'card') {
-        ui._onclick(displayGrid, 'enable');
-        ui._onclick(displayCard, 'disable');
-        ui._onclick(displayList, 'enable');
-    } else {
-        ui._onclick(displayGrid, 'enable');
-        ui._onclick(displayCard, 'enable');
-        ui._onclick(displayList, 'disable');
-    }
+    _MyUi.selectThemeIcon();
         
     // =======================================
     // --- Button [topup] enable / disable ---
@@ -274,4 +258,21 @@ MyUi.prototype._smallEntries = function (status) {
  * */
 MyUi.prototype.fade = function (_this) {
     _this.style.cssText = "opacity : 0.4;";
-}
+};
+
+
+MyUi.prototype.selectThemeIcon = function () {
+    if (params.entries.theme == 'grid') {
+        _MyUi._onclick(displayGrid, 'disable');
+        _MyUi._onclick(displayCard, 'enable');
+        _MyUi._onclick(displayList, 'enable');
+    } else if (params.entries.theme == 'card') {
+        _MyUi._onclick(displayGrid, 'enable');
+        _MyUi._onclick(displayCard, 'disable');
+        _MyUi._onclick(displayList, 'enable');
+    } else {
+        _MyUi._onclick(displayGrid, 'enable');
+        _MyUi._onclick(displayCard, 'enable');
+        _MyUi._onclick(displayList, 'disable');
+    }
+};

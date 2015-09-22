@@ -95,6 +95,8 @@
             params = _myParams;
         }
         
+        ui.selectThemeIcon();
+        
         // Get and set Feedly token from cache
         if (params.accounts.feedly.logged) {
             my._load('cache/feedly/access_token.json').then(function(_token){
@@ -184,9 +186,7 @@
     displayGrid.onclick     = function(event) {
         if (params.entries.theme != 'grid') {
             params.entries.theme = "grid";
-            ui._onclick(displayGrid, 'disable');
-            ui._onclick(displayCard, 'enable');
-            ui._onclick(displayList, 'enable');
+            ui.selectThemeIcon();
             dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             _saveParams();
         }
@@ -194,9 +194,7 @@
     displayCard.onclick     = function(event) {
         if (params.entries.theme != 'card') {
             params.entries.theme = "card";
-            ui._onclick(displayGrid, 'enable');
-            ui._onclick(displayCard, 'disable');
-            ui._onclick(displayList, 'enable');
+            ui.selectThemeIcon();
             dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             _saveParams();
         }
@@ -204,9 +202,7 @@
     displayList.onclick     = function(event) {
         if (params.entries.theme != 'list') {
             params.entries.theme = "list";
-            ui._onclick(displayGrid, 'enable');
-            ui._onclick(displayCard, 'enable');
-            ui._onclick(displayList, 'disable');
+            ui.selectThemeIcon();
             dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             _saveParams();
         }
