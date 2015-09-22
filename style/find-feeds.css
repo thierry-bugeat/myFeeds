@@ -114,7 +114,3 @@
 #find-feeds button.cantAddNewFeed{
     line-height: 5rem;
 }
-
-#find-feeds-container form{
-    display: flex;
-}

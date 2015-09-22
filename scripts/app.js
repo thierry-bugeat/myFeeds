@@ -79,6 +79,8 @@
     // Network Connection
 
     var _onLine = "NA";
+    
+    var _searchEntries = false;
 
     // Load params from SDCard.
     // Create file if doesn't exists.
@@ -152,12 +154,6 @@
 
     var useAnimations           = document.getElementById("useAnimations");
 
-    // DOM clicks :
-
-    //search.onclick = function(event) {
-        //theoldreader.login(); // test a supprimer
-        //feedly.deleteSubscription('http://linuxfr.org/news.atom');
-    //}
     sync.onclick            = function(event) {
         if (navigator.onLine) {
             ui._onclick(this, 'disable');
@@ -216,9 +212,13 @@
         }
     }
     
-    var searchEntries = function(string) {
+    /**
+     * Show entries matching string and hide others
+     * @param {string} string Min length 5 characters or "" to reset display
+     * */
+    var _search = function(string) {
 
-        //if ((string.length > 4) || (string === '')) {
+        if ((string.length > 4) || (string === '')) {
             var _divs = document.querySelectorAll("div.my-list-entry-s, div.my-list-entry-m, div.my-list-entry-l");
             
             _nb = _divs.length;
@@ -233,7 +233,35 @@
                     _divs[i].classList.add('_hide');
                 }
             }
-        //}
+        }
+    }
+    
+    searchEntries.onclick = function(string) {
+        
+        _searchEntries = !_searchEntries;
+        
+        if (_searchEntries) {
+            feeds_entries.style.height = "calc(100% - 17.5rem)";
+            searchEntries.classList.remove('enable-fxos-white');
+            searchEntries.classList.add('enable-fxos-blue');
+            document.getElementById('formSearchEntries').classList.remove('_hide');
+            document.getElementById('formSearchEntries').classList.add('_show');
+            document.getElementById('inputSearchEntries').focus();
+            _search(document.getElementById('inputSearchEntries').value);
+        } else {
+            feeds_entries.style.height = "calc(100% - 13.5rem)";
+            searchEntries.classList.remove('enable-fxos-blue');
+            searchEntries.classList.add('enable-fxos-white');
+            document.getElementById('formSearchEntries').classList.remove('_show');
+            document.getElementById('formSearchEntries').classList.add('_hide');
+            _search('');
+        }
+
+    }
+    
+    resetSearchEntries.onclick = function() {
+        //document.getElementById('inputSearchEntries').focus();
+        _search('');
     }
     
     /**
@@ -1120,6 +1148,8 @@
             if (!navigator.onLine) {
                 ui._disable();
             }
+            
+            document.body.dispatchEvent(new CustomEvent('dspEntries.done', {"detail": ""}));
         
         }, 250); // Schedule the execution for later
         
@@ -1452,6 +1482,22 @@
         browser.addEventListener('mozbrowsererror', function (event) {
             console.dir("Moz Browser loading error : " + event.detail);
         });
+        
+        // Keyboard
+        
+        window.addEventListener("keydown", function (event) {
+            /*if (event.defaultPrevented) {
+                return; // Should do nothing if the key event was already consumed.
+            }*/
+            if (event.keyCode == 13) {
+                if (document.activeElement.id == "inputSearchEntries") {
+                    _search(document.activeElement.value);
+                }
+            }
+
+            // Consume the event for suppressing "double action".
+            //event.preventDefault();
+        }, true);
 
         // Automatic update entries every N seconds :
 
@@ -1495,6 +1541,14 @@
                 }
             });
         };
+        
+        // Search entries after "dspEntries"
+        
+        document.body.addEventListener('dspEntries.done', function(event){
+            if (_searchEntries) {
+                _search(document.getElementById('inputSearchEntries').value);
+            }
+        });
 
         /* ===================== */
         /* --- Google Events --- */

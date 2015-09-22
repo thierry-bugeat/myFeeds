@@ -38,6 +38,10 @@ section[role="region"] {
     height: auto !important;
 }
 
+form{
+    display: flex;
+}
+
 #main {
     /* will-change: transform; GPU acceleration */
     height: 100%;
@@ -142,6 +146,14 @@ section[role="region"] {
 }
 
 /* --- Enable / Disable element(s) --- */
+
+.enable-fxos-blue {
+    color: var(--fxos-blue) !important;
+}
+
+.enable-fxos-white {
+    color: var(--fxos-white) !important;
+}
 
 .enable{
     opacity: 1;

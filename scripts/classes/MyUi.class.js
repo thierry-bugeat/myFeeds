@@ -28,6 +28,9 @@ var MyUi = function() {
     var displayGrid             = document.getElementById("displayGrid");
     var displayCard             = document.getElementById("displayCard");
     var displayList             = document.getElementById("displayList");
+    
+    var searchEntries           = document.getElementById("searchEntries");
+    var resetSearchEntries      = document.getElementById("resetSearchEntries");
 }
 
 MyUi.prototype.init = function() {

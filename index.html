@@ -110,13 +110,22 @@
         </section>
     
         <div id="feeds-entries" class="scrollable"></div>
+        
+        <section role="mySubHeader" id="formSearchEntries" class="_hide">
+            <header class="mySystemHeader">
+            <form action="#">
+                <input type="text" required="required" placeholder="search" id="inputSearchEntries">
+                <button type="reset" id="resetSearchEntries"><span data-icon="delete"></span></button>
+            </form>
+            </header>
+        </section>
     
         <section role="myFooter" class="">
             <header>
                 <button id="menu"><span data-icon="menu"></span></button>
                 <button id="sync" class="_online_"><span data-icon="sync"></span></button>
                 <button id="topup"><span data-icon="topup"></span></button>
-                <!-- button id="search"><span data-icon="search"></span></button -->
+                <button id="searchEntries"><span data-icon="search"></span></button>
                 <button id="settingsOpen"><span data-icon="settings"></span></button>
             </header>
         </section>

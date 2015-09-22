@@ -107,7 +107,6 @@ section[role="mySubHeader"] > header input[type="text"] {
     padding: 0 1.5rem;
     resize: none;
     unicode-bidi: -moz-plaintext;
-    width: 60%;
 }
 
 section[role="mySubHeader"] > header span {
