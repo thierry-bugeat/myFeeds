@@ -859,10 +859,6 @@
             }
         }
         
-        // @todo test.
-        //_htmlFeeds = _htmlFeeds +'<li id="feedlyGetSubscriptions">feedly get subscriptions</li>';
-        //document.getElementById('feedlyGetSubscriptions').onclick = function() {feedly.getSubscriptions();}
-
         // --- Display ---
 
         ui.echo("feeds-list", _htmlFeeds, "");
@@ -1339,7 +1335,6 @@
      * Disable online account
      * @param {string} feedly, theoldreader
      * */
-     
      function _disableAccount(_account) {
         my.log('_disableAccount', arguments);
         params.accounts[_account].logged = false
@@ -1486,17 +1481,11 @@
         // Keyboard
         
         window.addEventListener("keydown", function (event) {
-            /*if (event.defaultPrevented) {
-                return; // Should do nothing if the key event was already consumed.
-            }*/
             if (event.keyCode == 13) {
                 if (document.activeElement.id == "inputSearchEntries") {
                     _search(document.activeElement.value);
                 }
             }
-
-            // Consume the event for suppressing "double action".
-            //event.preventDefault();
         }, true);
 
         // Automatic update entries every N seconds :
