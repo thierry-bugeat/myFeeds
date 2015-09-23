@@ -17,7 +17,7 @@ html {
 }
 
 @media screen and (min-width: 321px) and (max-width: 480px) {
-    html {font-size: 57.0%;}
+    html {font-size: 62.5%;}
 }
 
 body {
