@@ -25,7 +25,7 @@
     var myFeedsSubscriptions = {'local': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 0,
+        "version": 1,
         "feeds": {
             "selectedFeed": "",                 // Display all feeds if empty otherwise display specified feed url
             "defaultPulsations": 5              // Default feed pulsations
@@ -54,7 +54,8 @@
         },
         "settings": {
             "ui": {
-                "animations": false             // Use transitions animations
+                "animations": false,            // Use transitions animations
+                "vibrate": true                 // Vibration on click
             },
             "developper_menu": {
                 "visible": false,               // Display or not developper menu in settings
@@ -158,17 +159,19 @@
 
     sync.onclick            = function(event) {
         if (navigator.onLine) {
+            ui._vibrate();
             ui._onclick(this, 'disable');
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }
     }
-    menu.onclick            = function(event) { ui._scrollTo(1); }
-    closeMainEntry.onclick  = function(event) { ui._quickScrollTo(2); ui.echo("browser", "", ""); }
-    closeFeedsList.onclick  = function(event) { ui._scrollTo(2); }
-    findFeedsOpen.onclick   = function(event) { ui._scrollTo(0); }
-    findFeedsClose.onclick  = function(event) { ui._scrollTo(1); }
+    menu.onclick            = function(event) { ui._vibrate(); ui._scrollTo(1); }
+    closeMainEntry.onclick  = function(event) { ui._vibrate(); ui._quickScrollTo(2); ui.echo("browser", "", ""); }
+    closeFeedsList.onclick  = function(event) { ui._vibrate(); ui._scrollTo(2); }
+    findFeedsOpen.onclick   = function(event) { ui._vibrate(); ui._scrollTo(0); }
+    findFeedsClose.onclick  = function(event) { ui._vibrate(); ui._scrollTo(1); }
     
     findFeedsSubmit.onclick = function(event) { 
+        ui._vibrate();
         var _keywords = document.getElementById("findFeedsText").value; 
         if (_keywords) {
             ui.echo("find-feeds", "Loading...", ""); 
@@ -180,12 +183,13 @@
         }
     }
     
-    findFeedsReset.onclick  = function(event) { ui.echo('find-feeds', '', ''); }
-    settingsOpen.onclick    = function(event) { ui._scrollTo(3); }
-    settingsClose.onclick   = function(event) { ui._scrollTo(2); }
+    findFeedsReset.onclick  = function(event) { ui._vibrate(); ui.echo('find-feeds', '', ''); }
+    settingsOpen.onclick    = function(event) { ui._vibrate(); ui._scrollTo(3); }
+    settingsClose.onclick   = function(event) { ui._vibrate(); ui._scrollTo(2); }
     displayGrid.onclick     = function(event) {
         if (params.entries.theme != 'grid') {
             params.entries.theme = "grid";
+            ui._vibrate();
             ui.selectThemeIcon();
             dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             _saveParams();
@@ -194,6 +198,7 @@
     displayCard.onclick     = function(event) {
         if (params.entries.theme != 'card') {
             params.entries.theme = "card";
+            ui._vibrate();
             ui.selectThemeIcon();
             dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             _saveParams();
@@ -202,6 +207,7 @@
     displayList.onclick     = function(event) {
         if (params.entries.theme != 'list') {
             params.entries.theme = "list";
+            ui._vibrate();
             ui.selectThemeIcon();
             dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             _saveParams();
@@ -234,6 +240,8 @@
     
     searchEntries.onclick = function(string) {
         
+        ui._vibrate();
+        
         _searchEntries = !_searchEntries;
         
         if (_searchEntries) {
@@ -256,7 +264,7 @@
     }
     
     resetSearchEntries.onclick = function() {
-        //document.getElementById('inputSearchEntries').focus();
+        ui._vibrate();
         _search('');
     }
     
@@ -302,6 +310,7 @@
     }
 
     nextDay.onclick = function(event) {
+        ui._vibrate();
         if (params.entries.nbDaysAgo > 0 ) {
             params.entries.nbDaysAgo--;
         }
@@ -316,6 +325,7 @@
     }
 
     previousDay.onclick = function(event) {
+        ui._vibrate();
         if (params.entries.nbDaysAgo < params.entries.dontDisplayEntriesOlderThan) {
             params.entries.nbDaysAgo++;
         }
@@ -459,12 +469,15 @@
             // --- Add Events ---
             // ==================
 
-            // onclick delete button :
+            // onclick add button :
 
             var _adds = document.querySelectorAll(".addNewFeed");
 
             for (var i = 0; i < _adds.length; i++) {
-                _adds[i].onclick = function() { findFeedsAddNewFeed(this);}
+                _adds[i].onclick = function() { 
+                    ui._vibrate();
+                    findFeedsAddNewFeed(this);
+                }
             }
         } else if (event.detail.responseData.entries.length == 0) {
             ui.echo("find-feeds", document.webL10n.get('find-feeds-no-results'), "");
@@ -514,6 +527,14 @@
 
         if (_minutes < 10) {
             _minutes = "0" + _minutes;
+        }
+        
+        // Vibrate on click
+        
+        if (params.settings.ui.vibrate) {
+            _vibrateOnClick = 'checked=""';
+        } else {
+            _vibrateOnClick = "";
         }
 
         // Small entries selector
@@ -622,6 +643,10 @@
         '       </divn>                                                                                                                                     ',
         '   </li>                                                                                                                                           ',
         '</ul>                                                                                                                                              ',
+        '<h2>' + document.webL10n.get('user-interface') + '</h2>                                                                                                     ',
+        '<ul>                                                                                                                                               ',
+        '   <li><span data-icon="vibrate"></span>' + document.webL10n.get('vibrate-on-click') + '<div><label class="pack-switch"><input id="toggleVibrate" type="checkbox" ' + _vibrateOnClick + '><span></span></label></div></li>',
+        '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('about') + '</h2>                                                                                                     ',
         '<ul>                                                                                                                                               ',
         '   <li id="appVersion"><span data-icon="messages"></span>' + document.webL10n.get('app-title') + '<div>' + myManifest.version + '</div></li>                       ',
@@ -662,7 +687,6 @@
             _saveParams();
         }
         
-
         // ============================
         // --- Show developper menu ---
         // ============================
@@ -713,6 +737,14 @@
             _saveParams();
         }
 
+
+        // UI vibrate
+
+        document.getElementById("toggleVibrate").onclick = function() {
+            params.settings.ui.vibrate = !params.settings.ui.vibrate;
+            _saveParams();
+        }
+        
         // UI animations checkbox
 
         document.getElementById("useAnimations").onclick = function() {
@@ -869,6 +901,7 @@
 
         for (var i = 0; i < _deletes.length; i++) {
             _deletes[i].onclick = function(e) {
+                ui._vibrate();
                 e.stopPropagation();
                 e.preventDefault();
                 deleteFeed(this);
@@ -881,6 +914,7 @@
 
         for (var i = 0; i < _opens.length; i++) {
             _opens[i].onclick = function() {
+                ui._vibrate();
                 ui._scrollTo(2);
                 ui._onclick(nextDay, 'disable');
                 ui._onclick(previousDay, 'enable');
@@ -1120,7 +1154,7 @@
             _nb = _small_entries.length;
 
             for (var i = 0; i < _nb; i++) {
-                _small_entries[i].onclick = function() { ui.fade(this); mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); }
+                _small_entries[i].onclick = function() { ui._vibrate(); ui.fade(this); mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); }
             }
 
             // onclick Normal Entries :
@@ -1130,7 +1164,7 @@
             _nb = _entries.length;
 
             for (var i = 0; i < _nb; i++) {
-                _entries[i].onclick = function() { ui.fade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }
+                _entries[i].onclick = function() { ui._vibrate(); ui.fade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }
             }
             
             // =========================
@@ -1502,6 +1536,7 @@
 
         share.onclick = function() {
             my.log(this);
+            ui._vibrate();
             var _entryId = 0;
             var _mySha256_title = this.getAttribute("_mySha256_title");
             var _mySha256_link  = this.getAttribute("_mySha256_link");

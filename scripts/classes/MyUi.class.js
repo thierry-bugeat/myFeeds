@@ -39,8 +39,6 @@ MyUi.prototype.init = function() {
     _MyUi._onclick(sync, 'disable');      // Disable "sync" button when application start
     _MyUi._onclick(nextDay, 'disable');
     
-    _MyUi._onclick(search, 'disable');    // Not yet implemented
-    
     _MyUi.selectThemeIcon();
         
     // =======================================
@@ -78,7 +76,11 @@ MyUi.prototype.init = function() {
         
     }, 500);
     
-    topup.onclick           = function(event) { _MyUi._onclick(topup, 'disable'); feeds_entries.scrollTop = 0; }
+    topup.onclick = function(event) { 
+        _MyUi._vibrate();
+        _MyUi._onclick(topup, 'disable'); 
+        feeds_entries.scrollTop = 0; 
+    }
     
     // ==============
     // --- Events ---
@@ -274,5 +276,11 @@ MyUi.prototype.selectThemeIcon = function () {
         _MyUi._onclick(displayGrid, 'enable');
         _MyUi._onclick(displayCard, 'enable');
         _MyUi._onclick(displayList, 'disable');
+    }
+};
+
+MyUi.prototype._vibrate = function () {
+    if (params.settings.ui.vibrate) {
+        window.navigator.vibrate(50);
     }
 };
