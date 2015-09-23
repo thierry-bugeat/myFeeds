@@ -221,7 +221,7 @@
     var _search = function(string) {
 
         if ((string.length > 4) || (string === '')) {
-            var _divs = document.querySelectorAll("div.my-list-entry-s, div.my-list-entry-m, div.my-list-entry-l");
+            var _divs = document.querySelectorAll("div.my-list-entry-s, div.my-list-entry-m, div.my-list-entry-l, div.my-grid-entry-s, div.my-grid-entry-m, div.my-grid-entry-l, div.my-card-entry-s, div.my-card-entry-m, div.my-card-entry-l");
             
             _nb = _divs.length;
             
