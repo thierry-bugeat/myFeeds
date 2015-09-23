@@ -261,16 +261,16 @@
     box-sizing: border-box;
     float:left;
     /*border-bottom:2px solid var(--fxos-ivory);*/
-    margin-bottom: var(--my-spacing);
+    /*margin-bottom: var(--my-spacing);*/
 }
 
-.my-grid-entry-s:nth-child(odd), .my-grid-entry-l:nth-child(odd) {
+/*.my-grid-entry-s:nth-child(odd), .my-grid-entry-l:nth-child(odd) {
     border-right:4px solid var(--fxos-ivory);
 }
 
 .my-grid-entry-s:nth-child(even), .my-grid-entry-l:nth-child(even) {
     border-left:4px solid var(--fxos-ivory);
-}
+}*/
 
 .my-grid-title{
     box-sizing: border-box;
@@ -282,7 +282,7 @@
     font-weight: bold;
     position:absolute;
     z-index: 1;
-    padding:1px;
+    padding:.4rem;
     height:100%;
     background: -moz-linear-gradient(top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
     /*background: -moz-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);*/
