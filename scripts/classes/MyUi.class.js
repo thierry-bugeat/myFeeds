@@ -1,45 +1,49 @@
+// DOM elements :
+
+var main                    = document.getElementById('main');
+var main_entry_container    = document.getElementById("main-entry-container");
+var main_entry              = document.getElementById("main-entry");
+var browser                 = document.getElementById("browser");
+var loading                 = document.getElementById("loading");
+var feeds_entries           = document.getElementById("feeds-entries");
+var feeds_list              = document.getElementById("feeds-list");
+var sync                    = document.getElementById("sync");
+var menu                    = document.getElementById("menu");
+var dom = {
+    "topups": {
+        "entries":  document.getElementById("topup"),
+        "feeds":    document.getElementById("topupFeedsList")
+    }
+};
+var search                  = document.getElementById("search");
+var settingsOpen            = document.getElementById("settingsOpen");
+var find_feeds              = document.getElementById("find-feeds");
+var findFeedsOpen           = document.getElementById("findFeedsOpen");
+var findFeedsClose          = document.getElementById("findFeedsClose");
+var findFeedsSubmit         = document.getElementById("findFeedsSubmit");
+var share                   = document.getElementById("share");
+var feedsEntriesNbDaysAgo   = document.getElementById("feedsEntriesNbDaysAgo");
+var displayGrid             = document.getElementById("displayGrid");
+var displayCard             = document.getElementById("displayCard");
+var displayList             = document.getElementById("displayList");
+var searchEntries           = document.getElementById("searchEntries");
+var resetSearchEntries      = document.getElementById("resetSearchEntries");
+var findFeedsReset          = document.getElementById("findFeedsReset");
+var useAnimations           = document.getElementById("useAnimations");
+    
 /* ============ */
 /* --- MyUi --- */
 /* ============ */
-
+   
 var MyUi = function() {
     _MyUi = this;
-    
-    // DOM elements :
-
-    var main                    = document.getElementById('main');
-    var main_entry_container    = document.getElementById("main-entry-container");
-    var main_entry              = document.getElementById("main-entry");
-    var browser                 = document.getElementById("browser");
-    var loading                 = document.getElementById("loading");
-    var feeds_entries           = document.getElementById("feeds-entries");
-    var feeds_list              = document.getElementById("feeds-list");
-
-    var sync                    = document.getElementById("sync");
-    var menu                    = document.getElementById("menu");
-    var topup                   = document.getElementById("topup");
-    var topupFeedsList          = document.getElementById("topupFeedsList");
-    var search                  = document.getElementById("search");
-    var settingsOpen            = document.getElementById("settingsOpen");
-    var find_feeds              = document.getElementById("find-feeds");
-    var findFeedsOpen           = document.getElementById("findFeedsOpen");
-    var findFeedsClose          = document.getElementById("findFeedsClose");
-    var findFeedsSubmit         = document.getElementById("findFeedsSubmit");
-    var share                   = document.getElementById("share");
-    var feedsEntriesNbDaysAgo   = document.getElementById("feedsEntriesNbDaysAgo");
-    var displayGrid             = document.getElementById("displayGrid");
-    var displayCard             = document.getElementById("displayCard");
-    var displayList             = document.getElementById("displayList");
-    
-    var searchEntries           = document.getElementById("searchEntries");
-    var resetSearchEntries      = document.getElementById("resetSearchEntries");
 }
 
 MyUi.prototype.init = function() {
 
-    _MyUi._onclick(topup, 'disable');           // Disable "topup" button when application start
-    _MyUi._onclick(topupFeedsList, 'disable');  // Disable "topupFeedsList" button when application start
-    _MyUi._onclick(sync, 'disable');            // Disable "sync" button when application start
+    _MyUi._onclick(dom.topups['entries'], 'disable');   // Disable "topup" button when application start
+    _MyUi._onclick(dom.topups['feeds'], 'disable');     // Disable "topupFeedsList" button when application start
+    _MyUi._onclick(sync, 'disable');                // Disable "sync" button when application start
     _MyUi._onclick(nextDay, 'disable');
     
     _MyUi.selectThemeIcon();
@@ -56,11 +60,11 @@ MyUi.prototype.init = function() {
     setInterval(function() {
         
         // Scroll in progress
-        topupFeedsList
+
         if (feeds_list.scrollTop != _topupFeedsList['previousScrollTop']) {
             
             if (_topupFeedsList['previousScrollTop'] == 0) { 
-                _MyUi._onclick(topupFeedsList, 'enable'); 
+                _MyUi._onclick(dom.topups['feeds'], 'enable'); 
                 _topupFeedsList['previousStatus'] = 'enabled'; 
             }
             
@@ -72,7 +76,7 @@ MyUi.prototype.init = function() {
         else {
             
             if ((_topupFeedsList['previousStatus'] == 'enabled') && (feeds_list.scrollTop == 0)) {
-                _MyUi._onclick(topupFeedsList, 'disable'); 
+                _MyUi._onclick(dom.topups['feeds'], 'disable'); 
                 _topupFeedsList['previousStatus'] = 'disabled';
             }
         }
@@ -81,7 +85,7 @@ MyUi.prototype.init = function() {
     
     topupFeedsList.onclick = function(event) { 
         _MyUi._vibrate();
-        _MyUi._onclick(topupFeedsList, 'disable'); 
+        _MyUi._onclick(dom.topups['feeds'], 'disable'); 
         feeds_list.scrollTop = 0; 
     }
         
@@ -101,7 +105,7 @@ MyUi.prototype.init = function() {
         if (feeds_entries.scrollTop != _topup['previousScrollTop']) {
             
             if (_topup['previousScrollTop'] == 0) { 
-                _MyUi._onclick(topup, 'enable'); 
+                _MyUi._onclick(dom.topups['entries'], 'enable'); 
                 _topup['previousStatus'] = 'enabled'; 
             }
             
@@ -113,7 +117,7 @@ MyUi.prototype.init = function() {
         else {
             
             if ((_topup['previousStatus'] == 'enabled') && (feeds_entries.scrollTop == 0)) {
-                _MyUi._onclick(topup, 'disable'); 
+                _MyUi._onclick(dom.topups['entries'], 'disable'); 
                 _topup['previousStatus'] = 'disabled';
             }
         }
@@ -122,7 +126,7 @@ MyUi.prototype.init = function() {
     
     topup.onclick = function(event) { 
         _MyUi._vibrate();
-        _MyUi._onclick(topup, 'disable'); 
+        _MyUi._onclick(dom.topups['entries'], 'disable'); 
         feeds_entries.scrollTop = 0; 
     }
     

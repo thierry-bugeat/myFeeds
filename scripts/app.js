@@ -132,32 +132,6 @@
     var sortedEntries = [];
     var sortedFeeds = [];
 
-    // DOM elements :
-
-    var main_entry_container    = document.getElementById("main-entry-container");
-    var main_entry              = document.getElementById("main-entry");
-    var browser                 = document.getElementById("browser");
-    var loading                 = document.getElementById("loading");
-    var feeds_entries           = document.getElementById("feeds-entries");
-    var feeds_list              = document.getElementById("feeds-list");
-
-    var sync                    = document.getElementById("sync");
-    var menu                    = document.getElementById("menu");
-    var search                  = document.getElementById("search");
-    var settingsOpen            = document.getElementById("settingsOpen");
-    var find_feeds              = document.getElementById("find-feeds");
-    var findFeedsOpen           = document.getElementById("findFeedsOpen");
-    var findFeedsClose          = document.getElementById("findFeedsClose");
-    var findFeedsSubmit         = document.getElementById("findFeedsSubmit");
-    var findFeedsReset          = document.getElementById("findFeedsReset");
-    var share                   = document.getElementById("share");
-    var feedsEntriesNbDaysAgo   = document.getElementById("feedsEntriesNbDaysAgo");
-    var displayGrid             = document.getElementById("displayGrid");
-    var displayCard             = document.getElementById("displayCard");
-    var displayList             = document.getElementById("displayList");
-
-    var useAnimations           = document.getElementById("useAnimations");
-
     sync.onclick            = function(event) {
         if (navigator.onLine) {
             ui._vibrate();
