@@ -232,14 +232,16 @@ MyUi.prototype._smoothScrollTo = function (screenX, duration) {
  * */
 MyUi.prototype._smallEntries = function (status) {
     
-    var _small_entries = document.querySelectorAll(".small");
-    var _css = "";
-    
-    status == "show" ?
-        _css = "display : block;" : _css = "display : none;";
+    var _small_entries = document.querySelectorAll("._small_");
 
     for (var i = 0; i < _small_entries.length; i++) {
-        _small_entries[i].style.cssText = _css; 
+        if (status == "show") {
+            _small_entries[i].classList.remove("_hide");
+            _small_entries[i].classList.add("_show"); 
+        } else {
+            _small_entries[i].classList.remove("_show");
+            _small_entries[i].classList.add("_hide"); 
+        }
     }
     
     // From status hide (unchecked) to status show (checked)

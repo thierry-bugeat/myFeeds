@@ -220,7 +220,7 @@
      * */
     var _search = function(string) {
 
-        if ((string.length > 4) || (string === '')) {
+        if ((string.length > 2) || (string === '')) {
             var _divs = document.querySelectorAll("div.my-list-entry-s, div.my-list-entry-m, div.my-list-entry-l, div.my-grid-entry-s, div.my-grid-entry-m, div.my-grid-entry-l, div.my-card-entry-s, div.my-card-entry-m, div.my-card-entry-l");
             
             _nb = _divs.length;
@@ -1071,7 +1071,7 @@
                             _nbEntriesDisplayed['large']++;
 
                         } else if (params.entries.theme == 'list') {
-                            _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
+                            _content = _content + '<div class="_online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
                             _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                             _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
                             _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
@@ -1094,7 +1094,7 @@
                             _nbEntriesDisplayed['large']++;
 
                         } else {
-                            _content = _content + '<div class="_online_ small my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
+                            _content = _content + '<div class="_online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
                             _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                             _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                             _content = _content + _imageUrl;
@@ -1568,6 +1568,13 @@
             if (_searchEntries) {
                 _search(document.getElementById('inputSearchEntries').value);
             }
+        });
+        
+        // Search on input change
+        
+        document.getElementById('inputSearchEntries').addEventListener('input', function(){
+            var _searchString = document.getElementById('inputSearchEntries').value;
+            _search(_searchString);
         });
 
         /* ===================== */
