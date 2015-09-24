@@ -73,7 +73,7 @@ function _swipe(callback) {
         // (2) Open feeds
         // (3) Open settings
         
-        else if ((myGesture._startX - myGesture._endX) <= -60) {
+        /*else if ((myGesture._startX - myGesture._endX) <= -60) {
             myGesture._startX -= ((myGesture._startX - myGesture._endX) + 60); // Move _startX
             if (params.settings.ui.animations) {ui._scrollTo(1.9);}
             myGesture._action = 'openFeeds';
@@ -84,7 +84,7 @@ function _swipe(callback) {
         } else {
             if (params.settings.ui.animations) {ui._scrollTo(2);}
             myGesture._action = '';
-        }
+        }*/
         
         my.log('startX,Y = ' + myGesture._startX + ',' + myGesture._startY + ' / endX,Y = ' + myGesture._endX + ',' + myGesture._endY + ' / delta X,Y = ' + _deltaX + ',' + _deltaY);
         
@@ -107,7 +107,7 @@ function _swipe(callback) {
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }
         
-        // Open feeds from entries screen
+        /*// Open feeds from entries screen
         
         if ((myGesture._action = 'openFeeds') && (myGesture._direction == 'right')) {
             ui._scrollTo(1);
@@ -117,7 +117,7 @@ function _swipe(callback) {
         
         if ((myGesture._action = 'openSettings') && (myGesture._direction == 'left')) {
             ui._scrollTo(3);
-        } 
+        }*/
 
         // ---
 
