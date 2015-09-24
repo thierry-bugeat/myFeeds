@@ -139,6 +139,7 @@
     var browser                 = document.getElementById("browser");
     var loading                 = document.getElementById("loading");
     var feeds_entries           = document.getElementById("feeds-entries");
+    var feeds_list              = document.getElementById("feeds-list");
 
     var sync                    = document.getElementById("sync");
     var menu                    = document.getElementById("menu");

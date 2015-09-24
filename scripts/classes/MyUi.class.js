@@ -13,10 +13,12 @@ var MyUi = function() {
     var browser                 = document.getElementById("browser");
     var loading                 = document.getElementById("loading");
     var feeds_entries           = document.getElementById("feeds-entries");
+    var feeds_list              = document.getElementById("feeds-list");
 
     var sync                    = document.getElementById("sync");
     var menu                    = document.getElementById("menu");
     var topup                   = document.getElementById("topup");
+    var topupFeedsList          = document.getElementById("topupFeedsList");
     var search                  = document.getElementById("search");
     var settingsOpen            = document.getElementById("settingsOpen");
     var find_feeds              = document.getElementById("find-feeds");
@@ -35,11 +37,53 @@ var MyUi = function() {
 
 MyUi.prototype.init = function() {
 
-    _MyUi._onclick(topup, 'disable');     // Disable "topup" button when application start
-    _MyUi._onclick(sync, 'disable');      // Disable "sync" button when application start
+    _MyUi._onclick(topup, 'disable');           // Disable "topup" button when application start
+    _MyUi._onclick(topupFeedsList, 'disable');  // Disable "topupFeedsList" button when application start
+    _MyUi._onclick(sync, 'disable');            // Disable "sync" button when application start
     _MyUi._onclick(nextDay, 'disable');
     
     _MyUi.selectThemeIcon();
+    
+    // ================================================
+    // --- Button [topupFeedsList] enable / disable ---
+    // ================================================
+    
+    var _topupFeedsList = {
+        "previousScrollTop": 0, 
+        "previousStatus": "disabled"
+    };
+    
+    setInterval(function() {
+        
+        // Scroll in progress
+        topupFeedsList
+        if (feeds_list.scrollTop != _topupFeedsList['previousScrollTop']) {
+            
+            if (_topupFeedsList['previousScrollTop'] == 0) { 
+                _MyUi._onclick(topupFeedsList, 'enable'); 
+                _topupFeedsList['previousStatus'] = 'enabled'; 
+            }
+            
+            _topupFeedsList['previousScrollTop'] = feeds_list.scrollTop;
+        } 
+        
+        // End scroll
+        
+        else {
+            
+            if ((_topupFeedsList['previousStatus'] == 'enabled') && (feeds_list.scrollTop == 0)) {
+                _MyUi._onclick(topupFeedsList, 'disable'); 
+                _topupFeedsList['previousStatus'] = 'disabled';
+            }
+        }
+        
+    }, 500);
+    
+    topupFeedsList.onclick = function(event) { 
+        _MyUi._vibrate();
+        _MyUi._onclick(topupFeedsList, 'disable'); 
+        feeds_list.scrollTop = 0; 
+    }
         
     // =======================================
     // --- Button [topup] enable / disable ---
@@ -111,7 +155,7 @@ MyUi.prototype._onclick = function(_this, pointerEvents) {
         } else {
             _this.classList.remove("enable");
             _this.classList.add("disable");
-            if (_this.id == 'sync') {sync.classList.add("rotation");}
+            if (_this.id == 'sync' && navigator.onLine) {sync.classList.add("rotation");}
         }
     }
 }
