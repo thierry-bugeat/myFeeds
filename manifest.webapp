@@ -41,7 +41,6 @@
         "systemXHR": {
             "description": "request cross domain."
         },
-        "device-storage:apps":      { "access": "readwrite" },
         "device-storage:sdcard":    { 
             "access": "readwrite",
             "description": "Required for storing and retrieving data." 
