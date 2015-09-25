@@ -41,14 +41,11 @@
         "systemXHR": {
             "description": "request cross domain."
         },
-        "datastores-owned": {
-            "myFeedsData": {
-                "access": "readwrite",
-                "description": "my Feeds Data"
-            }
-        },
         "device-storage:apps":      { "access": "readwrite" },
-        "device-storage:sdcard":    { "access": "readwrite" },
+        "device-storage:sdcard":    { 
+            "access": "readwrite",
+            "description": "Required for storing and retrieving data." 
+        },
         "webapps-manage": { },
         "storage": {
             "description": "Required for storing and retrieving data."
