@@ -45,29 +45,26 @@ function _swipe(callback) {
         if (_deltaY > 60) {_deltaY = 60;}
         if (_deltaY < -60) {_deltaY = -60;}
         
-        // Sync animation
+        // (1) Sync
         
-        if ((_deltaY >= 60) && (myGesture._scrollTop)) {
+        if ((_deltaY >= 60) && (myGesture._scrollTop) && (myGesture._direction == "down")) {
             if (navigator.onLine) {
                 ui._loading(1);
                 sync.classList.add("rotation");
+                myGesture._action = 'sync';
             }
         } else {
             ui._loading(0);
             sync.classList.remove("rotation");
+            myGesture._action = "";
         }
        
-        // (1) Sync
-        
-        if ((myGesture._direction == "down") && (myGesture._scrollTop)) {
-
-            myGesture._action = 'sync';
+        // Update startY
             
-            if ((myGesture._startY - myGesture._endY) <= -60) {
-                myGesture._startY -= ((myGesture._startY - myGesture._endY) + 60); // Move _startY
-            } else if ((myGesture._startY - myGesture._endY) >= 60) {
-                myGesture._startY -= ((myGesture._startY - myGesture._endY) - 60); // Move _startY
-            }
+        if ((myGesture._startY - myGesture._endY) <= -60) {
+            myGesture._startY -= ((myGesture._startY - myGesture._endY) + 60); // Move _startY
+        } else if ((myGesture._startY - myGesture._endY) >= 60) {
+            myGesture._startY -= ((myGesture._startY - myGesture._endY) - 60); // Move _startY
         }
         
         // (2) Open feeds
@@ -86,13 +83,13 @@ function _swipe(callback) {
             myGesture._action = '';
         }*/
         
-        my.log('startX,Y = ' + myGesture._startX + ',' + myGesture._startY + ' / endX,Y = ' + myGesture._endX + ',' + myGesture._endY + ' / delta X,Y = ' + _deltaX + ',' + _deltaY);
+        my.log('gestures: startX,Y = ' + myGesture._startX + ',' + myGesture._startY + ' / endX,Y = ' + myGesture._endX + ',' + myGesture._endY + ' / delta X,Y = ' + _deltaX + ',' + _deltaY);
         
     }, false);
     
     _element.addEventListener('touchend', function(event) {
         
-        my.log('scrollTop = ' + myGesture._scrollTop + " / direction = " + myGesture._direction + " / gesture = " + myGesture._action + " / pointerEvents = " + sync.style.pointerEvents); 
+        my.log('gestures: scrollTop = ' + myGesture._scrollTop + " / direction = " + myGesture._direction + " / gesture = " + myGesture._action + " / pointerEvents = " + sync.style.pointerEvents); 
         
         ui._loading(0);
         
