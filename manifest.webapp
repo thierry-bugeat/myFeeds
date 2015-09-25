@@ -35,9 +35,6 @@
         "browser": {
             "description": "Needed for displaying external website in app."
         },
-        "mobileconnection": {
-            "description": "Needed for mobile network information."
-        },
         "systemXHR": {
             "description": "request cross domain."
         },
