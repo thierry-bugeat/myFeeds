@@ -70,6 +70,8 @@
             "days": [3, 5, 7, 10]
         }
     }
+    
+    var keywords = [];
 
     var _entriesUpdateInterval = '';
     
@@ -125,6 +127,16 @@
         }
     }).catch(function(error) {
         _saveParams();
+    });
+    
+    // Load keywords from SDCard.
+    // Create file if doesn't exists.
+
+    my._load('keywords.json').then(function(_myKeywords) {
+        my.log('loading keywords from file keywords.json ...', _myKeywords);
+        keywords = _myKeywords;
+    }).catch(function(error) {
+        _saveKeywords();
     });
 
     // ---
@@ -217,7 +229,15 @@
         
         ui._vibrate();
         
-        _searchEntries = !_searchEntries;
+        if (_searchEntries && document.getElementById('formSearchEntries').classList.contains("_hide")) {
+        } else if (_searchEntries && document.getElementById('formSearchEntries').classList.contains("_show")) {
+            _searchEntries = !_searchEntries;
+        } else if (!_searchEntries && document.getElementById('formSearchEntries').classList.contains("_hide")) {
+            _searchEntries = !_searchEntries;
+        } else if (!_searchEntries && document.getElementById('formSearchEntries').classList.contains("_show")) {
+        }
+        
+        //_searchEntries = !_searchEntries;
         
         if (_searchEntries) {
             feeds_entries.style.height = "calc(100% - 17.5rem)";
@@ -312,6 +332,46 @@
         }
         dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
         feeds_entries.scrollTop = 0;
+    }
+    
+    function deleteKeyword(_this) {
+        my.log('deleteKeyword() ', arguments);
+
+        var _myKeyword = _this.getAttribute("myKeyword");
+
+        var _confirm = window.confirm(document.webL10n.get('confirm-delete-keyword') + "\n" + _myKeyword);
+
+        if (_confirm) {
+            
+            ui.fade(_this);
+
+            var _tmp = [];
+
+            // (1) Delete myKeyword from array "keyword"
+
+            for (var i = 0; i < keywords.length; i++) {
+                if (keywords[i] != _myKeyword) {
+                    _tmp.push(keywords[i]);
+                }
+            }
+
+            keywords = _tmp.slice();
+            
+            _saveKeywords();
+
+            // (2) Reload UI
+
+            if ((myFeedsSubscriptions.local.length > 0) ||
+                (myFeedsSubscriptions.feedly.length > 0) ||
+                (myFeedsSubscriptions.theoldreader.length > 0)
+            ){
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            } else {
+                ui.echo("feeds-list", "", "");
+                ui.echo("feeds-entries", "", "");
+                ui._onclick(sync, 'disable');
+            }
+        }
     }
 
     function deleteFeed(_this) {
@@ -826,9 +886,25 @@
             'theoldreader': ''
         };
         var _htmlFeeds = "";
+        var _htmlKeywords = '';
         var _feedlyAccessToken = feedly.getToken().access_token;
         var _theoldreaderAuth = theoldreader.getToken().Auth;
 
+        // ========================
+        // --- Display keywords ---
+        // ========================
+        
+        if (keywords.length > 0) {
+            _htmlKeywords = _htmlKeywords + '<h2>' + document.webL10n.get('search-by-keywords') + '</h2><ul class="keywords">';
+            
+            for (var i = 0; i < keywords.length; i++) {
+                var _deleteIcone = '<button class="deleteKeyword" myKeyword="' + keywords[i] + '"><span data-icon="delete"></span></button>';
+                _htmlKeywords = _htmlKeywords + '<li><a class="openKeyword" myKeyword="' +  keywords[i] + '"><p>' + _deleteIcone + '<button><span data-icon="search"></span></button>' + keywords[i] + '</p></a></li>';
+            }
+            
+            _htmlKeywords = _htmlKeywords + '</ul>';
+        }
+        
         // ==========================
         // --- Display feeds list ---
         // ==========================
@@ -854,7 +930,7 @@
             '<ul>' +
             '<li><a class="open" feedUrl=""><p><button><span data-icon="forward"></span></button>' + document.webL10n.get('all-feeds') + '</p></a></li>' +
             '</ul>' +
-            '';
+            '' + _htmlKeywords;
         
         for (var _account in _html) {
             if (_html[_account] != "") {
@@ -865,10 +941,45 @@
         // --- Display ---
 
         ui.echo("feeds-list", _htmlFeeds, "");
+        
+        // ===========================
+        // --- Add Events keywords ---
+        // ===========================
+        
+        // onclick delete keyword :
 
-        // ==================
-        // --- Add Events ---
-        // ==================
+        var _deletes = document.querySelectorAll(".deleteKeyword");
+
+        for (var i = 0; i < _deletes.length; i++) {
+            _deletes[i].onclick = function(e) {
+                ui._vibrate();
+                e.stopPropagation();
+                e.preventDefault();
+                deleteKeyword(this);
+            }
+        }
+        
+        // onclick open keyword :
+
+        var _opens = document.querySelectorAll(".openKeyword");
+
+        for (var i = 0; i < _opens.length; i++) {
+            _opens[i].onclick = function() {
+                _searchEntries = true;
+                ui._vibrate();
+                ui._scrollTo(2);
+                ui._onclick(nextDay, 'disable');
+                ui._onclick(previousDay, 'enable');
+                params.entries.nbDaysAgo = 0;
+                params.feeds.selectedFeed = "";
+                document.getElementById('inputSearchEntries').value = this.getAttribute("myKeyword");
+                dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+            }
+        }
+
+        // ========================
+        // --- Add Events Feeds ---
+        // ========================
 
         // onclick delete button :
 
@@ -889,6 +1000,8 @@
 
         for (var i = 0; i < _opens.length; i++) {
             _opens[i].onclick = function() {
+                _searchEntries = false;
+                document.getElementById('inputSearchEntries').value = "";
                 ui._vibrate();
                 ui._scrollTo(2);
                 ui._onclick(nextDay, 'disable');
@@ -1336,6 +1449,15 @@
         params.entries.nbDaysAgo = _nbDaysAgo;
     }
     
+    function _saveKeywords() {
+        my._save("keywords.json", "application/json", JSON.stringify(keywords)).then(function(results) {
+            my.log("Save file keywords.json");
+        }).catch(function(error) {
+            my.error("ERROR saving file keywords.json", error);
+            my.alert('ERROR saving file keywords.json');
+        });
+    }
+    
     /**
      * Disable online account
      * @param {string} feedly, theoldreader
@@ -1488,6 +1610,8 @@
         window.addEventListener("keydown", function (event) {
             if (event.keyCode == 13) {
                 if (document.activeElement.id == "inputSearchEntries") {
+                    event.stopPropagation();
+                    event.preventDefault();
                     _search(document.activeElement.value);
                 }
             }
@@ -1541,6 +1665,11 @@
         
         document.body.addEventListener('dspEntries.done', function(event){
             if (_searchEntries) {
+                feeds_entries.style.height = "calc(100% - 17.5rem)";
+                searchEntries.classList.remove('enable-fxos-white');
+                searchEntries.classList.add('enable-fxos-blue');
+                document.getElementById('formSearchEntries').classList.remove('_hide');
+                document.getElementById('formSearchEntries').classList.add('_show');
                 _search(document.getElementById('inputSearchEntries').value);
             }
         });
@@ -1551,6 +1680,44 @@
             var _searchString = document.getElementById('inputSearchEntries').value;
             _search(_searchString);
         });
+        
+        // Add keyword
+        
+        addKeyword.onclick = function() {
+            ui._vibrate();
+            var _myKeyword = document.getElementById('inputSearchEntries').value;
+
+            if (_myKeyword.length > 0) {
+                var _confirm = window.confirm(document.webL10n.get('confirm-add-keyword') + "\n" + _myKeyword);
+
+                if ((_confirm) && (!keywords.contains(_myKeyword))) {
+                    keywords.push(_myKeyword);
+                    _saveKeywords();
+                    
+                    // Reload UI
+                    
+                    _searchEntries = true;
+
+                    if ((myFeedsSubscriptions.local.length > 0) ||
+                        (myFeedsSubscriptions.feedly.length > 0) ||
+                        (myFeedsSubscriptions.theoldreader.length > 0)
+                    ){
+                        gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                    } else {
+                        ui.echo("feeds-list", "", "");
+                        ui.echo("feeds-entries", "", "");
+                        ui._onclick(sync, 'disable');
+                    }
+                    
+                    // Done
+                    
+                    window.alert(document.webL10n.get('keyword-was-added'));
+                } else {
+                    window.alert(document.webL10n.get('keyword-was-not-added'));
+                }
+            
+            }
+        }
 
         /* ===================== */
         /* --- Google Events --- */
