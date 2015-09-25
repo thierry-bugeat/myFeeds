@@ -58,14 +58,6 @@ function _swipe(callback) {
             sync.classList.remove("rotation");
             myGesture._action = "";
         }
-       
-        // Update startY
-            
-        if ((myGesture._startY - myGesture._endY) <= -60) {
-            myGesture._startY -= ((myGesture._startY - myGesture._endY) + 60); // Move _startY
-        } else if ((myGesture._startY - myGesture._endY) >= 60) {
-            myGesture._startY -= ((myGesture._startY - myGesture._endY) - 60); // Move _startY
-        }
         
         // (2) Open feeds
         // (3) Open settings
@@ -82,6 +74,24 @@ function _swipe(callback) {
             if (params.settings.ui.animations) {ui._scrollTo(2);}
             myGesture._action = '';
         }*/
+        
+        // Update startY
+            
+        if ((myGesture._startY - myGesture._endY) <= -60) {
+            myGesture._startY -= ((myGesture._startY - myGesture._endY) + 60); // Move _startY
+        } else if ((myGesture._startY - myGesture._endY) >= 60) {
+            myGesture._startY -= ((myGesture._startY - myGesture._endY) - 60); // Move _startY
+        }
+        
+        // Update startX
+        
+        /*if ((myGesture._startX - myGesture._endX) <= -60) {
+            myGesture._startX -= ((myGesture._startX - myGesture._endX) + 60); // Move _startX
+        } else if ((myGesture._startX - myGesture._endX) >= 60) {
+            myGesture._startX -= ((myGesture._startX - myGesture._endX) - 60); // Move _startX
+        }*/
+        
+        // Logs
         
         my.log('gestures: startX,Y = ' + myGesture._startX + ',' + myGesture._startY + ' / endX,Y = ' + myGesture._endX + ',' + myGesture._endY + ' / delta X,Y = ' + _deltaX + ',' + _deltaY);
         
