@@ -45,7 +45,6 @@
             "access": "readwrite",
             "description": "Required for storing and retrieving data." 
         },
-        "webapps-manage": { },
         "storage": {
             "description": "Required for storing and retrieving data."
         }
