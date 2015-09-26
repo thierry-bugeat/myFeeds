@@ -1617,6 +1617,7 @@
                 if (document.activeElement.id == "inputSearchEntries") {
                     event.stopPropagation();
                     event.preventDefault();
+                    document.getElementById('inputSearchEntries').blur(); // Remove focus
                     _search(document.activeElement.value);
                 }
             }
