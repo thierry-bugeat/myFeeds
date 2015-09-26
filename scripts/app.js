@@ -213,13 +213,18 @@
             _nb = _divs.length;
             
             for (var i = 0; i < _nb; i++) {
-                var _text = _divs[i].textContent.toLowerCase();
-                if ((string == '') || (_text.indexOf(string.toLowerCase()) >= 0)) {
-                    _divs[i].classList.remove('_hide')
-                    _divs[i].classList.add('_show');
-                } else {
+                if ((_divs[i].classList.contains("_small_")) && (!params.entries.displaySmallEntries)) {
                     _divs[i].classList.remove('_show');
                     _divs[i].classList.add('_hide');
+                } else {
+                    var _text = _divs[i].textContent.toLowerCase();
+                    if ((string == '') || (_text.indexOf(string.toLowerCase()) >= 0)) {
+                        _divs[i].classList.remove('_hide')
+                        _divs[i].classList.add('_show');
+                    } else {
+                        _divs[i].classList.remove('_show');
+                        _divs[i].classList.add('_hide');
+                    }
                 }
             }
         }
