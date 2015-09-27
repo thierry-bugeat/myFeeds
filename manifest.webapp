@@ -1,7 +1,7 @@
 {
     "name": "my Feeds",
     "description": "RSS & ATOM feeds reader",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "launch_path": "/index.html",
     "icons": {
         "60": "/images/icon-60.png",
