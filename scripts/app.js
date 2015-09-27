@@ -1,15 +1,21 @@
-    // Firefox OS
-    // Style Guide          : https://www.mozilla.org/en-US/styleguide/products/firefox-os/
-    // Icones               : https://buildingfirefoxos.com/downloads/
-    // APIs List            : https://developer.mozilla.org/fr/Apps/Reference/Firefox_OS_device_APIs
-    // Device Storage API   : https://developer.mozilla.org/en-US/docs/Web/API/Device_Storage_API
-    // Browser API          : https://developer.mozilla.org/fr/docs/WebAPI/Browser
-    // CSP                  : https://developer.mozilla.org/fr/Apps/PSC
-    // <iframe> : https://developer.mozilla.org/fr/docs/Web/HTML/Element/iframe
-
-    // To see :
-    // http://imikado.developpez.com/tutoriels/firefoxOS/ma-premier-application/
-    // http://toddmotto.com/is-it-time-to-drop-jquery-essentials-to-learning-javascript-from-a-jquery-background/
+/**
+ * Copyright 2015 Thierry BUGEAT
+ * 
+ * This file is part of myFeeds.
+ * 
+ * myFeeds is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * myFeeds is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with myFeeds.  If not, see <http://www.gnu.org/licenses/>.
+ */
     
     var my = new MyFeeds();
     var ui = new MyUi();
