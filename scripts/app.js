@@ -906,11 +906,13 @@
         // ========================
         
         if (keywords.length > 0) {
+            var _sortedKeywords = keywords.sort();
+            
             _htmlKeywords = _htmlKeywords + '<h2>' + document.webL10n.get('search-by-keywords') + '</h2><ul class="keywords">';
             
-            for (var i = 0; i < keywords.length; i++) {
-                var _deleteIcone = '<button class="deleteKeyword" myKeyword="' + keywords[i] + '"><span data-icon="delete"></span></button>';
-                _htmlKeywords = _htmlKeywords + '<li><a class="openKeyword" myKeyword="' +  keywords[i] + '"><p>' + _deleteIcone + '<button><span data-icon="search"></span></button>' + keywords[i] + '</p></a></li>';
+            for (var i = 0; i < _sortedKeywords.length; i++) {
+                var _deleteIcone = '<button class="deleteKeyword" myKeyword="' + _sortedKeywords[i] + '"><span data-icon="delete"></span></button>';
+                _htmlKeywords = _htmlKeywords + '<li><a class="openKeyword" myKeyword="' +  _sortedKeywords[i] + '"><p>' + _deleteIcone + '<button><span data-icon="search"></span></button>' + _sortedKeywords[i] + '</p></a></li>';
             }
             
             _htmlKeywords = _htmlKeywords + '</ul>';
