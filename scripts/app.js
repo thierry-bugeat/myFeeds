@@ -90,6 +90,8 @@
     var _onLine = "NA";
     
     var _searchEntries = false;
+    
+    var _previousNbDaysAgo = -1;
 
     // Load params from SDCard.
     // Create file if doesn't exists.
@@ -1040,6 +1042,7 @@
 
     function dspEntries(entries, nbDaysAgo, feedUrl) {
         var start = performance.now();
+        var feedsEntriesScrollTop = feeds_entries.scrollTop;
         
         ui.echo('feedsEntriesNbDaysAgo', document.webL10n.get('loading'), '');
         ui.echo('feeds-entries', '', '');
@@ -1129,9 +1132,9 @@
 
                         if (_entrie._myFirstImageUrl) {
                             if (_diff < params.entries.maxLengthForSmallEntries) {
-                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="' + _entrie._myFirstImageUrl + '"/></span>';
+                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="images/loading.png" data-src="' + _entrie._myFirstImageUrl + '"/></span>';
                             } else {
-                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="' + _entrie._myFirstImageUrl + '"/></span>';
+                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="images/loading.png" data-src="' + _entrie._myFirstImageUrl + '"/></span>';
                             }
                         }
 
@@ -1152,7 +1155,7 @@
                         var _accountIcone = '';
 
                         if (_entrie._myFeedInformations._myAccount != 'local') {
-                            _accountIcone = '<img src="images/' + _entrie._myFeedInformations._myAccount + '.' + _theme + '.png" />';
+                            _accountIcone = '<img src="images/' + _entrie._myFeedInformations._myAccount + '.' + _theme + '.png" data-src="images/' + _entrie._myFeedInformations._myAccount + '.' + _theme + '.png" />';
                         }
 
                         // Content ( Normal / Small )
@@ -1244,6 +1247,14 @@
             params.entries.displaySmallEntries ?
                 ui._smallEntries('show') : ui._smallEntries('hide');
 
+            // Scroll if you stay in same day.
+            
+            if (_previousNbDaysAgo == nbDaysAgo) {
+                feeds_entries.scrollTop = feedsEntriesScrollTop;
+            }
+            
+            _previousNbDaysAgo = nbDaysAgo;
+            
             // ==================
             // --- Add Events ---
             // ==================
@@ -1523,6 +1534,31 @@
             myFeedsSubscriptions[_account].push(_feed);
         }
     }
+    
+    /**
+     * Load images who are visibles in viewport
+     * */
+    function loadImages() {
+        var images = document.getElementsByTagName('img');
+        for (var i = 0; i < images.length; i++) {
+            if (isInViewport(images[i]) && (images[i].getAttribute('data-src') != images[i].getAttribute('src'))) {
+                images[i].setAttribute('src', images[i].getAttribute('data-src'));
+            }
+        }
+    }
+    
+    /**
+     * Check if element is visible in viewport
+     * @param {object} elem DOM element
+     * @return {boolean} true / false
+     * */
+    function isInViewport(element) {
+        var rect = element.getBoundingClientRect()
+        var windowHeight = window.innerHeight || document.documentElement.clientHeight
+        var windowWidth = window.innerWidth || document.documentElement.clientWidth
+
+        return rect.bottom > 0 && rect.top < windowHeight && rect.right > 0 && rect.left < windowWidth
+    }
 
     // ======================
     // --- Ready to start ---
@@ -1609,6 +1645,14 @@
             var _timestampMax = _myTimestamp - (86400 * _maxNbDaysAgo);
             gf.deleteOldEntries(_timestampMax);
         }, 60000);
+        
+        // ============================
+        // --- Load visibles images ---
+        // ============================
+        
+        setInterval(function() {
+            loadImages();
+        }, 200);
 
         // ==============
         // --- Events ---
