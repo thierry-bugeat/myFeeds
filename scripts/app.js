@@ -1124,9 +1124,9 @@
 
                         if (_entrie._myFirstImageUrl) {
                             if (_diff < params.entries.maxLengthForSmallEntries) {
-                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="' + _entrie._myFirstImageUrl + '"/></span>';
+                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="images/loading.png" data-src="' + _entrie._myFirstImageUrl + '"/></span>';
                             } else {
-                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="' + _entrie._myFirstImageUrl + '"/></span>';
+                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="images/loading.png" data-src="' + _entrie._myFirstImageUrl + '"/></span>';
                             }
                         }
 
@@ -1526,6 +1526,33 @@
             myFeedsSubscriptions[_account].push(_feed);
         }
     }
+    
+    /**
+     * Load images who are visibles in viewport
+     * */
+    function loadImages() {
+        if (navigator.onLine) {
+            var images = document.getElementsByTagName('img');
+            for (var i = 0; i < images.length; i++) {
+                if (isInViewport(images[i]) && (images[i].getAttribute('data-src') != images[i].getAttribute('src'))) {
+                    images[i].setAttribute('src', images[i].getAttribute('data-src'));
+                }
+            }
+        }
+    }
+    
+    /**
+     * Check if element is visible in viewport
+     * @param {object} elem DOM element
+     * @return {boolean} true / false
+     * */
+    function isInViewport(element) {
+        var rect = element.getBoundingClientRect()
+        var windowHeight = window.innerHeight || document.documentElement.clientHeight
+        var windowWidth = window.innerWidth || document.documentElement.clientWidth
+
+        return rect.bottom > 0 && rect.top < windowHeight && rect.right > 0 && rect.left < windowWidth
+    }
 
     // ======================
     // --- Ready to start ---
@@ -1612,6 +1639,14 @@
             var _timestampMax = _myTimestamp - (86400 * _maxNbDaysAgo);
             gf.deleteOldEntries(_timestampMax);
         }, 60000);
+        
+        // ============================
+        // --- Load visibles images ---
+        // ============================
+        
+        setInterval(function() {
+            loadImages();
+        }, 200);
 
         // ==============
         // --- Events ---
