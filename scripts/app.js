@@ -1531,12 +1531,10 @@
      * Load images who are visibles in viewport
      * */
     function loadImages() {
-        if (navigator.onLine) {
-            var images = document.getElementsByTagName('img');
-            for (var i = 0; i < images.length; i++) {
-                if (isInViewport(images[i]) && (images[i].getAttribute('data-src') != images[i].getAttribute('src'))) {
-                    images[i].setAttribute('src', images[i].getAttribute('data-src'));
-                }
+        var images = document.getElementsByTagName('img');
+        for (var i = 0; i < images.length; i++) {
+            if (isInViewport(images[i]) && (images[i].getAttribute('data-src') != images[i].getAttribute('src'))) {
+                images[i].setAttribute('src', images[i].getAttribute('data-src'));
             }
         }
     }
