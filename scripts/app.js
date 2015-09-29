@@ -84,6 +84,8 @@
     var _onLine = "NA";
     
     var _searchEntries = false;
+    
+    var _previousNbDaysAgo = -1;
 
     // Load params from SDCard.
     // Create file if doesn't exists.
@@ -1032,6 +1034,7 @@
 
     function dspEntries(entries, nbDaysAgo, feedUrl) {
         var start = performance.now();
+        var feedsEntriesScrollTop = feeds_entries.scrollTop;
         
         ui.echo('feedsEntriesNbDaysAgo', document.webL10n.get('loading'), '');
         ui.echo('feeds-entries', '', '');
@@ -1236,6 +1239,14 @@
             params.entries.displaySmallEntries ?
                 ui._smallEntries('show') : ui._smallEntries('hide');
 
+            // Scroll if you stay in same day.
+            
+            if (_previousNbDaysAgo == nbDaysAgo) {
+                feeds_entries.scrollTop = feedsEntriesScrollTop;
+            }
+            
+            _previousNbDaysAgo = nbDaysAgo;
+            
             // ==================
             // --- Add Events ---
             // ==================
