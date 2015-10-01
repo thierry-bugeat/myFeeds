@@ -32,6 +32,10 @@ var dom = {
     "topups": {
         "entries":  document.getElementById("topup"),
         "feeds":    document.getElementById("topupFeedsList")
+    },
+    "entry": {
+        "next":     document.getElementById("nextEntry"),
+        "previous": document.getElementById("previousEntry")
     }
 };
 var search                  = document.getElementById("search");

@@ -26,8 +26,6 @@
 
     var gf = new GoogleFeed();
 
-    var _myTimestamp;                           // Value set by function "_setMyTimestamp()"
-
     var myFeedsSubscriptions = {'local': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
 
     var params = {
@@ -71,9 +69,29 @@
                 }
             },
             "update": {
-                "every": [300, 900, 1800, 3600]      // In seconds 5mn, 15mn, 30mn, 60mn
+                "every": [300, 900, 1800, 3600] // In seconds 5mn, 15mn, 30mn, 60mn
             },
             "days": [3, 5, 7, 10]
+        }
+    }
+    
+    var liveValues = {
+        "timestamps": {
+            "min": -1,                          // Timestamp value beyond which an entry can't be displayed (Too old). Set by function "_setTimestamps()"
+            "max": -1                           // End of current day (23:59:59). Set by function "_setTimestamps()"
+        },
+        "entries": {
+            "id": {
+                "min": -1,                      // Set by function "setEntriesIds"
+                "max": -1                       // Set by function "setEntriesIds"
+                                                // Depends of: 
+                                                // - params.entries.dontDisplayEntriesOlderThan
+                                                // - isSmallEntry()
+                                                // - search keyword value
+            },
+            "search": {
+                "visible": false                // Form search entries by keyword is visible or not
+            }
         }
     }
     
@@ -88,8 +106,6 @@
     // Network Connection
 
     var _onLine = "NA";
-    
-    var _searchEntries = false;
     
     var _previousNbDaysAgo = -1;
 
@@ -242,17 +258,17 @@
         
         ui._vibrate();
         
-        if (_searchEntries && document.getElementById('formSearchEntries').classList.contains("_hide")) {
-        } else if (_searchEntries && document.getElementById('formSearchEntries').classList.contains("_show")) {
-            _searchEntries = !_searchEntries;
-        } else if (!_searchEntries && document.getElementById('formSearchEntries').classList.contains("_hide")) {
-            _searchEntries = !_searchEntries;
-        } else if (!_searchEntries && document.getElementById('formSearchEntries').classList.contains("_show")) {
+        if (liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_hide")) {
+        } else if (liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_show")) {
+            liveValues['entries']['search']['visible'] = !liveValues['entries']['search']['visible'];
+        } else if (!liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_hide")) {
+            liveValues['entries']['search']['visible'] = !liveValues['entries']['search']['visible'];
+        } else if (!liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_show")) {
         }
         
-        //_searchEntries = !_searchEntries;
+        //liveValues['entries']['search']['visible'] = !liveValues['entries']['search']['visible'];
         
-        if (_searchEntries) {
+        if (liveValues['entries']['search']['visible']) {
             feeds_entries.style.height = "calc(100% - 17.5rem)";
             searchEntries.classList.remove('enable-fxos-white');
             searchEntries.classList.add('enable-fxos-blue');
@@ -770,7 +786,7 @@
         _selectMaxNbDays.onchange = function(e) {
             params.entries.dontDisplayEntriesOlderThan = _selectMaxNbDays.options[_selectMaxNbDays.selectedIndex].value;
             
-            if (params.entries.nbDaysAgo > params.entries.dontDisplayEntriesOlderThan) {
+            if (params.entries.nbDaysAgo >= params.entries.dontDisplayEntriesOlderThan) {
                 params.entries.nbDaysAgo = params.entries.dontDisplayEntriesOlderThan;
                 ui._onclick(nextDay, 'enable');         // [<]
                 ui._onclick(previousDay, 'disable');    // [>]
@@ -980,7 +996,7 @@
 
         for (var i = 0; i < _opens.length; i++) {
             _opens[i].onclick = function() {
-                _searchEntries = true;
+                liveValues['entries']['search']['visible'] = true;
                 ui._vibrate();
                 ui._scrollTo(2);
                 ui._onclick(nextDay, 'disable');
@@ -1015,7 +1031,7 @@
 
         for (var i = 0; i < _opens.length; i++) {
             _opens[i].onclick = function() {
-                _searchEntries = false;
+                liveValues['entries']['search']['visible'] = false;
                 document.getElementById('inputSearchEntries').value = "";
                 ui._vibrate();
                 ui._scrollTo(2);
@@ -1056,10 +1072,12 @@
 
             sortedEntries = entries;
 
-            _setMyTimestamp();
+            _setTimestamps();
 
-            var _timestampMin = _myTimestamp - (86400 * nbDaysAgo);
-            var _timestampMax = _myTimestamp - (86400 * nbDaysAgo) + 86400;
+            var _timestampMin = liveValues['timestamps']['max'] - (86400 * nbDaysAgo) - 86400 + 1;
+            var _timestampMax = liveValues['timestamps']['max'] - (86400 * nbDaysAgo);
+            
+            my.log("dspEntries() beetween " + _timestampMin + " (00:00:00) & " + _timestampMax + " (23:59:59)");
 
             var _previousDaysAgo    = -1; // Count days to groups entries by day.
             var _entrieNbDaysAgo    = 0;
@@ -1097,9 +1115,7 @@
 
                 if ((_entrie._myTimestamp >= _timestampMin) && (_entrie._myTimestamp < _timestampMax)) {
 
-                    if ((_myTimestamp - _entrie._myTimestamp) < (params.entries.dontDisplayEntriesOlderThan * 86400)) {
-
-                        //my.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+_myTimestamp+' (' + (new Date(_myTimestamp*1000)).toUTCString() + ') ==> Diff = ' + (_myTimestamp - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
+                        //my.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+liveValues['timestamps']['max']+' (' + (new Date(liveValues['timestamps']['max']*1000)).toUTCString() + ') ==> Diff = ' + (liveValues['timestamps']['max'] - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
 
                         // ---
 
@@ -1113,10 +1129,9 @@
                         var _minutes = (_date.getMinutes() < 10) ? '0' + _date.getMinutes() : _date.getMinutes();
                         var _time = _date.getHours() + ':' + _minutes;
 
-                        // Diff between "contentSnippet" et "content" ?
                         // Small article or not ?
 
-                        var _diff = _entrie.content.length - _entrie.contentSnippet.length;
+                        var _isSmallEntry = isSmallEntry(_entrie);
 
                         // 1st image
 
@@ -1131,7 +1146,7 @@
                         }*/
 
                         if (_entrie._myFirstImageUrl) {
-                            if (_diff < params.entries.maxLengthForSmallEntries) {
+                            if (_isSmallEntry) {
                                 _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="images/loading.png" data-src="' + _entrie._myFirstImageUrl + '"/></span>';
                             } else {
                                 _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="images/loading.png" data-src="' + _entrie._myFirstImageUrl + '"/></span>';
@@ -1142,11 +1157,11 @@
 
                         var _ratioClass = _theme + '-ratio-entry-l';
 
-                        if ((_diff <= params.entries.maxLengthForSmallEntries) && (!_entrie._myFirstImageUrl)) {
+                        if (_isSmallEntry && (!_entrie._myFirstImageUrl)) {
                             _ratioClass = _theme + '-ratio-entry-s';
                         }
 
-                        else if ((_diff <= params.entries.maxLengthForSmallEntries) || (!_entrie._myFirstImageUrl)) {
+                        else if (_isSmallEntry || (!_entrie._myFirstImageUrl)) {
                             _ratioClass = _theme + '-ratio-entry-m';
                         }
 
@@ -1162,7 +1177,7 @@
 
                         var _content = "";
 
-                        if ((params.entries.theme == 'list') && (_diff >= params.entries.maxLengthForSmallEntries)) {
+                        if ((params.entries.theme == 'list') && (!_isSmallEntry)) {
                             _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
                             _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                             _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
@@ -1186,7 +1201,7 @@
 
                             _nbEntriesDisplayed['small']++;
 
-                        } else if (_diff >= params.entries.maxLengthForSmallEntries) {
+                        } else if (!_isSmallEntry) {
                             _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
                             _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                             _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
@@ -1212,7 +1227,6 @@
 
                         _htmlEntries = _htmlEntries + _content;
 
-                    } else { break; }
                 } else if ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0) { break; }
             }
 
@@ -1266,7 +1280,11 @@
             _nb = _small_entries.length;
 
             for (var i = 0; i < _nb; i++) {
-                _small_entries[i].onclick = function() { ui._vibrate(); ui.fade(this); mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); }
+                _small_entries[i].onclick = function() {
+                    ui._vibrate(); 
+                    ui.fade(this); 
+                    mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
+                }
             }
 
             // onclick Normal Entries :
@@ -1276,7 +1294,11 @@
             _nb = _entries.length;
 
             for (var i = 0; i < _nb; i++) {
-                _entries[i].onclick = function() { ui._vibrate(); ui.fade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }
+                _entries[i].onclick = function() { 
+                    ui._vibrate(); 
+                    ui.fade(this); 
+                    mainEntryOpenInBrowser(this.getAttribute("i"), ""); 
+                }
             }
             
             // =========================
@@ -1293,6 +1315,84 @@
         
         var end = performance.now();
         my.log("dspEntries() " + (end - start) + " milliseconds.");
+    }
+    
+    /**
+     * Is it a small entry ?
+     * @param {object} entry
+     * @return {boolean} true, false
+     * */
+    function isSmallEntry(entry) {
+        var _out;
+        var _diff = entry.content.length - entry.contentSnippet.length;
+        
+        if (_diff < params.entries.maxLengthForSmallEntries) {
+            _out = true;
+        } else {
+            _out = false;
+        }
+        
+        return _out;
+    }
+    
+    /**
+     * Set id max for entries. Variable "liveValues['entries']['id']['max']"
+     * Set id min for entries. Variable "liveValues['entries']['id']['min']"
+     * 
+     * News ID outside this range can't be displayed.
+     * 
+     * Depends of settings...
+     * - params.entries.dontDisplayEntriesOlderThan
+     * - isSmallEntry()
+     * - search keyword value
+     * 
+     * @param {null}
+     * @return {null}
+     * */
+    function setEntriesIds() {
+        my.log('setEntriesIds()');
+
+        // ID max
+        
+        _setTimestamps();
+
+        var _nb     = sortedEntries.length - 1;
+        var _string = document.getElementById('inputSearchEntries').value || "";
+
+        while ((sortedEntries[_nb]._myTimestamp < liveValues['timestamps']['min'])
+            || (!params.entries.displaySmallEntries && isSmallEntry(sortedEntries[_nb]))
+            || (_string !== "" && liveValues['entries']['search']['visible'] && (((JSON.stringify(sortedEntries[_nb])).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
+        ){
+            _nb = _nb - 1;
+            if (_nb < 0) { break; }
+        }
+        
+        my.log('setEntriesIds() entries = ', sortedEntries);
+        my.log('setEntriesIds() search = ' + _string);
+        my.log('setEntriesIds() result = ', sortedEntries[_nb]);
+        
+        liveValues['entries']['id']['max'] = _nb;
+        
+        // ID min
+
+        my.log('setEntriesIds()');
+        
+        var _nb     = 0;
+        var _string = document.getElementById('inputSearchEntries').value || "";
+
+        while ((sortedEntries[_nb]._myTimestamp > liveValues['timestamps']['max'])
+            || ((params.entries.displaySmallEntries == false) && (isSmallEntry(sortedEntries[_nb]) == true)) 
+            || (_string !== "" && liveValues['entries']['search']['visible'] && (((JSON.stringify(sortedEntries[_nb])).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
+        ){
+            _nb = _nb + 1;
+            if (_nb >= sortedEntries.length) { break; }
+        }
+        
+        my.log('setEntriesIds() entries = ', sortedEntries);
+        my.log('setEntriesIds() search = ' + _string);
+        my.log('setEntriesIds() result = ', sortedEntries[_nb]);
+        
+        liveValues['entries']['id']['min'] = _nb;
     }
 
     function mainEntryOpenInBrowser(entryId, url) {
@@ -1330,6 +1430,8 @@
         document.getElementById("browser").style.cssText = "display: block;";
 
         main_entry.scrollTop = 0;
+        
+        document.body.dispatchEvent(new CustomEvent('mainEntryOpen.done', {"detail": {"entryId": entryId, "url": url, "_mySha256_link": sortedEntries[entryId]['_mySha256_link'], "_mySha256_title": sortedEntries[entryId]['_mySha256_title']}}));
 
         ui._quickScrollTo(4);
     }
@@ -1370,18 +1472,22 @@
     }
 
     /**
-     * Set start of day timestamp.
+     * Set timestamps values Min & Max.
+     * Variable "liveValues['timestamps']['max']" Start of day timestamp. 
+     * Variable "liveValues['timestamps']['min']" Value beyond which an entry can't be displayed. (Too old)
      * @param {null}
      * */
-    function _setMyTimestamp() {
+    function _setTimestamps() {
         var _now    = new Date();
         var _year   = _now.getFullYear();
         var _month  = _now.getMonth();
         var _day    = _now.getDate();
 
-        var _mySod = new Date(_year, _month, _day, '00','00','00');
+        var _myDate = new Date(_year, _month, _day, '23','59','59');
+        
+        liveValues['timestamps']['max'] = Math.floor(_myDate.getTime() / 1000);
 
-        _myTimestamp = Math.floor(_mySod.getTime() / 1000);
+        liveValues['timestamps']['min'] = liveValues['timestamps']['max'] - (86400 * params.entries.dontDisplayEntriesOlderThan) - 86400 + 1;
     }
 
     // Callback for ALL subscriptions promises
@@ -1486,7 +1592,7 @@
      * Disable online account
      * @param {string} feedly, theoldreader
      * */
-     function _disableAccount(_account) {
+    function _disableAccount(_account) {
         my.log('_disableAccount', arguments);
         params.accounts[_account].logged = false
         myFeedsSubscriptions[_account] = [];
@@ -1642,7 +1748,7 @@
         
         setInterval(function() {
             var _maxNbDaysAgo = params.settings.days.last();
-            var _timestampMax = _myTimestamp - (86400 * _maxNbDaysAgo);
+            var _timestampMax = liveValues['timestamps']['max'] - (86400 * _maxNbDaysAgo);
             gf.deleteOldEntries(_timestampMax);
         }, 60000);
         
@@ -1688,6 +1794,106 @@
             }
         }, 59000); // 59s Less than minimal Firefox OS sleep time (60s)
         
+        // Main entry open done...
+        // Update next entry [<] & previous entry [>] buttons.
+        
+        document.body.addEventListener('mainEntryOpen.done', function(event){
+            
+            setEntriesIds(); // Set values liveValues['entries']['id']['max'] & liveValues['entries']['id']['min']
+            
+            var _entryId = 0;
+            var _mySha256_title = event.detail["_mySha256_title"];
+            var _mySha256_link  = event.detail["_mySha256_link"];
+            var _nb = sortedEntries.length;
+            var _string = document.getElementById('inputSearchEntries').value || "";
+
+            for (var i = 0; i < _nb; i++) {
+                if ((sortedEntries[i]['_mySha256_title']== _mySha256_title) ||
+                    (sortedEntries[i]['_mySha256_link'] == _mySha256_link)) {
+
+                    var _entryId = i;
+                    var _previousEntryId = i + 1;
+                    var _nextEntryId = i - 1;
+
+                    // [>] previous news ?
+                    
+                    var _content = (sortedEntries[_previousEntryId]._myFeedInformations.title + ' ' + sortedEntries[_previousEntryId].title + ' ' + sortedEntries[_previousEntryId].contentSnippet).toLowerCase();
+                    
+                    while ((sortedEntries[_previousEntryId]._myTimestamp < liveValues['timestamps']['min'])
+                        || (!params.entries.displaySmallEntries && isSmallEntry(sortedEntries[_previousEntryId]))
+                        || (_string !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_string.toLowerCase()) == -1))
+                    ){
+                        _previousEntryId = _previousEntryId + 1;
+                        if (_previousEntryId > liveValues['entries']['id']['max']) { _previousEntryId = _entryId; break; }
+                        _content = (sortedEntries[_previousEntryId]._myFeedInformations.title + ' ' + sortedEntries[_previousEntryId].title + ' ' + sortedEntries[_previousEntryId].contentSnippet).toLowerCase();
+                    }
+                    // [<] next news ?
+
+                    var _content = (sortedEntries[_nextEntryId]._myFeedInformations.title + ' ' + sortedEntries[_nextEntryId].title + ' ' + sortedEntries[_nextEntryId].contentSnippet).toLowerCase();
+                    
+                    while ((sortedEntries[_nextEntryId]._myTimestamp > liveValues['timestamps']['max'])
+                        || (!params.entries.displaySmallEntries && isSmallEntry(sortedEntries[_nextEntryId]))
+                        || (_string !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_string.toLowerCase()) == -1))
+                    ){
+                        _nextEntryId = _nextEntryId - 1;
+                        if (_nextEntryId < 0) {_nextEntryId = _entryId; break; }
+                        _content = (sortedEntries[_nextEntryId]._myFeedInformations.title + ' ' + sortedEntries[_nextEntryId].title + ' ' + sortedEntries[_nextEntryId].contentSnippet).toLowerCase();
+                    }
+                    
+                    break;
+                }
+            }
+            
+            //window.alert(_nextEntryId+ ' [<] '+ _entryId +' [>]' +_previousEntryId);
+
+            // [<]
+            
+            if (isSmallEntry(sortedEntries[_nextEntryId])) {
+                dom['entry']['next'].setAttribute("i", _nextEntryId);
+                dom['entry']['next'].setAttribute("entry_link", sortedEntries[_nextEntryId].link);
+            } else {
+                dom['entry']['next'].setAttribute("i", _nextEntryId);
+                dom['entry']['next'].setAttribute("entry_link", "");
+            }
+            
+            // [>]
+            
+            if (isSmallEntry(sortedEntries[_previousEntryId])) {
+                dom['entry']['previous'].setAttribute("i", _previousEntryId);
+                dom['entry']['previous'].setAttribute("entry_link", sortedEntries[_previousEntryId].link);
+            } else {
+                dom['entry']['previous'].setAttribute("i", _previousEntryId);
+                dom['entry']['previous'].setAttribute("entry_link", "");
+            }
+            
+            // Disable / enable button [<]
+            
+            if ((_nextEntryId < liveValues['entries']['id']['min']) || (_nextEntryId == _entryId)) {
+                ui._onclick(dom['entry']['next'], 'disable');
+            } else {
+                ui._onclick(dom['entry']['next'], 'enable');
+            }
+            
+            // Disable / enable button [>]
+            
+            if ((_previousEntryId > liveValues['entries']['id']['max']) || (_previousEntryId == _entryId)) {
+                ui._onclick(dom.entry['previous'], 'disable');
+            } else {
+                ui._onclick(dom.entry['previous'], 'enable');
+            }
+            
+        });
+        
+        // ---
+        
+        dom['entry']['next'].onclick = function() {
+            mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
+        }
+        
+        dom['entry']['previous'].onclick = function() {
+            mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
+        }
+        
         // Share entry :
         // https://developer.mozilla.org/fr/docs/Web/API/Web_Activities
 
@@ -1722,7 +1928,7 @@
         // Search entries after "dspEntries"
         
         document.body.addEventListener('dspEntries.done', function(event){
-            if (_searchEntries) {
+            if (liveValues['entries']['search']['visible']) {
                 feeds_entries.style.height = "calc(100% - 17.5rem)";
                 searchEntries.classList.remove('enable-fxos-white');
                 searchEntries.classList.add('enable-fxos-blue');
@@ -1754,7 +1960,7 @@
                     
                     // Reload UI
                     
-                    _searchEntries = true;
+                    liveValues['entries']['search']['visible'] = true;
 
                     if ((myFeedsSubscriptions.local.length > 0) ||
                         (myFeedsSubscriptions.feedly.length > 0) ||

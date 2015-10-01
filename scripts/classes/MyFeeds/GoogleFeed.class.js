@@ -256,6 +256,12 @@ GoogleFeed.prototype.deleteEntries = function(account, feedId) {
  * */
 GoogleFeed.prototype.deleteOldEntries = function(timestamp) {
     _MyFeeds.log('deleteOldEntries(' + timestamp + ')');
+    
+    var date = new Date(timestamp * 1000);
+    var dateTimeString = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2) + ' ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
+    
+    _MyFeeds.log('deleteOldEntries(' + dateTimeString + ') => ' + this.gf_unsortedEntries.length + ' entrie(s)');
+    
 
     var _tmp = [];
     var _oldEntries = 0;
