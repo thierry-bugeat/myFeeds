@@ -79,6 +79,31 @@ Feedly.prototype.getToken = function() {
 }
 
 /**
+ * Use "refresh_token" to obtain a new "access_token"
+ * @param   {null}
+ * @return  {CustomEvent} Feedly.getNewToken.done | Feedly.getNewToken.error
+ * */
+
+Feedly.prototype.updateToken = function() {
+    _MyFeeds.log('Feedly.prototype.getNewToken()');
+    
+    var _url = _Feedly.feedly.host + '/v3/auth/token';
+
+    var _params = 'refresh_token=' + encodeURIComponent(_Feedly.feedly.token.refresh_token) + 
+        '&client_id=' + encodeURIComponent(_Feedly.feedly.client_id) +
+        '&client_secret=' + encodeURIComponent(_Feedly.feedly.client_secret) +
+        '&grant_type=refresh_token';
+
+    this.post(_url, _params, function(response) {
+        _Feedly.feedly.token.access_token = response.access_token;
+        _Feedly._save('cache/feedly/access_token.json', 'application/json', JSON.stringify(_Feedly.feedly.token));
+        _Feedly._save('cache/feedly/access_token.new.json', 'application/json', JSON.stringify(response));
+        document.body.dispatchEvent(new CustomEvent('Feedly.getNewToken.done', {"detail": response}));
+        _MyFeeds.log('CustomEvent : Feedly.getNewToken.done');
+    });
+}
+
+/**
  * @param   {null}
  * @return  {CustomEvent} Feedly.login.done | Feedly.login.error
  * */

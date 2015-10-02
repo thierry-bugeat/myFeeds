@@ -124,7 +124,7 @@
         
         ui.selectThemeIcon();
         
-        // Get and set Feedly token from cache
+        // Get and set Feedly token from cache then try to update token.
         if (params.accounts.feedly.logged) {
             my._load('cache/feedly/access_token.json').then(function(_token){
                 feedly.setToken(_token);
@@ -134,6 +134,13 @@
             }).catch(function(error) {
                 my.alert("Can't load and set Feedly token");
                 _disableAccount('feedly');
+            }).then(function(){
+                if (navigator.onLine) {
+                    my.log("Try to update Feedly token...");
+                    feedly.updateToken();
+                }
+            }).catch(function(error) {
+                my.log("Can't update Feedly token");
             });
         }
         // Get and set The Old Reader token from cache
@@ -747,7 +754,7 @@
         document.getElementById('appVersion').onclick = function(e) {
             params.settings.developper_menu.visible = !params.settings.developper_menu.visible;
             dspSettings();
-            window.alert('Developper menu : ' + params.settings.developper_menu.visible);
+            my.message('Developper menu : ' + params.settings.developper_menu.visible);
             _saveParams();
         }
         
@@ -1844,7 +1851,7 @@
                 }
             }
             
-            //window.alert(_nextEntryId+ ' [<] '+ _entryId +' [>]' +_previousEntryId);
+            //my.message(_nextEntryId+ ' [<] '+ _entryId +' [>]' +_previousEntryId);
 
             // [<]
             
@@ -1975,9 +1982,9 @@
                     
                     // Done
                     
-                    window.alert(document.webL10n.get('keyword-was-added'));
+                    my.message(document.webL10n.get('keyword-was-added'));
                 } else {
-                    window.alert(document.webL10n.get('keyword-was-not-added'));
+                    my.message(document.webL10n.get('keyword-was-not-added'));
                 }
             
             }
@@ -2128,7 +2135,7 @@
 
         document.body.addEventListener('Feedly.getSubscriptions.error', function(response) {
             my.log('CustomEvent : Feedly.getSubscriptions.error', arguments);
-            my.message('Feedly error');
+            my.message(document.webL10n.get('feedly-get-subscriptions-error') + response.detail.message);
         });
 
         /* ============================= */
