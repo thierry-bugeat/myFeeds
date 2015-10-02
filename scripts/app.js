@@ -594,11 +594,6 @@
         var start = performance.now();
         
         var _now = new Date();
-        var _minutes = _now.getMinutes();
-
-        if (_minutes < 10) {
-            _minutes = "0" + _minutes;
-        }
         
         // Vibrate on click
         
@@ -695,8 +690,8 @@
         var _htmlSettings = [
         '<h2>' + document.webL10n.get('settings-feeds') + '</h2>                                                                                            ',
         '<ul>                                                                                                                                               ',
-        '   <li class="_online_"><span data-icon="reload"></span>' + document.webL10n.get('settings-last-update') + _now.getHours() + ':' + _minutes + '</li>                ',
-        '   <li class="_online_"><span data-icon="sync"></span>' + document.webL10n.get('settings-update-every') + _htmlSelectUpdateEvery + '</li>                           ',
+        '   <li class="_online_"><span data-icon="reload"></span>' + document.webL10n.get('settings-last-update') + _now.toLocaleTimeString() + '</li>      ',
+        '   <li class="_online_"><span data-icon="sync"></span>' + document.webL10n.get('settings-update-every') + _htmlSelectUpdateEvery + '</li>          ',
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-news') + '</h2>                                                                                             ',
         '<ul>                                                                                                                                               ',
@@ -714,13 +709,13 @@
         '       </divn>                                                                                                                                     ',
         '   </li>                                                                                                                                           ',
         '</ul>                                                                                                                                              ',
-        '<h2>' + document.webL10n.get('user-interface') + '</h2>                                                                                                     ',
+        '<h2>' + document.webL10n.get('user-interface') + '</h2>                                                                                            ',
         '<ul>                                                                                                                                               ',
         '   <li><span data-icon="vibrate"></span>' + document.webL10n.get('vibrate-on-click') + '<div><label class="pack-switch"><input id="toggleVibrate" type="checkbox" ' + _vibrateOnClick + '><span></span></label></div></li>',
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('about') + '</h2>                                                                                                     ',
         '<ul>                                                                                                                                               ',
-        '   <li id="appVersion"><span data-icon="messages"></span>' + document.webL10n.get('app-title') + '<div>' + myManifest.version + '</div></li>                       ',
+        '   <li id="appVersion"><span data-icon="messages"></span>' + document.webL10n.get('app-title') + '<div>' + myManifest.version + '</div></li>       ',
         '   <li><span data-icon="messages"></span>' + document.webL10n.get('author') + '<div>' + myManifest.developer.name + '</div></li>                   ',
         '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('website') + '<div><a href="' + myManifest.developer.url + '" target="_blank">url</a></div></li>',
         '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('git-repository') + '<div><a href="' + document.webL10n.get('git-url') + '" target="_blank">url</a></div></li>',
@@ -728,7 +723,7 @@
         '</ul>                                                                                                                                              ',
         '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
         '<ul class="developper-menu">                                                                                                                       ',
-        '   <li><span data-icon="wifi-4"></span>' + document.webL10n.get('settings-connection') + '<div id="onLine">NA</div></li>                                                                  ',
+        '   <li><span data-icon="wifi-4"></span>' + document.webL10n.get('settings-connection') + '<div id="onLine">NA</div></li>                           ',
         '   <li><span data-icon="play-circle"></span>' + document.webL10n.get('settings-use-animations') + '<div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
         '   <li><span data-icon="sd-card"></span>' + document.webL10n.get('my-subscriptions') + '<div><button id="loadSubscriptions"><span data-l10n-id="load">load</span></button></div></li>',
         '   <li><span data-icon="sd-card"></span>' + document.webL10n.get('my-subscriptions') + '<div><button id="saveSubscriptions"><span data-l10n-id="save">save</span></button></div></li>',
@@ -961,7 +956,7 @@
                 _deleteIcone = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed._myFeedId + '"><span data-icon="delete"></span></button>';
             }
 
-            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
+            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + new Date(_feed._myLastPublishedDate).toLocaleDateString() + ' ' + new Date(_feed._myLastPublishedDate).toLocaleTimeString() + '</time></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds +
@@ -1122,19 +1117,9 @@
 
                 if ((_entrie._myTimestamp >= _timestampMin) && (_entrie._myTimestamp < _timestampMax)) {
 
-                        //my.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+liveValues['timestamps']['max']+' (' + (new Date(liveValues['timestamps']['max']*1000)).toUTCString() + ') ==> Diff = ' + (liveValues['timestamps']['max'] - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
-
-                        // ---
-
-                        // Date analyse
-                        // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Date/toLocaleString
-                        // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/DateTimeFormat
-
                         // Time
                         
-                        var _date = new Date(_entrie.publishedDate);
-                        var _minutes = (_date.getMinutes() < 10) ? '0' + _date.getMinutes() : _date.getMinutes();
-                        var _time = _date.getHours() + ':' + _minutes;
+                        var _time = new Date(_entrie.publishedDate).toLocaleTimeString();
 
                         // Small article or not ?
 
@@ -1425,7 +1410,7 @@
 
             _srcDoc = _srcDoc + _srcDocCss; // Inline CSS from file "style/inline.css.js"
             _srcDoc = _srcDoc + '<div class="entrie-title">' + _entry.title.replace(_regex, "&#39;") + '</div>';
-            _srcDoc = _srcDoc + '<div class="entrie-date">' + new Date(_entry.publishedDate) + '</div>';
+            _srcDoc = _srcDoc + '<div class="entrie-date">' + new Date(_entry.publishedDate).toLocaleDateString() + ' ' + new Date(_entry.publishedDate).toLocaleTimeString() + '</div>';
             _srcDoc = _srcDoc + _author;
             _srcDoc = _srcDoc + '<div class="entrie-feed-title"><a href="' + _entry._myFeedInformations.link + '">' + _entry._myFeedInformations.title.replace(_regex, "&#39;") + '</a></div>';
             _srcDoc = _srcDoc + '<div class="entrie-contentSnippet">' + _entry.content.replace(_regex, "&#39;") + '</div>';
