@@ -690,7 +690,7 @@
         var _htmlSettings = [
         '<h2>' + document.webL10n.get('settings-feeds') + '</h2>                                                                                            ',
         '<ul>                                                                                                                                               ',
-        '   <li class="_online_"><span data-icon="reload"></span>' + document.webL10n.get('settings-last-update') + _now.toLocaleTimeString() + '</li>      ',
+        '   <li class="_online_"><span data-icon="reload"></span>' + document.webL10n.get('settings-last-update') + _now.toLocaleTimeString(userLocale) + '</li>      ',
         '   <li class="_online_"><span data-icon="sync"></span>' + document.webL10n.get('settings-update-every') + _htmlSelectUpdateEvery + '</li>          ',
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-news') + '</h2>                                                                                             ',
@@ -956,7 +956,7 @@
                 _deleteIcone = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed._myFeedId + '"><span data-icon="delete"></span></button>';
             }
 
-            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + new Date(_feed._myLastPublishedDate).toLocaleDateString() + ' ' + new Date(_feed._myLastPublishedDate).toLocaleTimeString() + '</time></p></a></li>';
+            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + new Date(_feed._myLastPublishedDate).toLocaleDateString(userLocale) + ' ' + new Date(_feed._myLastPublishedDate).toLocaleTimeString(userLocale) + '</time></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds +
@@ -1119,7 +1119,7 @@
 
                         // Time
                         
-                        var _time = new Date(_entrie.publishedDate).toLocaleTimeString();
+                        var _time = new Date(_entrie.publishedDate).toLocaleTimeString(userLocale);
 
                         // Small article or not ?
 
@@ -1410,7 +1410,7 @@
 
             _srcDoc = _srcDoc + _srcDocCss; // Inline CSS from file "style/inline.css.js"
             _srcDoc = _srcDoc + '<div class="entrie-title">' + _entry.title.replace(_regex, "&#39;") + '</div>';
-            _srcDoc = _srcDoc + '<div class="entrie-date">' + new Date(_entry.publishedDate).toLocaleDateString() + ' ' + new Date(_entry.publishedDate).toLocaleTimeString() + '</div>';
+            _srcDoc = _srcDoc + '<div class="entrie-date">' + new Date(_entry.publishedDate).toLocaleDateString(userLocale) + ' ' + new Date(_entry.publishedDate).toLocaleTimeString(userLocale) + '</div>';
             _srcDoc = _srcDoc + _author;
             _srcDoc = _srcDoc + '<div class="entrie-feed-title"><a href="' + _entry._myFeedInformations.link + '">' + _entry._myFeedInformations.title.replace(_regex, "&#39;") + '</a></div>';
             _srcDoc = _srcDoc + '<div class="entrie-contentSnippet">' + _entry.content.replace(_regex, "&#39;") + '</div>';
