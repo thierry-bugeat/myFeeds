@@ -956,7 +956,7 @@
                 _deleteIcone = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed._myFeedId + '"><span data-icon="delete"></span></button>';
             }
 
-            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + new Date(_feed._myLastPublishedDate).toLocaleDateString(userLocale) + ' ' + new Date(_feed._myLastPublishedDate).toLocaleTimeString(userLocale) + '</time></p></a></li>';
+            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + _feed._myLastPublishedDate + '</time></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds +
@@ -1059,7 +1059,7 @@
     }
 
     function dspEntries(entries, nbDaysAgo, feedUrl) {
-        var start = performance.now();
+
         var feedsEntriesScrollTop = feeds_entries.scrollTop;
         
         ui.echo('feedsEntriesNbDaysAgo', document.webL10n.get('loading'), '');
@@ -1069,6 +1069,8 @@
         
         _dspEntriesTimeout = window.setTimeout(function() {
 
+            var start = performance.now();
+            
             my.log("dspEntries()", arguments);
             my.log(entries);
 
@@ -1119,7 +1121,7 @@
 
                         // Time
                         
-                        var _time = new Date(_entrie.publishedDate).toLocaleTimeString(userLocale);
+                        var _time = _entrie._myLocalizedTime;
 
                         // Small article or not ?
 
@@ -1303,10 +1305,12 @@
             
             document.body.dispatchEvent(new CustomEvent('dspEntries.done', {"detail": ""}));
         
-        }, 250); // Schedule the execution for later
+            // --- Eecution time
+            
+            var end = performance.now();
+            my.log("dspEntries() " + (end - start) + " milliseconds.");
         
-        var end = performance.now();
-        my.log("dspEntries() " + (end - start) + " milliseconds.");
+        }, 250); // Schedule the execution for later
     }
     
     /**
@@ -1410,7 +1414,7 @@
 
             _srcDoc = _srcDoc + _srcDocCss; // Inline CSS from file "style/inline.css.js"
             _srcDoc = _srcDoc + '<div class="entrie-title">' + _entry.title.replace(_regex, "&#39;") + '</div>';
-            _srcDoc = _srcDoc + '<div class="entrie-date">' + new Date(_entry.publishedDate).toLocaleDateString(userLocale) + ' ' + new Date(_entry.publishedDate).toLocaleTimeString(userLocale) + '</div>';
+            _srcDoc = _srcDoc + '<div class="entrie-date">' + _entry._myLocalizedDate + ' ' + _entry._myLocalizedTime + '</div>';
             _srcDoc = _srcDoc + _author;
             _srcDoc = _srcDoc + '<div class="entrie-feed-title"><a href="' + _entry._myFeedInformations.link + '">' + _entry._myFeedInformations.title.replace(_regex, "&#39;") + '</a></div>';
             _srcDoc = _srcDoc + '<div class="entrie-contentSnippet">' + _entry.content.replace(_regex, "&#39;") + '</div>';
