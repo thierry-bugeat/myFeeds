@@ -1835,27 +1835,36 @@
 
                     // [>] previous news ?
                     
-                    var _content = (sortedEntries[_previousEntryId]._myFeedInformations.title + ' ' + sortedEntries[_previousEntryId].title + ' ' + sortedEntries[_previousEntryId].contentSnippet).toLowerCase();
-                    
-                    while ((sortedEntries[_previousEntryId]._myTimestamp < liveValues['timestamps']['min'])
-                        || (!params.entries.displaySmallEntries && isSmallEntry(sortedEntries[_previousEntryId]))
-                        || (_string !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_string.toLowerCase()) == -1))
-                    ){
-                        _previousEntryId = _previousEntryId + 1;
-                        if (_previousEntryId > liveValues['entries']['id']['max']) { _previousEntryId = _entryId; break; }
-                        _content = (sortedEntries[_previousEntryId]._myFeedInformations.title + ' ' + sortedEntries[_previousEntryId].title + ' ' + sortedEntries[_previousEntryId].contentSnippet).toLowerCase();
+                    if (_previousEntryId > liveValues['entries']['id']['max']) {
+                        _previousEntryId = _entryId;
+                    } else {
+                        var _content = (sortedEntries[_previousEntryId]._myFeedInformations.title + ' ' + sortedEntries[_previousEntryId].title + ' ' + sortedEntries[_previousEntryId].contentSnippet).toLowerCase();
+                        
+                        while ((sortedEntries[_previousEntryId]._myTimestamp < liveValues['timestamps']['min'])
+                            || (!params.entries.displaySmallEntries && isSmallEntry(sortedEntries[_previousEntryId]))
+                            || (_string !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_string.toLowerCase()) == -1))
+                        ){
+                            _previousEntryId = _previousEntryId + 1;
+                            if (_previousEntryId > liveValues['entries']['id']['max']) { _previousEntryId = _entryId; break; }
+                            _content = (sortedEntries[_previousEntryId]._myFeedInformations.title + ' ' + sortedEntries[_previousEntryId].title + ' ' + sortedEntries[_previousEntryId].contentSnippet).toLowerCase();
+                        }
                     }
+                
                     // [<] next news ?
-
-                    var _content = (sortedEntries[_nextEntryId]._myFeedInformations.title + ' ' + sortedEntries[_nextEntryId].title + ' ' + sortedEntries[_nextEntryId].contentSnippet).toLowerCase();
                     
-                    while ((sortedEntries[_nextEntryId]._myTimestamp > liveValues['timestamps']['max'])
-                        || (!params.entries.displaySmallEntries && isSmallEntry(sortedEntries[_nextEntryId]))
-                        || (_string !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_string.toLowerCase()) == -1))
-                    ){
-                        _nextEntryId = _nextEntryId - 1;
-                        if (_nextEntryId < 0) {_nextEntryId = _entryId; break; }
-                        _content = (sortedEntries[_nextEntryId]._myFeedInformations.title + ' ' + sortedEntries[_nextEntryId].title + ' ' + sortedEntries[_nextEntryId].contentSnippet).toLowerCase();
+                    if (_nextEntryId < 0) {
+                        _nextEntryId = _entryId; 
+                    } else {
+                        var _content = (sortedEntries[_nextEntryId]._myFeedInformations.title + ' ' + sortedEntries[_nextEntryId].title + ' ' + sortedEntries[_nextEntryId].contentSnippet).toLowerCase();
+                        
+                        while ((sortedEntries[_nextEntryId]._myTimestamp > liveValues['timestamps']['max'])
+                            || (!params.entries.displaySmallEntries && isSmallEntry(sortedEntries[_nextEntryId]))
+                            || (_string !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_string.toLowerCase()) == -1))
+                        ){
+                            _nextEntryId = _nextEntryId - 1;
+                            if (_nextEntryId < 0) {_nextEntryId = _entryId; break; }
+                            _content = (sortedEntries[_nextEntryId]._myFeedInformations.title + ' ' + sortedEntries[_nextEntryId].title + ' ' + sortedEntries[_nextEntryId].contentSnippet).toLowerCase();
+                        }
                     }
                     
                     break;
