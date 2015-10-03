@@ -95,11 +95,16 @@ Feedly.prototype.updateToken = function() {
         '&grant_type=refresh_token';
 
     this.post(_url, _params, function(response) {
-        _Feedly.feedly.token.access_token = response.access_token;
-        _Feedly._save('cache/feedly/access_token.json', 'application/json', JSON.stringify(_Feedly.feedly.token));
-        _Feedly._save('cache/feedly/access_token.new.json', 'application/json', JSON.stringify(response));
-        document.body.dispatchEvent(new CustomEvent('Feedly.getNewToken.done', {"detail": response}));
-        _MyFeeds.log('CustomEvent : Feedly.getNewToken.done');
+        if (typeof response['errorMessage'] !== 'undefined') {
+            window.alert("Feedly Error : \n" + JSON.stringify(response));
+            _MyFeeds.log('CustomEvent : Feedly.getNewToken.error');
+        } else {
+            _Feedly.feedly.token.access_token = response.access_token;
+            _Feedly._save('cache/feedly/access_token.json', 'application/json', JSON.stringify(_Feedly.feedly.token));
+            _Feedly._save('cache/feedly/access_token.new.json', 'application/json', JSON.stringify(response));
+            document.body.dispatchEvent(new CustomEvent('Feedly.getNewToken.done', {"detail": response}));
+            _MyFeeds.log('CustomEvent : Feedly.getNewToken.done');
+        }
     });
 }
 
