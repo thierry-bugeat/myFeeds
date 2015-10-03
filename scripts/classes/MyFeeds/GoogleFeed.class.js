@@ -199,7 +199,6 @@ GoogleFeed.prototype.addEntries = function(entries) {
 
         _entry['_myLocalizedDate']      = ""; // Due to severe performances issues dates are generated later
         _entry['_myLocalizedTime']      = ""; // Due to severe performances issues times are generated later
-        //_entry['_myLocalizedTime']      = _date.toLocaleTimeString(userLocale);
         
         _entry['_mySha256_title']       = (_entry['_myFeedInformations']['_myFeedId'] + _entry['title']).toString();
         _entry['_mySha256_link']        = (_entry['_myFeedInformations']['_myFeedId'] + _entry['link']).toString();
@@ -303,14 +302,6 @@ GoogleFeed.prototype.addFeed = function(feed) {
     
     _myNewfeed['_myNbEntries']          = _myNewEntries.length;
     
-    // /!\ The 3 following values are false. Entries are not sorted by dates.
-    
-    var _date = new Date(_myNewEntries[0].publishedDate);
-    
-    _myNewfeed['_myLastPublishedDate']  = _date.toLocaleString(userLocale);
-    _myNewfeed['_myLastTimestamp']      = _myNewEntries[0]._myTimestamp;
-    _myNewfeed['_myLastTimestampInMs']  = _myNewEntries[0]._myTimestampInMs;
-    
     // Pulsations ?
     
     var _timestamps = [];
@@ -331,6 +322,14 @@ GoogleFeed.prototype.addFeed = function(feed) {
     else if (_myPulsations > 8 )    { _myNewfeed['_myPulsationsIcone'] = 'wifi-3'; }
     else if (_myPulsations > 3 )    { _myNewfeed['_myPulsationsIcone'] = 'wifi-2'; }
     else                            { _myNewfeed['_myPulsationsIcone'] = 'wifi-1'; }
+    
+    // /!\ The 3 following values are false. Entries are not sorted by dates.
+    
+    var _date = new Date(_timestampMax * 1000);
+    
+    _myNewfeed['_myLastPublishedDate']  = _date.toLocaleString(userLocale);
+    _myNewfeed['_myLastTimestamp']      = _timestampMax;
+    _myNewfeed['_myLastTimestampInMs']  = _timestampMax;
     
     // Remove values.
     
