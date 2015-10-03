@@ -192,12 +192,15 @@ GoogleFeed.prototype.addEntries = function(entries) {
         // Dans le timestamp en "ms" j'ajoute une valeur aléatoire pour ne pas avoir 2 dates de publication identiques.
         // J'ajoute une valeur comprise entre 0 et 500 (0 à 0.5 seconde).
         //
-        _entry['_myTimestamp']          = Math.round(new Date(_entry.publishedDate).getTime()/1000);
-        _entry['_myTimestampInMs']      = Math.round(new Date(_entry.publishedDate).getTime()) + (Math.floor(Math.random()*500));
+        var _date = new Date(_entry.publishedDate);
         
-        _entry['_myPublishedDateUTC']   = new Date(_entry.publishedDate).toUTCString();
-        _entry['_myLocalizedDate']      = new Date(_entry.publishedDate).toLocaleDateString(userLocale);
-        _entry['_myLocalizedTime']      = new Date(_entry.publishedDate).toLocaleTimeString(userLocale);
+        _entry['_myTimestamp']          = Math.round(_date.getTime()/1000);
+        _entry['_myTimestampInMs']      = Math.round(_date.getTime()) + (Math.floor(Math.random()*500));
+
+        _entry['_myLocalizedDate']      = ""; // Due to severe performances issues dates are generated later
+        _entry['_myLocalizedTime']      = ""; // Due to severe performances issues times are generated later
+        //_entry['_myLocalizedTime']      = _date.toLocaleTimeString(userLocale);
+        
         _entry['_mySha256_title']       = (_entry['_myFeedInformations']['_myFeedId'] + _entry['title']).toString();
         _entry['_mySha256_link']        = (_entry['_myFeedInformations']['_myFeedId'] + _entry['link']).toString();
         
@@ -300,9 +303,11 @@ GoogleFeed.prototype.addFeed = function(feed) {
     
     _myNewfeed['_myNbEntries']          = _myNewEntries.length;
     
-    // /!\ The 3 following data are false. Entries are not sort by dates
+    // /!\ The 3 following values are false. Entries are not sorted by dates.
     
-    _myNewfeed['_myLastPublishedDate']  = new Date(_myNewEntries[0].publishedDate).toLocaleDateString(userLocale) + ' ' + new Date(_myNewEntries[0].publishedDate).toLocaleTimeString(userLocale);
+    var _date = new Date(_myNewEntries[0].publishedDate);
+    
+    _myNewfeed['_myLastPublishedDate']  = _date.toLocaleString(userLocale);
     _myNewfeed['_myLastTimestamp']      = _myNewEntries[0]._myTimestamp;
     _myNewfeed['_myLastTimestampInMs']  = _myNewEntries[0]._myTimestampInMs;
     

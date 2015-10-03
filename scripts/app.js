@@ -1174,7 +1174,7 @@
                         if ((params.entries.theme == 'list') && (!_isSmallEntry)) {
                             _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
                             _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
+                            _content = _content + '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>';
                             _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
                             _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                             _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
@@ -1186,7 +1186,7 @@
                         } else if (params.entries.theme == 'list') {
                             _content = _content + '<div class="_online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
                             _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
+                            _content = _content + '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>';
                             _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
                             _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                             _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
@@ -1200,7 +1200,7 @@
                             _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                             _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                             _content = _content + _imageUrl;
-                            _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
+                            _content = _content + '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>';
                             _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
                             _content = _content + '</div>';
 
@@ -1211,7 +1211,7 @@
                             _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                             _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                             _content = _content + _imageUrl;
-                            _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
+                            _content = _content + '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>';
                             _content = _content + '</div>';
 
                             _nbEntriesDisplayed['small']++;
@@ -1414,7 +1414,7 @@
 
             _srcDoc = _srcDoc + _srcDocCss; // Inline CSS from file "style/inline.css.js"
             _srcDoc = _srcDoc + '<div class="entrie-title">' + _entry.title.replace(_regex, "&#39;") + '</div>';
-            _srcDoc = _srcDoc + '<div class="entrie-date">' + _entry._myLocalizedDate + ' ' + _entry._myLocalizedTime + '</div>';
+            _srcDoc = _srcDoc + '<div class="entrie-date">' + new Date(_entry.publishedDate).toLocaleString() + '</div>';
             _srcDoc = _srcDoc + _author;
             _srcDoc = _srcDoc + '<div class="entrie-feed-title"><a href="' + _entry._myFeedInformations.link + '">' + _entry._myFeedInformations.title.replace(_regex, "&#39;") + '</a></div>';
             _srcDoc = _srcDoc + '<div class="entrie-contentSnippet">' + _entry.content.replace(_regex, "&#39;") + '</div>';
@@ -1638,6 +1638,20 @@
     }
     
     /**
+     * Localize times who are visibles in viewport
+     * */
+    function localizeTimes() {
+        var className = 'my-'+params.entries.theme+'-date';
+        var elements = document.getElementsByClassName(className);
+        for (var i = 0; i < elements.length; i++) {
+            if (isInViewport(elements[i]) && (elements[i].textContent == "")) {
+                var _publishedDate = elements[i].getAttribute('publishedDate');
+                elements[i].textContent = new Date(_publishedDate).toLocaleTimeString(userLocale);
+            }
+        }
+    }
+    
+    /**
      * Load images who are visibles in viewport
      * */
     function loadImages() {
@@ -1755,6 +1769,14 @@
         setInterval(function() {
             loadImages();
         }, 200);
+        
+        // ======================
+        // --- Localize times ---
+        // ======================
+        
+        setInterval(function() {
+            localizeTimes();
+        }, 500);
 
         // ==============
         // --- Events ---
