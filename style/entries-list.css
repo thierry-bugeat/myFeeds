@@ -3,6 +3,27 @@
 /* Responsive images – how to prevent reflow */
 /* http://andmag.se/2012/10/responsive-images-how-to-prevent-reflow/ */
 
+.icone {
+    height:4rem;
+    padding:0;
+    margin:0;
+}
+
+.card{
+    background: url("/images/card.svg") no-repeat center center;
+    background-size: 2.5rem 2.5rem;
+}
+
+.list{
+    background: url("/images/list.svg") no-repeat center center;
+    background-size: 2.5rem 2.5rem;
+}
+
+.grid{
+    background: url("/images/grid.svg") no-repeat center center;
+    background-size: 2.5rem 2.5rem;
+}
+
 /* ======================== */
 /* --- Entry LIST theme --- */
 /* ======================== */
