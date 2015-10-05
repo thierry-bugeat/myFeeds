@@ -1657,7 +1657,10 @@
     function loadImages() {
         var images = document.getElementsByTagName('img');
         for (var i = 0; i < images.length; i++) {
-            if (isInViewport(images[i]) && (images[i].getAttribute('data-src') != images[i].getAttribute('src'))) {
+            if (isInViewport(images[i]) 
+                && (images[i].getAttribute('data-src') != "")
+                && (images[i].getAttribute('src') == "")
+            ){
                 images[i].setAttribute('src', images[i].getAttribute('data-src'));
             }
         }
