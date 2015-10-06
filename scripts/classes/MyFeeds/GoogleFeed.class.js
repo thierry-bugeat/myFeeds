@@ -1,3 +1,21 @@
+/**
+ * Copyright 2015 Thierry BUGEAT
+ * 
+ * This file is part of myFeeds.
+ * 
+ * myFeeds is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * myFeeds is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with myFeeds.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /* ======================== */
 /* --- GoogleFeed Class --- */
@@ -174,10 +192,14 @@ GoogleFeed.prototype.addEntries = function(entries) {
         // Dans le timestamp en "ms" j'ajoute une valeur aléatoire pour ne pas avoir 2 dates de publication identiques.
         // J'ajoute une valeur comprise entre 0 et 500 (0 à 0.5 seconde).
         //
-        _entry['_myTimestamp']          = Math.round(new Date(_entry.publishedDate).getTime()/1000);
-        _entry['_myTimestampInMs']      = Math.round(new Date(_entry.publishedDate).getTime()) + (Math.floor(Math.random()*500));
+        var _date = new Date(_entry.publishedDate);
         
-        _entry['_myPublishedDateUTC']   = new Date(_entry.publishedDate).toUTCString();
+        _entry['_myTimestamp']          = Math.round(_date.getTime()/1000);
+        _entry['_myTimestampInMs']      = Math.round(_date.getTime()) + (Math.floor(Math.random()*500));
+
+        _entry['_myLocalizedDate']      = ""; // Due to severe performances issues dates are generated later
+        _entry['_myLocalizedTime']      = ""; // Due to severe performances issues times are generated later
+        
         _entry['_mySha256_title']       = (_entry['_myFeedInformations']['_myFeedId'] + _entry['title']).toString();
         _entry['_mySha256_link']        = (_entry['_myFeedInformations']['_myFeedId'] + _entry['link']).toString();
         
@@ -238,6 +260,12 @@ GoogleFeed.prototype.deleteEntries = function(account, feedId) {
  * */
 GoogleFeed.prototype.deleteOldEntries = function(timestamp) {
     _MyFeeds.log('deleteOldEntries(' + timestamp + ')');
+    
+    var date = new Date(timestamp * 1000);
+    var dateTimeString = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2) + ' ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
+    
+    _MyFeeds.log('deleteOldEntries(' + dateTimeString + ') => ' + this.gf_unsortedEntries.length + ' entrie(s)');
+    
 
     var _tmp = [];
     var _oldEntries = 0;
@@ -264,6 +292,7 @@ GoogleFeed.prototype.addFeed = function(feed) {
 
     var _myNewfeed = feed;
     var _myNewEntries = feed.entries;
+    var _lastUpdateTimestamp = 0;
     
     for (var i = 0; i < _myNewEntries.length; i++) {
         _myNewEntries[i]._myFeedInformations = feed;
@@ -273,17 +302,21 @@ GoogleFeed.prototype.addFeed = function(feed) {
     // Add custom values.
     
     _myNewfeed['_myNbEntries']          = _myNewEntries.length;
-    _myNewfeed['_myLastPublishedDate']  = _myNewEntries[0].publishedDate;       // Non, les news ne sont pas ordonnées par date
-    _myNewfeed['_myLastTimestamp']      = _myNewEntries[0]._myTimestamp;        // Non, les news ne sont pas ordonnées par date
-    _myNewfeed['_myLastTimestampInMs']  = _myNewEntries[0]._myTimestampInMs;    // Non, les news ne sont pas ordonnées par date
-    //_myNewfeed['_myFeedId']             = _myNewfeed._myFeedId;
     
     // Pulsations ?
     
     var _timestamps = [];
+    var _timestamp = 0;
     
     for (var i = 0; i < _myNewEntries.length; i++) {
-        _timestamps.push(Math.round(new Date(_myNewEntries[i].publishedDate).getTime() / 1000));
+        _timestamp = Math.round(new Date(_myNewEntries[i].publishedDate).getTime() / 1000);
+        _timestamps.push(_timestamp);
+        if ((_lastUpdateTimestamp < _timestamp)
+            && (((params.entries.displaySmallEntries == false) && (!_MyFeeds.isSmallEntry(_myNewEntries[i])))
+                || (params.entries.displaySmallEntries == true))
+        ){
+            _lastUpdateTimestamp = _timestamp;
+        }
     }
     
     var _timestampMin = Math.min.apply(Math, _timestamps);
@@ -298,6 +331,14 @@ GoogleFeed.prototype.addFeed = function(feed) {
     else if (_myPulsations > 8 )    { _myNewfeed['_myPulsationsIcone'] = 'wifi-3'; }
     else if (_myPulsations > 3 )    { _myNewfeed['_myPulsationsIcone'] = 'wifi-2'; }
     else                            { _myNewfeed['_myPulsationsIcone'] = 'wifi-1'; }
+    
+    // /!\ The 3 following values are false. Entries are not sorted by dates.
+    
+    var _date = new Date(_lastUpdateTimestamp * 1000);
+    
+    _myNewfeed['_myLastPublishedDate']  = _date.toLocaleString(userLocale);
+    _myNewfeed['_myLastTimestamp']      = _lastUpdateTimestamp;
+    _myNewfeed['_myLastTimestampInMs']  = _lastUpdateTimestamp;
     
     // Remove values.
     
@@ -463,4 +504,23 @@ GoogleFeed.prototype.get = function (url, myParams) {
             
         }); // Schedule the execution for later
     });
+}
+
+/**
+ * Is it a small entry ?
+ * @param {object} entry
+ * @return {boolean} true, false
+ * */
+GoogleFeed.prototype.isSmallEntry = function (entry) {
+
+    var _out;
+    var _diff = entry.content.length - entry.contentSnippet.length;
+    
+    if (_diff < params.entries.maxLengthForSmallEntries) {
+        _out = true;
+    } else {
+        _out = false;
+    }
+    
+    return _out;
 }

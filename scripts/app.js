@@ -1,15 +1,21 @@
-    // Firefox OS
-    // Style Guide          : https://www.mozilla.org/en-US/styleguide/products/firefox-os/
-    // Icones               : https://buildingfirefoxos.com/downloads/
-    // APIs List            : https://developer.mozilla.org/fr/Apps/Reference/Firefox_OS_device_APIs
-    // Device Storage API   : https://developer.mozilla.org/en-US/docs/Web/API/Device_Storage_API
-    // Browser API          : https://developer.mozilla.org/fr/docs/WebAPI/Browser
-    // CSP                  : https://developer.mozilla.org/fr/Apps/PSC
-    // <iframe> : https://developer.mozilla.org/fr/docs/Web/HTML/Element/iframe
-
-    // To see :
-    // http://imikado.developpez.com/tutoriels/firefoxOS/ma-premier-application/
-    // http://toddmotto.com/is-it-time-to-drop-jquery-essentials-to-learning-javascript-from-a-jquery-background/
+/**
+ * Copyright 2015 Thierry BUGEAT
+ * 
+ * This file is part of myFeeds.
+ * 
+ * myFeeds is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * myFeeds is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with myFeeds.  If not, see <http://www.gnu.org/licenses/>.
+ */
     
     var my = new MyFeeds();
     var ui = new MyUi();
@@ -19,8 +25,6 @@
     var feedly = new Feedly();
 
     var gf = new GoogleFeed();
-
-    var _myTimestamp;                           // Value set by function "_setMyTimestamp()"
 
     var myFeedsSubscriptions = {'local': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
 
@@ -65,9 +69,29 @@
                 }
             },
             "update": {
-                "every": [300, 900, 1800, 3600]      // In seconds 5mn, 15mn, 30mn, 60mn
+                "every": [300, 900, 1800, 3600] // In seconds 5mn, 15mn, 30mn, 60mn
             },
             "days": [3, 5, 7, 10]
+        }
+    }
+    
+    var liveValues = {
+        "timestamps": {
+            "min": -1,                          // Timestamp value beyond which an entry can't be displayed (Too old). Set by function "_setTimestamps()"
+            "max": -1                           // End of current day (23:59:59). Set by function "_setTimestamps()"
+        },
+        "entries": {
+            "id": {
+                "min": -1,                      // Set by function "setEntriesIds"
+                "max": -1                       // Set by function "setEntriesIds"
+                                                // Depends of: 
+                                                // - params.entries.dontDisplayEntriesOlderThan
+                                                // - my.isSmallEntry()
+                                                // - search keyword value
+            },
+            "search": {
+                "visible": false                // Form search entries by keyword is visible or not
+            }
         }
     }
     
@@ -82,8 +106,6 @@
     // Network Connection
 
     var _onLine = "NA";
-    
-    var _searchEntries = false;
     
     var _previousNbDaysAgo = -1;
 
@@ -102,7 +124,7 @@
         
         ui.selectThemeIcon();
         
-        // Get and set Feedly token from cache
+        // Get and set Feedly token from cache then try to update token.
         if (params.accounts.feedly.logged) {
             my._load('cache/feedly/access_token.json').then(function(_token){
                 feedly.setToken(_token);
@@ -112,6 +134,13 @@
             }).catch(function(error) {
                 my.alert("Can't load and set Feedly token");
                 _disableAccount('feedly');
+            }).then(function(){
+                if (navigator.onLine) {
+                    my.log("Try to update Feedly token...");
+                    feedly.updateToken();
+                }
+            }).catch(function(error) {
+                my.log("Can't update Feedly token");
             });
         }
         // Get and set The Old Reader token from cache
@@ -236,17 +265,17 @@
         
         ui._vibrate();
         
-        if (_searchEntries && document.getElementById('formSearchEntries').classList.contains("_hide")) {
-        } else if (_searchEntries && document.getElementById('formSearchEntries').classList.contains("_show")) {
-            _searchEntries = !_searchEntries;
-        } else if (!_searchEntries && document.getElementById('formSearchEntries').classList.contains("_hide")) {
-            _searchEntries = !_searchEntries;
-        } else if (!_searchEntries && document.getElementById('formSearchEntries').classList.contains("_show")) {
+        if (liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_hide")) {
+        } else if (liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_show")) {
+            liveValues['entries']['search']['visible'] = !liveValues['entries']['search']['visible'];
+        } else if (!liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_hide")) {
+            liveValues['entries']['search']['visible'] = !liveValues['entries']['search']['visible'];
+        } else if (!liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_show")) {
         }
         
-        //_searchEntries = !_searchEntries;
+        //liveValues['entries']['search']['visible'] = !liveValues['entries']['search']['visible'];
         
-        if (_searchEntries) {
+        if (liveValues['entries']['search']['visible']) {
             feeds_entries.style.height = "calc(100% - 17.5rem)";
             searchEntries.classList.remove('enable-fxos-white');
             searchEntries.classList.add('enable-fxos-blue');
@@ -565,11 +594,6 @@
         var start = performance.now();
         
         var _now = new Date();
-        var _minutes = _now.getMinutes();
-
-        if (_minutes < 10) {
-            _minutes = "0" + _minutes;
-        }
         
         // Vibrate on click
         
@@ -666,8 +690,8 @@
         var _htmlSettings = [
         '<h2>' + document.webL10n.get('settings-feeds') + '</h2>                                                                                            ',
         '<ul>                                                                                                                                               ',
-        '   <li class="_online_"><span data-icon="reload"></span>' + document.webL10n.get('settings-last-update') + _now.getHours() + ':' + _minutes + '</li>                ',
-        '   <li class="_online_"><span data-icon="sync"></span>' + document.webL10n.get('settings-update-every') + _htmlSelectUpdateEvery + '</li>                           ',
+        '   <li class="_online_"><span data-icon="reload"></span>' + document.webL10n.get('settings-last-update') + _now.toLocaleTimeString(userLocale) + '</li>      ',
+        '   <li class="_online_"><span data-icon="sync"></span>' + document.webL10n.get('settings-update-every') + _htmlSelectUpdateEvery + '</li>          ',
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-news') + '</h2>                                                                                             ',
         '<ul>                                                                                                                                               ',
@@ -685,13 +709,13 @@
         '       </divn>                                                                                                                                     ',
         '   </li>                                                                                                                                           ',
         '</ul>                                                                                                                                              ',
-        '<h2>' + document.webL10n.get('user-interface') + '</h2>                                                                                                     ',
+        '<h2>' + document.webL10n.get('user-interface') + '</h2>                                                                                            ',
         '<ul>                                                                                                                                               ',
         '   <li><span data-icon="vibrate"></span>' + document.webL10n.get('vibrate-on-click') + '<div><label class="pack-switch"><input id="toggleVibrate" type="checkbox" ' + _vibrateOnClick + '><span></span></label></div></li>',
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('about') + '</h2>                                                                                                     ',
         '<ul>                                                                                                                                               ',
-        '   <li id="appVersion"><span data-icon="messages"></span>' + document.webL10n.get('app-title') + '<div>' + myManifest.version + '</div></li>                       ',
+        '   <li id="appVersion"><span data-icon="messages"></span>' + document.webL10n.get('app-title') + '<div>' + myManifest.version + '</div></li>       ',
         '   <li><span data-icon="messages"></span>' + document.webL10n.get('author') + '<div>' + myManifest.developer.name + '</div></li>                   ',
         '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('website') + '<div><a href="' + myManifest.developer.url + '" target="_blank">url</a></div></li>',
         '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('git-repository') + '<div><a href="' + document.webL10n.get('git-url') + '" target="_blank">url</a></div></li>',
@@ -699,7 +723,7 @@
         '</ul>                                                                                                                                              ',
         '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
         '<ul class="developper-menu">                                                                                                                       ',
-        '   <li><span data-icon="wifi-4"></span>' + document.webL10n.get('settings-connection') + '<div id="onLine">NA</div></li>                                                                  ',
+        '   <li><span data-icon="wifi-4"></span>' + document.webL10n.get('settings-connection') + '<div id="onLine">NA</div></li>                           ',
         '   <li><span data-icon="play-circle"></span>' + document.webL10n.get('settings-use-animations') + '<div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
         '   <li><span data-icon="sd-card"></span>' + document.webL10n.get('my-subscriptions') + '<div><button id="loadSubscriptions"><span data-l10n-id="load">load</span></button></div></li>',
         '   <li><span data-icon="sd-card"></span>' + document.webL10n.get('my-subscriptions') + '<div><button id="saveSubscriptions"><span data-l10n-id="save">save</span></button></div></li>',
@@ -725,7 +749,7 @@
         document.getElementById('appVersion').onclick = function(e) {
             params.settings.developper_menu.visible = !params.settings.developper_menu.visible;
             dspSettings();
-            window.alert('Developper menu : ' + params.settings.developper_menu.visible);
+            my.message('Developper menu : ' + params.settings.developper_menu.visible);
             _saveParams();
         }
         
@@ -764,7 +788,7 @@
         _selectMaxNbDays.onchange = function(e) {
             params.entries.dontDisplayEntriesOlderThan = _selectMaxNbDays.options[_selectMaxNbDays.selectedIndex].value;
             
-            if (params.entries.nbDaysAgo > params.entries.dontDisplayEntriesOlderThan) {
+            if (params.entries.nbDaysAgo >= params.entries.dontDisplayEntriesOlderThan) {
                 params.entries.nbDaysAgo = params.entries.dontDisplayEntriesOlderThan;
                 ui._onclick(nextDay, 'enable');         // [<]
                 ui._onclick(previousDay, 'disable');    // [>]
@@ -902,11 +926,13 @@
         // ========================
         
         if (keywords.length > 0) {
+            var _sortedKeywords = keywords.sort();
+            
             _htmlKeywords = _htmlKeywords + '<h2>' + document.webL10n.get('search-by-keywords') + '</h2><ul class="keywords">';
             
-            for (var i = 0; i < keywords.length; i++) {
-                var _deleteIcone = '<button class="deleteKeyword" myKeyword="' + keywords[i] + '"><span data-icon="delete"></span></button>';
-                _htmlKeywords = _htmlKeywords + '<li><a class="openKeyword" myKeyword="' +  keywords[i] + '"><p>' + _deleteIcone + '<button><span data-icon="search"></span></button>' + keywords[i] + '</p></a></li>';
+            for (var i = 0; i < _sortedKeywords.length; i++) {
+                var _deleteIcone = '<button class="deleteKeyword" myKeyword="' + _sortedKeywords[i] + '"><span data-icon="delete"></span></button>';
+                _htmlKeywords = _htmlKeywords + '<li><a class="openKeyword" myKeyword="' +  _sortedKeywords[i] + '"><p>' + _deleteIcone + '<button><span data-icon="search"></span></button>' + _sortedKeywords[i] + '</p></a></li>';
             }
             
             _htmlKeywords = _htmlKeywords + '</ul>';
@@ -930,7 +956,9 @@
                 _deleteIcone = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed._myFeedId + '"><span data-icon="delete"></span></button>';
             }
 
-            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + new Date(_feed._myLastPublishedDate) + '</time></p></a></li>';
+            var _myLastPublishedDate = (_feed._myLastTimestamp == 0) ? "No news" : _feed._myLastPublishedDate;
+
+            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + _myLastPublishedDate + '</time></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds +
@@ -972,7 +1000,7 @@
 
         for (var i = 0; i < _opens.length; i++) {
             _opens[i].onclick = function() {
-                _searchEntries = true;
+                liveValues['entries']['search']['visible'] = true;
                 ui._vibrate();
                 ui._scrollTo(2);
                 ui._onclick(nextDay, 'disable');
@@ -1007,7 +1035,7 @@
 
         for (var i = 0; i < _opens.length; i++) {
             _opens[i].onclick = function() {
-                _searchEntries = false;
+                liveValues['entries']['search']['visible'] = false;
                 document.getElementById('inputSearchEntries').value = "";
                 ui._vibrate();
                 ui._scrollTo(2);
@@ -1033,7 +1061,7 @@
     }
 
     function dspEntries(entries, nbDaysAgo, feedUrl) {
-        var start = performance.now();
+
         var feedsEntriesScrollTop = feeds_entries.scrollTop;
         
         ui.echo('feedsEntriesNbDaysAgo', document.webL10n.get('loading'), '');
@@ -1043,15 +1071,19 @@
         
         _dspEntriesTimeout = window.setTimeout(function() {
 
+            var start = performance.now();
+            
             my.log("dspEntries()", arguments);
             my.log(entries);
 
             sortedEntries = entries;
 
-            _setMyTimestamp();
+            _setTimestamps();
 
-            var _timestampMin = _myTimestamp - (86400 * nbDaysAgo);
-            var _timestampMax = _myTimestamp - (86400 * nbDaysAgo) + 86400;
+            var _timestampMin = liveValues['timestamps']['max'] - (86400 * nbDaysAgo) - 86400 + 1;
+            var _timestampMax = liveValues['timestamps']['max'] - (86400 * nbDaysAgo);
+            
+            my.log("dspEntries() beetween " + _timestampMin + " (00:00:00) & " + _timestampMax + " (23:59:59)");
 
             var _previousDaysAgo    = -1; // Count days to groups entries by day.
             var _entrieNbDaysAgo    = 0;
@@ -1089,26 +1121,13 @@
 
                 if ((_entrie._myTimestamp >= _timestampMin) && (_entrie._myTimestamp < _timestampMax)) {
 
-                    if ((_myTimestamp - _entrie._myTimestamp) < (params.entries.dontDisplayEntriesOlderThan * 86400)) {
-
-                        //my.log(_entrie._myTimestamp + ' ('+(new Date(_entrie.publishedDate).toUTCString()) +') | '+_myTimestamp+' (' + (new Date(_myTimestamp*1000)).toUTCString() + ') ==> Diff = ' + (_myTimestamp - _entrie._myTimestamp) + ' / ' + _entrieNbDaysAgo + ' day(s) ago / ' + _entrie.title);
-
-                        // ---
-
-                        // Date analyse
-                        // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Date/toLocaleString
-                        // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/DateTimeFormat
-
                         // Time
                         
-                        var _date = new Date(_entrie.publishedDate);
-                        var _minutes = (_date.getMinutes() < 10) ? '0' + _date.getMinutes() : _date.getMinutes();
-                        var _time = _date.getHours() + ':' + _minutes;
+                        var _time = _entrie._myLocalizedTime;
 
-                        // Diff between "contentSnippet" et "content" ?
                         // Small article or not ?
 
-                        var _diff = _entrie.content.length - _entrie.contentSnippet.length;
+                        var _isSmallEntry = my.isSmallEntry(_entrie);
 
                         // 1st image
 
@@ -1123,7 +1142,7 @@
                         }*/
 
                         if (_entrie._myFirstImageUrl) {
-                            if (_diff < params.entries.maxLengthForSmallEntries) {
+                            if (_isSmallEntry) {
                                 _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="images/loading.png" data-src="' + _entrie._myFirstImageUrl + '"/></span>';
                             } else {
                                 _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="images/loading.png" data-src="' + _entrie._myFirstImageUrl + '"/></span>';
@@ -1134,11 +1153,11 @@
 
                         var _ratioClass = _theme + '-ratio-entry-l';
 
-                        if ((_diff <= params.entries.maxLengthForSmallEntries) && (!_entrie._myFirstImageUrl)) {
+                        if (_isSmallEntry && (!_entrie._myFirstImageUrl)) {
                             _ratioClass = _theme + '-ratio-entry-s';
                         }
 
-                        else if ((_diff <= params.entries.maxLengthForSmallEntries) || (!_entrie._myFirstImageUrl)) {
+                        else if (_isSmallEntry || (!_entrie._myFirstImageUrl)) {
                             _ratioClass = _theme + '-ratio-entry-m';
                         }
 
@@ -1154,10 +1173,10 @@
 
                         var _content = "";
 
-                        if ((params.entries.theme == 'list') && (_diff >= params.entries.maxLengthForSmallEntries)) {
+                        if ((params.entries.theme == 'list') && (!_isSmallEntry)) {
                             _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
                             _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
+                            _content = _content + '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>';
                             _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
                             _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                             _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
@@ -1169,7 +1188,7 @@
                         } else if (params.entries.theme == 'list') {
                             _content = _content + '<div class="_online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
                             _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
+                            _content = _content + '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>';
                             _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
                             _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                             _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
@@ -1178,12 +1197,12 @@
 
                             _nbEntriesDisplayed['small']++;
 
-                        } else if (_diff >= params.entries.maxLengthForSmallEntries) {
+                        } else if (!_isSmallEntry) {
                             _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
                             _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                             _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                             _content = _content + _imageUrl;
-                            _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
+                            _content = _content + '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>';
                             _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
                             _content = _content + '</div>';
 
@@ -1194,7 +1213,7 @@
                             _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
                             _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
                             _content = _content + _imageUrl;
-                            _content = _content + '<span class="my-'+_theme+'-date">' + _time + '</span>';
+                            _content = _content + '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>';
                             _content = _content + '</div>';
 
                             _nbEntriesDisplayed['small']++;
@@ -1204,7 +1223,6 @@
 
                         _htmlEntries = _htmlEntries + _content;
 
-                    } else { break; }
                 } else if ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0) { break; }
             }
 
@@ -1258,7 +1276,11 @@
             _nb = _small_entries.length;
 
             for (var i = 0; i < _nb; i++) {
-                _small_entries[i].onclick = function() { ui._vibrate(); ui.fade(this); mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); }
+                _small_entries[i].onclick = function() {
+                    ui._vibrate(); 
+                    ui.fade(this); 
+                    mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
+                }
             }
 
             // onclick Normal Entries :
@@ -1268,7 +1290,11 @@
             _nb = _entries.length;
 
             for (var i = 0; i < _nb; i++) {
-                _entries[i].onclick = function() { ui._vibrate(); ui.fade(this); mainEntryOpenInBrowser(this.getAttribute("i"), ""); }
+                _entries[i].onclick = function() { 
+                    ui._vibrate(); 
+                    ui.fade(this); 
+                    mainEntryOpenInBrowser(this.getAttribute("i"), ""); 
+                }
             }
             
             // =========================
@@ -1281,10 +1307,72 @@
             
             document.body.dispatchEvent(new CustomEvent('dspEntries.done', {"detail": ""}));
         
-        }, 250); // Schedule the execution for later
+            // --- Eecution time
+            
+            var end = performance.now();
+            my.log("dspEntries() " + (end - start) + " milliseconds.");
         
-        var end = performance.now();
-        my.log("dspEntries() " + (end - start) + " milliseconds.");
+        }, 250); // Schedule the execution for later
+    }
+    
+    /**
+     * Set id max for entries. Variable "liveValues['entries']['id']['max']"
+     * Set id min for entries. Variable "liveValues['entries']['id']['min']"
+     * 
+     * News ID outside this range can't be displayed.
+     * 
+     * Depends of settings...
+     * - params.entries.dontDisplayEntriesOlderThan
+     * - my.isSmallEntry()
+     * - search keyword value
+     * 
+     * @param {null}
+     * @return {null}
+     * */
+    function setEntriesIds() {
+        my.log('setEntriesIds()');
+
+        // ID max
+        
+        _setTimestamps();
+
+        var _nb     = sortedEntries.length - 1;
+        var _string = document.getElementById('inputSearchEntries').value || "";
+
+        while ((sortedEntries[_nb]._myTimestamp < liveValues['timestamps']['min'])
+            || (!params.entries.displaySmallEntries && my.isSmallEntry(sortedEntries[_nb]))
+            || (_string !== "" && liveValues['entries']['search']['visible'] && (((JSON.stringify(sortedEntries[_nb])).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
+        ){
+            _nb = _nb - 1;
+            if (_nb < 0) { break; }
+        }
+        
+        my.log('setEntriesIds() entries = ', sortedEntries);
+        my.log('setEntriesIds() search = ' + _string);
+        my.log('setEntriesIds() result = ', sortedEntries[_nb]);
+        
+        liveValues['entries']['id']['max'] = _nb;
+        
+        // ID min
+
+        my.log('setEntriesIds()');
+        
+        var _nb     = 0;
+        var _string = document.getElementById('inputSearchEntries').value || "";
+
+        while ((sortedEntries[_nb]._myTimestamp > liveValues['timestamps']['max'])
+            || ((params.entries.displaySmallEntries == false) && (my.isSmallEntry(sortedEntries[_nb]) == true)) 
+            || (_string !== "" && liveValues['entries']['search']['visible'] && (((JSON.stringify(sortedEntries[_nb])).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
+        ){
+            _nb = _nb + 1;
+            if (_nb >= sortedEntries.length) { break; }
+        }
+        
+        my.log('setEntriesIds() entries = ', sortedEntries);
+        my.log('setEntriesIds() search = ' + _string);
+        my.log('setEntriesIds() result = ', sortedEntries[_nb]);
+        
+        liveValues['entries']['id']['min'] = _nb;
     }
 
     function mainEntryOpenInBrowser(entryId, url) {
@@ -1310,7 +1398,7 @@
 
             _srcDoc = _srcDoc + _srcDocCss; // Inline CSS from file "style/inline.css.js"
             _srcDoc = _srcDoc + '<div class="entrie-title">' + _entry.title.replace(_regex, "&#39;") + '</div>';
-            _srcDoc = _srcDoc + '<div class="entrie-date">' + new Date(_entry.publishedDate) + '</div>';
+            _srcDoc = _srcDoc + '<div class="entrie-date">' + new Date(_entry.publishedDate).toLocaleString() + '</div>';
             _srcDoc = _srcDoc + _author;
             _srcDoc = _srcDoc + '<div class="entrie-feed-title"><a href="' + _entry._myFeedInformations.link + '">' + _entry._myFeedInformations.title.replace(_regex, "&#39;") + '</a></div>';
             _srcDoc = _srcDoc + '<div class="entrie-contentSnippet">' + _entry.content.replace(_regex, "&#39;") + '</div>';
@@ -1322,6 +1410,8 @@
         document.getElementById("browser").style.cssText = "display: block;";
 
         main_entry.scrollTop = 0;
+        
+        document.body.dispatchEvent(new CustomEvent('mainEntryOpen.done', {"detail": {"entryId": entryId, "url": url, "_mySha256_link": sortedEntries[entryId]['_mySha256_link'], "_mySha256_title": sortedEntries[entryId]['_mySha256_title']}}));
 
         ui._quickScrollTo(4);
     }
@@ -1362,18 +1452,22 @@
     }
 
     /**
-     * Set start of day timestamp.
+     * Set timestamps values Min & Max.
+     * Variable "liveValues['timestamps']['max']" Start of day timestamp. 
+     * Variable "liveValues['timestamps']['min']" Value beyond which an entry can't be displayed. (Too old)
      * @param {null}
      * */
-    function _setMyTimestamp() {
+    function _setTimestamps() {
         var _now    = new Date();
         var _year   = _now.getFullYear();
         var _month  = _now.getMonth();
         var _day    = _now.getDate();
 
-        var _mySod = new Date(_year, _month, _day, '00','00','00');
+        var _myDate = new Date(_year, _month, _day, '23','59','59');
+        
+        liveValues['timestamps']['max'] = Math.floor(_myDate.getTime() / 1000);
 
-        _myTimestamp = Math.floor(_mySod.getTime() / 1000);
+        liveValues['timestamps']['min'] = liveValues['timestamps']['max'] - (86400 * params.entries.dontDisplayEntriesOlderThan) - 86400 + 1;
     }
 
     // Callback for ALL subscriptions promises
@@ -1478,7 +1572,7 @@
      * Disable online account
      * @param {string} feedly, theoldreader
      * */
-     function _disableAccount(_account) {
+    function _disableAccount(_account) {
         my.log('_disableAccount', arguments);
         params.accounts[_account].logged = false
         myFeedsSubscriptions[_account] = [];
@@ -1528,12 +1622,29 @@
     }
     
     /**
+     * Localize times who are visibles in viewport
+     * */
+    function localizeTimes() {
+        var className = 'my-'+params.entries.theme+'-date';
+        var elements = document.getElementsByClassName(className);
+        for (var i = 0; i < elements.length; i++) {
+            if (isInViewport(elements[i]) && (elements[i].textContent == "")) {
+                var _publishedDate = elements[i].getAttribute('publishedDate');
+                elements[i].textContent = new Date(_publishedDate).toLocaleTimeString(userLocale);
+            }
+        }
+    }
+    
+    /**
      * Load images who are visibles in viewport
      * */
     function loadImages() {
         var images = document.getElementsByTagName('img');
         for (var i = 0; i < images.length; i++) {
-            if (isInViewport(images[i]) && (images[i].getAttribute('data-src') != images[i].getAttribute('src'))) {
+            if (isInViewport(images[i]) 
+                && (images[i].getAttribute('data-src') != "")
+                && (images[i].getAttribute('src') == "images/loading.png")
+            ){
                 images[i].setAttribute('src', images[i].getAttribute('data-src'));
             }
         }
@@ -1634,7 +1745,7 @@
         
         setInterval(function() {
             var _maxNbDaysAgo = params.settings.days.last();
-            var _timestampMax = _myTimestamp - (86400 * _maxNbDaysAgo);
+            var _timestampMax = liveValues['timestamps']['max'] - (86400 * _maxNbDaysAgo);
             gf.deleteOldEntries(_timestampMax);
         }, 60000);
         
@@ -1645,6 +1756,14 @@
         setInterval(function() {
             loadImages();
         }, 200);
+        
+        // ======================
+        // --- Localize times ---
+        // ======================
+        
+        setInterval(function() {
+            localizeTimes();
+        }, 500);
 
         // ==============
         // --- Events ---
@@ -1680,6 +1799,115 @@
             }
         }, 59000); // 59s Less than minimal Firefox OS sleep time (60s)
         
+        // Main entry open done...
+        // Update next entry [<] & previous entry [>] buttons.
+        
+        document.body.addEventListener('mainEntryOpen.done', function(event){
+            
+            setEntriesIds(); // Set values liveValues['entries']['id']['max'] & liveValues['entries']['id']['min']
+            
+            var _entryId = 0;
+            var _mySha256_title = event.detail["_mySha256_title"];
+            var _mySha256_link  = event.detail["_mySha256_link"];
+            var _nb = sortedEntries.length;
+            var _string = document.getElementById('inputSearchEntries').value || "";
+
+            for (var i = 0; i < _nb; i++) {
+                if ((sortedEntries[i]['_mySha256_title']== _mySha256_title) ||
+                    (sortedEntries[i]['_mySha256_link'] == _mySha256_link)) {
+
+                    var _entryId = i;
+                    var _previousEntryId = i + 1;
+                    var _nextEntryId = i - 1;
+
+                    // [>] previous news ?
+                    
+                    if (_previousEntryId > liveValues['entries']['id']['max']) {
+                        _previousEntryId = _entryId;
+                    } else {
+                        var _content = (sortedEntries[_previousEntryId]._myFeedInformations.title + ' ' + sortedEntries[_previousEntryId].title + ' ' + sortedEntries[_previousEntryId].contentSnippet).toLowerCase();
+                        
+                        while ((sortedEntries[_previousEntryId]._myTimestamp < liveValues['timestamps']['min'])
+                            || (!params.entries.displaySmallEntries && my.isSmallEntry(sortedEntries[_previousEntryId]))
+                            || (_string !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_string.toLowerCase()) == -1))
+                        ){
+                            _previousEntryId = _previousEntryId + 1;
+                            if (_previousEntryId > liveValues['entries']['id']['max']) { _previousEntryId = _entryId; break; }
+                            _content = (sortedEntries[_previousEntryId]._myFeedInformations.title + ' ' + sortedEntries[_previousEntryId].title + ' ' + sortedEntries[_previousEntryId].contentSnippet).toLowerCase();
+                        }
+                    }
+                
+                    // [<] next news ?
+                    
+                    if (_nextEntryId < 0) {
+                        _nextEntryId = _entryId; 
+                    } else {
+                        var _content = (sortedEntries[_nextEntryId]._myFeedInformations.title + ' ' + sortedEntries[_nextEntryId].title + ' ' + sortedEntries[_nextEntryId].contentSnippet).toLowerCase();
+                        
+                        while ((sortedEntries[_nextEntryId]._myTimestamp > liveValues['timestamps']['max'])
+                            || (!params.entries.displaySmallEntries && my.isSmallEntry(sortedEntries[_nextEntryId]))
+                            || (_string !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_string.toLowerCase()) == -1))
+                        ){
+                            _nextEntryId = _nextEntryId - 1;
+                            if (_nextEntryId < 0) {_nextEntryId = _entryId; break; }
+                            _content = (sortedEntries[_nextEntryId]._myFeedInformations.title + ' ' + sortedEntries[_nextEntryId].title + ' ' + sortedEntries[_nextEntryId].contentSnippet).toLowerCase();
+                        }
+                    }
+                    
+                    break;
+                }
+            }
+            
+            //my.message(_nextEntryId+ ' [<] '+ _entryId +' [>]' +_previousEntryId);
+
+            // [<]
+            
+            if (my.isSmallEntry(sortedEntries[_nextEntryId])) {
+                dom['entry']['next'].setAttribute("i", _nextEntryId);
+                dom['entry']['next'].setAttribute("entry_link", sortedEntries[_nextEntryId].link);
+            } else {
+                dom['entry']['next'].setAttribute("i", _nextEntryId);
+                dom['entry']['next'].setAttribute("entry_link", "");
+            }
+            
+            // [>]
+            
+            if (my.isSmallEntry(sortedEntries[_previousEntryId])) {
+                dom['entry']['previous'].setAttribute("i", _previousEntryId);
+                dom['entry']['previous'].setAttribute("entry_link", sortedEntries[_previousEntryId].link);
+            } else {
+                dom['entry']['previous'].setAttribute("i", _previousEntryId);
+                dom['entry']['previous'].setAttribute("entry_link", "");
+            }
+            
+            // Disable / enable button [<]
+            
+            if ((_nextEntryId < liveValues['entries']['id']['min']) || (_nextEntryId == _entryId)) {
+                ui._onclick(dom['entry']['next'], 'disable');
+            } else {
+                ui._onclick(dom['entry']['next'], 'enable');
+            }
+            
+            // Disable / enable button [>]
+            
+            if ((_previousEntryId > liveValues['entries']['id']['max']) || (_previousEntryId == _entryId)) {
+                ui._onclick(dom.entry['previous'], 'disable');
+            } else {
+                ui._onclick(dom.entry['previous'], 'enable');
+            }
+            
+        });
+        
+        // ---
+        
+        dom['entry']['next'].onclick = function() {
+            mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
+        }
+        
+        dom['entry']['previous'].onclick = function() {
+            mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
+        }
+        
         // Share entry :
         // https://developer.mozilla.org/fr/docs/Web/API/Web_Activities
 
@@ -1714,7 +1942,7 @@
         // Search entries after "dspEntries"
         
         document.body.addEventListener('dspEntries.done', function(event){
-            if (_searchEntries) {
+            if (liveValues['entries']['search']['visible']) {
                 feeds_entries.style.height = "calc(100% - 17.5rem)";
                 searchEntries.classList.remove('enable-fxos-white');
                 searchEntries.classList.add('enable-fxos-blue');
@@ -1746,7 +1974,7 @@
                     
                     // Reload UI
                     
-                    _searchEntries = true;
+                    liveValues['entries']['search']['visible'] = true;
 
                     if ((myFeedsSubscriptions.local.length > 0) ||
                         (myFeedsSubscriptions.feedly.length > 0) ||
@@ -1761,9 +1989,9 @@
                     
                     // Done
                     
-                    window.alert(document.webL10n.get('keyword-was-added'));
+                    my.message(document.webL10n.get('keyword-was-added'));
                 } else {
-                    window.alert(document.webL10n.get('keyword-was-not-added'));
+                    my.message(document.webL10n.get('keyword-was-not-added'));
                 }
             
             }
@@ -1914,7 +2142,7 @@
 
         document.body.addEventListener('Feedly.getSubscriptions.error', function(response) {
             my.log('CustomEvent : Feedly.getSubscriptions.error', arguments);
-            my.message('Feedly error');
+            my.message(document.webL10n.get('feedly-get-subscriptions-error') + response.detail.message);
         });
 
         /* ============================= */

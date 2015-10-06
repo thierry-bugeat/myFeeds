@@ -1,3 +1,21 @@
+/**
+ * Copyright 2015 Thierry BUGEAT
+ * 
+ * This file is part of myFeeds.
+ * 
+ * myFeeds is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * myFeeds is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with myFeeds.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /* ==================== */
 /* --- Feedly Class --- */
@@ -58,6 +76,36 @@ Feedly.prototype.setToken = function(token) {
 Feedly.prototype.getToken = function() {
     _MyFeeds.log('Feedly.prototype.getToken()');
     return this.feedly.token;
+}
+
+/**
+ * Use "refresh_token" to obtain a new "access_token"
+ * @param   {null}
+ * @return  {CustomEvent} Feedly.getNewToken.done | Feedly.getNewToken.error
+ * */
+
+Feedly.prototype.updateToken = function() {
+    _MyFeeds.log('Feedly.prototype.getNewToken()');
+    
+    var _url = _Feedly.feedly.host + '/v3/auth/token';
+
+    var _params = 'refresh_token=' + encodeURIComponent(_Feedly.feedly.token.refresh_token) + 
+        '&client_id=' + encodeURIComponent(_Feedly.feedly.client_id) +
+        '&client_secret=' + encodeURIComponent(_Feedly.feedly.client_secret) +
+        '&grant_type=refresh_token';
+
+    this.post(_url, _params, function(response) {
+        if (typeof response['errorMessage'] !== 'undefined') {
+            window.alert("Feedly Error : \n" + JSON.stringify(response));
+            _MyFeeds.log('CustomEvent : Feedly.getNewToken.error');
+        } else {
+            _Feedly.feedly.token.access_token = response.access_token;
+            _Feedly._save('cache/feedly/access_token.json', 'application/json', JSON.stringify(_Feedly.feedly.token));
+            _Feedly._save('cache/feedly/access_token.new.json', 'application/json', JSON.stringify(response));
+            document.body.dispatchEvent(new CustomEvent('Feedly.getNewToken.done', {"detail": response}));
+            _MyFeeds.log('CustomEvent : Feedly.getNewToken.done');
+        }
+    });
 }
 
 /**

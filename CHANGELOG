@@ -1,0 +1,32 @@
+--------------------------------------------------------- 
+# myFeeds 1.1.0 (2015-10-06) 
+ 
+### New feature(s): 
+ 
+	- #9 Add buttons next & previous news
+ 
+### Improvement(s): 
+ 
+	- #6 Update themes icones
+	- #15 Sort keywords by alphabetical order
+	- #26 Dates and times localization
+	- #25 Update subscriptions when application start
+	- #23 Add GPL licence
+	- #24 Add copyright in sources files
+	- #28 Add CHANGELOG file
+ 
+### Bug(s): 
+ 
+	- #7 Bug: Some photos are not displayed
+	- #27 Incorrect feeds last update date
+ 
+--------------------------------------------------------- 
+# myFeeds 1.0.1 
+ 
+### Improvement(s): 
+ 
+	- Keep scrolling position after synchro
+	- Load only visibles images
+
+--------------------------------------------------------- 
+ 
