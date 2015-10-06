@@ -292,6 +292,7 @@ GoogleFeed.prototype.addFeed = function(feed) {
 
     var _myNewfeed = feed;
     var _myNewEntries = feed.entries;
+    var _lastUpdateTimestamp = 0;
     
     for (var i = 0; i < _myNewEntries.length; i++) {
         _myNewEntries[i]._myFeedInformations = feed;
@@ -305,9 +306,17 @@ GoogleFeed.prototype.addFeed = function(feed) {
     // Pulsations ?
     
     var _timestamps = [];
+    var _timestamp = 0;
     
     for (var i = 0; i < _myNewEntries.length; i++) {
-        _timestamps.push(Math.round(new Date(_myNewEntries[i].publishedDate).getTime() / 1000));
+        _timestamp = Math.round(new Date(_myNewEntries[i].publishedDate).getTime() / 1000);
+        _timestamps.push(_timestamp);
+        if ((_lastUpdateTimestamp < _timestamp)
+            && (((params.entries.displaySmallEntries == false) && (!_MyFeeds.isSmallEntry(_myNewEntries[i])))
+                || (params.entries.displaySmallEntries == true))
+        ){
+            _lastUpdateTimestamp = _timestamp;
+        }
     }
     
     var _timestampMin = Math.min.apply(Math, _timestamps);
@@ -325,11 +334,11 @@ GoogleFeed.prototype.addFeed = function(feed) {
     
     // /!\ The 3 following values are false. Entries are not sorted by dates.
     
-    var _date = new Date(_timestampMax * 1000);
+    var _date = new Date(_lastUpdateTimestamp * 1000);
     
     _myNewfeed['_myLastPublishedDate']  = _date.toLocaleString(userLocale);
-    _myNewfeed['_myLastTimestamp']      = _timestampMax;
-    _myNewfeed['_myLastTimestampInMs']  = _timestampMax;
+    _myNewfeed['_myLastTimestamp']      = _lastUpdateTimestamp;
+    _myNewfeed['_myLastTimestampInMs']  = _lastUpdateTimestamp;
     
     // Remove values.
     
@@ -495,4 +504,23 @@ GoogleFeed.prototype.get = function (url, myParams) {
             
         }); // Schedule the execution for later
     });
+}
+
+/**
+ * Is it a small entry ?
+ * @param {object} entry
+ * @return {boolean} true, false
+ * */
+GoogleFeed.prototype.isSmallEntry = function (entry) {
+
+    var _out;
+    var _diff = entry.content.length - entry.contentSnippet.length;
+    
+    if (_diff < params.entries.maxLengthForSmallEntries) {
+        _out = true;
+    } else {
+        _out = false;
+    }
+    
+    return _out;
 }

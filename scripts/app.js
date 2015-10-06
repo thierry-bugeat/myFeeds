@@ -86,7 +86,7 @@
                 "max": -1                       // Set by function "setEntriesIds"
                                                 // Depends of: 
                                                 // - params.entries.dontDisplayEntriesOlderThan
-                                                // - isSmallEntry()
+                                                // - my.isSmallEntry()
                                                 // - search keyword value
             },
             "search": {
@@ -956,7 +956,9 @@
                 _deleteIcone = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed._myFeedId + '"><span data-icon="delete"></span></button>';
             }
 
-            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + _feed._myLastPublishedDate + '</time></p></a></li>';
+            var _myLastPublishedDate = (_feed._myLastTimestamp == 0) ? "No news" : _feed._myLastPublishedDate;
+
+            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + _myLastPublishedDate + '</time></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds +
@@ -1125,7 +1127,7 @@
 
                         // Small article or not ?
 
-                        var _isSmallEntry = isSmallEntry(_entrie);
+                        var _isSmallEntry = my.isSmallEntry(_entrie);
 
                         // 1st image
 
@@ -1314,24 +1316,6 @@
     }
     
     /**
-     * Is it a small entry ?
-     * @param {object} entry
-     * @return {boolean} true, false
-     * */
-    function isSmallEntry(entry) {
-        var _out;
-        var _diff = entry.content.length - entry.contentSnippet.length;
-        
-        if (_diff < params.entries.maxLengthForSmallEntries) {
-            _out = true;
-        } else {
-            _out = false;
-        }
-        
-        return _out;
-    }
-    
-    /**
      * Set id max for entries. Variable "liveValues['entries']['id']['max']"
      * Set id min for entries. Variable "liveValues['entries']['id']['min']"
      * 
@@ -1339,7 +1323,7 @@
      * 
      * Depends of settings...
      * - params.entries.dontDisplayEntriesOlderThan
-     * - isSmallEntry()
+     * - my.isSmallEntry()
      * - search keyword value
      * 
      * @param {null}
@@ -1356,7 +1340,7 @@
         var _string = document.getElementById('inputSearchEntries').value || "";
 
         while ((sortedEntries[_nb]._myTimestamp < liveValues['timestamps']['min'])
-            || (!params.entries.displaySmallEntries && isSmallEntry(sortedEntries[_nb]))
+            || (!params.entries.displaySmallEntries && my.isSmallEntry(sortedEntries[_nb]))
             || (_string !== "" && liveValues['entries']['search']['visible'] && (((JSON.stringify(sortedEntries[_nb])).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
         ){
             _nb = _nb - 1;
@@ -1377,7 +1361,7 @@
         var _string = document.getElementById('inputSearchEntries').value || "";
 
         while ((sortedEntries[_nb]._myTimestamp > liveValues['timestamps']['max'])
-            || ((params.entries.displaySmallEntries == false) && (isSmallEntry(sortedEntries[_nb]) == true)) 
+            || ((params.entries.displaySmallEntries == false) && (my.isSmallEntry(sortedEntries[_nb]) == true)) 
             || (_string !== "" && liveValues['entries']['search']['visible'] && (((JSON.stringify(sortedEntries[_nb])).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
         ){
             _nb = _nb + 1;
@@ -1844,7 +1828,7 @@
                         var _content = (sortedEntries[_previousEntryId]._myFeedInformations.title + ' ' + sortedEntries[_previousEntryId].title + ' ' + sortedEntries[_previousEntryId].contentSnippet).toLowerCase();
                         
                         while ((sortedEntries[_previousEntryId]._myTimestamp < liveValues['timestamps']['min'])
-                            || (!params.entries.displaySmallEntries && isSmallEntry(sortedEntries[_previousEntryId]))
+                            || (!params.entries.displaySmallEntries && my.isSmallEntry(sortedEntries[_previousEntryId]))
                             || (_string !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_string.toLowerCase()) == -1))
                         ){
                             _previousEntryId = _previousEntryId + 1;
@@ -1861,7 +1845,7 @@
                         var _content = (sortedEntries[_nextEntryId]._myFeedInformations.title + ' ' + sortedEntries[_nextEntryId].title + ' ' + sortedEntries[_nextEntryId].contentSnippet).toLowerCase();
                         
                         while ((sortedEntries[_nextEntryId]._myTimestamp > liveValues['timestamps']['max'])
-                            || (!params.entries.displaySmallEntries && isSmallEntry(sortedEntries[_nextEntryId]))
+                            || (!params.entries.displaySmallEntries && my.isSmallEntry(sortedEntries[_nextEntryId]))
                             || (_string !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_string.toLowerCase()) == -1))
                         ){
                             _nextEntryId = _nextEntryId - 1;
@@ -1878,7 +1862,7 @@
 
             // [<]
             
-            if (isSmallEntry(sortedEntries[_nextEntryId])) {
+            if (my.isSmallEntry(sortedEntries[_nextEntryId])) {
                 dom['entry']['next'].setAttribute("i", _nextEntryId);
                 dom['entry']['next'].setAttribute("entry_link", sortedEntries[_nextEntryId].link);
             } else {
@@ -1888,7 +1872,7 @@
             
             // [>]
             
-            if (isSmallEntry(sortedEntries[_previousEntryId])) {
+            if (my.isSmallEntry(sortedEntries[_previousEntryId])) {
                 dom['entry']['previous'].setAttribute("i", _previousEntryId);
                 dom['entry']['previous'].setAttribute("entry_link", sortedEntries[_previousEntryId].link);
             } else {

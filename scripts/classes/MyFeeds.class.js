@@ -226,3 +226,22 @@ MyFeeds.prototype.error = function (message, arguments) {
         window.console && console.error(message, _arguments);
     }
 }
+
+/**
+ * Is it a small entry ?
+ * @param {object} entry
+ * @return {boolean} true, false
+ * */
+MyFeeds.prototype.isSmallEntry = function (entry) {
+
+    var _out;
+    var _diff = entry.content.length - entry.contentSnippet.length;
+    
+    if (_diff < params.entries.maxLengthForSmallEntries) {
+        _out = true;
+    } else {
+        _out = false;
+    }
+    
+    return _out;
+}
