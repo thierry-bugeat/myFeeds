@@ -1,7 +1,7 @@
 {
     "name": "my Feeds",
     "description": "RSS & ATOM feeds reader",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "launch_path": "/index.html",
     "icons": {
         "60": "/images/icon-60.png",
@@ -26,7 +26,8 @@
     "type": "privileged",
     "csp": "default-src *; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'",
     "redirects": [
-        {"from": "http://localhost/", "to": "/scripts/feedly/loginCallback.html"}
+        {"from": "http://localhost/", "to": "/scripts/feedly/loginCallback.html"},
+        {"from": "http://localhost:8080/", "to": "/scripts/aolreader/loginCallback.html"}
     ],
     "permissions": {
         "desktop-notification": {
