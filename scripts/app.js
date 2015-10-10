@@ -23,13 +23,14 @@
 
     var theoldreader = new TheOldReader();
     var feedly = new Feedly();
+    var aolreader = new AolReader();
 
     var gf = new GoogleFeed();
 
-    var myFeedsSubscriptions = {'local': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
+    var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 1,
+        "version": 2,
         "feeds": {
             "selectedFeed": "",                 // Display all feeds if empty otherwise display specified feed url
             "defaultPulsations": 5              // Default feed pulsations
@@ -53,6 +54,10 @@
             },
             "theoldreader": {
                 "title": "The Old Reader",
+                "logged": false
+            },
+            "aolreader": {
+                "title": "Aol Reader",
                 "logged": false
             }
         },
@@ -101,7 +106,7 @@
     
     var _dspEntriesTimeout = '';
     
-    var _loginInProgress = {"local": false, "feedly": false, "theoldreader": false}
+    var _loginInProgress = {"local": false, "feedly": false, "theoldreader": false, "aolreader": false}
 
     // Network Connection
 
@@ -116,7 +121,13 @@
         my.log('loading params from file params.json ...', _myParams);
         
         if (params.version > _myParams.version) {
-            params.accounts = _myParams.accounts; // Keep user accounts
+            
+            for (var _account in myFeedsSubscriptions) {
+                if (typeof _myParams.accounts[_account] !== 'undefined') {
+                    params.accounts[_account] = _myParams.accounts[_account]; // Keep user account parameters if exists
+                }
+            }
+            
             _saveParams();
         } else {
             params = _myParams;
@@ -156,6 +167,56 @@
                 _disableAccount('theoldreader');
             });
         }
+        // Get and set Aol Reader token from cache
+        // http://www.html5rocks.com/fr/tutorials/es6/promises/
+        if (params.accounts.aolreader.logged) {
+            my._load('cache/aolreader/access_token.json').then(function(_token){
+                aolreader.setToken(_token);
+                if (navigator.onLine) {
+                    aolreader.getSubscriptions();
+                }
+            }).catch(function(error) {
+                my.alert("Can't set Aol Reader token and/or load subscriptions");
+                _disableAccount('aolreader');
+            }).then(
+                function(){
+                    if (navigator.onLine) {
+                        my.log("Try to update Aol Reader token...");
+                        aolreader.updateToken();
+                    }
+                },
+                function(error) {
+                    my.log("Can't update Aol Reader token");
+                }
+            );
+        }
+        // Get and set Aol Reader token from cache
+        /*if (params.accounts.aolreader.logged) {
+            window.alert('AOL 1');
+            my._load('cache/aolreader/access_token.json').then(function(_token){
+                window.alert('AOL 2a');
+                aolreader.setToken(_token);
+                window.alert('AOL 2b');
+                if (navigator.onLine) {
+                    aolreader.getSubscriptions();
+                }
+                window.alert('AOL 2c');
+            }, function(error) {
+                window.alert('AOL 3');
+                my.alert("Can't load and set Aol Reader token");
+                _disableAccount('aolreader');
+            }).then(function(){
+                window.alert('AOL 4');
+                if (navigator.onLine) {
+                    my.log("Try to update Aol Reader token...");
+                    aolreader.updateToken();
+                }
+            }, function(error) {
+                window.alert('AOL 5');
+                my.log("Can't update Aol Reader token");
+            });
+        }*/
+        
     }).catch(function(error) {
         _saveParams();
     });
@@ -399,7 +460,8 @@
 
             if ((myFeedsSubscriptions.local.length > 0) ||
                 (myFeedsSubscriptions.feedly.length > 0) ||
-                (myFeedsSubscriptions.theoldreader.length > 0)
+                (myFeedsSubscriptions.theoldreader.length > 0) || 
+                (myFeedsSubscriptions.aolreader.length > 0)
             ){
                 gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
             } else {
@@ -480,6 +542,23 @@
                 });
             }
             
+            // (3d) Delete from AolReader
+
+            if (_account == 'aolreader') {
+                aolreader.deleteSubscription(_feedId).then(function(response){
+                    my.message(document.webL10n.get('feed-has-been-deleted'));
+                    my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
+                        my.log('Save subscriptions.' + _account + '.json');
+                    }).catch(function(error) {
+                        my.error("ERROR saving file ", error);
+                        my.alert("ERROR saving file " + error.filename);
+                    });
+                }).catch(function(error) {
+                    my.message(document.webL10n.get('error-cant-delete-this-feed'));
+                    my.error(error);
+                });
+            }
+            
             // (4) Delete entries
             
             gf.deleteEntries(_account, _feedId);
@@ -488,7 +567,8 @@
 
             if ((myFeedsSubscriptions.local.length > 0) ||
                 (myFeedsSubscriptions.feedly.length > 0) ||
-                (myFeedsSubscriptions.theoldreader.length > 0)
+                (myFeedsSubscriptions.theoldreader.length > 0) || 
+                (myFeedsSubscriptions.aolreader.length > 0)
             ){
                 gf.setFeedsSubscriptions(myFeedsSubscriptions);
                 gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
@@ -626,6 +706,14 @@
         } else {
             _theoldreaderAccount = "";
         }
+        
+        // Aol Reader selector
+
+        if (params.accounts.aolreader.logged) {
+            _aolreaderAccount = 'checked=""';
+        } else {
+            _aolreaderAccount = "";
+        }
 
         // Use animations selector
 
@@ -699,7 +787,8 @@
         '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-number-of-days') + _htmlMaxNbDays + '</li>                             ',
         '</ul>                                                                                                                                              ',
         '<h2>' + document.webL10n.get('settings-online-accounts') + '</h2>                                                                                  ',
-        '<ul class="feedly theoldreader">                                                                                                                   ',
+        '<ul class="feedly theoldreader aolreader">                                                                                                                   ',
+        '   <li class="_online_"><span data-icon="messages"></span>Aol Reader<div><label class="pack-switch"><input id="aolreaderLogin" type="checkbox" ' + _aolreaderAccount + '><span></span></label></div></li>',
         '   <li class="_online_"><span data-icon="messages"></span>Feedly<div><label class="pack-switch"><input id="feedlyLogin" type="checkbox" ' + _feedlyAccount + '><span></span></label></div></li>',
         '   <li class="_online_">',
         '       <span data-icon="messages"></span>The Old Reader<div><label class="pack-switch"><input id="theoldreaderCheckbox" type="checkbox" ' + _theoldreaderAccount + '><span></span></label></div>',
@@ -891,6 +980,19 @@
             }
         }
         
+        // Aol Reader checkbox
+        
+        document.getElementById('aolreaderLogin').onclick = function() {
+            if (this.checked) {
+                this.checked = false; // False until CustomEvent AolReader.login.done
+                aolreader.login();
+            } else {
+                params.accounts.aolreader.logged = false;
+                _disableAccount('aolreader');
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            }
+        }
+        
         // =========================
         // --- App start offline ---
         // =========================
@@ -913,6 +1015,7 @@
 
         var _html = {
             'local': '',
+            'aolreader': '',
             'feedly': '',
             'theoldreader': ''
         };
@@ -920,6 +1023,7 @@
         var _htmlKeywords = '';
         var _feedlyAccessToken = feedly.getToken().access_token;
         var _theoldreaderAuth = theoldreader.getToken().Auth;
+        var _aolreaderAccessToken = aolreader.getToken().access_token;
 
         // ========================
         // --- Display keywords ---
@@ -949,7 +1053,8 @@
 
             if ((_account == 'local') ||
                 ((_account == 'feedly') && (_feedlyAccessToken !== undefined)) ||
-                ((_account == 'theoldreader') && (_theoldreaderAuth !== undefined))
+                ((_account == 'theoldreader') && (_theoldreaderAuth !== undefined)) || 
+                ((_account == 'aolreader') && (_aolreaderAccessToken !== undefined))
             ){
                 var _class = (_account == 'local') ? "delete" : "delete _online_";
                     
@@ -1480,6 +1585,7 @@
         // subscriptions.local.json
         // subscriptions.feedly.json
         // subscriptions.theoldreader.json
+        // subscriptions.aolreader.json
         // ...
 
         for (var i = 0; i < subscriptions.length; i++) {
@@ -1570,7 +1676,7 @@
     
     /**
      * Disable online account
-     * @param {string} feedly, theoldreader
+     * @param {string} feedly, theoldreader, aolreader
      * */
     function _disableAccount(_account) {
         my.log('_disableAccount', arguments);
@@ -1681,8 +1787,11 @@
 
         var promise3 = my._load('subscriptions.theoldreader.json').then(function(results) {return results;}
         ).catch(function(error) {_disableAccount('theoldreader'); return {};});
+        
+        var promise4 = my._load('subscriptions.aolreader.json').then(function(results) {return results;}
+        ).catch(function(error) {_disableAccount('aolreader'); return {};});
 
-        var arrayPromises = [promise1, promise2, promise3];
+        var arrayPromises = [promise1, promise2, promise3, promise4];
 
         Promise.all(arrayPromises).then(function(arrayOfResults) {
             initAndLoadFeeds(arrayOfResults);
@@ -1711,11 +1820,11 @@
         // =================================
         // Disable button if subscriptions file doesn't exists.
 
-        my._file_exists('subscriptions.local.json', function(exists){
+        /*my._file_exists('subscriptions.local.json', function(exists){
             if (!exists) {
                 ui._onclick(loadSubscriptions, 'disable');
             }
-        });
+        });*/
 
         // ===============================================
         // --- Network connection : online / offline ? ---
@@ -1978,7 +2087,8 @@
 
                     if ((myFeedsSubscriptions.local.length > 0) ||
                         (myFeedsSubscriptions.feedly.length > 0) ||
-                        (myFeedsSubscriptions.theoldreader.length > 0)
+                        (myFeedsSubscriptions.theoldreader.length > 0) || 
+                        (myFeedsSubscriptions.aolreader.length > 0)
                     ){
                         gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
                     } else {
@@ -2203,6 +2313,65 @@
         document.body.addEventListener('TheOldReader.getSubscriptions.error', function(response) {
             my.log('CustomEvent : TheOldReader.getSubscriptions.error', arguments);
             my.message('The Old Reader error');
+        });
+        
+        /* ========================= */
+        /* --- Aol Reader Events --- */
+        /* ========================= */
+  
+        document.body.addEventListener('AolReader.login.done', function(response){
+            _loginInProgress['aolreader'] = true;
+            my.log(aolreader.getToken());
+            params.accounts.aolreader.logged = true;
+            _saveParams();
+            document.getElementById('aolreaderLogin').checked = true; // Enable settings checkbox
+            aolreader.getSubscriptions(); // CustomEvent AolReader.getSubscriptions.done, AolReader.getSubscriptions.error
+        });
+
+        document.body.addEventListener('AolReader.login.error', function(response){
+            my.log('CustomEvent : AolReader.login.error', arguments);
+            my.message('Aol Reader login error');
+        });
+        
+        document.body.addEventListener('AolReader.getSubscriptions.done', function(response){
+            my.log('CustomEvent : AolReader.getSubscriptions.done');
+            var _subscriptions = response.detail.subscriptions;
+            var _feed = '';
+            var _newFeeds = [];
+            for (var i = 0; i < _subscriptions.length; i++) {
+                _feed = {
+                    'url': _subscriptions[i].url,
+                    'pulsations': params['feeds']['defaultPulsations'],
+                    'account': 'aolreader',
+                    'id': _subscriptions[i].id
+                };
+                _newFeeds.push(_feed);
+            }
+            addNewSubscriptions(_newFeeds);
+            gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            
+            if (_loginInProgress['aolreader'] == true ) {
+                _loginInProgress['aolreader'] = false;
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            }
+
+            my._save("subscriptions.aolreader.json", "application/json", JSON.stringify(myFeedsSubscriptions.aolreader)).then(function(results) {
+                my.log("Save file subscriptions.aolreader.json");
+            }).catch(function(error) {
+                my.error("ERROR saving file subscriptions.aolreader.json", error);
+                my.alert("ERROR saving file subscriptions.aolreader.json");
+            });
+            my._save("cache/aolreader/subscriptions.json", "application/json", JSON.stringify(_subscriptions)).then(function(results) {
+                my.log("Save file cache/aolreader/subscriptions.json");
+            }).catch(function(error) {
+                my.error("ERROR saving file cache/aolreader/subscriptions.json", error);
+                my.alert("ERROR saving file cache/aolreader/subscriptions.json");
+            });
+        });
+
+        document.body.addEventListener('AolReader.getSubscriptions.error', function(response) {
+            my.log('CustomEvent : AolReader.getSubscriptions.error', arguments);
+            my.message(document.webL10n.get('aolreader-get-subscriptions-error') + response.detail.message);
         });
 
         // ============
