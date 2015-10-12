@@ -84,6 +84,7 @@ TheOldReader.prototype.login = function(email, password) {
 
     this.post(_url, _params, function(response) {
         if (_TheOldReader.setToken(response)) {
+            response.lastModified = Math.floor(new Date().getTime() / 1000);
             _TheOldReader._save('cache/theoldreader/access_token.json', 'application/json', JSON.stringify(response));
             document.body.dispatchEvent(new CustomEvent('TheOldReader.login.done', {"detail": response}));
             _MyFeeds.log('CustomEvent : TheOldReader.login.done');

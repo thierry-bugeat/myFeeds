@@ -100,6 +100,7 @@ Feedly.prototype.updateToken = function() {
             _MyFeeds.log('CustomEvent : Feedly.getNewToken.error');
         } else {
             _Feedly.feedly.token.access_token = response.access_token;
+            _Feedly.feedly.token.lastModified = Math.floor(new Date().getTime() / 1000);
             _Feedly._save('cache/feedly/access_token.json', 'application/json', JSON.stringify(_Feedly.feedly.token));
             _Feedly._save('cache/feedly/access_token.new.json', 'application/json', JSON.stringify(response));
             document.body.dispatchEvent(new CustomEvent('Feedly.getNewToken.done', {"detail": response}));
@@ -144,6 +145,7 @@ Feedly.prototype._loginCallback = function(url) {
         
         this.post(_url, _params, function(response) {
             if (_Feedly.setToken(response)) {
+                response.lastModified = Math.floor(new Date().getTime() / 1000);
                 _Feedly._save('cache/feedly/access_token.json', 'application/json', JSON.stringify(response));
                 document.body.dispatchEvent(new CustomEvent('Feedly.login.done', {"detail": response}));
                 _MyFeeds.log('CustomEvent : Feedly.login.done');
