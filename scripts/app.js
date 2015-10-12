@@ -171,9 +171,17 @@
         // http://www.html5rocks.com/fr/tutorials/es6/promises/
         if (params.accounts.aolreader.logged) {
             my._load('cache/aolreader/access_token.json').then(function(_token){
-                aolreader.setToken(_token);
-                if (navigator.onLine) {
-                    aolreader.getSubscriptions();
+                var _now = Math.floor(new Date().getTime() / 1000);
+                if ((typeof _token['lastModified'] !== 'undefined') 
+                    && ((_token['lastModified'] + _token['expires_in']) < _now)
+                ){
+                    my.message("Aol Token is expired. Please connect to your account again.");
+                    _disableAccount('aolreader');
+                } else {
+                    aolreader.setToken(_token);
+                    if (navigator.onLine) {
+                        aolreader.getSubscriptions();
+                    }
                 }
             }).catch(function(error) {
                 my.alert("Can't set Aol Reader token and/or load subscriptions");
@@ -2318,6 +2326,12 @@
         /* ========================= */
         /* --- Aol Reader Events --- */
         /* ========================= */
+        
+        // Due to quick expiration time (1h), Aol token is 
+        // actualized every 14mn.
+        setInterval(function() {
+            if (navigator.onLine) {aolreader.updateToken();}
+        }, (60000 * 14));
   
         document.body.addEventListener('AolReader.login.done', function(response){
             _loginInProgress['aolreader'] = true;
