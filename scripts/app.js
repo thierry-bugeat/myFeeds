@@ -835,7 +835,7 @@
         '<h2 data-l10n-id="user-interface">' + document.webL10n.get('user-interface') + '</h2>                                                                                            ',
         '<ul>                                                                                                                                               ',
         '   <li><span data-icon="vibrate"></span><my data-l10n-id="vibrate-on-click">' + document.webL10n.get('vibrate-on-click') + '</my><div><label class="pack-switch"><input id="toggleVibrate" type="checkbox" ' + _vibrateOnClick + '><span></span></label></div></li>',
-        '   <li><span data-icon="flag"></span><my data-l10n-id="settings-ui-language">' + document.webL10n.get('settings-ui-language') + '</my>' +  _htmlLanguages + '</li>',
+        '   <li><span data-icon="languages"></span><my data-l10n-id="settings-ui-language">' + document.webL10n.get('settings-ui-language') + '</my>' +  _htmlLanguages + '</li>',
         '</ul>                                                                                                                                              ',
         '<h2 data-l10n-id="about">' + document.webL10n.get('about') + '</h2>                                                                                ',
         '<ul>                                                                                                                                               ',
