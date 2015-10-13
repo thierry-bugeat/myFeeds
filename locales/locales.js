@@ -1,23 +1,33 @@
 var myDynamicsLocales = {
     
     "en": {
+        "title": "English",
         "nb-days-ago": "{{n}} days ago",
         "by": "by"
     },
     
     "es": {
+        "title": "Español",
         "nb-days-ago": "Hace {{n}} días", 
         "by": "por"
     },
     
     "fr": {
+        "title": "Français",
         "nb-days-ago": "Il y a {{n}} jours", 
         "by": "par"
     },
     
-    "pt-BR": {
+    "pt": {
+        "title": "Português",
         "nb-days-ago": "{{n}} dias atrás", 
         "by": "por"
+    },
+    
+    "ru": {
+        "title": "Pусский",
+        "nb-days-ago": "{{n}} days ago",
+        "by": "by"
     }
 
 };
@@ -32,5 +42,3 @@ if (myDynamicsLocales[userLocale] !== undefined) {
 } else {
     myExtraTranslations = myDynamicsLocales['en'];
 }
-
-// console.log(myExtraTranslations);

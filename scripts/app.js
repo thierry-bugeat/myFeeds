@@ -30,7 +30,7 @@
     var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 2,
+        "version": 2.1,
         "feeds": {
             "selectedFeed": "",                 // Display all feeds if empty otherwise display specified feed url
             "defaultPulsations": 5              // Default feed pulsations
@@ -64,7 +64,8 @@
         "settings": {
             "ui": {
                 "animations": false,            // Use transitions animations
-                "vibrate": true                 // Vibration on click
+                "vibrate": true,                // Vibration on click
+                "language": ""                  // Language
             },
             "developper_menu": {
                 "visible": false,               // Display or not developper menu in settings
@@ -121,7 +122,7 @@
         my.log('loading params from file params.json ...', _myParams);
         
         if (params.version > _myParams.version) {
-            
+
             for (var _account in myFeedsSubscriptions) {
                 if (typeof _myParams.accounts[_account] !== 'undefined') {
                     params.accounts[_account] = _myParams.accounts[_account]; // Keep user account parameters if exists
@@ -134,6 +135,13 @@
         }
         
         ui.selectThemeIcon();
+        
+        // Set language
+        
+        if (params.settings.ui.language != "") {
+            userLocale = params.settings.ui.language;
+            document.webL10n.setLanguage(params.settings.ui.language, "");
+        }
         
         // Get and set Feedly token from cache then try to update token.
         if (params.accounts.feedly.logged) {
@@ -762,7 +770,7 @@
 
         _htmlSelectUpdateEvery = _htmlSelectUpdateEvery + '</select>';
 
-        // Max nb Days
+        // Select max nb Days
 
         var _days = params.settings.days;
         var _htmlMaxNbDays = "";
@@ -780,21 +788,39 @@
         }
 
         _htmlMaxNbDays = _htmlMaxNbDays + '</select>';
+        
+        // Select language
+
+        var _htmlLanguages = "";
+        var _selected = "";
+
+        _htmlLanguages = _htmlLanguages + '<select id="selectLanguage">';
+
+        for (var _locale in myDynamicsLocales) {
+            if (params.settings.ui.language == _locale) {
+                _selected = "selected";
+            } else {
+                _selected = "";
+            }
+            _htmlLanguages = _htmlLanguages + '<option value="' + _locale + '" ' + _selected + ' >' + myDynamicsLocales[_locale]['title'] + '</option>';
+        }
+
+        _htmlLanguages = _htmlLanguages + '</select>';
 
         // ---
 
         var _htmlSettings = [
-        '<h2>' + document.webL10n.get('settings-feeds') + '</h2>                                                                                            ',
+        '<h2 data-l10n-id="settings-feeds">' + document.webL10n.get('settings-feeds') + '</h2>                                                                                            ',
         '<ul>                                                                                                                                               ',
-        '   <li class="_online_"><span data-icon="reload"></span>' + document.webL10n.get('settings-last-update') + _now.toLocaleTimeString(userLocale) + '</li>      ',
-        '   <li class="_online_"><span data-icon="sync"></span>' + document.webL10n.get('settings-update-every') + _htmlSelectUpdateEvery + '</li>          ',
+        '   <li class="_online_"><span data-icon="reload"></span><my data-l10n-id="settings-last-update">' + document.webL10n.get('settings-last-update') + '</my>' + _now.toLocaleTimeString(userLocale) + '</li>      ',
+        '   <li class="_online_"><span data-icon="sync"></span><my data-l10n-id="settings-update-every">' + document.webL10n.get('settings-update-every') + '</my>' + _htmlSelectUpdateEvery + '</li>          ',
         '</ul>                                                                                                                                              ',
-        '<h2>' + document.webL10n.get('settings-news') + '</h2>                                                                                             ',
+        '<h2 data-l10n-id="settings-news">' + document.webL10n.get('settings-news') + '</h2>                                                                ',
         '<ul>                                                                                                                                               ',
-        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-small-news') + '<div><label class="pack-switch"><input id="toggleDisplaySmallEntries" type="checkbox" ' + _displaySmallEntriesChecked + '><span></span></label></div></li>',
-        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-number-of-days') + _htmlMaxNbDays + '</li>                             ',
+        '   <li><span data-icon="messages"></span><my data-l10n-id="settings-small-news">' + document.webL10n.get('settings-small-news') + '</my><div><label class="pack-switch"><input id="toggleDisplaySmallEntries" type="checkbox" ' + _displaySmallEntriesChecked + '><span></span></label></div></li>',
+        '   <li><span data-icon="messages"></span><my data-l10n-id="settings-number-of-days">' + document.webL10n.get('settings-number-of-days') + '</my>' + _htmlMaxNbDays + '</li>',
         '</ul>                                                                                                                                              ',
-        '<h2>' + document.webL10n.get('settings-online-accounts') + '</h2>                                                                                  ',
+        '<h2 data-l10n-id="settings-online-accounts">' + document.webL10n.get('settings-online-accounts') + '</h2>                                                                                  ',
         '<ul class="feedly theoldreader aolreader">                                                                                                                   ',
         '   <li class="_online_"><span data-icon="messages"></span>Aol Reader<div><label class="pack-switch"><input id="aolreaderLogin" type="checkbox" ' + _aolreaderAccount + '><span></span></label></div></li>',
         '   <li class="_online_"><span data-icon="messages"></span>Feedly<div><label class="pack-switch"><input id="feedlyLogin" type="checkbox" ' + _feedlyAccount + '><span></span></label></div></li>',
@@ -806,24 +832,25 @@
         '       </divn>                                                                                                                                     ',
         '   </li>                                                                                                                                           ',
         '</ul>                                                                                                                                              ',
-        '<h2>' + document.webL10n.get('user-interface') + '</h2>                                                                                            ',
+        '<h2 data-l10n-id="user-interface">' + document.webL10n.get('user-interface') + '</h2>                                                                                            ',
         '<ul>                                                                                                                                               ',
-        '   <li><span data-icon="vibrate"></span>' + document.webL10n.get('vibrate-on-click') + '<div><label class="pack-switch"><input id="toggleVibrate" type="checkbox" ' + _vibrateOnClick + '><span></span></label></div></li>',
+        '   <li><span data-icon="vibrate"></span><my data-l10n-id="vibrate-on-click">' + document.webL10n.get('vibrate-on-click') + '</my><div><label class="pack-switch"><input id="toggleVibrate" type="checkbox" ' + _vibrateOnClick + '><span></span></label></div></li>',
+        '   <li><span data-icon="flag"></span><my data-l10n-id="settings-ui-language">' + document.webL10n.get('settings-ui-language') + '</my>' +  _htmlLanguages + '</li>',
         '</ul>                                                                                                                                              ',
-        '<h2>' + document.webL10n.get('about') + '</h2>                                                                                                     ',
+        '<h2 data-l10n-id="about">' + document.webL10n.get('about') + '</h2>                                                                                ',
         '<ul>                                                                                                                                               ',
-        '   <li id="appVersion"><span data-icon="messages"></span>' + document.webL10n.get('app-title') + '<div>' + myManifest.version + '</div></li>       ',
-        '   <li><span data-icon="messages"></span>' + document.webL10n.get('author') + '<div>' + myManifest.developer.name + '</div></li>                   ',
-        '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('website') + '<div><a href="' + myManifest.developer.url + '" target="_blank">url</a></div></li>',
-        '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('git-repository') + '<div><a href="' + document.webL10n.get('git-url') + '" target="_blank">url</a></div></li>',
-        '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('settings-translations') + '<ul><a href="https://github.com/Sergio-Muriel" target="_blank">Sergio Muriel (es)</a><br><a href="https://github.com/evertton" target="_blank">Evertton de Lima (pt-BR)</a><br></ul></li>',
+        '   <li id="appVersion"><span data-icon="messages"></span><my data-l10n-id="app-title">' + document.webL10n.get('app-title') + '</my><div>' + myManifest.version + '</div></li>',
+        '   <li><span data-icon="messages"></span><my data-l10n-id="author">' + document.webL10n.get('author') + '</my><div>' + myManifest.developer.name + '</div></li>                   ',
+        '   <li class="about _online_"><span data-icon="messages"></span><my data-l10n-id="website">' + document.webL10n.get('website') + '</my><div><a href="' + myManifest.developer.url + '" target="_blank">url</a></div></li>',
+        '   <li class="about _online_"><span data-icon="messages"></span><my data-l10n-id="git-repository">' + document.webL10n.get('git-repository') + '</my><div><a href="' + document.webL10n.get('git-url') + '" target="_blank">url</a></div></li>',
+        '   <li class="about _online_"><span data-icon="messages"></span><my data-l10n-id="settings-translations">' + document.webL10n.get('settings-translations') + '</my><ul><a href="https://github.com/Sergio-Muriel" target="_blank">Sergio Muriel (es)</a><br><a href="https://github.com/evertton" target="_blank">Evertton de Lima (pt)</a><br><a>Petr Жоря (ru)</a></ul></li>',
         '</ul>                                                                                                                                              ',
-        '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
+        '<h2 class="developper-menu" data-l10n-id="settings-developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
         '<ul class="developper-menu">                                                                                                                       ',
-        '   <li><span data-icon="wifi-4"></span>' + document.webL10n.get('settings-connection') + '<div id="onLine">NA</div></li>                           ',
-        '   <li><span data-icon="play-circle"></span>' + document.webL10n.get('settings-use-animations') + '<div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
-        '   <li><span data-icon="sd-card"></span>' + document.webL10n.get('my-subscriptions') + '<div><button id="loadSubscriptions"><span data-l10n-id="load">load</span></button></div></li>',
-        '   <li><span data-icon="sd-card"></span>' + document.webL10n.get('my-subscriptions') + '<div><button id="saveSubscriptions"><span data-l10n-id="save">save</span></button></div></li>',
+        '   <li><span data-icon="wifi-4"></span><my data-l10n-id="settings-connection">' + document.webL10n.get('settings-connection') + '</my><div id="onLine">NA</div></li>',
+        '   <li><span data-icon="play-circle"></span><my data-l10n-id="settings-use-animations">' + document.webL10n.get('settings-use-animations') + '</my><div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
+        '   <li><span data-icon="sd-card"></span><my data-l10n-id="my-subscriptions">' + document.webL10n.get('my-subscriptions') + '</my><div><button id="loadSubscriptions"><span data-l10n-id="load">load</span></button></div></li>',
+        '   <li><span data-icon="sd-card"></span><my data-l10n-id="my-subscriptions">' + document.webL10n.get('my-subscriptions') + '</my><div><button id="saveSubscriptions"><span data-l10n-id="save">save</span></button></div></li>',
         '   <li><span data-icon="bug"></span>Logs console<div><label class="pack-switch"><input id="logsConsole" type="checkbox" ' + _logsConsole + '><span></span></label></div></li>',
         '   <li><span data-icon="bug"></span>Logs screen<div><label class="pack-switch"><input id="logsScreen" type="checkbox" ' + _logsScreen + '><span></span></label></div></li>',
         '</ul>                                                                                                                                              '
@@ -899,8 +926,18 @@
             
             _saveParams();
         }
+        
+        // UI select language
 
-
+        var _selectLanguage = document.getElementById('selectLanguage');
+        _selectLanguage.onchange = function(e) {
+            params.settings.ui.language = _selectLanguage.options[_selectLanguage.selectedIndex].value;
+            _saveParams();
+            document.webL10n.setLanguage(params.settings.ui.language, "");
+            //dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+            //gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+        }
+        
         // UI vibrate
 
         document.getElementById("toggleVibrate").onclick = function() {
@@ -1040,7 +1077,7 @@
         if (keywords.length > 0) {
             var _sortedKeywords = keywords.sort();
             
-            _htmlKeywords = _htmlKeywords + '<h2>' + document.webL10n.get('search-by-keywords') + '</h2><ul class="keywords">';
+            _htmlKeywords = _htmlKeywords + '<h2 data-l10n-id="search-by-keywords">' + document.webL10n.get('search-by-keywords') + '</h2><ul class="keywords">';
             
             for (var i = 0; i < _sortedKeywords.length; i++) {
                 var _deleteIcone = '<button class="deleteKeyword" myKeyword="' + _sortedKeywords[i] + '"><span data-icon="delete"></span></button>';
@@ -1076,7 +1113,7 @@
 
         _htmlFeeds = _htmlFeeds +
             '<ul>' +
-            '<li><a class="open" feedUrl=""><p><button><span data-icon="forward"></span></button>' + document.webL10n.get('all-feeds') + '</p></a></li>' +
+            '<li><a class="open" feedUrl=""><p><button><span data-icon="forward"></span></button><my data-l10n-id="all-feeds">' + document.webL10n.get('all-feeds') + '</my></p></a></li>' +
             '</ul>' +
             '' + _htmlKeywords;
         
@@ -1358,11 +1395,11 @@
             } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] > 0)) {
                 ui.echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
             } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] == 0)) {
-                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('no-news-today') + '</div>', "");
+                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification" data-l10n-id="no-news-today">' + document.webL10n.get('no-news-today') + '</div>', "");
             } else if ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) == 0) {
-                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('no-news-today') + '</div>', "");
+                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification" data-l10n-id="no-news-today">' + document.webL10n.get('no-news-today') + '</div>', "");
             } else {
-                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
+                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification" data-l10n-id="error-no-network-connection">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
             } 
             
             // Hide/show small entries:
@@ -1515,7 +1552,7 @@
             _srcDoc = _srcDoc + _author;
             _srcDoc = _srcDoc + '<div class="entrie-feed-title"><a href="' + _entry._myFeedInformations.link + '">' + _entry._myFeedInformations.title.replace(_regex, "&#39;") + '</a></div>';
             _srcDoc = _srcDoc + '<div class="entrie-contentSnippet">' + _entry.content.replace(_regex, "&#39;") + '</div>';
-            _srcDoc = _srcDoc + '<div class="entrie-visit-website"><a href="' + _entry.link + '">' + document.webL10n.get('entry-visit-website') + '</a></div>';
+            _srcDoc = _srcDoc + '<div class="entrie-visit-website"><a href="' + _entry.link + '"><my data-l10n-id="entry-visit-website">' + document.webL10n.get('entry-visit-website') + '</my></a></div>';
 
             ui.echo("browser", '<iframe srcdoc=\'' + _srcDoc + '\' sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
         }
@@ -1902,6 +1939,13 @@
                 }
             }
         }, true);
+        
+        // Set the 'lang' and 'dir' attributes to <html> when the page is translated
+        
+        window.addEventListener('localized', function() {
+            document.documentElement.lang = document.webL10n.getLanguage();
+            document.documentElement.dir = document.webL10n.getDirection();
+        }, false);
 
         // Automatic update entries every N seconds :
 

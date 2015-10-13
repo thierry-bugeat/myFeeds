@@ -145,7 +145,7 @@ AolReader.prototype.getSubscriptions = function () {
     
     var _url = _AolReader.aolreader.host + '/reader/api/0/subscription/list' + 
         '?access_token=' + _AolReader.aolreader.token.access_token;
-console.log("bugeat", _AolReader.aolreader.token);
+
     var promise = this.get(_url, '');
     
     promise.then(function(response) {

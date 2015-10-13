@@ -15,12 +15,16 @@
     "default_locale": "en",
     "locales": {
         "es": {
-            "name" : "mis Noticias",
-            "description" : "Lector de RSS y ATOM."
+            "name": "mis Noticias",
+            "description": "Lector de RSS y ATOM."
         },
         "fr": {
-            "name" : "mes Fluxs",
-            "description" : "Lecteur de flux RSS & ATOM."
+            "name": "mes Fluxs",
+            "description": "Lecteur de flux RSS & ATOM."
+        },
+        "pt": {
+            "name" : "meus Fluxs",
+            "description": "RSS e Atom Reader."
         }
     },
     "type": "privileged",
