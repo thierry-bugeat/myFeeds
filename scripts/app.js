@@ -120,7 +120,7 @@
 
     my._load('params.json').then(function(_myParams) {
         my.log('loading params from file params.json ...', _myParams);
-        
+
         if (params.version > _myParams.version) {
 
             for (var _account in myFeedsSubscriptions) {
@@ -144,6 +144,7 @@
         }
         
         // Get and set Feedly token from cache then try to update token.
+        
         if (params.accounts.feedly.logged) {
             my._load('cache/feedly/access_token.json').then(function(_token){
                 feedly.setToken(_token);
@@ -162,7 +163,9 @@
                 my.log("Can't update Feedly token");
             });
         }
+        
         // Get and set The Old Reader token from cache
+        
         if (params.accounts.theoldreader.logged) {
             my._load('cache/theoldreader/access_token.json').then(function(_token){
                 theoldreader.setToken(_token);
@@ -175,68 +178,28 @@
                 _disableAccount('theoldreader');
             });
         }
+        
         // Get and set Aol Reader token from cache
-        // http://www.html5rocks.com/fr/tutorials/es6/promises/
+        
         if (params.accounts.aolreader.logged) {
             my._load('cache/aolreader/access_token.json').then(function(_token){
-                var _now = Math.floor(new Date().getTime() / 1000);
-                if ((typeof _token['lastModified'] !== 'undefined') 
-                    && ((_token['lastModified'] + _token['expires_in']) < _now)
-                ){
-                    my.message("Aol Token is expired. Please connect to your account again.");
-                    _disableAccount('aolreader');
-                } else {
-                    aolreader.setToken(_token);
-                    if (navigator.onLine) {
-                        aolreader.getSubscriptions();
-                    }
-                }
-            }).catch(function(error) {
-                my.alert("Can't set Aol Reader token and/or load subscriptions");
-                _disableAccount('aolreader');
-            }).then(
-                function(){
-                    if (navigator.onLine) {
-                        my.log("Try to update Aol Reader token...");
-                        aolreader.updateToken();
-                    }
-                },
-                function(error) {
-                    my.log("Can't update Aol Reader token");
-                }
-            );
-        }
-        // Get and set Aol Reader token from cache
-        /*if (params.accounts.aolreader.logged) {
-            window.alert('AOL 1');
-            my._load('cache/aolreader/access_token.json').then(function(_token){
-                window.alert('AOL 2a');
                 aolreader.setToken(_token);
-                window.alert('AOL 2b');
                 if (navigator.onLine) {
+                    aolreader.updateToken();
                     aolreader.getSubscriptions();
                 }
-                window.alert('AOL 2c');
-            }, function(error) {
-                window.alert('AOL 3');
-                my.alert("Can't load and set Aol Reader token");
+            }).catch(function(error) {
+                my.alert("Can't connect Aol Reader account");
                 _disableAccount('aolreader');
-            }).then(function(){
-                window.alert('AOL 4');
-                if (navigator.onLine) {
-                    my.log("Try to update Aol Reader token...");
-                    aolreader.updateToken();
-                }
-            }, function(error) {
-                window.alert('AOL 5');
-                my.log("Can't update Aol Reader token");
             });
-        }*/
+        }
+
+        // ---
         
     }).catch(function(error) {
         _saveParams();
     });
-    
+
     // Load keywords from SDCard.
     // Create file if doesn't exists.
 
@@ -308,7 +271,7 @@
             _saveParams();
         }
     }
-    
+
     /**
      * Show entries matching string and hide others
      * @param {string} string Min length 5 characters or "" to reset display
@@ -375,7 +338,7 @@
         ui._vibrate();
         _search('');
     }
-    
+
     /**
      * Save subscriptions for specified account
      * @param {boolean} _logsOnScreen Display or not logs on screen.
@@ -1464,7 +1427,7 @@
         
         }, 250); // Schedule the execution for later
     }
-    
+
     /**
      * Set id max for entries. Variable "liveValues['entries']['id']['max']"
      * Set id min for entries. Variable "liveValues['entries']['id']['min']"
@@ -1709,7 +1672,7 @@
         });
         params.entries.nbDaysAgo = _nbDaysAgo;
     }
-    
+
     function _saveKeywords() {
         my._save("keywords.json", "application/json", JSON.stringify(keywords)).then(function(results) {
             my.log("Save file keywords.json");
@@ -1819,7 +1782,7 @@
     // ======================
 
     window.onload = function () {
-        
+
         _swipe("");
 
         // Promises V1
@@ -2373,9 +2336,9 @@
         
         // Due to quick expiration time (1h), Aol token is 
         // actualized every 14mn.
-        setInterval(function() {
+        /*setInterval(function() {
             if (navigator.onLine) {aolreader.updateToken();}
-        }, (60000 * 14));
+        }, (60000 * 14));*/
   
         document.body.addEventListener('AolReader.login.done', function(response){
             _loginInProgress['aolreader'] = true;
