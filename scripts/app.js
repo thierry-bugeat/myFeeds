@@ -170,11 +170,12 @@
             my._load('cache/theoldreader/access_token.json').then(function(_token){
                 theoldreader.setToken(_token);
                 if (navigator.onLine) {
+                    theoldreader.updateToken();
                     theoldreader.getSubscriptions();
                 }
                 document.getElementById('theoldreaderForm').style.cssText = 'display: none';
             }).catch(function(error) {
-                my.alert("Can't load and set T.O.R. token");
+                my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Old Reader"}));
                 _disableAccount('theoldreader');
             });
         }
@@ -189,7 +190,7 @@
                     aolreader.getSubscriptions();
                 }
             }).catch(function(error) {
-                my.alert("Can't connect Aol Reader account");
+                my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Aol Reader"}));
                 _disableAccount('aolreader');
             });
         }
