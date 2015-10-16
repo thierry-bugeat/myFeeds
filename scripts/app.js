@@ -347,38 +347,52 @@
      * */
     function _saveSubscriptions(_logsOnScreen) {
         
+        var _output = ['<?xml version="1.0"?>',
+            '<opml version="1.0">',
+            '<head>',
+            '<title>myFeeds Subscriptions Export</title>',
+            '</head>',
+            '<body>',
+            '<outline title="My feeds" text="My feeds" description="My feeds" type="folder">',
+            ''
+            ].join("\n");
+        
         for (var _account in myFeedsSubscriptions) {
 
-            var _output = [];
             var _feeds = gf.getFeeds();
             var _feed = "";
+            var _outlines = "";
+            var _nbOutlines = 0;
             
             for (var i = 0 ; i < _feeds.length; i++) {
                 if ( _feeds[i]._myAccount == _account) {
+                    _nbOutlines++;
                     _url = _feeds[i].feedUrl;
-                    
-                    if ((isNaN(_feeds[i]._myPulsations)) || (_feeds[i]._myPulsations == "Infinity")){
-                        _feeds[i]._myPulsations = "0.1";
-                    }
-                    
-                    _feed = {"url": _url, "pulsations": _feeds[i]._myPulsations, "account": _feeds[i]._myAccount, "id": _feeds[i]._myFeedId};
-                    _output.push(_feed);
+                    _outlines = _outlines + '        <outline title="' + _feeds[i].title + '" text="' + _feeds[i].title + '" description="' + _feeds[i].description + '" type="' + _feeds[i].type + '" xmlUrl="" htmlUrl="' + encodeURIComponent(_url) + '" />' + "\n";
                 }
             }
-
-            my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(_output)).then(function(results) {
-                my.log('Save subscriptions : ' + results);
-                if (_logsOnScreen) {
-                    my.message('Backup completed : ' + results);
-                }
-            }).catch(function(error) {
-                my.error("ERROR saving file ", error);
-                if (_logsOnScreen) {
-                    my.alert("ERROR saving file " + error.filename);
-                }
-            });
             
+            if (_nbOutlines > 0){
+                _output = _output + '    <outline title="' + _account + '" text="' + _account + '" description="' + _account + '" type="folder">' + "\n";
+                _output = _output + _outlines;
+                _output = _output + "    </outline>\n";
+            }
         }
+        
+        _output = _output + "</outline>\n</body>\n</opml>\n";
+
+        my._save("opml/myFeeds.subscriptions.opml", "application/json", _output).then(function(results) {
+            my.log('Save subscriptions : ' + results);
+            if (_logsOnScreen) {
+                my.message('Backup completed : ' + results);
+            }
+        }).catch(function(error) {
+            my.error("ERROR saving file ", error);
+            if (_logsOnScreen) {
+                my.alert("ERROR saving file " + error.filename);
+            }
+        });
+
     }
 
     nextDay.onclick = function(event) {
@@ -814,7 +828,7 @@
         '   <li><span data-icon="wifi-4"></span><my data-l10n-id="settings-connection">' + document.webL10n.get('settings-connection') + '</my><div id="onLine">NA</div></li>',
         '   <li><span data-icon="play-circle"></span><my data-l10n-id="settings-use-animations">' + document.webL10n.get('settings-use-animations') + '</my><div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
         '   <li><span data-icon="sd-card"></span><my data-l10n-id="my-subscriptions">' + document.webL10n.get('my-subscriptions') + '</my><div><button id="loadSubscriptions"><span data-l10n-id="load">load</span></button></div></li>',
-        '   <li><span data-icon="sd-card"></span><my data-l10n-id="my-subscriptions">' + document.webL10n.get('my-subscriptions') + '</my><div><button id="saveSubscriptions"><span data-l10n-id="save">save</span></button></div></li>',
+        '   <li><span data-icon="sd-card"></span><my data-l10n-id="my-subscriptions-opml">' + document.webL10n.get('my-subscriptions-opml') + '</my><div><button id="saveSubscriptions"><span data-l10n-id="save">save</span></button></div></li>',
         '   <li><span data-icon="bug"></span>Logs console<div><label class="pack-switch"><input id="logsConsole" type="checkbox" ' + _logsConsole + '><span></span></label></div></li>',
         '   <li><span data-icon="bug"></span>Logs screen<div><label class="pack-switch"><input id="logsScreen" type="checkbox" ' + _logsScreen + '><span></span></label></div></li>',
         '</ul>                                                                                                                                              '
