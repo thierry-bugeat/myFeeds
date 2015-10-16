@@ -759,13 +759,13 @@
 
         _htmlLanguages = _htmlLanguages + '<select id="selectLanguage">';
 
-        for (var _locale in myDynamicsLocales) {
+        for (var _locale in myManifest['locales']) {
             if (params.settings.ui.language == _locale) {
                 _selected = "selected";
             } else {
                 _selected = "";
             }
-            _htmlLanguages = _htmlLanguages + '<option value="' + _locale + '" ' + _selected + ' >' + myDynamicsLocales[_locale]['title'] + '</option>';
+            _htmlLanguages = _htmlLanguages + '<option value="' + _locale + '" ' + _selected + ' >' + myManifest['locales'][_locale]['my_title'] + '</option>';
         }
 
         _htmlLanguages = _htmlLanguages + '</select>';
@@ -1346,7 +1346,7 @@
             } else if (nbDaysAgo == 1) {
                 _daySeparator = document.webL10n.get('nb-days-ago-yesterday');
             } else {
-                _daySeparator = myExtraTranslations['nb-days-ago'].replace('{{n}}', nbDaysAgo);
+                _daySeparator = document.webL10n.get('nb-days-ago').replace('{{n}}', nbDaysAgo);
             }
 
             ui.echo('feedsEntriesNbDaysAgo', _daySeparator, '');
@@ -1506,7 +1506,7 @@
             //my.log('mainEntryOpenInBrowser()', _entry.content);
 
             if (_entry.author !== "") {
-                _author = '<div class="entrie-author">' + myExtraTranslations['by'] + ' ' + _entry.author + '</div>';
+                _author = '<div class="entrie-author"><my data-l10n-id="by">' + document.webL10n.get('by') + '</my> ' + _entry.author + '</div>';
             }
 
             _srcDoc = _srcDoc + _srcDocCss; // Inline CSS from file "style/inline.css.js"

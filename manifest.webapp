@@ -14,17 +14,30 @@
     "orientation": "portrait-primary",
     "default_locale": "en",
     "locales": {
+        "en": {
+            "name": "my Feeds",
+            "description": "RSS & ATOM Reader.",
+            "my_title": "English"
+        },
         "es": {
             "name": "mis Noticias",
-            "description": "Lector de RSS y ATOM."
+            "description": "Lector de RSS y ATOM.",
+            "my_title": "Español"
         },
         "fr": {
             "name": "mes Fluxs",
-            "description": "Lecteur de flux RSS & ATOM."
+            "description": "Lecteur de flux RSS & ATOM.",
+            "my_title": "Français"
         },
         "pt": {
             "name" : "meus Fluxs",
-            "description": "RSS e Atom Reader."
+            "description": "RSS e Atom Reader.",
+            "my_title": "Português"
+        },
+        "ru": {
+            "name": "my Feeds",
+            "description": "RSS & ATOM Reader.",
+            "my_title": "Pусский"
         }
     },
     "type": "privileged",
