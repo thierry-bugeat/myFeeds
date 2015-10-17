@@ -143,55 +143,114 @@
             document.webL10n.setLanguage(params.settings.ui.language, "");
         }
         
-        // Get and set Feedly token from cache then try to update token.
+        // Get and set Feedly token from cache 
+        // then try to update token
+        // then try to update subscriptions.
         
         if (params.accounts.feedly.logged) {
             my._load('cache/feedly/access_token.json').then(function(_token){
+            
                 feedly.setToken(_token);
-                if (navigator.onLine) {
-                    feedly.getSubscriptions();
+                
+                var _now = Math.floor(new Date().getTime() / 1000);
+                var _expires_in = _token.expires_in || 604800;
+                var _tokenIsExpired = ((_now - _token.lastModified) > _expires_in) ? true : false;
+                
+                if ((!navigator.onLine) && (_tokenIsExpired)) {
+                    _disableAccount('feedly');
                 }
+                    
+                if (navigator.onLine) {
+                    if (_tokenIsExpired) {
+                        feedly.updateToken().catch(function(error) {
+                            _disableAccount('feedly');
+                        }).then(function(){
+                            if (params.accounts.feedly.logged) {
+                                feedly.getSubscriptions();
+                            }
+                        });
+                    } else {
+                        feedly.getSubscriptions();
+                    }
+                }
+                
             }).catch(function(error) {
-                my.alert("Can't load and set Feedly token");
                 _disableAccount('feedly');
-            }).then(function(){
-                if (navigator.onLine) {
-                    my.log("Try to update Feedly token...");
-                    feedly.updateToken();
-                }
-            }).catch(function(error) {
-                my.log("Can't update Feedly token");
+                my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Feedly"}));
             });
         }
         
-        // Get and set The Old Reader token from cache
+        // Get and set The Old Reader token from cache 
+        // then try to update token
+        // then try to update subscriptions.
         
         if (params.accounts.theoldreader.logged) {
             my._load('cache/theoldreader/access_token.json').then(function(_token){
+            
                 theoldreader.setToken(_token);
-                if (navigator.onLine) {
-                    theoldreader.updateToken();
-                    theoldreader.getSubscriptions();
+                
+                var _now = Math.floor(new Date().getTime() / 1000);
+                var _expires_in = _token.expires_in || 604800;
+                var _tokenIsExpired = ((_now - _token.lastModified) > _expires_in) ? true : false;
+                
+                if ((!navigator.onLine) && (_tokenIsExpired)) {
+                    _disableAccount('theoldreader');
                 }
-                document.getElementById('theoldreaderForm').style.cssText = 'display: none';
+                    
+                if (navigator.onLine) {
+                    if (_tokenIsExpired) {
+                        theoldreader.updateToken().catch(function(error) {
+                            _disableAccount('theoldreader');
+                        }).then(function(){
+                            if (params.accounts.theoldreader.logged) {
+                                theoldreader.getSubscriptions();
+                            }
+                        });
+                    } else {
+                        theoldreader.getSubscriptions();
+                    }
+                }
+                
             }).catch(function(error) {
-                my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Old Reader"}));
                 _disableAccount('theoldreader');
+                my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Old Reader"}));
             });
         }
         
         // Get and set Aol Reader token from cache
+        // then try to update token
+        // then try to update subscriptions.
         
         if (params.accounts.aolreader.logged) {
             my._load('cache/aolreader/access_token.json').then(function(_token){
+            
                 aolreader.setToken(_token);
-                if (navigator.onLine) {
-                    aolreader.updateToken();
-                    aolreader.getSubscriptions();
+                
+                var _now = Math.floor(new Date().getTime() / 1000);
+                var _expires_in = _token.expires_in || 604800;
+                var _tokenIsExpired = ((_now - _token.lastModified) > _expires_in) ? true : false;
+                
+                if ((!navigator.onLine) && (_tokenIsExpired)) {
+                    _disableAccount('aolreader');
                 }
+                    
+                if (navigator.onLine) {
+                    if (_tokenIsExpired) {
+                        aolreader.updateToken().catch(function(error) {
+                            _disableAccount('aolreader');
+                        }).then(function(){
+                            if (params.accounts.aolreader.logged) {
+                                aolreader.getSubscriptions();
+                            }
+                        });
+                    } else {
+                        aolreader.getSubscriptions();
+                    }
+                }
+                
             }).catch(function(error) {
-                my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Aol Reader"}));
                 _disableAccount('aolreader');
+                my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Aol Reader"}));
             });
         }
 

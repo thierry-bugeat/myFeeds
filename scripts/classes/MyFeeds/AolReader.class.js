@@ -167,25 +167,35 @@ AolReader.prototype.getSubscriptions = function () {
 AolReader.prototype.updateToken = function() {
     _MyFeeds.log('AolReader.prototype.getNewToken()');
     
-    var _url = _AolReader.aolreader.host_auth + '/auth/access_token';
+    return new Promise(function(resolve, reject) {
+        
+        var _url = _AolReader.aolreader.host_auth + '/auth/access_token';
 
-    var _params = 'refresh_token=' + encodeURIComponent(_AolReader.aolreader.token.refresh_token) + 
-        '&client_id=' + encodeURIComponent(_AolReader.aolreader.client_id) +
-        '&client_secret=' + encodeURIComponent(_AolReader.aolreader.client_secret) +
-        '&grant_type=refresh_token';
+        var _params = 'refresh_token=' + encodeURIComponent(_AolReader.aolreader.token.refresh_token) + 
+            '&client_id=' + encodeURIComponent(_AolReader.aolreader.client_id) +
+            '&client_secret=' + encodeURIComponent(_AolReader.aolreader.client_secret) +
+            '&grant_type=refresh_token';
+            
+        var promise = _AolReader.post(_url, _params);
 
-    this.post(_url, _params, function(response) {
-        if (typeof response['errorMessage'] !== 'undefined') {
-            window.alert("AolReader Error : \n" + JSON.stringify(response));
-            _MyFeeds.log('CustomEvent : AolReader.getNewToken.error');
-        } else {
-            _AolReader.aolreader.token.access_token = response.access_token;
-            _AolReader.aolreader.token.lastModified = Math.floor(new Date().getTime() / 1000);
-            _AolReader._save('cache/aolreader/access_token.json', 'application/json', JSON.stringify(_AolReader.aolreader.token));
-            _AolReader._save('cache/aolreader/access_token.new.json', 'application/json', JSON.stringify(response));
-            document.body.dispatchEvent(new CustomEvent('AolReader.getNewToken.done', {"detail": response}));
-            _MyFeeds.log('CustomEvent : AolReader.getNewToken.done', response);
-        }
+        promise.then(function(response) {
+            if (typeof response['errorMessage'] !== 'undefined') {
+                window.alert("AolReader Error : \n" + JSON.stringify(response));
+                _MyFeeds.log('CustomEvent : AolReader.getNewToken.error');
+            } else {
+                _AolReader.aolreader.token.access_token = response.access_token;
+                _AolReader.aolreader.token.lastModified = Math.floor(new Date().getTime() / 1000);
+                _AolReader._save('cache/aolreader/access_token.json', 'application/json', JSON.stringify(_AolReader.aolreader.token));
+                _AolReader._save('cache/aolreader/access_token.new.json', 'application/json', JSON.stringify(response));
+                document.body.dispatchEvent(new CustomEvent('AolReader.getNewToken.done', {"detail": response}));
+                _MyFeeds.log('CustomEvent : AolReader.getNewToken.done', response);
+            }
+        }).catch(function(error) {
+            document.body.dispatchEvent(new CustomEvent('AolReader.getNewToken.error', {"detail": error}));
+            _MyFeeds.error("CustomEvent : AolReader.getNewToken.error", error);
+            reject(Error(JSON.stringify(error)));
+        });
+    
     });
 }
 

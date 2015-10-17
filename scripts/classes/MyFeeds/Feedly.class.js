@@ -87,25 +87,35 @@ Feedly.prototype.getToken = function() {
 Feedly.prototype.updateToken = function() {
     _MyFeeds.log('Feedly.prototype.getNewToken()');
     
-    var _url = _Feedly.feedly.host + '/v3/auth/token';
+    return new Promise(function(resolve, reject) {
+        
+        var _url = _Feedly.feedly.host + '/v3/auth/token';
 
-    var _params = 'refresh_token=' + encodeURIComponent(_Feedly.feedly.token.refresh_token) + 
-        '&client_id=' + encodeURIComponent(_Feedly.feedly.client_id) +
-        '&client_secret=' + encodeURIComponent(_Feedly.feedly.client_secret) +
-        '&grant_type=refresh_token';
+        var _params = 'refresh_token=' + encodeURIComponent(_Feedly.feedly.token.refresh_token) + 
+            '&client_id=' + encodeURIComponent(_Feedly.feedly.client_id) +
+            '&client_secret=' + encodeURIComponent(_Feedly.feedly.client_secret) +
+            '&grant_type=refresh_token';
 
-    this.post(_url, _params, function(response) {
-        if (typeof response['errorMessage'] !== 'undefined') {
-            window.alert("Feedly Error : \n" + JSON.stringify(response));
-            _MyFeeds.log('CustomEvent : Feedly.getNewToken.error');
-        } else {
-            _Feedly.feedly.token.access_token = response.access_token;
-            _Feedly.feedly.token.lastModified = Math.floor(new Date().getTime() / 1000);
-            _Feedly._save('cache/feedly/access_token.json', 'application/json', JSON.stringify(_Feedly.feedly.token));
-            _Feedly._save('cache/feedly/access_token.new.json', 'application/json', JSON.stringify(response));
-            document.body.dispatchEvent(new CustomEvent('Feedly.getNewToken.done', {"detail": response}));
-            _MyFeeds.log('CustomEvent : Feedly.getNewToken.done');
-        }
+        var promise = _Feedly.post(_url, _params);
+        
+        promise.then(function(response) {
+            if (typeof response['errorMessage'] !== 'undefined') {
+                window.alert("Feedly Error : \n" + JSON.stringify(response));
+                _MyFeeds.log('CustomEvent : Feedly.getNewToken.error');
+            } else {
+                _Feedly.feedly.token.access_token = response.access_token;
+                _Feedly.feedly.token.lastModified = Math.floor(new Date().getTime() / 1000);
+                _Feedly._save('cache/feedly/access_token.json', 'application/json', JSON.stringify(_Feedly.feedly.token));
+                _Feedly._save('cache/feedly/access_token.new.json', 'application/json', JSON.stringify(response));
+                document.body.dispatchEvent(new CustomEvent('Feedly.getNewToken.done', {"detail": response}));
+                _MyFeeds.log('CustomEvent : Feedly.getNewToken.done');
+            }
+        }).catch(function(error) {
+            document.body.dispatchEvent(new CustomEvent('Feedly.getNewToken.error', {"detail": error}));
+            _MyFeeds.error("CustomEvent : Feedly.getNewToken.error", error);
+            reject(Error(JSON.stringify(error)));
+        });
+    
     });
 }
 

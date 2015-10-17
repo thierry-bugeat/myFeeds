@@ -63,6 +63,22 @@ TheOldReader.prototype.getToken = function() {
 }
 
 /**
+ * Use "refresh_token" to obtain a new "access_token"
+ * @todo Not yet implemented
+ * @param   {null}
+ * @return  {CustomEvent} TheOldReader.getNewToken.done | TheOldReader.getNewToken.error
+
+ * */
+
+TheOldReader.prototype.updateToken = function() {
+    _MyFeeds.log('TheOldReader.prototype.getNewToken()');
+    
+    return new Promise(function(resolve, reject) {
+        resolve('{}');
+    });
+}
+
+/**
  * @param   {string} email
  * @param   {string} password
  * @return  {CustomEvent} TheOldReader.login.done | TheOldReader.login.error
