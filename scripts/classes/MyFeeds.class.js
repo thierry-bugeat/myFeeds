@@ -128,6 +128,64 @@ MyFeeds.prototype._save = function(filename, mimetype, content) {
 
 }
 
+/**
+ * Export subscriptions as OPML file
+ * @param {string} Export format "opml"
+ * @param {boolean} _logsOnScreen Display or not logs on screen.
+ *                                Overwrite settings.
+ * */
+ 
+ MyFeeds.prototype.export = function(format, _logsOnScreen) {
+    
+    var _output = ['<?xml version="1.0"?>',
+        '<opml version="1.0">',
+        '  <head>',
+        '    <title>myFeeds</title>',
+        '  </head>',
+        '  <body>',
+        '    <outline title="My feeds" type="folder">',
+        ''
+        ].join("\n");
+    
+    for (var _account in myFeedsSubscriptions) {
+
+        var _feeds = gf.getFeeds();
+        var _feed = "";
+        var _outlines = "";
+        var _nbOutlines = 0;
+        
+        for (var i = 0 ; i < _feeds.length; i++) {
+            if ( _feeds[i]._myAccount == _account) {
+                _nbOutlines++;
+                _url = _feeds[i].feedUrl;
+                _type = (_feeds[i].type.substr(0,3) == 'rss') ? 'rss' : 'atom';
+                _outlines = _outlines + '        <outline type="' + _type + '" title="' + _feeds[i].title + '" text="' + _feeds[i].title + '" description="' + _feeds[i].description + '" xmlUrl="' + _url.htmlentities() + '" htmlUrl="' + _feeds[i].link + '" />' + "\n";
+            }
+        }
+        
+        if (_nbOutlines > 0){
+            _output = _output + '      <outline type="folder" title="' + _account + '">' + "\n";
+            _output = _output + _outlines;
+            _output = _output + "      </outline>\n";
+        }
+    }
+    
+    _output = _output + "    </outline>\n  </body>\n</opml>\n";
+
+    _MyFeeds._save("opml/myFeeds.subscriptions.opml", "application/json", _output).then(function(results) {
+        _MyFeeds.log('Save subscriptions : ' + results);
+        if (_logsOnScreen) {
+            _MyFeeds.message(document.webL10n.get('opml-export-done') + "\n" + results);
+        }
+    }).catch(function(error) {
+        _MyFeeds.error("ERROR saving file ", error);
+        if (_logsOnScreen) {
+            _MyFeeds.alert("ERROR saving file " + error.filename);
+        }
+    });
+
+}
+
 MyFeeds.prototype._file_exists = function(filename, callback) {
     _MyFeeds.log('MyFeeds.prototype._file_exist', arguments);
     

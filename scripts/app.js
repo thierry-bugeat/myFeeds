@@ -399,62 +399,6 @@
         _search('');
     }
 
-    /**
-     * Save subscriptions for specified account
-     * @param {boolean} _logsOnScreen Display or not logs on screen.
-     *                                Overwrite settings.
-     * */
-    function _saveSubscriptions(_logsOnScreen) {
-        
-        var _output = ['<?xml version="1.0"?>',
-            '<opml version="1.0">',
-            '  <head>',
-            '    <title>myFeeds</title>',
-            '  </head>',
-            '  <body>',
-            '    <outline title="My feeds" type="folder">',
-            ''
-            ].join("\n");
-        
-        for (var _account in myFeedsSubscriptions) {
-
-            var _feeds = gf.getFeeds();
-            var _feed = "";
-            var _outlines = "";
-            var _nbOutlines = 0;
-            
-            for (var i = 0 ; i < _feeds.length; i++) {
-                if ( _feeds[i]._myAccount == _account) {
-                    _nbOutlines++;
-                    _url = _feeds[i].feedUrl;
-                    _type = (_feeds[i].type.substr(0,3) == 'rss') ? 'rss' : 'atom';
-                    _outlines = _outlines + '        <outline type="' + _type + '" title="' + _feeds[i].title + '" text="' + _feeds[i].title + '" description="' + _feeds[i].description + '" xmlUrl="' + _url.htmlentities() + '" htmlUrl="' + _feeds[i].link + '" />' + "\n";
-                }
-            }
-            
-            if (_nbOutlines > 0){
-                _output = _output + '      <outline type="folder" title="' + _account + '">' + "\n";
-                _output = _output + _outlines;
-                _output = _output + "      </outline>\n";
-            }
-        }
-        
-        _output = _output + "    </outline>\n  </body>\n</opml>\n";
-
-        my._save("opml/myFeeds.subscriptions.opml", "application/json", _output).then(function(results) {
-            my.log('Save subscriptions : ' + results);
-            if (_logsOnScreen) {
-                my.message('Backup completed : ' + results);
-            }
-        }).catch(function(error) {
-            my.error("ERROR saving file ", error);
-            if (_logsOnScreen) {
-                my.alert("ERROR saving file " + error.filename);
-            }
-        });
-
-    }
-
     nextDay.onclick = function(event) {
         ui._vibrate();
         if (params.entries.nbDaysAgo > 0 ) {
@@ -852,6 +796,7 @@
         '<ul>                                                                                                                                               ',
         '   <li class="_online_"><span data-icon="reload"></span><my data-l10n-id="settings-last-update">' + document.webL10n.get('settings-last-update') + '</my>' + _now.toLocaleTimeString(userLocale) + '</li>      ',
         '   <li class="_online_"><span data-icon="sync"></span><my data-l10n-id="settings-update-every">' + document.webL10n.get('settings-update-every') + '</my>' + _htmlSelectUpdateEvery + '</li>          ',
+        '   <li><span data-icon="sd-card"></span><my data-l10n-id="my-subscriptions-opml">' + document.webL10n.get('my-subscriptions-opml') + '</my><div><button id="saveSubscriptions"><span data-l10n-id="save">save</span></button></div></li>',
         '</ul>                                                                                                                                              ',
         '<h2 data-l10n-id="settings-news">' + document.webL10n.get('settings-news') + '</h2>                                                                ',
         '<ul>                                                                                                                                               ',
@@ -888,7 +833,6 @@
         '   <li><span data-icon="wifi-4"></span><my data-l10n-id="settings-connection">' + document.webL10n.get('settings-connection') + '</my><div id="onLine">NA</div></li>',
         '   <li><span data-icon="play-circle"></span><my data-l10n-id="settings-use-animations">' + document.webL10n.get('settings-use-animations') + '</my><div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
         '   <li><span data-icon="sd-card"></span><my data-l10n-id="my-subscriptions">' + document.webL10n.get('my-subscriptions') + '</my><div><button id="loadSubscriptions"><span data-l10n-id="load">load</span></button></div></li>',
-        '   <li><span data-icon="sd-card"></span><my data-l10n-id="my-subscriptions-opml">' + document.webL10n.get('my-subscriptions-opml') + '</my><div><button id="saveSubscriptions"><span data-l10n-id="save">save</span></button></div></li>',
         '   <li><span data-icon="bug"></span>Logs console<div><label class="pack-switch"><input id="logsConsole" type="checkbox" ' + _logsConsole + '><span></span></label></div></li>',
         '   <li><span data-icon="bug"></span>Logs screen<div><label class="pack-switch"><input id="logsScreen" type="checkbox" ' + _logsScreen + '><span></span></label></div></li>',
         '</ul>                                                                                                                                              '
@@ -1016,7 +960,7 @@
 
         document.getElementById("saveSubscriptions").onclick = function(event) {
             if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
-                _saveSubscriptions(true);
+                my.export('opml', true);
             }
         }
         
@@ -2235,7 +2179,6 @@
                     dspFeeds(gf.getFeeds());
                     dspSettings();
                     updateFeedsPulsations();
-                    //_saveSubscriptions(false);
                 }
 
                 if (_nbFeedsLoaded >= _nbFeedsToLoad) {
@@ -2270,7 +2213,6 @@
                     dspFeeds(gf.getFeeds());
                     dspSettings();
                     updateFeedsPulsations();
-                    //_saveSubscriptions(false);
                 }
 
                 if (_nbFeedsLoaded >= _nbFeedsToLoad) {
