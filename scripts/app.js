@@ -349,11 +349,11 @@
         
         var _output = ['<?xml version="1.0"?>',
             '<opml version="1.0">',
-            '<head>',
-            '<title>myFeeds Subscriptions Export</title>',
-            '</head>',
-            '<body>',
-            '<outline title="My feeds" text="My feeds" description="My feeds" type="folder">',
+            '  <head>',
+            '    <title>myFeeds</title>',
+            '  </head>',
+            '  <body>',
+            '    <outline title="My feeds" type="folder">',
             ''
             ].join("\n");
         
@@ -368,18 +368,19 @@
                 if ( _feeds[i]._myAccount == _account) {
                     _nbOutlines++;
                     _url = _feeds[i].feedUrl;
-                    _outlines = _outlines + '        <outline title="' + _feeds[i].title + '" text="' + _feeds[i].title + '" description="' + _feeds[i].description + '" type="' + _feeds[i].type + '" xmlUrl="" htmlUrl="' + encodeURIComponent(_url) + '" />' + "\n";
+                    _type = (_feeds[i].type.substr(0,3) == 'rss') ? 'rss' : 'atom';
+                    _outlines = _outlines + '        <outline type="' + _type + '" title="' + _feeds[i].title + '" text="' + _feeds[i].title + '" description="' + _feeds[i].description + '" xmlUrl="' + _url.htmlentities() + '" htmlUrl="' + _feeds[i].link + '" />' + "\n";
                 }
             }
             
             if (_nbOutlines > 0){
-                _output = _output + '    <outline title="' + _account + '" text="' + _account + '" description="' + _account + '" type="folder">' + "\n";
+                _output = _output + '      <outline type="folder" title="' + _account + '">' + "\n";
                 _output = _output + _outlines;
-                _output = _output + "    </outline>\n";
+                _output = _output + "      </outline>\n";
             }
         }
         
-        _output = _output + "</outline>\n</body>\n</opml>\n";
+        _output = _output + "    </outline>\n  </body>\n</opml>\n";
 
         my._save("opml/myFeeds.subscriptions.opml", "application/json", _output).then(function(results) {
             my.log('Save subscriptions : ' + results);

@@ -37,3 +37,7 @@ Array.prototype.last = function() {
     var i = -1 + this.length;
     return this[i];
 }
+
+String.prototype.htmlentities = function() {
+    return String(this).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
