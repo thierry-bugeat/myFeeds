@@ -2411,7 +2411,7 @@
 
         document.body.addEventListener('AolReader.getSubscriptions.error', function(response) {
             my.log('CustomEvent : AolReader.getSubscriptions.error', arguments);
-            my.message(document.webL10n.get('aolreader-get-subscriptions-error') + response.detail.message);
+            my.alert(document.webL10n.get('aolreader-get-subscriptions-error') + response.detail.message);
         });
 
         // ============
