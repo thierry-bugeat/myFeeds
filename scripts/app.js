@@ -2344,7 +2344,7 @@
 
         document.body.addEventListener('TheOldReader.getSubscriptions.error', function(response) {
             my.log('CustomEvent : TheOldReader.getSubscriptions.error', arguments);
-            my.message('The Old Reader error');
+            my.alert('TheOldReader.getSubscriptions.error');
         });
         
         /* ========================= */
