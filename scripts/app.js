@@ -2353,9 +2353,9 @@
         
         // Due to quick expiration time (1h), Aol token is 
         // actualized every 14mn.
-        /*setInterval(function() {
+        setInterval(function() {
             if (navigator.onLine) {aolreader.updateToken();}
-        }, (60000 * 14));*/
+        }, (60000 * 14));
   
         document.body.addEventListener('AolReader.login.done', function(response){
             _loginInProgress['aolreader'] = true;
