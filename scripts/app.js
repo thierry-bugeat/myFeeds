@@ -97,7 +97,9 @@
             },
             "search": {
                 "visible": false                // Form search entries by keyword is visible or not
-            }
+            },
+            "imagesPreviouslyDisplayed": []     // Store images previously displayed. 
+                                                // Used for displaying images in offline mode.
         }
     }
     
@@ -1761,39 +1763,11 @@
         var className = 'my-'+params.entries.theme+'-date';
         var elements = document.getElementsByClassName(className);
         for (var i = 0; i < elements.length; i++) {
-            if (isInViewport(elements[i]) && (elements[i].textContent == "")) {
+            if (ui.isInViewport(elements[i]) && (elements[i].textContent == "")) {
                 var _publishedDate = elements[i].getAttribute('publishedDate');
                 elements[i].textContent = new Date(_publishedDate).toLocaleTimeString(userLocale);
             }
         }
-    }
-    
-    /**
-     * Load images who are visibles in viewport
-     * */
-    function loadImages() {
-        var images = document.getElementsByTagName('img');
-        for (var i = 0; i < images.length; i++) {
-            if (isInViewport(images[i]) 
-                && (images[i].getAttribute('data-src') != "")
-                && (images[i].getAttribute('src') == "images/loading.png")
-            ){
-                images[i].setAttribute('src', images[i].getAttribute('data-src'));
-            }
-        }
-    }
-    
-    /**
-     * Check if element is visible in viewport
-     * @param {object} elem DOM element
-     * @return {boolean} true / false
-     * */
-    function isInViewport(element) {
-        var rect = element.getBoundingClientRect()
-        var windowHeight = window.innerHeight || document.documentElement.clientHeight
-        var windowWidth = window.innerWidth || document.documentElement.clientWidth
-
-        return rect.bottom > 0 && rect.top < windowHeight && rect.right > 0 && rect.left < windowWidth
     }
 
     // ======================
@@ -1890,7 +1864,7 @@
         // ============================
         
         setInterval(function() {
-            loadImages();
+            ui.loadImages();
         }, 200);
         
         // ======================

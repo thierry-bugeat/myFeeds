@@ -295,7 +295,7 @@ MyUi.prototype._smoothScrollTo = function (screenX, duration) {
         main.style.cssText = 'transition: transform 0.25s linear; transform: translateX('+_x+');';
         
     }); // Schedule the execution for later
-};
+}
 
 /**
  * Show/Hide small entries
@@ -324,7 +324,7 @@ MyUi.prototype._smallEntries = function (status) {
             _MyUi._onclick(_small_entries[i], _tmp); 
         }
     }
-};
+}
     
 /**
  * Change element opacity
@@ -333,7 +333,7 @@ MyUi.prototype._smallEntries = function (status) {
  * */
 MyUi.prototype.fade = function (_this) {
     _this.style.cssText = "opacity : 0.4;";
-};
+}
 
 
 MyUi.prototype.selectThemeIcon = function () {
@@ -356,4 +356,52 @@ MyUi.prototype._vibrate = function () {
     if (params.settings.ui.vibrate) {
         window.navigator.vibrate(50);
     }
-};
+}
+
+/**
+ * Load images who are visibles in viewport.
+ * Use images from navigator cache if network is offline.
+ * */
+MyUi.prototype.loadImages = function () {
+    var images = document.getElementsByTagName('img');
+    
+    for (var i = 0; i < images.length; i++) {
+        
+        var _dataSrc = images[i].getAttribute('data-src');
+        
+        if (navigator.onLine) {
+            
+            if (_MyUi.isInViewport(images[i]) 
+                && (_dataSrc != "")
+                && (images[i].getAttribute('src') == "images/loading.png")
+            ){
+                images[i].setAttribute('src', _dataSrc);
+                if (!liveValues.entries.imagesPreviouslyDisplayed.contains(_dataSrc)) {
+                    liveValues.entries.imagesPreviouslyDisplayed.push(_dataSrc);
+                }
+            }
+            
+        } else {
+        
+            if (_MyUi.isInViewport(images[i]) 
+                && liveValues.entries.imagesPreviouslyDisplayed.contains(_dataSrc)
+            ){
+                images[i].setAttribute('src', _dataSrc);
+            }
+            
+        }
+    }
+}
+
+/**
+ * Check if element is visible in viewport
+ * @param {object} elem DOM element
+ * @return {boolean} true / false
+ * */
+MyUi.prototype.isInViewport = function (element) {
+    var rect = element.getBoundingClientRect()
+    var windowHeight = window.innerHeight || document.documentElement.clientHeight
+    var windowWidth = window.innerWidth || document.documentElement.clientWidth
+
+    return rect.bottom > 0 && rect.top < windowHeight && rect.right > 0 && rect.left < windowWidth
+}
