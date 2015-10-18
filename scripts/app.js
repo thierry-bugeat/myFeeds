@@ -2284,7 +2284,7 @@
 
         document.body.addEventListener('Feedly.getSubscriptions.error', function(response) {
             my.log('CustomEvent : Feedly.getSubscriptions.error', arguments);
-            my.message(document.webL10n.get('feedly-get-subscriptions-error') + response.detail.message);
+            my.alert(document.webL10n.get('feedly-get-subscriptions-error') + response.detail.message);
         });
 
         /* ============================= */
