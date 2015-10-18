@@ -2284,7 +2284,7 @@
 
         document.body.addEventListener('Feedly.getSubscriptions.error', function(response) {
             my.log('CustomEvent : Feedly.getSubscriptions.error', arguments);
-            my.alert(document.webL10n.get('feedly-get-subscriptions-error') + response.detail.message);
+            my.alert(document.webL10n.get('feedly-get-subscriptions-error') + JSON.stringify(response.detail.message));
         });
 
         /* ============================= */
@@ -2344,7 +2344,7 @@
 
         document.body.addEventListener('TheOldReader.getSubscriptions.error', function(response) {
             my.log('CustomEvent : TheOldReader.getSubscriptions.error', arguments);
-            my.alert('TheOldReader.getSubscriptions.error');
+            my.alert(document.webL10n.get('theoldreader-get-subscriptions-error') + JSON.stringify(response.detail.message));
         });
         
         /* ========================= */
@@ -2411,7 +2411,7 @@
 
         document.body.addEventListener('AolReader.getSubscriptions.error', function(response) {
             my.log('CustomEvent : AolReader.getSubscriptions.error', arguments);
-            my.alert(document.webL10n.get('aolreader-get-subscriptions-error') + response.detail.message);
+            my.alert(document.webL10n.get('aolreader-get-subscriptions-error') + JSON.stringify(response.detail.message));
         });
 
         // ============
