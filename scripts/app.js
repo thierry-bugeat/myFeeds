@@ -350,7 +350,27 @@
                     _divs[i].classList.remove('_show');
                     _divs[i].classList.add('_hide');
                 } else {
-                    var _text = _divs[i].textContent.toLowerCase();
+                    //var _text = _divs[i].textContent.toLowerCase(); // v1 Search in complete entries
+                    
+                    // v3
+                    /*
+                    var _text = (_divs[i].children)[0].textContent.toLowerCase(); // my-card-theme
+                    var _text = (_divs[i].children)[3].textContent.toLowerCase(); // my-list-theme
+                    var _text = (_divs[i].children)[0].textContent.toLowerCase(); // my-grid-theme
+                    */
+
+                    // v2 Search only in entries titles
+                    var _text = "";
+                    var childrens = _divs[i].children;
+                    for (var j = 0; j < childrens.length; j++) {
+                        if (childrens[j].className == 'my-'+params.entries.theme+'-title') {
+                            _text = childrens[j].textContent.toLowerCase();
+                            break;
+                        }
+                    }
+
+                    // ---
+                    
                     if ((string == '') || (_text.indexOf(string.toLowerCase()) >= 0)) {
                         _divs[i].classList.remove('_hide')
                         _divs[i].classList.add('_show');
@@ -1064,8 +1084,9 @@
             _htmlKeywords = _htmlKeywords + '<h2 data-l10n-id="search-by-keywords">' + document.webL10n.get('search-by-keywords') + '</h2><ul class="keywords">';
             
             for (var i = 0; i < _sortedKeywords.length; i++) {
+                var _count = count(_sortedKeywords[i]);
                 var _deleteIcone = '<button class="deleteKeyword" myKeyword="' + _sortedKeywords[i] + '"><span data-icon="delete"></span></button>';
-                _htmlKeywords = _htmlKeywords + '<li><a class="openKeyword" myKeyword="' +  _sortedKeywords[i] + '"><p>' + _deleteIcone + '<button><span data-icon="search"></span></button>' + _sortedKeywords[i] + '</p></a></li>';
+                _htmlKeywords = _htmlKeywords + '<li><a class="openKeyword" myKeyword="' +  _sortedKeywords[i] + '"><p>' + _deleteIcone + '<button><span data-icon="search"></span></button><count class="count">'+_count+'</count>' + _sortedKeywords[i] + '</p></a></li>';
             }
             
             _htmlKeywords = _htmlKeywords + '</ul>';
@@ -1475,7 +1496,7 @@
 
         while ((sortedEntries[_nb]._myTimestamp < liveValues['timestamps']['min'])
             || (!params.entries.displaySmallEntries && my.isSmallEntry(sortedEntries[_nb]))
-            || (_string !== "" && liveValues['entries']['search']['visible'] && (((JSON.stringify(sortedEntries[_nb])).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
+            || (_string !== "" && liveValues['entries']['search']['visible'] && (((sortedEntries[_nb].title).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
         ){
             _nb = _nb - 1;
             if (_nb < 0) { break; }
@@ -1496,7 +1517,7 @@
 
         while ((sortedEntries[_nb]._myTimestamp > liveValues['timestamps']['max'])
             || ((params.entries.displaySmallEntries == false) && (my.isSmallEntry(sortedEntries[_nb]) == true)) 
-            || (_string !== "" && liveValues['entries']['search']['visible'] && (((JSON.stringify(sortedEntries[_nb])).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
+            || (_string !== "" && liveValues['entries']['search']['visible'] && (((sortedEntries[_nb].title).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
         ){
             _nb = _nb + 1;
             if (_nb >= sortedEntries.length) { break; }
@@ -1769,7 +1790,33 @@
             }
         }
     }
+    
+    /**
+     * Count entries matching specified keyword
+     * @param {string} keyword
+     * @return {int}
+     * */
+    function count(keyword){
+        var out = 0;
+        
+        entries = gf.getEntries();
 
+        var _nb = entries.length;
+        var _regex = new RegExp(keyword, "gi");
+
+        for (var i = 0; i < _nb; i++) {
+            if ((!params.entries.displaySmallEntries && my.isSmallEntry(entries[i])) 
+                || (entries[i].id > liveValues['timestamps']['max'])
+            ){
+                // nothing to do
+            } else if ((entries[i].title).match(_regex)) {
+                out++;
+            }
+        }
+
+        return out;
+    }
+                            
     // ======================
     // --- Ready to start ---
     // ======================

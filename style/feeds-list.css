@@ -114,3 +114,15 @@
     padding:0;
     margin-right: var(--my-spacing);
 }
+
+count{
+    background: var(--fxos-blue);
+    color: var(--fxos-white);
+    width:4rem;
+    height:4rem;
+    line-height:4rem;
+    border-radius:2rem;
+    display:inline-block;
+    text-align:center;
+    margin-right: var(--my-spacing);
+}
