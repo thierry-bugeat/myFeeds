@@ -34,8 +34,14 @@ var dom = {
         "feeds":    document.getElementById("topupFeedsList")
     },
     "entry": {
-        "next":     document.getElementById("nextEntry"),
-        "previous": document.getElementById("previousEntry")
+        "next": {
+            "button":   document.getElementById("nextEntry"),
+            "title":    document.getElementById("nextEntryTitle")
+        },
+        "previous": {
+            "button":   document.getElementById("previousEntry"),
+            "title":    document.getElementById("previousEntryTitle")
+        }
     }
 };
 var search                  = document.getElementById("search");

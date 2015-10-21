@@ -1530,6 +1530,11 @@
         liveValues['entries']['id']['min'] = _nb;
     }
 
+    /**
+     * @param {int} entryId
+     * @param {string} url
+     * @return {CustomEvent} mainEntryOpen.done
+     * */
     function mainEntryOpenInBrowser(entryId, url) {
         my.log('mainEntryOpenInBrowser()', arguments);
         document.body.style.cssText = "overflow: hidden;";  // Disable scroll in entries list.
@@ -1965,6 +1970,7 @@
         
         // Main entry open done...
         // Update next entry [<] & previous entry [>] buttons.
+        // Update next & previous entries titles
         
         document.body.addEventListener('mainEntryOpen.done', function(event){
             
@@ -2027,48 +2033,52 @@
             // [<]
             
             if (my.isSmallEntry(sortedEntries[_nextEntryId])) {
-                dom['entry']['next'].setAttribute("i", _nextEntryId);
-                dom['entry']['next'].setAttribute("entry_link", sortedEntries[_nextEntryId].link);
+                dom['entry']['next']['button'].setAttribute("i", _nextEntryId);
+                dom['entry']['next']['button'].setAttribute("entry_link", sortedEntries[_nextEntryId].link);
             } else {
-                dom['entry']['next'].setAttribute("i", _nextEntryId);
-                dom['entry']['next'].setAttribute("entry_link", "");
+                dom['entry']['next']['button'].setAttribute("i", _nextEntryId);
+                dom['entry']['next']['button'].setAttribute("entry_link", "");
             }
             
             // [>]
             
             if (my.isSmallEntry(sortedEntries[_previousEntryId])) {
-                dom['entry']['previous'].setAttribute("i", _previousEntryId);
-                dom['entry']['previous'].setAttribute("entry_link", sortedEntries[_previousEntryId].link);
+                dom['entry']['previous']['button'].setAttribute("i", _previousEntryId);
+                dom['entry']['previous']['button'].setAttribute("entry_link", sortedEntries[_previousEntryId].link);
             } else {
-                dom['entry']['previous'].setAttribute("i", _previousEntryId);
-                dom['entry']['previous'].setAttribute("entry_link", "");
+                dom['entry']['previous']['button'].setAttribute("i", _previousEntryId);
+                dom['entry']['previous']['button'].setAttribute("entry_link", "");
             }
             
             // Disable / enable button [<]
-            
+
             if ((_nextEntryId < liveValues['entries']['id']['min']) || (_nextEntryId == _entryId)) {
-                ui._onclick(dom['entry']['next'], 'disable');
+                ui._onclick(dom['entry']['next']['button'], 'disable');
+                ui.echo("nextEntryTitle", "", "");
             } else {
-                ui._onclick(dom['entry']['next'], 'enable');
+                ui._onclick(dom['entry']['next']['button'], 'enable');
+                ui.echo("nextEntryTitle", sortedEntries[_nextEntryId].title, "");
             }
             
             // Disable / enable button [>]
             
             if ((_previousEntryId > liveValues['entries']['id']['max']) || (_previousEntryId == _entryId)) {
-                ui._onclick(dom.entry['previous'], 'disable');
+                ui._onclick(dom.entry['previous']['button'], 'disable');
+                ui.echo("previousEntryTitle", "", "");
             } else {
-                ui._onclick(dom.entry['previous'], 'enable');
+                ui._onclick(dom.entry['previous']['button'], 'enable');
+                ui.echo("previousEntryTitle", sortedEntries[_previousEntryId].title, "");
             }
             
         });
         
         // ---
         
-        dom['entry']['next'].onclick = function() {
+        dom['entry']['next']['button'].onclick = function() {
             mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
         }
         
-        dom['entry']['previous'].onclick = function() {
+        dom['entry']['previous']['button'].onclick = function() {
             mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
         }
         
