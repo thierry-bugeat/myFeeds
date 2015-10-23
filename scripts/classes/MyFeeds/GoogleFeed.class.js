@@ -378,8 +378,13 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
 
             this._setNum(1 + Math.floor(_myFeed.pulsations * nbDaysToLoad)); // Pulsations = Estimation of news per day.
 
-            var _urlParams = '&output=' + this.gf.output + '&num=' + this.gf.num + '&scoring=' + this.gf.scoring + '&q=' + encodeURIComponent(this.gf.q) + '&key=' + this.gf.key + '&v=' + this.gf.v;
+            var _urlParams = '&output=' + this.gf.output + '&num=' + this.gf.num + '&scoring=' + this.gf.scoring + '&q=' + encodeURIComponent(this.gf.q) + '&key=' + this.gf.key + '&v=' + this.gf.v + "&rnd=" + Math.random();
             var _url    = this.gf.ServiceBase + _urlParams;
+
+            if (params.settings.proxy.use) {
+                _urlParams = '&url=' + encodeURIComponent(this.gf.ServiceBase + '&output=' + this.gf.output + '&num=' + this.gf.num + '&scoring=' + this.gf.scoring + '&q=' + encodeURIComponent(this.gf.q) + '&key=' + this.gf.key + '&v=' + this.gf.v + "&rnd=" + Math.random());
+                _url = 'http://' + params.settings.proxy.host + '/proxy/?' + _urlParams;
+            }
 
             //_MyFeeds.log("GoogleFeed.load.done : " + _url);
             //_MyFeeds.log("GoogleFeed.load.done : ", _myFeed);
@@ -470,8 +475,10 @@ GoogleFeed.prototype.get = function (url, myParams) {
         window.setTimeout(function() {
             
             var xhr = new XMLHttpRequest({ mozSystem: true });
-            
-            xhr.open('GET', url + "&rnd="+ Math.random());
+
+            xhr.open("GET", url);
+
+            _MyFeeds.log('GoogleFeed.prototype.get()', url);
 
             xhr.onload = function() {
                 if (xhr.status == 200) {
