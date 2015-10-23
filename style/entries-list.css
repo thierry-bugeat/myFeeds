@@ -10,17 +10,17 @@
 }
 
 .card{
-    background: url("/images/card.svg") no-repeat center center;
+    background: url("../images/card.svg") no-repeat center center;
     background-size: 2rem 2.5rem;
 }
 
 .list{
-    background: url("/images/list.svg") no-repeat center center;
+    background: url("../images/list.svg") no-repeat center center;
     background-size: 2rem 2.5rem;
 }
 
 .grid{
-    background: url("/images/grid.svg") no-repeat center center;
+    background: url("../images/grid.svg") no-repeat center center;
     background-size: 2rem 2.5rem;
 }
 
