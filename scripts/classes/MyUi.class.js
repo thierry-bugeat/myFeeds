@@ -360,7 +360,10 @@ MyUi.prototype.selectThemeIcon = function () {
 
 MyUi.prototype._vibrate = function () {
     if (params.settings.ui.vibrate) {
-        window.navigator.vibrate(50);
+        try {
+            window.navigator.vibrate(50);
+        } catch (e) {
+        }
     }
 }
 

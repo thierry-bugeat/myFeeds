@@ -30,7 +30,7 @@
     var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 2.1,
+        "version": 2.2,
         "feeds": {
             "selectedFeed": "",                 // Display all feeds if empty otherwise display specified feed url
             "defaultPulsations": 5              // Default feed pulsations
@@ -77,7 +77,11 @@
             "update": {
                 "every": [300, 900, 1800, 3600] // In seconds 5mn, 15mn, 30mn, 60mn
             },
-            "days": [3, 5, 7, 10]
+            "days": [3, 5, 7, 10],
+            "proxy": {
+                "use": false,                    // Use proxy to get url content
+                "host": "54.229.143.103"
+            }
         }
     }
     
@@ -755,6 +759,12 @@
             _logsScreen = 'checked=""':
             _logsScreen = "";
 
+        // Proxy selector
+
+        params.settings.proxy.use ?
+            _useProxy = 'checked=""':
+            _useProxy = "";
+
         // Update every
 
         var _every = params.settings.update.every;
@@ -854,6 +864,7 @@
         '<ul class="developper-menu">                                                                                                                       ',
         '   <li><span data-icon="wifi-4"></span><my data-l10n-id="settings-connection">' + document.webL10n.get('settings-connection') + '</my><div id="onLine">NA</div></li>',
         '   <li><span data-icon="play-circle"></span><my data-l10n-id="settings-use-animations">' + document.webL10n.get('settings-use-animations') + '</my><div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
+        '   <li><span data-icon="addons"></span><my data-l10n-id="settings-use-proxy">' + document.webL10n.get('settings-use-proxy') + '</my><div><label class="pack-switch"><input id="useProxy" type="checkbox" ' + _useProxy + '><span></span></label></div></li>',
         '   <li><span data-icon="sd-card"></span><my data-l10n-id="my-subscriptions">' + document.webL10n.get('my-subscriptions') + '</my><div><button id="loadSubscriptions"><span data-l10n-id="load">load</span></button></div></li>',
         '   <li><span data-icon="bug"></span>Logs console<div><label class="pack-switch"><input id="logsConsole" type="checkbox" ' + _logsConsole + '><span></span></label></div></li>',
         '   <li><span data-icon="bug"></span>Logs screen<div><label class="pack-switch"><input id="logsScreen" type="checkbox" ' + _logsScreen + '><span></span></label></div></li>',
@@ -953,6 +964,13 @@
 
         document.getElementById("useAnimations").onclick = function() {
             params.settings.ui.animations = !params.settings.ui.animations;
+            _saveParams();
+        }
+        
+        // UI proxy checkbox
+
+        document.getElementById("useProxy").onclick = function() {
+            params.settings.proxy.use = !params.settings.proxy.use;
             _saveParams();
         }
         
