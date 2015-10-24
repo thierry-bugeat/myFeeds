@@ -442,6 +442,12 @@ GoogleFeed.prototype.findFeeds = function(keywords) {
         var _params     = {};
         var _urlParams  = '&q=' + encodeURIComponent(keywords) + '&v=' + _GoogleFeed.gf.v;
         var _url        = _GoogleFeed.gf.ServiceFind + _urlParams;
+
+        if (params.settings.proxy.use) {
+            _urlParams = '&url=' + encodeURIComponent(_GoogleFeed.gf.ServiceFind + '&q=' + encodeURIComponent(keywords) + '&v=' + _GoogleFeed.gf.v);
+            _url = 'http://' + params.settings.proxy.host + '/proxy/?' + _urlParams;
+        }
+
         var promise     = _GoogleFeed.get(_url, _params);
 
         promise.then(function(response) {
