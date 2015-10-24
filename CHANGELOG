@@ -1,5 +1,24 @@
 --------------------------------------------------------- 
-# myFeeds 1.1.1 
+# myFeeds 1.2.0 (2015-10-24) 
+
+### New feature(s): 
+
+    - #13 Add AOL Reader online account
+    - #30 Export subscriptions as OPML file
+    - #29 Add Russian language (Thanks to Пётр Жоря)
+    - #33 Display next & previous news titles at bottom of page
+    
+### Improvement(s):
+
+    - #32 Count keywords
+
+### Bug(s) 
+
+    - #31 Display previoulsy loaded images in offline mode
+ 
+ 
+--------------------------------------------------------- 
+# myFeeds 1.1.1 (2015-10-10) 
  
 ### Improvement(s): 
  
