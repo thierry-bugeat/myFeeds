@@ -63,6 +63,22 @@ TheOldReader.prototype.getToken = function() {
 }
 
 /**
+ * Use "refresh_token" to obtain a new "access_token"
+ * @todo Not yet implemented
+ * @param   {null}
+ * @return  {CustomEvent} TheOldReader.getNewToken.done | TheOldReader.getNewToken.error
+
+ * */
+
+TheOldReader.prototype.updateToken = function() {
+    _MyFeeds.log('TheOldReader.prototype.getNewToken()');
+    
+    return new Promise(function(resolve, reject) {
+        resolve('{}');
+    });
+}
+
+/**
  * @param   {string} email
  * @param   {string} password
  * @return  {CustomEvent} TheOldReader.login.done | TheOldReader.login.error
@@ -84,6 +100,7 @@ TheOldReader.prototype.login = function(email, password) {
 
     this.post(_url, _params, function(response) {
         if (_TheOldReader.setToken(response)) {
+            response.lastModified = Math.floor(new Date().getTime() / 1000);
             _TheOldReader._save('cache/theoldreader/access_token.json', 'application/json', JSON.stringify(response));
             document.body.dispatchEvent(new CustomEvent('TheOldReader.login.done', {"detail": response}));
             _MyFeeds.log('CustomEvent : TheOldReader.login.done');

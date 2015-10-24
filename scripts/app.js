@@ -23,13 +23,14 @@
 
     var theoldreader = new TheOldReader();
     var feedly = new Feedly();
+    var aolreader = new AolReader();
 
     var gf = new GoogleFeed();
 
-    var myFeedsSubscriptions = {'local': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
+    var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 1,
+        "version": 2.1,
         "feeds": {
             "selectedFeed": "",                 // Display all feeds if empty otherwise display specified feed url
             "defaultPulsations": 5              // Default feed pulsations
@@ -54,12 +55,17 @@
             "theoldreader": {
                 "title": "The Old Reader",
                 "logged": false
+            },
+            "aolreader": {
+                "title": "Aol Reader",
+                "logged": false
             }
         },
         "settings": {
             "ui": {
                 "animations": false,            // Use transitions animations
-                "vibrate": true                 // Vibration on click
+                "vibrate": true,                // Vibration on click
+                "language": ""                  // Language
             },
             "developper_menu": {
                 "visible": false,               // Display or not developper menu in settings
@@ -91,7 +97,9 @@
             },
             "search": {
                 "visible": false                // Form search entries by keyword is visible or not
-            }
+            },
+            "imagesPreviouslyDisplayed": []     // Store images previously displayed. 
+                                                // Used for displaying images in offline mode.
         }
     }
     
@@ -101,7 +109,7 @@
     
     var _dspEntriesTimeout = '';
     
-    var _loginInProgress = {"local": false, "feedly": false, "theoldreader": false}
+    var _loginInProgress = {"local": false, "feedly": false, "theoldreader": false, "aolreader": false}
 
     // Network Connection
 
@@ -114,9 +122,15 @@
 
     my._load('params.json').then(function(_myParams) {
         my.log('loading params from file params.json ...', _myParams);
-        
+
         if (params.version > _myParams.version) {
-            params.accounts = _myParams.accounts; // Keep user accounts
+
+            for (var _account in myFeedsSubscriptions) {
+                if (typeof _myParams.accounts[_account] !== 'undefined') {
+                    params.accounts[_account] = _myParams.accounts[_account]; // Keep user account parameters if exists
+                }
+            }
+            
             _saveParams();
         } else {
             params = _myParams;
@@ -124,42 +138,130 @@
         
         ui.selectThemeIcon();
         
-        // Get and set Feedly token from cache then try to update token.
+        // Set language
+        
+        if (params.settings.ui.language != "") {
+            userLocale = params.settings.ui.language;
+            document.webL10n.setLanguage(params.settings.ui.language, "");
+        }
+        
+        // Get and set Feedly token from cache 
+        // then try to update token
+        // then try to update subscriptions.
+        
         if (params.accounts.feedly.logged) {
             my._load('cache/feedly/access_token.json').then(function(_token){
+            
                 feedly.setToken(_token);
-                if (navigator.onLine) {
-                    feedly.getSubscriptions();
+                
+                var _now = Math.floor(new Date().getTime() / 1000);
+                var _expires_in = _token.expires_in || 604800;
+                var _tokenIsExpired = ((_now - _token.lastModified) > _expires_in) ? true : false;
+                
+                if ((!navigator.onLine) && (_tokenIsExpired)) {
+                    _disableAccount('feedly');
                 }
+                    
+                if (navigator.onLine) {
+                    if (_tokenIsExpired) {
+                        feedly.updateToken().catch(function(error) {
+                            _disableAccount('feedly');
+                        }).then(function(){
+                            if (params.accounts.feedly.logged) {
+                                feedly.getSubscriptions();
+                            }
+                        });
+                    } else {
+                        feedly.getSubscriptions();
+                    }
+                }
+                
             }).catch(function(error) {
-                my.alert("Can't load and set Feedly token");
                 _disableAccount('feedly');
-            }).then(function(){
-                if (navigator.onLine) {
-                    my.log("Try to update Feedly token...");
-                    feedly.updateToken();
-                }
-            }).catch(function(error) {
-                my.log("Can't update Feedly token");
+                my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Feedly"}));
             });
         }
-        // Get and set The Old Reader token from cache
+        
+        // Get and set The Old Reader token from cache 
+        // then try to update token
+        // then try to update subscriptions.
+        
         if (params.accounts.theoldreader.logged) {
             my._load('cache/theoldreader/access_token.json').then(function(_token){
+            
                 theoldreader.setToken(_token);
-                if (navigator.onLine) {
-                    theoldreader.getSubscriptions();
+                
+                var _now = Math.floor(new Date().getTime() / 1000);
+                var _expires_in = _token.expires_in || 604800;
+                var _tokenIsExpired = ((_now - _token.lastModified) > _expires_in) ? true : false;
+                
+                if ((!navigator.onLine) && (_tokenIsExpired)) {
+                    _disableAccount('theoldreader');
                 }
-                document.getElementById('theoldreaderForm').style.cssText = 'display: none';
+                    
+                if (navigator.onLine) {
+                    if (_tokenIsExpired) {
+                        theoldreader.updateToken().catch(function(error) {
+                            _disableAccount('theoldreader');
+                        }).then(function(){
+                            if (params.accounts.theoldreader.logged) {
+                                theoldreader.getSubscriptions();
+                            }
+                        });
+                    } else {
+                        theoldreader.getSubscriptions();
+                    }
+                }
+                
             }).catch(function(error) {
-                my.alert("Can't load and set T.O.R. token");
                 _disableAccount('theoldreader');
+                my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Old Reader"}));
             });
         }
+        
+        // Get and set Aol Reader token from cache
+        // then try to update token
+        // then try to update subscriptions.
+        
+        if (params.accounts.aolreader.logged) {
+            my._load('cache/aolreader/access_token.json').then(function(_token){
+            
+                aolreader.setToken(_token);
+                
+                var _now = Math.floor(new Date().getTime() / 1000);
+                var _expires_in = _token.expires_in || 604800;
+                var _tokenIsExpired = ((_now - _token.lastModified) > _expires_in) ? true : false;
+                
+                if ((!navigator.onLine) && (_tokenIsExpired)) {
+                    _disableAccount('aolreader');
+                }
+                    
+                if (navigator.onLine) {
+                    if (_tokenIsExpired) {
+                        aolreader.updateToken().catch(function(error) {
+                            _disableAccount('aolreader');
+                        }).then(function(){
+                            if (params.accounts.aolreader.logged) {
+                                aolreader.getSubscriptions();
+                            }
+                        });
+                    } else {
+                        aolreader.getSubscriptions();
+                    }
+                }
+                
+            }).catch(function(error) {
+                _disableAccount('aolreader');
+                my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Aol Reader"}));
+            });
+        }
+
+        // ---
+        
     }).catch(function(error) {
         _saveParams();
     });
-    
+
     // Load keywords from SDCard.
     // Create file if doesn't exists.
 
@@ -231,7 +333,7 @@
             _saveParams();
         }
     }
-    
+
     /**
      * Show entries matching string and hide others
      * @param {string} string Min length 5 characters or "" to reset display
@@ -248,7 +350,27 @@
                     _divs[i].classList.remove('_show');
                     _divs[i].classList.add('_hide');
                 } else {
-                    var _text = _divs[i].textContent.toLowerCase();
+                    //var _text = _divs[i].textContent.toLowerCase(); // v1 Search in complete entries
+                    
+                    // v3
+                    /*
+                    var _text = (_divs[i].children)[0].textContent.toLowerCase(); // my-card-theme
+                    var _text = (_divs[i].children)[3].textContent.toLowerCase(); // my-list-theme
+                    var _text = (_divs[i].children)[0].textContent.toLowerCase(); // my-grid-theme
+                    */
+
+                    // v2 Search only in entries titles
+                    var _text = "";
+                    var childrens = _divs[i].children;
+                    for (var j = 0; j < childrens.length; j++) {
+                        if (childrens[j].className == 'my-'+params.entries.theme+'-title') {
+                            _text = childrens[j].textContent.toLowerCase();
+                            break;
+                        }
+                    }
+
+                    // ---
+                    
                     if ((string == '') || (_text.indexOf(string.toLowerCase()) >= 0)) {
                         _divs[i].classList.remove('_hide')
                         _divs[i].classList.add('_show');
@@ -297,47 +419,6 @@
     resetSearchEntries.onclick = function() {
         ui._vibrate();
         _search('');
-    }
-    
-    /**
-     * Save subscriptions for specified account
-     * @param {boolean} _logsOnScreen Display or not logs on screen.
-     *                                Overwrite settings.
-     * */
-    function _saveSubscriptions(_logsOnScreen) {
-        
-        for (var _account in myFeedsSubscriptions) {
-
-            var _output = [];
-            var _feeds = gf.getFeeds();
-            var _feed = "";
-            
-            for (var i = 0 ; i < _feeds.length; i++) {
-                if ( _feeds[i]._myAccount == _account) {
-                    _url = _feeds[i].feedUrl;
-                    
-                    if ((isNaN(_feeds[i]._myPulsations)) || (_feeds[i]._myPulsations == "Infinity")){
-                        _feeds[i]._myPulsations = "0.1";
-                    }
-                    
-                    _feed = {"url": _url, "pulsations": _feeds[i]._myPulsations, "account": _feeds[i]._myAccount, "id": _feeds[i]._myFeedId};
-                    _output.push(_feed);
-                }
-            }
-
-            my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(_output)).then(function(results) {
-                my.log('Save subscriptions : ' + results);
-                if (_logsOnScreen) {
-                    my.message('Backup completed : ' + results);
-                }
-            }).catch(function(error) {
-                my.error("ERROR saving file ", error);
-                if (_logsOnScreen) {
-                    my.alert("ERROR saving file " + error.filename);
-                }
-            });
-            
-        }
     }
 
     nextDay.onclick = function(event) {
@@ -399,7 +480,8 @@
 
             if ((myFeedsSubscriptions.local.length > 0) ||
                 (myFeedsSubscriptions.feedly.length > 0) ||
-                (myFeedsSubscriptions.theoldreader.length > 0)
+                (myFeedsSubscriptions.theoldreader.length > 0) || 
+                (myFeedsSubscriptions.aolreader.length > 0)
             ){
                 gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
             } else {
@@ -480,6 +562,23 @@
                 });
             }
             
+            // (3d) Delete from AolReader
+
+            if (_account == 'aolreader') {
+                aolreader.deleteSubscription(_feedId).then(function(response){
+                    my.message(document.webL10n.get('feed-has-been-deleted'));
+                    my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
+                        my.log('Save subscriptions.' + _account + '.json');
+                    }).catch(function(error) {
+                        my.error("ERROR saving file ", error);
+                        my.alert("ERROR saving file " + error.filename);
+                    });
+                }).catch(function(error) {
+                    my.message(document.webL10n.get('error-cant-delete-this-feed'));
+                    my.error(error);
+                });
+            }
+            
             // (4) Delete entries
             
             gf.deleteEntries(_account, _feedId);
@@ -488,7 +587,8 @@
 
             if ((myFeedsSubscriptions.local.length > 0) ||
                 (myFeedsSubscriptions.feedly.length > 0) ||
-                (myFeedsSubscriptions.theoldreader.length > 0)
+                (myFeedsSubscriptions.theoldreader.length > 0) || 
+                (myFeedsSubscriptions.aolreader.length > 0)
             ){
                 gf.setFeedsSubscriptions(myFeedsSubscriptions);
                 gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
@@ -626,6 +726,14 @@
         } else {
             _theoldreaderAccount = "";
         }
+        
+        // Aol Reader selector
+
+        if (params.accounts.aolreader.logged) {
+            _aolreaderAccount = 'checked=""';
+        } else {
+            _aolreaderAccount = "";
+        }
 
         // Use animations selector
 
@@ -666,7 +774,7 @@
 
         _htmlSelectUpdateEvery = _htmlSelectUpdateEvery + '</select>';
 
-        // Max nb Days
+        // Select max nb Days
 
         var _days = params.settings.days;
         var _htmlMaxNbDays = "";
@@ -684,22 +792,42 @@
         }
 
         _htmlMaxNbDays = _htmlMaxNbDays + '</select>';
+        
+        // Select language
+
+        var _htmlLanguages = "";
+        var _selected = "";
+
+        _htmlLanguages = _htmlLanguages + '<select id="selectLanguage">';
+
+        for (var _locale in myManifest['locales']) {
+            if (params.settings.ui.language == _locale) {
+                _selected = "selected";
+            } else {
+                _selected = "";
+            }
+            _htmlLanguages = _htmlLanguages + '<option value="' + _locale + '" ' + _selected + ' >' + myManifest['locales'][_locale]['my_title'] + '</option>';
+        }
+
+        _htmlLanguages = _htmlLanguages + '</select>';
 
         // ---
 
         var _htmlSettings = [
-        '<h2>' + document.webL10n.get('settings-feeds') + '</h2>                                                                                            ',
+        '<h2 data-l10n-id="settings-feeds">' + document.webL10n.get('settings-feeds') + '</h2>                                                                                            ',
         '<ul>                                                                                                                                               ',
-        '   <li class="_online_"><span data-icon="reload"></span>' + document.webL10n.get('settings-last-update') + _now.toLocaleTimeString(userLocale) + '</li>      ',
-        '   <li class="_online_"><span data-icon="sync"></span>' + document.webL10n.get('settings-update-every') + _htmlSelectUpdateEvery + '</li>          ',
+        '   <li class="_online_"><span data-icon="reload"></span><my data-l10n-id="settings-last-update">' + document.webL10n.get('settings-last-update') + '</my>' + _now.toLocaleTimeString(userLocale) + '</li>      ',
+        '   <li class="_online_"><span data-icon="sync"></span><my data-l10n-id="settings-update-every">' + document.webL10n.get('settings-update-every') + '</my>' + _htmlSelectUpdateEvery + '</li>          ',
+        '   <li><span data-icon="sd-card"></span><my data-l10n-id="my-subscriptions-opml">' + document.webL10n.get('my-subscriptions-opml') + '</my><div><button id="saveSubscriptions"><span data-l10n-id="save">save</span></button></div></li>',
         '</ul>                                                                                                                                              ',
-        '<h2>' + document.webL10n.get('settings-news') + '</h2>                                                                                             ',
+        '<h2 data-l10n-id="settings-news">' + document.webL10n.get('settings-news') + '</h2>                                                                ',
         '<ul>                                                                                                                                               ',
-        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-small-news') + '<div><label class="pack-switch"><input id="toggleDisplaySmallEntries" type="checkbox" ' + _displaySmallEntriesChecked + '><span></span></label></div></li>',
-        '   <li><span data-icon="messages"></span>' + document.webL10n.get('settings-number-of-days') + _htmlMaxNbDays + '</li>                             ',
+        '   <li><span data-icon="messages"></span><my data-l10n-id="settings-small-news">' + document.webL10n.get('settings-small-news') + '</my><div><label class="pack-switch"><input id="toggleDisplaySmallEntries" type="checkbox" ' + _displaySmallEntriesChecked + '><span></span></label></div></li>',
+        '   <li><span data-icon="messages"></span><my data-l10n-id="settings-number-of-days">' + document.webL10n.get('settings-number-of-days') + '</my>' + _htmlMaxNbDays + '</li>',
         '</ul>                                                                                                                                              ',
-        '<h2>' + document.webL10n.get('settings-online-accounts') + '</h2>                                                                                  ',
-        '<ul class="feedly theoldreader">                                                                                                                   ',
+        '<h2 data-l10n-id="settings-online-accounts">' + document.webL10n.get('settings-online-accounts') + '</h2>                                                                                  ',
+        '<ul class="feedly theoldreader aolreader">                                                                                                                   ',
+        '   <li class="_online_"><span data-icon="messages"></span>Aol Reader<div><label class="pack-switch"><input id="aolreaderLogin" type="checkbox" ' + _aolreaderAccount + '><span></span></label></div></li>',
         '   <li class="_online_"><span data-icon="messages"></span>Feedly<div><label class="pack-switch"><input id="feedlyLogin" type="checkbox" ' + _feedlyAccount + '><span></span></label></div></li>',
         '   <li class="_online_">',
         '       <span data-icon="messages"></span>The Old Reader<div><label class="pack-switch"><input id="theoldreaderCheckbox" type="checkbox" ' + _theoldreaderAccount + '><span></span></label></div>',
@@ -709,24 +837,24 @@
         '       </divn>                                                                                                                                     ',
         '   </li>                                                                                                                                           ',
         '</ul>                                                                                                                                              ',
-        '<h2>' + document.webL10n.get('user-interface') + '</h2>                                                                                            ',
+        '<h2 data-l10n-id="user-interface">' + document.webL10n.get('user-interface') + '</h2>                                                                                            ',
         '<ul>                                                                                                                                               ',
-        '   <li><span data-icon="vibrate"></span>' + document.webL10n.get('vibrate-on-click') + '<div><label class="pack-switch"><input id="toggleVibrate" type="checkbox" ' + _vibrateOnClick + '><span></span></label></div></li>',
+        '   <li><span data-icon="vibrate"></span><my data-l10n-id="vibrate-on-click">' + document.webL10n.get('vibrate-on-click') + '</my><div><label class="pack-switch"><input id="toggleVibrate" type="checkbox" ' + _vibrateOnClick + '><span></span></label></div></li>',
+        '   <li><span data-icon="languages"></span><my data-l10n-id="settings-ui-language">' + document.webL10n.get('settings-ui-language') + '</my>' +  _htmlLanguages + '</li>',
         '</ul>                                                                                                                                              ',
-        '<h2>' + document.webL10n.get('about') + '</h2>                                                                                                     ',
+        '<h2 data-l10n-id="about">' + document.webL10n.get('about') + '</h2>                                                                                ',
         '<ul>                                                                                                                                               ',
-        '   <li id="appVersion"><span data-icon="messages"></span>' + document.webL10n.get('app-title') + '<div>' + myManifest.version + '</div></li>       ',
-        '   <li><span data-icon="messages"></span>' + document.webL10n.get('author') + '<div>' + myManifest.developer.name + '</div></li>                   ',
-        '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('website') + '<div><a href="' + myManifest.developer.url + '" target="_blank">url</a></div></li>',
-        '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('git-repository') + '<div><a href="' + document.webL10n.get('git-url') + '" target="_blank">url</a></div></li>',
-        '   <li class="about _online_"><span data-icon="messages"></span>' + document.webL10n.get('settings-translations') + '<ul><a href="https://github.com/Sergio-Muriel" target="_blank">Sergio Muriel (es)</a><br><a href="https://github.com/evertton" target="_blank">Evertton de Lima (pt-BR)</a><br></ul></li>',
+        '   <li id="appVersion"><span data-icon="messages"></span><my data-l10n-id="app-title">' + document.webL10n.get('app-title') + '</my><div>' + myManifest.version + '</div></li>',
+        '   <li><span data-icon="messages"></span><my data-l10n-id="author">' + document.webL10n.get('author') + '</my><div>' + myManifest.developer.name + '</div></li>                   ',
+        '   <li class="about _online_"><span data-icon="messages"></span><my data-l10n-id="website">' + document.webL10n.get('website') + '</my><div><a href="' + myManifest.developer.url + '" target="_blank">url</a></div></li>',
+        '   <li class="about _online_"><span data-icon="messages"></span><my data-l10n-id="git-repository">' + document.webL10n.get('git-repository') + '</my><div><a href="' + document.webL10n.get('git-url') + '" target="_blank">url</a></div></li>',
+        '   <li class="about _online_"><span data-icon="messages"></span><my data-l10n-id="settings-translations">' + document.webL10n.get('settings-translations') + '</my><ul><a href="https://github.com/Sergio-Muriel" target="_blank">Sergio Muriel (es)</a><br><a href="https://github.com/evertton" target="_blank">Evertton de Lima (pt)</a><br><a>Пётр Жоря (ru)</a></ul></li>',
         '</ul>                                                                                                                                              ',
-        '<h2 class="developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
+        '<h2 class="developper-menu" data-l10n-id="settings-developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
         '<ul class="developper-menu">                                                                                                                       ',
-        '   <li><span data-icon="wifi-4"></span>' + document.webL10n.get('settings-connection') + '<div id="onLine">NA</div></li>                           ',
-        '   <li><span data-icon="play-circle"></span>' + document.webL10n.get('settings-use-animations') + '<div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
-        '   <li><span data-icon="sd-card"></span>' + document.webL10n.get('my-subscriptions') + '<div><button id="loadSubscriptions"><span data-l10n-id="load">load</span></button></div></li>',
-        '   <li><span data-icon="sd-card"></span>' + document.webL10n.get('my-subscriptions') + '<div><button id="saveSubscriptions"><span data-l10n-id="save">save</span></button></div></li>',
+        '   <li><span data-icon="wifi-4"></span><my data-l10n-id="settings-connection">' + document.webL10n.get('settings-connection') + '</my><div id="onLine">NA</div></li>',
+        '   <li><span data-icon="play-circle"></span><my data-l10n-id="settings-use-animations">' + document.webL10n.get('settings-use-animations') + '</my><div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
+        '   <li><span data-icon="sd-card"></span><my data-l10n-id="my-subscriptions">' + document.webL10n.get('my-subscriptions') + '</my><div><button id="loadSubscriptions"><span data-l10n-id="load">load</span></button></div></li>',
         '   <li><span data-icon="bug"></span>Logs console<div><label class="pack-switch"><input id="logsConsole" type="checkbox" ' + _logsConsole + '><span></span></label></div></li>',
         '   <li><span data-icon="bug"></span>Logs screen<div><label class="pack-switch"><input id="logsScreen" type="checkbox" ' + _logsScreen + '><span></span></label></div></li>',
         '</ul>                                                                                                                                              '
@@ -802,8 +930,18 @@
             
             _saveParams();
         }
+        
+        // UI select language
 
-
+        var _selectLanguage = document.getElementById('selectLanguage');
+        _selectLanguage.onchange = function(e) {
+            params.settings.ui.language = _selectLanguage.options[_selectLanguage.selectedIndex].value;
+            _saveParams();
+            document.webL10n.setLanguage(params.settings.ui.language, "");
+            //dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+            //gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+        }
+        
         // UI vibrate
 
         document.getElementById("toggleVibrate").onclick = function() {
@@ -844,7 +982,7 @@
 
         document.getElementById("saveSubscriptions").onclick = function(event) {
             if (window.confirm(document.webL10n.get('confirm-save-subscriptions'))) {
-                _saveSubscriptions(true);
+                my.export('opml', true);
             }
         }
         
@@ -891,6 +1029,19 @@
             }
         }
         
+        // Aol Reader checkbox
+        
+        document.getElementById('aolreaderLogin').onclick = function() {
+            if (this.checked) {
+                this.checked = false; // False until CustomEvent AolReader.login.done
+                aolreader.login();
+            } else {
+                params.accounts.aolreader.logged = false;
+                _disableAccount('aolreader');
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            }
+        }
+        
         // =========================
         // --- App start offline ---
         // =========================
@@ -913,6 +1064,7 @@
 
         var _html = {
             'local': '',
+            'aolreader': '',
             'feedly': '',
             'theoldreader': ''
         };
@@ -920,6 +1072,7 @@
         var _htmlKeywords = '';
         var _feedlyAccessToken = feedly.getToken().access_token;
         var _theoldreaderAuth = theoldreader.getToken().Auth;
+        var _aolreaderAccessToken = aolreader.getToken().access_token;
 
         // ========================
         // --- Display keywords ---
@@ -928,11 +1081,12 @@
         if (keywords.length > 0) {
             var _sortedKeywords = keywords.sort();
             
-            _htmlKeywords = _htmlKeywords + '<h2>' + document.webL10n.get('search-by-keywords') + '</h2><ul class="keywords">';
+            _htmlKeywords = _htmlKeywords + '<h2 data-l10n-id="search-by-keywords">' + document.webL10n.get('search-by-keywords') + '</h2><ul class="keywords">';
             
             for (var i = 0; i < _sortedKeywords.length; i++) {
+                var _count = count(_sortedKeywords[i]);
                 var _deleteIcone = '<button class="deleteKeyword" myKeyword="' + _sortedKeywords[i] + '"><span data-icon="delete"></span></button>';
-                _htmlKeywords = _htmlKeywords + '<li><a class="openKeyword" myKeyword="' +  _sortedKeywords[i] + '"><p>' + _deleteIcone + '<button><span data-icon="search"></span></button>' + _sortedKeywords[i] + '</p></a></li>';
+                _htmlKeywords = _htmlKeywords + '<li><a class="openKeyword" myKeyword="' +  _sortedKeywords[i] + '"><p>' + _deleteIcone + '<button><span data-icon="search"></span></button><count class="count">'+_count+'</count>' + _sortedKeywords[i] + '</p></a></li>';
             }
             
             _htmlKeywords = _htmlKeywords + '</ul>';
@@ -949,7 +1103,8 @@
 
             if ((_account == 'local') ||
                 ((_account == 'feedly') && (_feedlyAccessToken !== undefined)) ||
-                ((_account == 'theoldreader') && (_theoldreaderAuth !== undefined))
+                ((_account == 'theoldreader') && (_theoldreaderAuth !== undefined)) || 
+                ((_account == 'aolreader') && (_aolreaderAccessToken !== undefined))
             ){
                 var _class = (_account == 'local') ? "delete" : "delete _online_";
                     
@@ -963,7 +1118,7 @@
 
         _htmlFeeds = _htmlFeeds +
             '<ul>' +
-            '<li><a class="open" feedUrl=""><p><button><span data-icon="forward"></span></button>' + document.webL10n.get('all-feeds') + '</p></a></li>' +
+            '<li><a class="open" feedUrl=""><p><button><span data-icon="forward"></span></button><my data-l10n-id="all-feeds">' + document.webL10n.get('all-feeds') + '</my></p></a></li>' +
             '</ul>' +
             '' + _htmlKeywords;
         
@@ -1233,7 +1388,7 @@
             } else if (nbDaysAgo == 1) {
                 _daySeparator = document.webL10n.get('nb-days-ago-yesterday');
             } else {
-                _daySeparator = myExtraTranslations['nb-days-ago'].replace('{{n}}', nbDaysAgo);
+                _daySeparator = document.webL10n.get('nb-days-ago').replace('{{n}}', nbDaysAgo);
             }
 
             ui.echo('feedsEntriesNbDaysAgo', _daySeparator, '');
@@ -1245,11 +1400,11 @@
             } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] > 0)) {
                 ui.echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
             } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] == 0)) {
-                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('no-news-today') + '</div>', "");
+                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification" data-l10n-id="no-news-today">' + document.webL10n.get('no-news-today') + '</div>', "");
             } else if ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) == 0) {
-                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('no-news-today') + '</div>', "");
+                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification" data-l10n-id="no-news-today">' + document.webL10n.get('no-news-today') + '</div>', "");
             } else {
-                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
+                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification" data-l10n-id="error-no-network-connection">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
             } 
             
             // Hide/show small entries:
@@ -1314,7 +1469,7 @@
         
         }, 250); // Schedule the execution for later
     }
-    
+
     /**
      * Set id max for entries. Variable "liveValues['entries']['id']['max']"
      * Set id min for entries. Variable "liveValues['entries']['id']['min']"
@@ -1341,7 +1496,7 @@
 
         while ((sortedEntries[_nb]._myTimestamp < liveValues['timestamps']['min'])
             || (!params.entries.displaySmallEntries && my.isSmallEntry(sortedEntries[_nb]))
-            || (_string !== "" && liveValues['entries']['search']['visible'] && (((JSON.stringify(sortedEntries[_nb])).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
+            || (_string !== "" && liveValues['entries']['search']['visible'] && (((sortedEntries[_nb].title).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
         ){
             _nb = _nb - 1;
             if (_nb < 0) { break; }
@@ -1362,7 +1517,7 @@
 
         while ((sortedEntries[_nb]._myTimestamp > liveValues['timestamps']['max'])
             || ((params.entries.displaySmallEntries == false) && (my.isSmallEntry(sortedEntries[_nb]) == true)) 
-            || (_string !== "" && liveValues['entries']['search']['visible'] && (((JSON.stringify(sortedEntries[_nb])).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
+            || (_string !== "" && liveValues['entries']['search']['visible'] && (((sortedEntries[_nb].title).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
         ){
             _nb = _nb + 1;
             if (_nb >= sortedEntries.length) { break; }
@@ -1375,6 +1530,11 @@
         liveValues['entries']['id']['min'] = _nb;
     }
 
+    /**
+     * @param {int} entryId
+     * @param {string} url
+     * @return {CustomEvent} mainEntryOpen.done
+     * */
     function mainEntryOpenInBrowser(entryId, url) {
         my.log('mainEntryOpenInBrowser()', arguments);
         document.body.style.cssText = "overflow: hidden;";  // Disable scroll in entries list.
@@ -1393,7 +1553,7 @@
             //my.log('mainEntryOpenInBrowser()', _entry.content);
 
             if (_entry.author !== "") {
-                _author = '<div class="entrie-author">' + myExtraTranslations['by'] + ' ' + _entry.author + '</div>';
+                _author = '<div class="entrie-author"><my data-l10n-id="by">' + document.webL10n.get('by') + '</my> ' + _entry.author + '</div>';
             }
 
             _srcDoc = _srcDoc + _srcDocCss; // Inline CSS from file "style/inline.css.js"
@@ -1402,7 +1562,7 @@
             _srcDoc = _srcDoc + _author;
             _srcDoc = _srcDoc + '<div class="entrie-feed-title"><a href="' + _entry._myFeedInformations.link + '">' + _entry._myFeedInformations.title.replace(_regex, "&#39;") + '</a></div>';
             _srcDoc = _srcDoc + '<div class="entrie-contentSnippet">' + _entry.content.replace(_regex, "&#39;") + '</div>';
-            _srcDoc = _srcDoc + '<div class="entrie-visit-website"><a href="' + _entry.link + '">' + document.webL10n.get('entry-visit-website') + '</a></div>';
+            _srcDoc = _srcDoc + '<div class="entrie-visit-website"><a href="' + _entry.link + '"><my data-l10n-id="entry-visit-website">' + document.webL10n.get('entry-visit-website') + '</my></a></div>';
 
             ui.echo("browser", '<iframe srcdoc=\'' + _srcDoc + '\' sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
         }
@@ -1480,6 +1640,7 @@
         // subscriptions.local.json
         // subscriptions.feedly.json
         // subscriptions.theoldreader.json
+        // subscriptions.aolreader.json
         // ...
 
         for (var i = 0; i < subscriptions.length; i++) {
@@ -1558,7 +1719,7 @@
         });
         params.entries.nbDaysAgo = _nbDaysAgo;
     }
-    
+
     function _saveKeywords() {
         my._save("keywords.json", "application/json", JSON.stringify(keywords)).then(function(results) {
             my.log("Save file keywords.json");
@@ -1570,7 +1731,7 @@
     
     /**
      * Disable online account
-     * @param {string} feedly, theoldreader
+     * @param {string} feedly, theoldreader, aolreader
      * */
     function _disableAccount(_account) {
         my.log('_disableAccount', arguments);
@@ -1628,7 +1789,7 @@
         var className = 'my-'+params.entries.theme+'-date';
         var elements = document.getElementsByClassName(className);
         for (var i = 0; i < elements.length; i++) {
-            if (isInViewport(elements[i]) && (elements[i].textContent == "")) {
+            if (ui.isInViewport(elements[i]) && (elements[i].textContent == "")) {
                 var _publishedDate = elements[i].getAttribute('publishedDate');
                 elements[i].textContent = new Date(_publishedDate).toLocaleTimeString(userLocale);
             }
@@ -1636,39 +1797,37 @@
     }
     
     /**
-     * Load images who are visibles in viewport
+     * Count entries matching specified keyword
+     * @param {string} keyword
+     * @return {int}
      * */
-    function loadImages() {
-        var images = document.getElementsByTagName('img');
-        for (var i = 0; i < images.length; i++) {
-            if (isInViewport(images[i]) 
-                && (images[i].getAttribute('data-src') != "")
-                && (images[i].getAttribute('src') == "images/loading.png")
+    function count(keyword){
+        var out = 0;
+        
+        entries = gf.getEntries();
+
+        var _nb = entries.length;
+        var _regex = new RegExp(keyword, "gi");
+
+        for (var i = 0; i < _nb; i++) {
+            if ((!params.entries.displaySmallEntries && my.isSmallEntry(entries[i])) 
+                || (entries[i].id > liveValues['timestamps']['max'])
             ){
-                images[i].setAttribute('src', images[i].getAttribute('data-src'));
+                // nothing to do
+            } else if ((entries[i].title).match(_regex)) {
+                out++;
             }
         }
-    }
-    
-    /**
-     * Check if element is visible in viewport
-     * @param {object} elem DOM element
-     * @return {boolean} true / false
-     * */
-    function isInViewport(element) {
-        var rect = element.getBoundingClientRect()
-        var windowHeight = window.innerHeight || document.documentElement.clientHeight
-        var windowWidth = window.innerWidth || document.documentElement.clientWidth
 
-        return rect.bottom > 0 && rect.top < windowHeight && rect.right > 0 && rect.left < windowWidth
+        return out;
     }
-
+                            
     // ======================
     // --- Ready to start ---
     // ======================
 
     window.onload = function () {
-        
+
         _swipe("");
 
         // Promises V1
@@ -1681,8 +1840,11 @@
 
         var promise3 = my._load('subscriptions.theoldreader.json').then(function(results) {return results;}
         ).catch(function(error) {_disableAccount('theoldreader'); return {};});
+        
+        var promise4 = my._load('subscriptions.aolreader.json').then(function(results) {return results;}
+        ).catch(function(error) {_disableAccount('aolreader'); return {};});
 
-        var arrayPromises = [promise1, promise2, promise3];
+        var arrayPromises = [promise1, promise2, promise3, promise4];
 
         Promise.all(arrayPromises).then(function(arrayOfResults) {
             initAndLoadFeeds(arrayOfResults);
@@ -1711,11 +1873,11 @@
         // =================================
         // Disable button if subscriptions file doesn't exists.
 
-        my._file_exists('subscriptions.local.json', function(exists){
+        /*my._file_exists('subscriptions.local.json', function(exists){
             if (!exists) {
                 ui._onclick(loadSubscriptions, 'disable');
             }
-        });
+        });*/
 
         // ===============================================
         // --- Network connection : online / offline ? ---
@@ -1754,7 +1916,7 @@
         // ============================
         
         setInterval(function() {
-            loadImages();
+            ui.loadImages();
         }, 200);
         
         // ======================
@@ -1785,6 +1947,13 @@
                 }
             }
         }, true);
+        
+        // Set the 'lang' and 'dir' attributes to <html> when the page is translated
+        
+        window.addEventListener('localized', function() {
+            document.documentElement.lang = document.webL10n.getLanguage();
+            document.documentElement.dir = document.webL10n.getDirection();
+        }, false);
 
         // Automatic update entries every N seconds :
 
@@ -1801,6 +1970,7 @@
         
         // Main entry open done...
         // Update next entry [<] & previous entry [>] buttons.
+        // Update next & previous entries titles
         
         document.body.addEventListener('mainEntryOpen.done', function(event){
             
@@ -1863,48 +2033,52 @@
             // [<]
             
             if (my.isSmallEntry(sortedEntries[_nextEntryId])) {
-                dom['entry']['next'].setAttribute("i", _nextEntryId);
-                dom['entry']['next'].setAttribute("entry_link", sortedEntries[_nextEntryId].link);
+                dom['entry']['next']['button'].setAttribute("i", _nextEntryId);
+                dom['entry']['next']['button'].setAttribute("entry_link", sortedEntries[_nextEntryId].link);
             } else {
-                dom['entry']['next'].setAttribute("i", _nextEntryId);
-                dom['entry']['next'].setAttribute("entry_link", "");
+                dom['entry']['next']['button'].setAttribute("i", _nextEntryId);
+                dom['entry']['next']['button'].setAttribute("entry_link", "");
             }
             
             // [>]
             
             if (my.isSmallEntry(sortedEntries[_previousEntryId])) {
-                dom['entry']['previous'].setAttribute("i", _previousEntryId);
-                dom['entry']['previous'].setAttribute("entry_link", sortedEntries[_previousEntryId].link);
+                dom['entry']['previous']['button'].setAttribute("i", _previousEntryId);
+                dom['entry']['previous']['button'].setAttribute("entry_link", sortedEntries[_previousEntryId].link);
             } else {
-                dom['entry']['previous'].setAttribute("i", _previousEntryId);
-                dom['entry']['previous'].setAttribute("entry_link", "");
+                dom['entry']['previous']['button'].setAttribute("i", _previousEntryId);
+                dom['entry']['previous']['button'].setAttribute("entry_link", "");
             }
             
             // Disable / enable button [<]
-            
+
             if ((_nextEntryId < liveValues['entries']['id']['min']) || (_nextEntryId == _entryId)) {
-                ui._onclick(dom['entry']['next'], 'disable');
+                ui._onclick(dom['entry']['next']['button'], 'disable');
+                ui.echo("nextEntryTitle", "", "");
             } else {
-                ui._onclick(dom['entry']['next'], 'enable');
+                ui._onclick(dom['entry']['next']['button'], 'enable');
+                ui.echo("nextEntryTitle", sortedEntries[_nextEntryId].title, "");
             }
             
             // Disable / enable button [>]
             
             if ((_previousEntryId > liveValues['entries']['id']['max']) || (_previousEntryId == _entryId)) {
-                ui._onclick(dom.entry['previous'], 'disable');
+                ui._onclick(dom.entry['previous']['button'], 'disable');
+                ui.echo("previousEntryTitle", "", "");
             } else {
-                ui._onclick(dom.entry['previous'], 'enable');
+                ui._onclick(dom.entry['previous']['button'], 'enable');
+                ui.echo("previousEntryTitle", sortedEntries[_previousEntryId].title, "");
             }
             
         });
         
         // ---
         
-        dom['entry']['next'].onclick = function() {
+        dom['entry']['next']['button'].onclick = function() {
             mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
         }
         
-        dom['entry']['previous'].onclick = function() {
+        dom['entry']['previous']['button'].onclick = function() {
             mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
         }
         
@@ -1978,7 +2152,8 @@
 
                     if ((myFeedsSubscriptions.local.length > 0) ||
                         (myFeedsSubscriptions.feedly.length > 0) ||
-                        (myFeedsSubscriptions.theoldreader.length > 0)
+                        (myFeedsSubscriptions.theoldreader.length > 0) || 
+                        (myFeedsSubscriptions.aolreader.length > 0)
                     ){
                         gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
                     } else {
@@ -2035,7 +2210,6 @@
                     dspFeeds(gf.getFeeds());
                     dspSettings();
                     updateFeedsPulsations();
-                    //_saveSubscriptions(false);
                 }
 
                 if (_nbFeedsLoaded >= _nbFeedsToLoad) {
@@ -2070,7 +2244,6 @@
                     dspFeeds(gf.getFeeds());
                     dspSettings();
                     updateFeedsPulsations();
-                    //_saveSubscriptions(false);
                 }
 
                 if (_nbFeedsLoaded >= _nbFeedsToLoad) {
@@ -2142,7 +2315,7 @@
 
         document.body.addEventListener('Feedly.getSubscriptions.error', function(response) {
             my.log('CustomEvent : Feedly.getSubscriptions.error', arguments);
-            my.message(document.webL10n.get('feedly-get-subscriptions-error') + response.detail.message);
+            my.alert(document.webL10n.get('feedly-get-subscriptions-error') + JSON.stringify(response.detail.message));
         });
 
         /* ============================= */
@@ -2202,7 +2375,74 @@
 
         document.body.addEventListener('TheOldReader.getSubscriptions.error', function(response) {
             my.log('CustomEvent : TheOldReader.getSubscriptions.error', arguments);
-            my.message('The Old Reader error');
+            my.alert(document.webL10n.get('theoldreader-get-subscriptions-error') + JSON.stringify(response.detail.message));
+        });
+        
+        /* ========================= */
+        /* --- Aol Reader Events --- */
+        /* ========================= */
+        
+        // Due to quick expiration time (1h), Aol token is 
+        // actualized every 14mn.
+        setInterval(function() {
+            if ((navigator.onLine) && (params.accounts.aolreader.logged)) {
+                aolreader.updateToken();
+            }
+        }, (60000 * 14));
+  
+        document.body.addEventListener('AolReader.login.done', function(response){
+            _loginInProgress['aolreader'] = true;
+            my.log(aolreader.getToken());
+            params.accounts.aolreader.logged = true;
+            _saveParams();
+            document.getElementById('aolreaderLogin').checked = true; // Enable settings checkbox
+            aolreader.getSubscriptions(); // CustomEvent AolReader.getSubscriptions.done, AolReader.getSubscriptions.error
+        });
+
+        document.body.addEventListener('AolReader.login.error', function(response){
+            my.log('CustomEvent : AolReader.login.error', arguments);
+            my.message('Aol Reader login error');
+        });
+        
+        document.body.addEventListener('AolReader.getSubscriptions.done', function(response){
+            my.log('CustomEvent : AolReader.getSubscriptions.done');
+            var _subscriptions = response.detail.subscriptions;
+            var _feed = '';
+            var _newFeeds = [];
+            for (var i = 0; i < _subscriptions.length; i++) {
+                _feed = {
+                    'url': _subscriptions[i].url,
+                    'pulsations': params['feeds']['defaultPulsations'],
+                    'account': 'aolreader',
+                    'id': _subscriptions[i].id
+                };
+                _newFeeds.push(_feed);
+            }
+            addNewSubscriptions(_newFeeds);
+            gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            
+            if (_loginInProgress['aolreader'] == true ) {
+                _loginInProgress['aolreader'] = false;
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            }
+
+            my._save("subscriptions.aolreader.json", "application/json", JSON.stringify(myFeedsSubscriptions.aolreader)).then(function(results) {
+                my.log("Save file subscriptions.aolreader.json");
+            }).catch(function(error) {
+                my.error("ERROR saving file subscriptions.aolreader.json", error);
+                my.alert("ERROR saving file subscriptions.aolreader.json");
+            });
+            my._save("cache/aolreader/subscriptions.json", "application/json", JSON.stringify(_subscriptions)).then(function(results) {
+                my.log("Save file cache/aolreader/subscriptions.json");
+            }).catch(function(error) {
+                my.error("ERROR saving file cache/aolreader/subscriptions.json", error);
+                my.alert("ERROR saving file cache/aolreader/subscriptions.json");
+            });
+        });
+
+        document.body.addEventListener('AolReader.getSubscriptions.error', function(response) {
+            my.log('CustomEvent : AolReader.getSubscriptions.error', arguments);
+            my.alert(document.webL10n.get('aolreader-get-subscriptions-error') + JSON.stringify(response.detail.message));
         });
 
         // ============

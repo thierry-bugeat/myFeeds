@@ -1,7 +1,7 @@
 {
     "name": "my Feeds",
     "description": "RSS & ATOM feeds reader",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "launch_path": "/index.html",
     "icons": {
         "60": "/images/icon-60.png",
@@ -14,19 +14,37 @@
     "orientation": "portrait-primary",
     "default_locale": "en",
     "locales": {
+        "en": {
+            "name": "my Feeds",
+            "description": "RSS & ATOM Reader.",
+            "my_title": "English"
+        },
         "es": {
-            "name" : "mis Noticias",
-            "description" : "Lector de RSS y ATOM."
+            "name": "mis Noticias",
+            "description": "Lector de RSS y ATOM.",
+            "my_title": "Español"
         },
         "fr": {
-            "name" : "mes Fluxs",
-            "description" : "Lecteur de flux RSS & ATOM."
+            "name": "mes Fluxs",
+            "description": "Lecteur de flux RSS & ATOM.",
+            "my_title": "Français"
+        },
+        "pt": {
+            "name" : "meus Fluxs",
+            "description": "RSS e Atom Reader.",
+            "my_title": "Português"
+        },
+        "ru": {
+            "name": "my Feeds",
+            "description": "RSS & ATOM Reader.",
+            "my_title": "Pусский"
         }
     },
     "type": "privileged",
     "csp": "default-src *; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'",
     "redirects": [
-        {"from": "http://localhost/", "to": "/scripts/feedly/loginCallback.html"}
+        {"from": "http://localhost/", "to": "/scripts/feedly/loginCallback.html"},
+        {"from": "http://localhost:8080/", "to": "/scripts/aolreader/loginCallback.html"}
     ],
     "permissions": {
         "desktop-notification": {
