@@ -400,7 +400,7 @@
 }
 
 @media screen and (min-width: 1200px) {
-    .grid-ratio-entry-l .grid-ratio-entry-m {padding-bottom: 12.5%;}
+    .grid-ratio-entry-l, .grid-ratio-entry-m {padding-bottom: 12.5%;}
     .my-grid-entry-s, .my-grid-entry-l{width: 12.5%;}
 }
 
