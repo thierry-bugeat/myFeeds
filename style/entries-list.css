@@ -384,3 +384,23 @@
     font-size:1.7rem;
     font-weight:normal;
 }
+
+/* ============================ */
+/* --- Themes media queries --- */
+/* ============================ */
+
+@media screen and (min-width: 481px) and (max-width:960px) {
+    .grid-ratio-entry-l, .grid-ratio-entry-m {padding-bottom: 25%;}
+    .my-grid-entry-s, .my-grid-entry-l{width: 25%;}
+}
+
+@media screen and (min-width: 961px) {
+    .grid-ratio-entry-l, .grid-ratio-entry-m {padding-bottom: 20%;}
+    .my-grid-entry-s, .my-grid-entry-l{width: 20%;}
+}
+
+@media screen and (min-width: 1200px) {
+    .grid-ratio-entry-l .grid-ratio-entry-m {padding-bottom: 12.5%;}
+    .my-grid-entry-s, .my-grid-entry-l{width: 12.5%;}
+}
+
