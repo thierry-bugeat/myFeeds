@@ -390,17 +390,46 @@
 /* ============================ */
 
 @media screen and (min-width: 481px) and (max-width:960px) {
+    :root {--my-spacing: 2%;}
+
+    #feeds-entries > div:first-child {margin-top:var(--my-spacing);}
+
     .grid-ratio-entry-l, .grid-ratio-entry-m {padding-bottom: 25%;}
     .my-grid-entry-s, .my-grid-entry-l{width: 25%;}
+
+    .my-card-entry-s, .my-card-entry-l{box-sizing:border-box; position: relative; float: left; width: 46%;}
+    .card-ratio-entry-l, .card-ratio-entry-m {padding-bottom: 52%;}
 }
+
+@media screen and (min-width: 600px) {.card-ratio-entry-l, .card-ratio-entry-m {padding-bottom: 43%;}}
+@media screen and (min-width: 720px) {.card-ratio-entry-l, .card-ratio-entry-m {padding-bottom: 35%;}}
 
 @media screen and (min-width: 961px) {
+    :root {--my-spacing: 1.5%;}
+
+    #feeds-entries > div:first-child {margin-top:var(--my-spacing);}
+
     .grid-ratio-entry-l, .grid-ratio-entry-m {padding-bottom: 20%;}
     .my-grid-entry-s, .my-grid-entry-l{width: 20%;}
+
+    .my-card-entry-s, .my-card-entry-l{box-sizing:border-box; position: relative; float: left; width: 22%;}
+    .card-ratio-entry-l, .card-ratio-entry-m {padding-bottom: 27%;}
 }
 
+@media screen and (min-width: 1080px) {.card-ratio-entry-l, .card-ratio-entry-m {padding-bottom: 23%;}}
+ 
 @media screen and (min-width: 1200px) {
+    :root {--my-spacing: 1%;}
+
+    #feeds-entries > div:first-child {margin-top:var(--my-spacing);}
+
     .grid-ratio-entry-l, .grid-ratio-entry-m {padding-bottom: 12.5%;}
     .my-grid-entry-s, .my-grid-entry-l{width: 12.5%;}
+
+    .my-card-entry-s, .my-card-entry-l{box-sizing:border-box; position: relative; float: left; width: 18%;}
+    .card-ratio-entry-l, .card-ratio-entry-m {padding-bottom: 21%;}
 }
 
+@media screen and (min-width: 1440px) {.card-ratio-entry-l, .card-ratio-entry-m {padding-bottom: 17%;}}
+@media screen and (min-width: 1680px) {.card-ratio-entry-l, .card-ratio-entry-m {padding-bottom: 15%;}}
+ 
