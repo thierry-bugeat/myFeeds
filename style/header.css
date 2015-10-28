@@ -45,8 +45,8 @@ section[role="myHeader"] > header button {
     color: var(--fxos-white);
     box-sizing: border-box;
     overflow: hidden;
-    min-width: 20%;
-    width: auto;
+    width: 20%;
+    max-width: 100px;
     height: 5rem;
     border: medium none;
     background: transparent none repeat scroll 0% 0%;

@@ -5,14 +5,15 @@ section[role="myFooter"] {
     margin:0;
     position: relative;
     z-index:1;
-}
+    background-color: var(--fxos-grey);
+} 
 
 section[role="myFooter"] > header:first-child {
-    background-color: var(--fxos-grey);
     z-index:10;
     padding:0;
     height:5rem;
     border:medium none;
+    /*max-width:500px; margin:0px auto;*/ /* For centering icones */
 }
 
 section[role="myFooter"] > header:first-child button {
@@ -27,8 +28,8 @@ section[role="myFooter"] > header:first-child button {
     display: block;
     overflow: hidden;
     float: left;
-    min-width: 20%;
-    width: auto;
+    width: 20%;
+    max-width: 100px;
     height: 4.5rem;
     border: medium none;
     background: transparent none repeat scroll 0% 0%;

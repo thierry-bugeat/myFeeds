@@ -116,6 +116,7 @@ section[role="mySubHeader"] > header span {
     display: block;
     box-sizing: border-box;
     width:20%;
+    max-width: 100px;
     text-align:center;
 }
 
