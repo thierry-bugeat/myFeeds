@@ -19,4 +19,4 @@ This project is now hosted by Framasoft. The Github repository is only a mirror.
 Ce projet est maintenant hébergé par Framasoft. Le dépôt Github n'est qu'un mirroir. Si vous souhaitez contribuer, forkez ce projet depuis l'url https://git.framasoft.org/thierry-bugeat/myFeeds. (l'inscription n'est pas nécessaire et vous pouvez vous connecter avec votre compte Github)
  
  
-![myFeeds](http://thierry.bugeat.free.fr/myFeeds/images/myFeeds/features/myFeeds-desktop-version.png =400x)
+![myFeeds](http://thierry.bugeat.free.fr/myFeeds/images/myFeeds/features/myFeeds-desktop-version.png)
