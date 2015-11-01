@@ -76,7 +76,7 @@ form{
     padding:0;
     width:100%;
     height: calc(100% - 13.5rem);
-    background-color:#FFFFFF;
+    background-color: var(--fxos-white);
     overflow-x:hidden;
     overflow-y:auto;
 }
