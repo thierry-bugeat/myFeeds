@@ -131,6 +131,11 @@ Feedly.prototype.login = function() {
         '&response_type=code' + 
         '&scope=' + encodeURIComponent('https://cloud.feedly.com/subscriptions');
 
+    /*if (params.settings.proxy.use) {
+        _urlParams = '&url=' + encodeURIComponent(_Feedly.feedly.host + '/v3/auth/auth?client_id=' + encodeURIComponent(_Feedly.feedly.client_id) + '&redirect_uri=' + encodeURIComponent('http://localhost') + '&response_type=code' + '&scope=' + encodeURIComponent('https://cloud.feedly.com/subscriptions'));
+        _url = 'http://' + params.settings.proxy.host + '/proxy/?' + _urlParams;
+    }*/   
+ 
     window.open(_url);
     return false;
 };
@@ -138,20 +143,25 @@ Feedly.prototype.login = function() {
 Feedly.prototype._loginCallback = function(url) {
     _MyFeeds.log('Feedly.prototype._loginCallback()', arguments);
 
-    var params = [];
+    var urlParams = [];
     
-    if (params = url.match(/code=([^&]+)/)) {
+    if (urlParams = url.match(/code=([^&]+)/)) {
         
-        _Feedly.feedly.code = params[1];
+        _Feedly.feedly.code = urlParams[1];
         
         var _url = _Feedly.feedly.host + '/v3/auth/token';
 
-        var _params = 'code=' + encodeURIComponent(params[1]) + 
+        var _params = 'code=' + encodeURIComponent(urlParams[1]) + 
                 '&client_id=' + encodeURIComponent(_Feedly.feedly.client_id) +
                 '&client_secret=' + encodeURIComponent(_Feedly.feedly.client_secret) +
                 '&redirect_uri=' + encodeURIComponent('http://localhost/') +
-                '&state=' + encodeURIComponent(params[0]) +
+                '&state=' + encodeURIComponent(urlParams[0]) +
                 '&grant_type=authorization_code';
+
+        /*if (params.settings.proxy.use) {
+            _urlParams = 'url=' + encodeURIComponent(_Feedly.feedly.host + '/v3/auth/token?code=' + urlParams[1] + '&client_id=' + _Feedly.feedly.client_id + '&redirect_uri=' + encodeURIComponent('http://localhost') + '&state=' + urlParams[0] + '&grant_type=authorization_code');
+            _url = 'http://' + params.settings.proxy.host + '/proxy/?' + _urlParams;
+        }*/   
         
         this.post(_url, _params, function(response) {
             if (_Feedly.setToken(response)) {
@@ -182,6 +192,11 @@ Feedly.prototype.getSubscriptions = function () {
     
     var _url = _Feedly.feedly.host + '/v3/subscriptions' + 
             '?output=json';
+
+    if (params.settings.proxy.use) {
+        _urlParams = '&url=' + encodeURIComponent(_Feedly.feedly.host + '/v3/subscriptions?output=json');
+        _url = 'http://' + params.settings.proxy.host + '/proxy/?' + _urlParams;
+    }   
     
     var promise = this.get(_url, '');
     
