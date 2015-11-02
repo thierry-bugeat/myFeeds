@@ -844,7 +844,7 @@
         '       <div id="theoldreaderForm">                                                                                                                 ',
         '           <p><input id="theoldreaderEmail" required="" placeholder="Email" name="theoldreaderEmail" type="email" value=""></p>                    ',
         '           <p><input id="theoldreaderPasswd" required="" placeholder="Password" name="theoldreaderPasswd" type="password" value=""><p>             ',
-        '       </divn>                                                                                                                                     ',
+        '       </div>                                                                                                                                      ',
         '   </li>                                                                                                                                           ',
         '</ul>                                                                                                                                              ',
         '<h2 data-l10n-id="user-interface">' + document.webL10n.get('user-interface') + '</h2>                                                                                            ',
