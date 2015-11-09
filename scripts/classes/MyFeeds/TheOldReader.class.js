@@ -161,8 +161,14 @@ TheOldReader.prototype.deleteSubscription = function (feedId) {
             '&ac=unsubscribe' + 
             '&s=' + encodeURIComponent(feedId);
         
-        var promise = _TheOldReader._delete(_url, _params, '');
+        if (params.settings.proxy.use) {
+            _urlParams = '&method=post&myAuth=' + _TheOldReader.tor.token.Auth + '&url=' + encodeURIComponent(_TheOldReader.tor.host + '/reader/api/0/subscription/edit' + '?output=' + encodeURIComponent(_TheOldReader.tor.output) + '&ac=unsubscribe&s=' + encodeURIComponent(feedId));
+            _url = 'http://' + params.settings.proxy.host + '/proxy/theoldreader/?' + _urlParams;
+        }       
         
+        //var promise = _TheOldReader._delete(_url, _params, '');
+        var promise = _TheOldReader.post(_url, _params, '');
+
         promise.then(function(response) {
             resolve(response);
         }).catch(function(error) {
@@ -261,7 +267,6 @@ TheOldReader.prototype.post = function (_url, _params, callback) {
         xhr.send(_params);
     });
 }
-
 
 TheOldReader.prototype._delete = function (url, params, callback) {
     _MyFeeds.log('TheOldReader.prototype.post222()', arguments);
