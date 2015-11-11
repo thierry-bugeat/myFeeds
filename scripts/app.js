@@ -1027,11 +1027,11 @@
         '       </a>',
         '   </li>',
 
-        '   <li>',
+        '   <!-- li>',
         '       <aside class="icon"><span data-icon="sd-card"></span></aside>',
         '       <aside class="pack-end"><div><button id="loadSubscriptions"><span data-l10n-id="load">load</span></button></div></aside>',
         '       <a href="#"><p class="double"><my data-l10n-id="my-subscriptions">' + document.webL10n.get('my-subscriptions') + '</my></p></a>',
-        '   </li>',
+        '   </li -->',
 
         '   <li>',
         '       <aside class="icon"><span data-icon="bug"></span></aside>',
