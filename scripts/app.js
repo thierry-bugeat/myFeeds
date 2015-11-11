@@ -30,7 +30,8 @@
     var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 2.2,
+        "version": 2.31,
+        "changelog": "https://git.framasoft.org/thierry-bugeat/myFeeds/raw/master/CHANGELOG",
         "feeds": {
             "selectedFeed": "",                 // Display all feeds if empty otherwise display specified feed url
             "defaultPulsations": 5              // Default feed pulsations
@@ -824,51 +825,228 @@
         // ---
 
         var _htmlSettings = [
-        '<h2 data-l10n-id="settings-feeds">' + document.webL10n.get('settings-feeds') + '</h2>                                                                                            ',
-        '<ul>                                                                                                                                               ',
-        '   <li class="_online_"><span data-icon="reload"></span><my data-l10n-id="settings-last-update">' + document.webL10n.get('settings-last-update') + '</my>' + _now.toLocaleTimeString(userLocale) + '</li>      ',
-        '   <li class="_online_"><span data-icon="sync"></span><my data-l10n-id="settings-update-every">' + document.webL10n.get('settings-update-every') + '</my>' + _htmlSelectUpdateEvery + '</li>          ',
-        '   <li><span data-icon="sd-card"></span><my data-l10n-id="my-subscriptions-opml">' + document.webL10n.get('my-subscriptions-opml') + '</my><div><button id="saveSubscriptions"><span data-l10n-id="save">save</span></button></div></li>',
-        '</ul>                                                                                                                                              ',
-        '<h2 data-l10n-id="settings-news">' + document.webL10n.get('settings-news') + '</h2>                                                                ',
-        '<ul>                                                                                                                                               ',
-        '   <li><span data-icon="messages"></span><my data-l10n-id="settings-small-news">' + document.webL10n.get('settings-small-news') + '</my><div><label class="pack-switch"><input id="toggleDisplaySmallEntries" type="checkbox" ' + _displaySmallEntriesChecked + '><span></span></label></div></li>',
-        '   <li><span data-icon="messages"></span><my data-l10n-id="settings-number-of-days">' + document.webL10n.get('settings-number-of-days') + '</my>' + _htmlMaxNbDays + '</li>',
-        '</ul>                                                                                                                                              ',
-        '<h2 data-l10n-id="settings-online-accounts">' + document.webL10n.get('settings-online-accounts') + '</h2>                                                                                  ',
-        '<ul class="feedly theoldreader aolreader">                                                                                                                   ',
-        '   <li class="_online_"><span data-icon="messages"></span>Aol Reader<div><label class="pack-switch"><input id="aolreaderLogin" type="checkbox" ' + _aolreaderAccount + '><span></span></label></div></li>',
-        '   <li class="_online_"><span data-icon="messages"></span>Feedly<div><label class="pack-switch"><input id="feedlyLogin" type="checkbox" ' + _feedlyAccount + '><span></span></label></div></li>',
+        '<h2 data-l10n-id="settings-feeds">' + document.webL10n.get('settings-feeds') + '</h2>',
+        '<section data-type="list">',
+        '<ul>',
+        
         '   <li class="_online_">',
-        '       <span data-icon="messages"></span>The Old Reader<div><label class="pack-switch"><input id="theoldreaderCheckbox" type="checkbox" ' + _theoldreaderAccount + '><span></span></label></div>',
-        '       <div id="theoldreaderForm">                                                                                                                 ',
-        '           <p><input id="theoldreaderEmail" required="" placeholder="Email" name="theoldreaderEmail" type="email" value=""></p>                    ',
-        '           <p><input id="theoldreaderPasswd" required="" placeholder="Password" name="theoldreaderPasswd" type="password" value=""><p>             ',
-        '       </div>                                                                                                                                      ',
-        '   </li>                                                                                                                                           ',
-        '</ul>                                                                                                                                              ',
-        '<h2 data-l10n-id="user-interface">' + document.webL10n.get('user-interface') + '</h2>                                                                                            ',
-        '<ul>                                                                                                                                               ',
-        '   <li><span data-icon="vibrate"></span><my data-l10n-id="vibrate-on-click">' + document.webL10n.get('vibrate-on-click') + '</my><div><label class="pack-switch"><input id="toggleVibrate" type="checkbox" ' + _vibrateOnClick + '><span></span></label></div></li>',
-        '   <li><span data-icon="languages"></span><my data-l10n-id="settings-ui-language">' + document.webL10n.get('settings-ui-language') + '</my>' +  _htmlLanguages + '</li>',
-        '</ul>                                                                                                                                              ',
-        '<h2 data-l10n-id="about">' + document.webL10n.get('about') + '</h2>                                                                                ',
-        '<ul>                                                                                                                                               ',
-        '   <li id="appVersion"><span data-icon="messages"></span><my data-l10n-id="app-title">' + document.webL10n.get('app-title') + '</my><div>' + myManifest.version + '</div></li>',
-        '   <li><span data-icon="messages"></span><my data-l10n-id="author">' + document.webL10n.get('author') + '</my><div>' + myManifest.developer.name + '</div></li>                   ',
-        '   <li class="about _online_"><span data-icon="messages"></span><my data-l10n-id="website">' + document.webL10n.get('website') + '</my><div><a href="' + myManifest.developer.url + '" target="_blank">url</a></div></li>',
-        '   <li class="about _online_"><span data-icon="messages"></span><my data-l10n-id="git-repository">' + document.webL10n.get('git-repository') + '</my><div><a href="' + document.webL10n.get('git-url') + '" target="_blank">url</a></div></li>',
-        '   <li class="about _online_"><span data-icon="messages"></span><my data-l10n-id="settings-translations">' + document.webL10n.get('settings-translations') + '</my><ul><a href="https://github.com/Sergio-Muriel" target="_blank">Sergio Muriel (es)</a><br><a href="https://github.com/evertton" target="_blank">Evertton de Lima (pt)</a><br><a>Пётр Жоря (ru)</a></ul></li>',
-        '</ul>                                                                                                                                              ',
-        '<h2 class="developper-menu" data-l10n-id="settings-developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
-        '<ul class="developper-menu">                                                                                                                       ',
-        '   <li><span data-icon="wifi-4"></span><my data-l10n-id="settings-connection">' + document.webL10n.get('settings-connection') + '</my><div id="onLine">NA</div></li>',
-        '   <li><span data-icon="play-circle"></span><my data-l10n-id="settings-use-animations">' + document.webL10n.get('settings-use-animations') + '</my><div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
-        '   <li><span data-icon="addons"></span><my data-l10n-id="settings-use-proxy">' + document.webL10n.get('settings-use-proxy') + '</my><div><label class="pack-switch"><input id="useProxy" type="checkbox" ' + _useProxy + '><span></span></label></div></li>',
-        '   <li><span data-icon="sd-card"></span><my data-l10n-id="my-subscriptions">' + document.webL10n.get('my-subscriptions') + '</my><div><button id="loadSubscriptions"><span data-l10n-id="load">load</span></button></div></li>',
-        '   <li><span data-icon="bug"></span>Logs console<div><label class="pack-switch"><input id="logsConsole" type="checkbox" ' + _logsConsole + '><span></span></label></div></li>',
-        '   <li><span data-icon="bug"></span>Logs screen<div><label class="pack-switch"><input id="logsScreen" type="checkbox" ' + _logsScreen + '><span></span></label></div></li>',
-        '</ul>                                                                                                                                              '
+        '       <aside class="icon"><span data-icon="reload"></span></aside>',
+        '       <aside class="pack-end"><p class="double">' + _now.toLocaleTimeString(userLocale) + '</p></aside>',
+        '       <a href="#"><p class="double"><my data-l10n-id="settings-last-update">' + document.webL10n.get('settings-last-update') + '</my></p></a>',
+        '   </li>',
+
+        '   <li class="_online_">',
+        '       <aside class="icon"><span data-icon="sync"></span></aside>',
+        '       <a>',
+        '           <p class="double"><my data-l10n-id="settings-update-every">' + document.webL10n.get('settings-update-every') + '</my></p>',
+        '       </a>',
+        '       ' + _htmlSelectUpdateEvery,
+        '   </li>',
+
+        '   <li>',
+        '       <aside class="icon"><span data-icon="sd-card"></span></aside>',
+        '       <aside class="pack-end"><div><button id="saveSubscriptions"><span data-l10n-id="save">' + document.webL10n.get('save') + '</span></button></div></aside>',
+        '       <a href="#"><p class="double"><my data-l10n-id="my-subscriptions-opml">' + document.webL10n.get('my-subscriptions-opml') + '</my></p></a>',
+        '   </li>',
+
+        '</ul>',
+        '</section>',
+        
+        '<h2 data-l10n-id="settings-news">' + document.webL10n.get('settings-news') + '</h2>',
+        '<section data-type="list">',
+        '<ul>',
+        
+        '   <li>',
+        '       <aside class="icon"><span data-icon="messages"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="toggleDisplaySmallEntries" type="checkbox"' + _displaySmallEntriesChecked + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double"><my data-l10n-id="settings-small-news">' + document.webL10n.get('settings-small-news') + '</my></p>',
+        '       </a>',
+        '   </li>',
+
+        '   <li class="_online_">',
+        '       <aside class="icon"><span data-icon="time"></span></aside>',
+        '       <a>',
+        '           <p class="double"><my data-l10n-id="settings-number-of-days">' + document.webL10n.get('settings-number-of-days') + '</my></p>',
+        '       </a>',
+        '       ' + _htmlMaxNbDays,
+        '   </li>',
+        
+        '</ul>',
+        '</section>',
+        
+        '<h2 data-l10n-id="settings-online-accounts">' + document.webL10n.get('settings-online-accounts') + '</h2>',
+        '<section data-type="list">',
+        '<ul class="feedly theoldreader aolreader">',
+        
+        '   <li class="_online_ _onlineAccount_">',
+        '       <aside class="icon"><span data-icon="addons"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="aolreaderLogin" type="checkbox"' + _aolreaderAccount + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double">Aol Reader</p>',
+        '       </a>',
+        '   </li>',
+
+        '   <li class="_online_ _onlineAccount_">',
+        '       <aside class="icon"><span data-icon="addons"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="feedlyLogin" type="checkbox"' + _feedlyAccount + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double">Feedly</p>',
+        '       </a>',
+        '   </li>',
+
+        '   <li class="_online_ _onlineAccount_ _proxyAvailable_">',
+        '       <aside class="icon"><span data-icon="addons"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="theoldreaderCheckbox" type="checkbox"' + _theoldreaderAccount + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double">The Old Reader</p>',
+        '       </a>',
+        '       <div id="theoldreaderForm">',
+        '           <p><input id="theoldreaderEmail" required="" placeholder="Email" name="theoldreaderEmail" type="email" value=""></p>',
+        '           <p><input id="theoldreaderPasswd" required="" placeholder="Password" name="theoldreaderPasswd" type="password" value=""><p>',
+        '       </div>',
+        '   </li>',
+        
+        '</ul>',
+        '</section>',
+        
+        '<h2 data-l10n-id="user-interface">' + document.webL10n.get('user-interface') + '</h2>',
+        '<section data-type="list">',
+        '<ul>',
+        
+        '   <li>',
+        '       <aside class="icon"><span data-icon="vibrate"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="toggleVibrate" type="checkbox"' + _vibrateOnClick + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double"><my data-l10n-id="vibrate-on-click">' + document.webL10n.get('vibrate-on-click') + '</my></p>',
+        '       </a>',
+        '   </li>',
+
+        '   <li>',
+        '       <aside class="icon"><span data-icon="languages"></span></aside>',
+        '       <a>',
+        '           <p class="double"><my data-l10n-id="settings-ui-language">' + document.webL10n.get('settings-ui-language') + '</my></p>',
+        '       </a>',
+        '       ' + _htmlLanguages,
+        '   </li>',
+        
+        '</ul>',
+        '</section>',
+        
+        '<h2 data-l10n-id="about">' + document.webL10n.get('about') + '</h2>',
+        '<section data-type="list">',
+        '<ul>',
+
+        '   <li id="appVersion">',
+        '       <aside class="icon"><span data-icon="wifi-4"></span></aside>',
+        '       <aside class="pack-end"><p class="double">' + myManifest.version + '</p></aside>',
+        '       <a href="#"><p class="double"><my data-l10n-id="app-title">' + document.webL10n.get('app-title') + '</my></p></a>',
+        '   </li>',
+ 
+        '   <li>',
+        '       <aside class="icon"><span data-icon="contacts"></span></aside>',
+        '       <aside class="pack-end"><p class="double">' + myManifest.developer.name + '</p></aside>',
+        '       <a href="#"><p class="double"><my data-l10n-id="author">' + document.webL10n.get('author') + '</my></p></a>',
+        '   </li>',
+ 
+        '   <li>',
+        '       <aside class="icon"><span data-icon="help"></span></aside>',
+        '       <aside class="pack-end">',
+        '           <a href="' + params.changelog + '" target="_blank">',
+        '               <p class="double"><button><span>www</span></button></p>',
+        '           </a>',
+        '       </aside>',
+        '       <a href="' + params.changelog + '" target="_blank">',
+        '           <p class="double"><my data-l10n-id="author">' + document.webL10n.get('settings-release-notes') + '</my></p>',
+        '       </a>',
+        '   </li>',
+ 
+        '   <li class="about _online_">',
+        '       <aside class="icon"><span data-icon="firefox"></span></aside>',
+        '       <aside class="pack-end">',
+        '           <a href="' + myManifest.developer.url + '" target="_blank">',
+        '               <p class="double"><button><span>www</span></button></p>',
+        '           </a>',
+        '       </aside>',
+        '       <a href="' + myManifest.developer.url + '" target="_blank">',
+        '           <p class="double"><my data-l10n-id="website">' + document.webL10n.get('website') + '</my></p>',
+                '</a>',
+        '   </li>',
+        
+        '   <li class="about _online_">',
+        '       <aside class="icon"><span data-icon="firefox"></span></aside>',
+        '       <aside class="pack-end">',
+        '           <a href="' + document.webL10n.get('git-url') + '" target="_blank">',
+        '               <p class="double"><button><span>www</span></button></p>',
+        '           </a>',
+        '       </aside>',
+        '       <a href="' + document.webL10n.get('git-url') + '" target="_blank">',
+        '           <p class="double"><my data-l10n-id="git-repository">' + document.webL10n.get('git-repository') + '</my></p>',
+        '       </a>',
+        '   </li>',
+ 
+        '   <li class="about _online_">',
+        '       <aside class="icon"><span data-icon="languages"></span></aside>',
+        '       <a href="#">',
+        '           <p class="double"><my data-l10n-id="settings-translations">' + document.webL10n.get('settings-translations') + '</my></p>',
+        '       </a>',
+        '       <ul>',
+        '           <li><a href="https://github.com/Sergio-Muriel" target="_blank">Sergio Muriel (es)</a></li>',
+        '           <li><a href="https://github.com/evertton" target="_blank">Evertton de Lima (pt)</a></li>',
+        '           <li><a>Пётр Жоря (ru)</a></li>',
+        '       </ul>',
+        '   </li>',
+
+        '</ul>',
+        '</section>',
+        
+        '<h2 class="developper-menu" data-l10n-id="settings-developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>',
+        '<section data-type="list">',
+        '<ul class="developper-menu">',
+
+        '   <li>',
+        '       <aside class="icon"><span data-icon="wifi-4"></span></aside>',
+        '       <aside class="pack-end"><p class="double" id="onLine">NA</p></aside>',
+        '       <a href="#"><p class="double"><my data-l10n-id="settings-connection">' + document.webL10n.get('settings-connection') + '</my></p></a>',
+        '   </li>',
+ 
+        '   <li>',
+        '       <aside class="icon"><span data-icon="play-circle"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double"><my data-l10n-id="settings-use-animations">' + document.webL10n.get('settings-use-animations') + '</my></p>',
+        '       </a>',
+        '   </li>',
+
+        '   <li>',
+        '       <aside class="icon"><span data-icon="addons"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="useProxy" type="checkbox" ' + _useProxy + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p><my data-l10n-id="settings-use-proxy">' + document.webL10n.get('settings-use-proxy') + '</my></p>',
+        '           <p><my data-l10n-id="settings-proxy-not-available">' + document.webL10n.get('settings-proxy-not-available') + '</my></p>',
+        '       </a>',
+        '   </li>',
+
+        '   <li>',
+        '       <aside class="icon"><span data-icon="sd-card"></span></aside>',
+        '       <aside class="pack-end"><div><button id="loadSubscriptions"><span data-l10n-id="load">load</span></button></div></aside>',
+        '       <a href="#"><p class="double"><my data-l10n-id="my-subscriptions">' + document.webL10n.get('my-subscriptions') + '</my></p></a>',
+        '   </li>',
+
+        '   <li>',
+        '       <aside class="icon"><span data-icon="bug"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="logsConsole" type="checkbox"' + _logsConsole + '><span></span></label></aside>',
+        '       <a href="#"><p class="double">Logs console</p></a>',
+        '   </li>',
+
+        '   <li>',
+        '       <aside class="icon"><span data-icon="bug"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="logsScreen" type="checkbox"' + _logsScreen + '><span></span></label></aside>',
+        '       <a href="#"><p class="double">Logs screen</p></a>',
+        '   </li>',
+
+        '</ul>',
+        '</section>'
         ].join('');
 
         ui.echo("settings", _htmlSettings, "");
@@ -972,6 +1150,24 @@
         document.getElementById("useProxy").onclick = function() {
             params.settings.proxy.use = !params.settings.proxy.use;
             _saveParams();
+            // Enable online accounts
+            if (!params.settings.proxy.use) {
+                var _items = document.querySelectorAll("._onlineAccount_");
+                for (var i = 0; i < _items.length; i++) {
+                    _MyUi._onclick(_items[i], 'enable');
+                }
+            }
+            // Disable online accounts for which proxy is not yet implemented
+            else {
+                var _items = document.querySelectorAll("._onlineAccount_");
+                for (var i = 0; i < _items.length; i++) {
+                    _MyUi._onclick(_items[i], 'disable');
+                }
+                var _items = document.querySelectorAll("._proxyAvailable_");
+                for (var i = 0; i < _items.length; i++) {
+                    _MyUi._onclick(_items[i], 'enable');
+                }
+            }
         }
         
         // Load subscriptions

@@ -9,6 +9,7 @@
 :root {
     --fxos-blue: #00AACC;
     --fxos-orange: #FF4E00;
+    --fxos-orange-light: #F97C17; /* custom */
     --fxos-brick: #CD6723;
     --fxos-red: #B90000;
     --fxos-green: #5F9B0A;

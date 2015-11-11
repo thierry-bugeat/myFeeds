@@ -374,6 +374,10 @@
     margin-top:0rem;
 }
 
+#feeds-entries-container h1 {
+    color: var(--fxos-white);
+}
+
 #feeds-entries > h2 {
     color: var(--fxos-orange);
     overflow: auto;

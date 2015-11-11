@@ -26,11 +26,11 @@
     height: calc(100% - 9.5rem) !important;
     overflow-x:hidden;
     overflow-y:auto;
-    padding: var(--my-spacing);
+    padding: 0;
 }
 
 #feeds-list > h2 {
-    color: var(--fxos-orange);
+    color: var(--fxos-grey);
     overflow: auto;
     list-style: none outside none;
     margin: 0;
