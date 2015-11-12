@@ -50,6 +50,14 @@ section[role="myFooter"] > header:first-child button:active {
     color: var(--fxos-blue);
 }
 
+section[role="myFooter"] > header:first-child button:last-child {
+    float:right;
+}
+
+section[role="myFooter"] > header:first-child button:first-child {
+    float:left;
+}
+
 /* --- Section option(s) --- */
 
 section[role="myFooter"]._fixed{

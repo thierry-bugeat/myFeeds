@@ -9,7 +9,7 @@
  /* ====================== */
  
 section[role="myHeader"] {
-    width: 100%;
+    /*width: auto;*/
     height: 5rem;
     margin:0;
     position: relative;

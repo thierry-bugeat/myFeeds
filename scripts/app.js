@@ -309,8 +309,8 @@
     }
     
     findFeedsReset.onclick  = function(event) { ui._vibrate(); ui.echo('find-feeds', '', ''); }
-    settingsOpen.onclick    = function(event) { ui._vibrate(); ui._scrollTo(3); }
-    settingsClose.onclick   = function(event) { ui._vibrate(); ui._scrollTo(2); }
+    settingsOpen.onclick    = function(event) { ui._vibrate(); ui._translate(dom['screens']['settings'], 'left'); }
+    settingsClose.onclick   = function(event) { ui._vibrate(); ui._translate(dom['screens']['settings'], 'right'); }
     displayGrid.onclick     = function(event) {
         if (params.entries.theme != 'grid') {
             params.entries.theme = "grid";
@@ -1053,6 +1053,12 @@
 
         ui.echo("settings", _htmlSettings, "");
         
+        // ==========================================
+        // --- Enable / Disable online account(s) ---
+        // ==========================================
+        
+        ui.toggleProxy(); // If proxy is in use, disable online account(s) who does not support proxy.
+
         // =======================================
         // --- Hide / show The old reader form ---
         // =======================================
@@ -1152,24 +1158,7 @@
         document.getElementById("useProxy").onclick = function() {
             params.settings.proxy.use = !params.settings.proxy.use;
             _saveParams();
-            // Enable online accounts
-            if (!params.settings.proxy.use) {
-                var _items = document.querySelectorAll("._onlineAccount_");
-                for (var i = 0; i < _items.length; i++) {
-                    _MyUi._onclick(_items[i], 'enable');
-                }
-            }
-            // Disable online accounts for which proxy is not yet implemented
-            else {
-                var _items = document.querySelectorAll("._onlineAccount_");
-                for (var i = 0; i < _items.length; i++) {
-                    _MyUi._onclick(_items[i], 'disable');
-                }
-                var _items = document.querySelectorAll("._proxyAvailable_");
-                for (var i = 0; i < _items.length; i++) {
-                    _MyUi._onclick(_items[i], 'enable');
-                }
-            }
+            ui.toggleProxy();
         }
         
         // Load subscriptions
@@ -1789,7 +1778,7 @@
         
         document.body.dispatchEvent(new CustomEvent('mainEntryOpen.done', {"detail": {"entryId": entryId, "url": url, "_mySha256_link": sortedEntries[entryId]['_mySha256_link'], "_mySha256_title": sortedEntries[entryId]['_mySha256_title']}}));
 
-        ui._quickScrollTo(4);
+        ui._quickScrollTo(3);
     }
 
     /**
