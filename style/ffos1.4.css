@@ -81,6 +81,10 @@ section[role="myFooter"] > header:first-child button {color: #FFFFFF;} /* --fxos
 
 #feeds-entries-container h1 {color: #FFFFFF;} /* --fxos-white */
 
+/* --- Main entry --- */
+
+#main-entry-container h1 {color: #FFFFFF;} /* --fxos-white*/
+
 /* --- Settings --- */
 
 #settings {

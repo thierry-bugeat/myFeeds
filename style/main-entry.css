@@ -37,3 +37,8 @@ section[role="mySubEntry"] > header span:nth-child(1) {
 section[role="mySubEntry"] > header span:nth-child(2) {
     text-align:right;
 }
+
+#main-entry-container h1 {
+    color: var(--fxos-white);
+}
+

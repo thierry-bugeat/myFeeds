@@ -843,10 +843,12 @@
         '       ' + _htmlSelectUpdateEvery,
         '   </li>',
 
+
+
         '   <li>',
         '       <aside class="icon"><span data-icon="sd-card"></span></aside>',
-        '       <aside class="pack-end"><div><button id="saveSubscriptions"><span data-l10n-id="save">' + document.webL10n.get('save') + '</span></button></div></aside>',
-        '       <a href="#"><p class="double"><my data-l10n-id="my-subscriptions-opml">' + document.webL10n.get('my-subscriptions-opml') + '</my></p></a>',
+        '       <aside class="pack-end"><button id="saveSubscriptions"><span data-l10n-id="save">' + document.webL10n.get('save') + '</span></button></aside>',
+        '       <a><p class="double"><my data-l10n-id="my-subscriptions-opml">' + document.webL10n.get('my-subscriptions-opml') + '</my></p></a>',
         '   </li>',
 
         '</ul>',
@@ -864,7 +866,7 @@
         '       </a>',
         '   </li>',
 
-        '   <li class="_online_">',
+        '   <li>',
         '       <aside class="icon"><span data-icon="time"></span></aside>',
         '       <a>',
         '           <p class="double"><my data-l10n-id="settings-number-of-days">' + document.webL10n.get('settings-number-of-days') + '</my></p>',
@@ -949,7 +951,7 @@
         '       <a href="#"><p class="double"><my data-l10n-id="author">' + document.webL10n.get('author') + '</my></p></a>',
         '   </li>',
  
-        '   <li>',
+        '   <li class="_online_">',
         '       <aside class="icon"><span data-icon="help"></span></aside>',
         '       <aside class="pack-end">',
         '           <a href="' + params.changelog + '" target="_blank">',
@@ -957,7 +959,7 @@
         '           </a>',
         '       </aside>',
         '       <a href="' + params.changelog + '" target="_blank">',
-        '           <p class="double"><my data-l10n-id="author">' + document.webL10n.get('settings-release-notes') + '</my></p>',
+        '           <p class="double"><my data-l10n-id="settings-release-notes">' + document.webL10n.get('settings-release-notes') + '</my></p>',
         '       </a>',
         '   </li>',
  
@@ -1018,7 +1020,7 @@
         '       </a>',
         '   </li>',
 
-        '   <li>',
+        '   <li class="_online_">',
         '       <aside class="icon"><span data-icon="addons"></span></aside>',
         '       <aside class="pack-end"><label class="pack-switch"><input id="useProxy" type="checkbox" ' + _useProxy + '><span></span></label></aside>',
         '       <a href="#">',
@@ -1172,7 +1174,7 @@
         
         // Load subscriptions
         
-        document.getElementById("loadSubscriptions").onclick = function(event) {
+        /*document.getElementById("loadSubscriptions").onclick = function(event) {
             if (window.confirm(document.webL10n.get('confirm-load-subscriptions'))) {
                 my._load('subscriptions.local.json').then(
                     function (_mySubscriptions) {
@@ -1190,7 +1192,7 @@
                     my.message(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
                 });
             }
-        }
+        }*/
         
         // Save subscriptions
 
