@@ -50,7 +50,7 @@
 }
 
 #feeds-list > ul {
-    background-color: var(--fxos-white);
+    background-color: var(--fxos-light-grey);
     overflow: auto;
     list-style: none outside none;
     margin: 0;
