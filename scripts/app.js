@@ -929,6 +929,14 @@
         '<ul>',
         
         '   <li>',
+        '       <aside class="icon"><span data-icon="play-circle"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double"><my data-l10n-id="settings-use-animations">' + document.webL10n.get('settings-use-animations') + '</my></p>',
+        '       </a>',
+        '   </li>',
+        
+        '   <li>',
         '       <aside class="icon"><span data-icon="vibrate"></span></aside>',
         '       <aside class="pack-end"><label class="pack-switch"><input id="toggleVibrate" type="checkbox"' + _vibrateOnClick + '><span></span></label></aside>',
         '       <a href="#">',
@@ -1022,14 +1030,6 @@
         '       <aside class="icon"><span data-icon="wifi-4"></span></aside>',
         '       <aside class="pack-end"><p class="double" id="onLine">NA</p></aside>',
         '       <a href="#"><p class="double"><my data-l10n-id="settings-connection">' + document.webL10n.get('settings-connection') + '</my></p></a>',
-        '   </li>',
- 
-        '   <li>',
-        '       <aside class="icon"><span data-icon="play-circle"></span></aside>',
-        '       <aside class="pack-end"><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></aside>',
-        '       <a href="#">',
-        '           <p class="double"><my data-l10n-id="settings-use-animations">' + document.webL10n.get('settings-use-animations') + '</my></p>',
-        '       </a>',
         '   </li>',
 
         '   <li class="_online_">',
