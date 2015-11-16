@@ -352,7 +352,7 @@ MyUi.prototype._smoothScrollTo = function(screenX, duration) {
             var _x = ('-' + (screenX * 50) + '%').toString();
         }
 
-        main.style.cssText = 'transition: transform 0.25s linear; transform: translateX('+_x+');';
+        main.style.cssText = 'transition: transform 0.25s ease; transform: translateX('+_x+');';
         
     }); // Schedule the execution for later
 }
@@ -367,7 +367,7 @@ MyUi.prototype._translate = function(id, direction) {
         }
            
         if (params.settings.ui.animations) {
-            id.style.cssText = 'transition: transform 0.25s linear; transform: translateX('+_x+');';
+            id.style.cssText = 'transition: transform 0.25s ease; transform: translateX('+_x+');';
         } else {
             id.style.cssText = 'transform: translateX(' + _x + ');';
         }
