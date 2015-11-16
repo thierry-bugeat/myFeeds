@@ -44,23 +44,36 @@ form{
 
 #main {
     /* will-change: transform; GPU acceleration */
+    z-index: 5;
     height: 100%;
-    width: 400%; /* 4 screens */
+    width: 200%; /* 2 screens */
     display: inline-flex;
     position: absolute; 
     left: 0;
     /*transform: translateX(-200%);*/
 }
 
+#main:before {
+    position:inherit;
+    content: " ";
+	width: 200%;
+	height: 100%;
+	box-shadow: 0 0 22px #888;
+}
+
 .warning {
     color: red !important;
+}
+
+.back {
+    z-index: 0 !important;
 }
 
 /* Main Entry */
 
 #main-entry-container{
     display:block;
-    width:25%;
+    width:50%;
     height:100%;
     /*margin:0px auto;*/
     /*position: fixed;*/

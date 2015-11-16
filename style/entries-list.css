@@ -358,7 +358,7 @@
 #feeds-entries-container{
     /*will-change: transform; GPU acceleration */
     display:block;
-    width: 25%;
+    width: 50%;
     height: calc(100%);
     background: var(--fxos-ivory);
     /*position:fixed;*/

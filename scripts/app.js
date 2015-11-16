@@ -105,6 +105,11 @@
             },
             "imagesPreviouslyDisplayed": []     // Store images previously displayed. 
                                                 // Used for displaying images in offline mode.
+        },
+        "screens": {
+            "feedsList": {
+                "opened": false
+            }
         }
     }
     
@@ -289,11 +294,18 @@
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }
     }
-    menu.onclick            = function(event) { ui._vibrate(); ui._scrollTo(1); }
-    closeMainEntry.onclick  = function(event) { ui._vibrate(); ui._quickScrollTo(2); ui.echo("browser", "", ""); }
-    closeFeedsList.onclick  = function(event) { ui._vibrate(); ui._scrollTo(2); }
-    findFeedsOpen.onclick   = function(event) { ui._vibrate(); ui._scrollTo(0); }
-    findFeedsClose.onclick  = function(event) { ui._vibrate(); ui._scrollTo(1); }
+    menu.onclick            = function(event) {
+        liveValues.screens.feedsList.opened = !liveValues.screens.feedsList.opened;
+        ui._vibrate();
+        (liveValues.screens.feedsList.opened) ? ui._scrollTo(-1) : ui._scrollTo(0);
+    }
+    closeMainEntry.onclick  = function(event) { ui._vibrate(); ui._quickScrollTo(0); ui.echo("browser", "", ""); }
+    closeFeedsList.onclick  = function(event) { 
+        ui._vibrate(); ui._scrollTo(0); 
+        liveValues.screens.feedsList.opened = !liveValues.screens.feedsList.opened;
+    }
+    findFeedsOpen.onclick   = function(event) { ui._vibrate(); ui._scrollTo(-2); }
+    findFeedsClose.onclick  = function(event) { ui._vibrate(); ui._scrollTo(-1); }
     
     findFeedsSubmit.onclick = function(event) { 
         ui._vibrate();
@@ -881,7 +893,7 @@
         '<section data-type="list">',
         '<ul class="feedly theoldreader aolreader">',
         
-        '   <li class="_online_ _onlineAccount_">',
+        '   <li class="_online_ _onlineAccount_ _proxyNotAvailable_">',
         '       <aside class="icon"><span data-icon="addons"></span></aside>',
         '       <aside class="pack-end"><label class="pack-switch"><input id="aolreaderLogin" type="checkbox"' + _aolreaderAccount + '><span></span></label></aside>',
         '       <a href="#">',
@@ -889,7 +901,7 @@
         '       </a>',
         '   </li>',
 
-        '   <li class="_online_ _onlineAccount_">',
+        '   <li class="_online_ _onlineAccount_ _proxyNotAvailable_">',
         '       <aside class="icon"><span data-icon="addons"></span></aside>',
         '       <aside class="pack-end"><label class="pack-switch"><input id="feedlyLogin" type="checkbox"' + _feedlyAccount + '><span></span></label></aside>',
         '       <a href="#">',
@@ -897,7 +909,7 @@
         '       </a>',
         '   </li>',
 
-        '   <li class="_online_ _onlineAccount_ _proxyAvailable_">',
+        '   <li class="_online_ _onlineAccount_">',
         '       <aside class="icon"><span data-icon="addons"></span></aside>',
         '       <aside class="pack-end"><label class="pack-switch"><input id="theoldreaderCheckbox" type="checkbox"' + _theoldreaderAccount + '><span></span></label></aside>',
         '       <a href="#">',
@@ -1312,6 +1324,10 @@
                 ((_account == 'aolreader') && (_aolreaderAccessToken !== undefined))
             ){
                 var _class = (_account == 'local') ? "delete" : "delete _online_";
+                
+                if ((_account == 'feedly') || (_account == 'aolreader')) {
+                    _class = _class + ' _proxyNotAvailable_'; // Proxy not available for "aolreader" & "feedly". Not yet implemented.
+                }
                     
                 _deleteIcone = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed._myFeedId + '"><span data-icon="delete"></span></button>';
             }
@@ -1362,7 +1378,7 @@
             _opens[i].onclick = function() {
                 liveValues['entries']['search']['visible'] = true;
                 ui._vibrate();
-                ui._scrollTo(2);
+                ui._scrollTo(0);
                 ui._onclick(nextDay, 'disable');
                 ui._onclick(previousDay, 'enable');
                 params.entries.nbDaysAgo = 0;
@@ -1398,7 +1414,7 @@
                 liveValues['entries']['search']['visible'] = false;
                 document.getElementById('inputSearchEntries').value = "";
                 ui._vibrate();
-                ui._scrollTo(2);
+                ui._scrollTo(0);
                 ui._onclick(nextDay, 'disable');
                 ui._onclick(previousDay, 'enable');
                 params.entries.nbDaysAgo = 0;
@@ -1638,7 +1654,8 @@
             for (var i = 0; i < _nb; i++) {
                 _small_entries[i].onclick = function() {
                     ui._vibrate(); 
-                    ui.fade(this); 
+                    ui.fade(this);
+                    liveValues.screens.feedsList.opened = false; 
                     mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
                 }
             }
@@ -1652,7 +1669,8 @@
             for (var i = 0; i < _nb; i++) {
                 _entries[i].onclick = function() { 
                     ui._vibrate(); 
-                    ui.fade(this); 
+                    ui.fade(this);
+                    liveValues.screens.feedsList.opened = false;
                     mainEntryOpenInBrowser(this.getAttribute("i"), ""); 
                 }
             }
@@ -1778,7 +1796,7 @@
         
         document.body.dispatchEvent(new CustomEvent('mainEntryOpen.done', {"detail": {"entryId": entryId, "url": url, "_mySha256_link": sortedEntries[entryId]['_mySha256_link'], "_mySha256_title": sortedEntries[entryId]['_mySha256_title']}}));
 
-        ui._quickScrollTo(3);
+        ui._quickScrollTo(1);
     }
 
     /**
@@ -2655,5 +2673,5 @@
         // ============
 
         ui.init();
-        ui._quickScrollTo(2);
+        ui._quickScrollTo(0);
     };

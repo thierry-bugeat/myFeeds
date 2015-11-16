@@ -44,7 +44,9 @@ var dom = {
         }
     },
     "screens": {
-        "settings": document.getElementById('settings-container')
+        "settings": document.getElementById('settings-container'),
+        "feeds": document.getElementById('feeds-list-container'),
+        "find": document.getElementById('find-feeds-container')
     }
 };
 var search                  = document.getElementById("search");
@@ -247,28 +249,25 @@ MyUi.prototype.toggle = function(_status) {
 
 /**
  * Change opacity of UI elements when proxy checkbox change.
+ * Affect elements with class _proxyNotAvailable_
  * */
 MyUi.prototype.toggleProxy = function() {
     
-    // Enable online accounts
+    // Enable online accounts when proxy is not used.
     
     if (!params.settings.proxy.use) {
-        var _items = document.querySelectorAll("._onlineAccount_");
+        var _items = document.querySelectorAll("._proxyNotAvailable_");
         for (var i = 0; i < _items.length; i++) {
             _MyUi._onclick(_items[i], 'enable');
         }
     }
 
-    // Disable online accounts for which proxy is not yet implemented
+    // Disable elements for which proxy is not yet implemented
     
     else {
-        var _items = document.querySelectorAll("._onlineAccount_");
+        var _items = document.querySelectorAll("._proxyNotAvailable_");
         for (var i = 0; i < _items.length; i++) {
             _MyUi._onclick(_items[i], 'disable');
-        }
-        var _items = document.querySelectorAll("._proxyAvailable_");
-        for (var i = 0; i < _items.length; i++) {
-            _MyUi._onclick(_items[i], 'enable');
         }
     }
 
@@ -310,10 +309,10 @@ MyUi.prototype._loading = function(percentage) {
 /**
  * Scroll main div to specified screen.
  * @param {screenX} int
- * 0 : Search feed
- * 1 : Feeds list
- * 2 : Entries list
- * 3 : Entry
+ * 0 : Search feed  (mainLeft)
+ * 1 : Feeds list   (mainLeft)
+ * 0 : Entries list (main)
+ * 1 : Entry        (main)
  * */
 MyUi.prototype._scrollTo = function(screenX) {
     if (params.settings.ui.animations) {
@@ -326,7 +325,14 @@ MyUi.prototype._scrollTo = function(screenX) {
 MyUi.prototype._quickScrollTo = function(screenX) {
     window.setTimeout(function() {
         
-        var _x = ('-' + (screenX * 25) + '%').toString();
+        if (screenX == -1) {
+            var _x = (dom['screens']['feeds'].scrollWidth + 'px').toString();   /* Screen feeds list */
+            dom['screens']['feeds'].classList.remove('back');
+        } else if (screenX == -2) {
+            dom['screens']['feeds'].classList.add('back'); return;              /* Screen find feeds */
+        } else {
+            var _x = ('-' + (screenX * 50) + '%').toString();                   /* Screens entries or main entry */
+        }
 
         main.style.cssText = 'transform: translateX('+_x+');';
         
@@ -337,7 +343,14 @@ MyUi.prototype._smoothScrollTo = function(screenX, duration) {
     
     window.setTimeout(function() {
         
-        var _x = ('-' + (screenX * 25) + '%').toString();
+        if (screenX == -1) {
+            var _x = (dom['screens']['feeds'].scrollWidth + 'px').toString();
+            dom['screens']['feeds'].classList.remove('back');
+        } else if (screenX == -2) {
+            dom['screens']['feeds'].classList.add('back'); return;
+        } else {
+            var _x = ('-' + (screenX * 50) + '%').toString();
+        }
 
         main.style.cssText = 'transition: transform 0.25s linear; transform: translateX('+_x+');';
         

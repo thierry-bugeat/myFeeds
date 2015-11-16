@@ -50,7 +50,7 @@ section[role="myFooter"] > header:first-child button:active {
     color: var(--fxos-blue);
 }
 
-section[role="myFooter"] > header:first-child button:last-child {
+#feeds-entries-container section[role="myFooter"] > header:first-child button:last-child {
     float:right;
 }
 

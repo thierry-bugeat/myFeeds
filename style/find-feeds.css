@@ -8,13 +8,14 @@
  
 #find-feeds-container{
     display: block;
-    width:25%;
+    width:100%;
+    max-width:480px;
     height:100%;
     /*margin:0px auto;*/
-    /*position: fixed;*/
-    top:0%;
-    left:0%;
-    z-index:12;
+    position: absolute;
+    top:0;
+    left:0;
+    z-index:1;
     box-sizing: border-box;
 }
 
