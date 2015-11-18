@@ -44,12 +44,12 @@
     margin: 0;
     overflow: hidden;
     padding: var(--my-spacing);
-    font-size:1.7rem;
+    font-size:1.6rem;
     font-weight:normal;
 }
 
 #settings h3 {
-    font-size:1.7rem;
+    font-size:1.6rem;
     font-weight:normal;
     overflow: auto;
     list-style: none outside none;

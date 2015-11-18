@@ -30,7 +30,7 @@
     var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 2.31,
+        "version": 2.35,
         "changelog": "https://git.framasoft.org/thierry-bugeat/myFeeds/raw/master/CHANGELOG",
         "feeds": {
             "selectedFeed": "",                 // Display all feeds if empty otherwise display specified feed url
@@ -80,8 +80,14 @@
             },
             "days": [3, 5, 7, 10],
             "proxy": {
-                "use": false,                    // Use proxy to get url content
-                "host": "54.229.143.103"
+                "use": false,                   // Use proxy to get url content
+                "host": "54.229.143.103",
+                "availability": {
+                    "local": true,
+                    "feedly": false,            // Not yet implemented
+                    "theoldreader": true,
+                    "aolreader": false          // Not yet implemented
+                }
             }
         }
     }
@@ -108,7 +114,7 @@
         },
         "screens": {
             "feedsList": {
-                "opened": false
+                "opened": false                 // Slide right or left entries screen
             }
         }
     }
@@ -557,6 +563,9 @@
                         my.alert("ERROR saving file " + error.filename);
                     });
                 }).catch(function(error) {
+                    my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
+                        my.log('Save subscriptions.' + _account + '.json');
+                    }).catch(function(error) {});
                     my.message(document.webL10n.get('error-cant-delete-this-feed'));
                     my.error(error);
                 });
@@ -574,6 +583,9 @@
                         my.alert("ERROR saving file " + error.filename);
                     });
                 }).catch(function(error) {
+                    my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
+                        my.log('Save subscriptions.' + _account + '.json');
+                    }).catch(function(error) {});
                     my.message(document.webL10n.get('error-cant-delete-this-feed'));
                     my.error(error);
                 });
@@ -591,6 +603,9 @@
                         my.alert("ERROR saving file " + error.filename);
                     });
                 }).catch(function(error) {
+                    my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
+                        my.log('Save subscriptions.' + _account + '.json');
+                    }).catch(function(error) {});
                     my.message(document.webL10n.get('error-cant-delete-this-feed'));
                     my.error(error);
                 });
@@ -893,7 +908,7 @@
         '<section data-type="list">',
         '<ul class="feedly theoldreader aolreader">',
         
-        '   <li class="_online_ _onlineAccount_ _proxyNotAvailable_">',
+        '   <li class="_online_ _onlineAccount_ ' + (params.settings.proxy.availability.aolreader ? '' : '_proxyNotAvailable_') + '">',
         '       <aside class="icon"><span data-icon="addons"></span></aside>',
         '       <aside class="pack-end"><label class="pack-switch"><input id="aolreaderLogin" type="checkbox"' + _aolreaderAccount + '><span></span></label></aside>',
         '       <a href="#">',
@@ -901,7 +916,7 @@
         '       </a>',
         '   </li>',
 
-        '   <li class="_online_ _onlineAccount_ _proxyNotAvailable_">',
+        '   <li class="_online_ _onlineAccount_ ' + (params.settings.proxy.availability.feedly ? '' : '_proxyNotAvailable_') + '">',
         '       <aside class="icon"><span data-icon="addons"></span></aside>',
         '       <aside class="pack-end"><label class="pack-switch"><input id="feedlyLogin" type="checkbox"' + _feedlyAccount + '><span></span></label></aside>',
         '       <a href="#">',
@@ -909,7 +924,7 @@
         '       </a>',
         '   </li>',
 
-        '   <li class="_online_ _onlineAccount_">',
+        '   <li class="_online_ _onlineAccount_ ' + (params.settings.proxy.availability.theoldreader ? '' : '_proxyNotAvailable_') + '">',
         '       <aside class="icon"><span data-icon="addons"></span></aside>',
         '       <aside class="pack-end"><label class="pack-switch"><input id="theoldreaderCheckbox" type="checkbox"' + _theoldreaderAccount + '><span></span></label></aside>',
         '       <a href="#">',
@@ -1325,7 +1340,7 @@
             ){
                 var _class = (_account == 'local') ? "delete" : "delete _online_";
                 
-                if ((_account == 'feedly') || (_account == 'aolreader')) {
+                if (!params.settings.proxy.availability[_account]) {
                     _class = _class + ' _proxyNotAvailable_'; // Proxy not available for "aolreader" & "feedly". Not yet implemented.
                 }
                     
