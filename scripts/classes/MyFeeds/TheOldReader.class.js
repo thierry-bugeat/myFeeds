@@ -23,7 +23,7 @@
 
 var TheOldReader = function() {
     
-    MyFeeds.call(this); /* Appel du constructeur de la classe parente */
+    MyFeeds.call(this); /* Call the constructor of parent class. */
 
     this.tor = {
         "host"          : "https://theoldreader.com",
@@ -63,11 +63,11 @@ TheOldReader.prototype.getToken = function() {
 }
 
 /**
+ * updateToken()
  * Use "refresh_token" to obtain a new "access_token"
  * @todo Not yet implemented
  * @param   {null}
  * @return  {CustomEvent} TheOldReader.getNewToken.done | TheOldReader.getNewToken.error
-
  * */
 
 TheOldReader.prototype.updateToken = function() {
@@ -79,6 +79,8 @@ TheOldReader.prototype.updateToken = function() {
 }
 
 /**
+ * login(email, password)
+ *
  * @param   {string} email
  * @param   {string} password
  * @return  {CustomEvent} TheOldReader.login.done | TheOldReader.login.error
@@ -118,6 +120,8 @@ TheOldReader.prototype.login = function(email, password) {
 };
 
 /**
+ * getSubscriptions()
+ *
  * @param   {null}
  * @return  {CustomEvent} TheOldReader.getSubscriptions.done | TheOldReader.getSubscriptions.error
  * */
@@ -133,9 +137,7 @@ TheOldReader.prototype.getSubscriptions = function () {
         _url = 'http://' + params.settings.proxy.host + '/proxy/theoldreader/?' + _urlParams;
     }   
     
-    var promise = this.get(_url, '');
-    
-    promise.then(function(response) {
+    this.get(_url, '').then(function(response) {
         _TheOldReader.tor.subscriptions = response;
         document.body.dispatchEvent(new CustomEvent('TheOldReader.getSubscriptions.done', {"detail": response}));
         _MyFeeds.log("CustomEvent : TheOldReader.getSubscriptions.done");
@@ -146,6 +148,8 @@ TheOldReader.prototype.getSubscriptions = function () {
 }
 
 /**
+ * deleteSubscription(feedId)
+ *
  * @param   {feedId} String Feed id
  * @return  {CustomEvent} TheOldReader.deleteSubscription.done | TheOldReader.deleteSubscription.error
  * */
@@ -166,10 +170,7 @@ TheOldReader.prototype.deleteSubscription = function (feedId) {
             _url = 'http://' + params.settings.proxy.host + '/proxy/theoldreader/?' + _urlParams;
         }       
         
-        //var promise = _TheOldReader._delete(_url, _params, '');
-        var promise = _TheOldReader.post(_url, _params, '');
-
-        promise.then(function(response) {
+        _TheOldReader._delete(_url, _params).then(function(response) {
             resolve(response);
         }).catch(function(error) {
             reject(Error(JSON.stringify(error)));
@@ -181,8 +182,8 @@ TheOldReader.prototype.deleteSubscription = function (feedId) {
 /**
  * get(_url, myParams)
  * 
- * @param string _url Url to load.
- * @param object myParams You can retrieve this object in response.
+ * @param {_url} string Url to load.
+ * @param {myParams} object You can retrieve this object in response.
  * 
  * */
  
@@ -252,6 +253,7 @@ TheOldReader.prototype.post = function (_url, _params, callback) {
 
         xhr.onload = function() {
             var _response;
+
             try {
                 _response = JSON.parse(xhr.response);
             } catch (e) {
@@ -268,8 +270,8 @@ TheOldReader.prototype.post = function (_url, _params, callback) {
     });
 }
 
-TheOldReader.prototype._delete = function (url, params, callback) {
-    _MyFeeds.log('TheOldReader.prototype.post222()', arguments);
+TheOldReader.prototype._delete = function (url, params) {
+    _MyFeeds.log('TheOldReader.prototype._delete()', arguments);
     
     return new Promise(function(resolve, reject) {
 
@@ -287,7 +289,6 @@ TheOldReader.prototype._delete = function (url, params, callback) {
             
             if (xhr.status == 200) {
 
-                //var _response = JSON.parse(xhr.response);
                 var _response = xhr.response;
 
                 try {
@@ -301,8 +302,8 @@ TheOldReader.prototype._delete = function (url, params, callback) {
             }
         };
 
-        xhr.onerror = function(err) {
-            reject(Error(JSON.stringify(err)));
+        xhr.onerror = function(error) {
+            reject(Error(JSON.stringify(error)));
         };
         
         xhr.send(params);
