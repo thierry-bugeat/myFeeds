@@ -79,6 +79,8 @@ section[role="myFooter"] > header:first-child button {color: #FFFFFF;} /* --fxos
 
 /* --- Entries --- */
 
+#feeds-entries-container {background: #EAEAE7;} /*--fxos-ivory */
+
 #feeds-entries-container h1 {color: #FFFFFF;} /* --fxos-white */
 
 /* --- Main entry --- */
