@@ -24,13 +24,14 @@
     var theoldreader = new TheOldReader();
     var feedly = new Feedly();
     var aolreader = new AolReader();
+    var tinytinyrss = new TinyTinyRss();
 
     var gf = new GoogleFeed();
 
-    var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
+    var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': [], 'tinytinyrss': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 2.35,
+        "version": 2.4,
         "changelog": "https://git.framasoft.org/thierry-bugeat/myFeeds/raw/master/CHANGELOG",
         "feeds": {
             "selectedFeed": "",                 // Display all feeds if empty otherwise display specified feed url
@@ -60,6 +61,10 @@
             "aolreader": {
                 "title": "Aol Reader",
                 "logged": false
+            },
+            "tinytinyrss": {
+                "title": "Tiny Tiny Rss",
+                "logged": false
             }
         },
         "settings": {
@@ -86,7 +91,8 @@
                     "local": true,
                     "feedly": false,            // Not yet implemented
                     "theoldreader": true,
-                    "aolreader": false          // Not yet implemented
+                    "aolreader": false,         // Not yet implemented
+                    "tinytinyrss": false        // Not yet implemented
                 }
             }
         }
@@ -125,7 +131,7 @@
     
     var _dspEntriesTimeout = '';
     
-    var _loginInProgress = {"local": false, "feedly": false, "theoldreader": false, "aolreader": false}
+    var _loginInProgress = {"local": false, "feedly": false, "theoldreader": false, "aolreader": false, "tinytinyrss": false}
 
     // Network Connection
 
@@ -269,6 +275,43 @@
             }).catch(function(error) {
                 _disableAccount('aolreader');
                 my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Aol Reader"}));
+            });
+        }
+
+        // Get end set Tiny Tiny Rss token (session_id) from cache
+        // then try to update token (session_id)
+        // then try to update subscriptions
+        
+        if (params.accounts.tinytinyrss.logged) {
+            my._load('cache/tinytinyrss/access_token.json').then(function(_token){
+            
+                tinytinyrss.setToken(_token);
+                
+                var _now = Math.floor(new Date().getTime() / 1000);
+                var _expires_in = _token.expires_in || 604800;
+                var _tokenIsExpired = ((_now - _token.lastModified) > _expires_in) ? true : false;
+                
+                if ((!navigator.onLine) && (_tokenIsExpired)) {
+                    _disableAccount('tinytinyrss');
+                }
+                    
+                if (navigator.onLine) {
+                    if (_tokenIsExpired) {
+                        tinytinyrss.updateToken().catch(function(error) {
+                            _disableAccount('tinytinyrss');
+                        }).then(function(){
+                            if (params.accounts.tinytinyrss.logged) {
+                                tinytinyrss.getSubscriptions();
+                            }
+                        });
+                    } else {
+                        tinytinyrss.getSubscriptions();
+                    }
+                }
+                
+            }).catch(function(error) {
+                _disableAccount('tinytinyrss');
+                my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Tiny Tiny Rss"}));
             });
         }
 
@@ -504,7 +547,8 @@
             if ((myFeedsSubscriptions.local.length > 0) ||
                 (myFeedsSubscriptions.feedly.length > 0) ||
                 (myFeedsSubscriptions.theoldreader.length > 0) || 
-                (myFeedsSubscriptions.aolreader.length > 0)
+                (myFeedsSubscriptions.aolreader.length > 0) ||
+                (myFeedsSubscriptions.tinytinyrss.length > 0)
             ){
                 gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
             } else {
@@ -611,6 +655,26 @@
                 });
             }
             
+            // (3e) Delete from Tiny Tiny Rss
+
+            if (_account == 'tinytinyrss') {
+                tinytinyrss.deleteSubscription(_feedId).then(function(response){
+                    my.message(document.webL10n.get('feed-has-been-deleted'));
+                    my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
+                        my.log('Save subscriptions.' + _account + '.json');
+                    }).catch(function(error) {
+                        my.error("ERROR saving file ", error);
+                        my.alert("ERROR saving file " + error.filename);
+                    });
+                }).catch(function(error) {
+                    my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
+                        my.log('Save subscriptions.' + _account + '.json');
+                    }).catch(function(error) {});
+                    my.message(document.webL10n.get('error-cant-delete-this-feed'));
+                    my.error(error);
+                });
+            }
+
             // (4) Delete entries
             
             gf.deleteEntries(_account, _feedId);
@@ -620,7 +684,8 @@
             if ((myFeedsSubscriptions.local.length > 0) ||
                 (myFeedsSubscriptions.feedly.length > 0) ||
                 (myFeedsSubscriptions.theoldreader.length > 0) || 
-                (myFeedsSubscriptions.aolreader.length > 0)
+                (myFeedsSubscriptions.aolreader.length > 0) ||
+                (myFeedsSubscriptions.tinytinyrss.length > 0) 
             ){
                 gf.setFeedsSubscriptions(myFeedsSubscriptions);
                 gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
@@ -765,6 +830,14 @@
             _aolreaderAccount = 'checked=""';
         } else {
             _aolreaderAccount = "";
+        }
+
+        // Tiny Tiny Rss selector
+
+        if (params.accounts.tinytinyrss.logged) {
+            _tinytinyrssAccount = 'checked=""';
+        } else {
+            _tinytinyrssAccount = "";
         }
 
         // Use animations selector
@@ -935,6 +1008,19 @@
         '           <p><input id="theoldreaderPasswd" required="" placeholder="Password" name="theoldreaderPasswd" type="password" value=""><p>',
         '       </div>',
         '   </li>',
+ 
+        '   <li class="_online_ _onlineAccount_ ' + (params.settings.proxy.availability.tinytinyrss ? '' : '_proxyNotAvailable_') + '">',
+        '       <aside class="icon"><span data-icon="addons"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="tinytinyrssCheckbox" type="checkbox"' + _tinytinyrssAccount + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double">Tiny Tiny Rss</p>',
+        '       </a>',
+        '       <div id="tinytinyrssForm">',
+        '           <p><input id="tinytinyrssUrl" required="" placeholder="Url" name="tinytinyrssUrl" type="text" value=""></p>',
+        '           <p><input id="tinytinyrssUser" required="" placeholder="Login" name="tinytinyrssUser" type="text" value=""></p>',
+        '           <p><input id="tinytinyrssPasswd" required="" placeholder="Password" name="tinytinyrssPasswd" type="password" value=""><p>',
+        '       </div>',
+        '   </li>',
         
         '</ul>',
         '</section>',
@@ -1093,6 +1179,14 @@
         params.accounts.theoldreader.logged ?
             document.getElementById('theoldreaderForm').style.cssText = 'display: none':
             document.getElementById('theoldreaderForm').style.cssText = 'display: block';
+ 
+        // ======================================
+        // --- Hide / show Tiny Tiny Rss form ---
+        // ======================================
+        
+        params.accounts.tinytinyrss.logged ?
+            document.getElementById('tinytinyrssForm').style.cssText = 'display: none':
+            document.getElementById('tinytinyrssForm').style.cssText = 'display: block';
         
         // ============================
         // --- Show developper menu ---
@@ -1273,6 +1367,23 @@
                 gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
             }
         }
+ 
+        // Tiny Tiny Rss login checkbox
+
+        document.getElementById('tinytinyrssCheckbox').onclick = function() {
+            if (this.checked) {
+                this.checked = false; // False until CustomEvent TinyTinyRss.login.done
+                var _url = document.getElementById("tinytinyrssUrl").value;
+                var _user = document.getElementById("tinytinyrssUser").value;
+                var _passwd = document.getElementById("tinytinyrssPasswd").value;
+                tinytinyrss.login(_url, _user, _passwd);
+            } else {
+                params.accounts.tinytinyrss.logged = false;
+                _disableAccount('tinytinyrss');
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                document.getElementById('tinytinyrssForm').style.cssText = 'display: block';
+            }
+        }        
         
         // =========================
         // --- App start offline ---
@@ -1298,14 +1409,16 @@
             'local': '',
             'aolreader': '',
             'feedly': '',
-            'theoldreader': ''
+            'theoldreader': '',
+            'tinytinyrss': ''
         };
         var _htmlFeeds = "";
         var _htmlKeywords = '';
         var _feedlyAccessToken = feedly.getToken().access_token;
         var _theoldreaderAuth = theoldreader.getToken().Auth;
         var _aolreaderAccessToken = aolreader.getToken().access_token;
-
+        var _tinytinyrssAuth = (params.accounts.tinytinyrss.logged == true) ? tinytinyrss.getToken().content.session_id : undefined;
+        
         // ========================
         // --- Display keywords ---
         // ========================
@@ -1336,7 +1449,8 @@
             if ((_account == 'local') ||
                 ((_account == 'feedly') && (_feedlyAccessToken !== undefined)) ||
                 ((_account == 'theoldreader') && (_theoldreaderAuth !== undefined)) || 
-                ((_account == 'aolreader') && (_aolreaderAccessToken !== undefined))
+                ((_account == 'aolreader') && (_aolreaderAccessToken !== undefined)) ||
+                ((_account == 'tinytinyrss') && (_tinytinyrssAuth !== undefined)) 
             ){
                 var _class = (_account == 'local') ? "delete" : "delete _online_";
                 
@@ -1879,6 +1993,7 @@
         // subscriptions.feedly.json
         // subscriptions.theoldreader.json
         // subscriptions.aolreader.json
+        // subscriptions.tinytinyrss.json
         // ...
 
         for (var i = 0; i < subscriptions.length; i++) {
@@ -1969,7 +2084,7 @@
     
     /**
      * Disable online account
-     * @param {string} feedly, theoldreader, aolreader
+     * @param {string} feedly, theoldreader, aolreader, tinytinyrss
      * */
     function _disableAccount(_account) {
         my.log('_disableAccount', arguments);
@@ -2082,7 +2197,10 @@
         var promise4 = my._load('subscriptions.aolreader.json').then(function(results) {return results;}
         ).catch(function(error) {_disableAccount('aolreader'); return {};});
 
-        var arrayPromises = [promise1, promise2, promise3, promise4];
+        var promise5 = my._load('subscriptions.tinytinyrss.json').then(function(results) {return results;}
+        ).catch(function(error) {_disableAccount('tinytinyrss'); return {};});
+ 
+        var arrayPromises = [promise1, promise2, promise3, promise4, promise5];
 
         Promise.all(arrayPromises).then(function(arrayOfResults) {
             initAndLoadFeeds(arrayOfResults);
@@ -2391,7 +2509,8 @@
                     if ((myFeedsSubscriptions.local.length > 0) ||
                         (myFeedsSubscriptions.feedly.length > 0) ||
                         (myFeedsSubscriptions.theoldreader.length > 0) || 
-                        (myFeedsSubscriptions.aolreader.length > 0)
+                        (myFeedsSubscriptions.aolreader.length > 0) || 
+                        (myFeedsSubscriptions.tinytinyrss.length > 0)
                     ){
                         gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
                     } else {
@@ -2681,6 +2800,66 @@
         document.body.addEventListener('AolReader.getSubscriptions.error', function(response) {
             my.log('CustomEvent : AolReader.getSubscriptions.error', arguments);
             my.alert(document.webL10n.get('aolreader-get-subscriptions-error') + JSON.stringify(response.detail.message));
+        });
+
+        /* ============================ */
+        /* --- Tiny Tiny Rss Events --- */
+        /* ============================ */
+
+        document.body.addEventListener('TinyTinyRss.login.done', function(response){
+            _loginInProgress['tinytinyrss'] = true;
+            my.log('TinyTinyRss.getToken()', tinytinyrss.getToken());
+            params.accounts.tinytinyrss.logged = true;
+            _saveParams();
+            document.getElementById('tinytinyrssCheckbox').checked = true; // Enable settings checkbox
+            document.getElementById('tinytinyrssForm').style.cssText = 'display: none';
+            tinytinyrss.getSubscriptions(); // CustomEvent TinyTinyRss.getSubscriptions.done, TinyTinyRss.getSubscriptions.error
+        });
+
+        document.body.addEventListener('TinyTinyRss.login.error', function(response){
+            my.log('CustomEvent : TinyTinyRss.login.error', arguments);
+            my.message('Tiny Tiny Rss login error');
+        });
+
+        document.body.addEventListener('TinyTinyRss.getSubscriptions.done', function(response){
+            my.log('CustomEvent : TinyTinyRss.getSubscriptions.done', response);
+            var _subscriptions = response.detail.content;
+            var _feed = '';
+            var _newFeeds = [];
+            for (var i = 0; i < _subscriptions.length; i++) {
+                _feed = {
+                    'url': _subscriptions[i].feed_url,
+                    'pulsations': params['feeds']['defaultPulsations'],
+                    'account': 'tinytinyrss',
+                    'id': _subscriptions[i].id
+                };
+                _newFeeds.push(_feed);
+            }
+            addNewSubscriptions(_newFeeds);
+            gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            
+            if (_loginInProgress['tinytinyrss'] == true ) {
+                _loginInProgress['tinytinyrss'] = false;
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            }
+            
+            my._save("subscriptions.tinytinyrss.json", "application/json", JSON.stringify(myFeedsSubscriptions.tinytinyrss)).then(function(results) {
+                my.log("Save file subscriptions.tinytinyrss.json");
+            }).catch(function(error) {
+                my.error("ERROR saving file subscriptions.tinytinyrss.json", error);
+                my.alert("ERROR saving file subscriptions.tinytinyrss.json");
+            });
+            my._save("cache/tinytinyrss/subscriptions.json", "application/json", JSON.stringify(_subscriptions)).then(function(results) {
+                my.log("Save file cache/tinytinyrss/subscriptions.json");
+            }).catch(function(error) {
+                my.error("ERROR saving file cache/tinytinyrss/subscriptions.json", error);
+                my.alert("ERROR saving file cache/tinytinyrss/subscriptions.json");
+            });
+        });
+
+        document.body.addEventListener('TinyTinyRss.getSubscriptions.error', function(response) {
+            my.log('CustomEvent : TinyTinyRss.getSubscriptions.error', arguments);
+            my.alert(document.webL10n.get('tinytinyrss-get-subscriptions-error') + JSON.stringify(response.detail.message));
         });
 
         // ============
