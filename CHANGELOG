@@ -1,5 +1,5 @@
 --------------------------------------------------------- 
-#myFeeds 1.3.0 (2015-11-19) 
+#myFeeds 1.3.0 (2015-11-21) 
 
 ### New feature(s) 
  
@@ -9,6 +9,7 @@
 
 ### Improvement(s) 
     
+    - #36 Update settings screen theme
     - #37 Update themes for Firefox OS 1.4 
     - #38 Update Russian translations 
     
