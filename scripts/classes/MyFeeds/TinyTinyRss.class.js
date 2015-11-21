@@ -23,7 +23,7 @@
 
 var TinyTinyRss = function() {
     
-    MyFeeds.call(this); /* Call the constructor of parent class. */
+    //MyFeeds.call(this); /* Call the constructor of parent class. */
 
     this.tinytinyrss = {
         //"host"          : "",
@@ -39,12 +39,27 @@ var TinyTinyRss = function() {
     };
 
     _TinyTinyRss = this;
+
 }
+//TinyTinyRss.prototype.__proto__ = MyFeeds.prototype; // http://naholyr.fr/2011/02/le-point-sur-javascript-et-heritage-prototypal/
 TinyTinyRss.prototype = new MyFeeds();
 
 /* =============== */
 /* --- Methods --- */
 /* =============== */
+
+TinyTinyRss.prototype._saveParams = function() {
+    _MyFeeds._save("cache/tinytinyrss/params.json", "application/json", _TinyTinyRss.getParams()).then(function(results) {
+        _MyFeeds.log("Save file cache/tinytinyrss/params.json");
+    }).catch(function(error) {
+        _MyFeeds.error("ERROR saving file cache/tinytinyrss/params.json", error);
+        _MyFeeds.alert("ERROR saving file cache/tinytinyrss/params.json");
+    });
+}
+
+TinyTinyRss.prototype.getParams = function() {
+    return '{"url": "' + _TinyTinyRss.tinytinyrss.url + '", "user": "' + _TinyTinyRss.tinytinyrss.user + '"}';
+}
 
 TinyTinyRss.prototype.setToken = function(token) {
     _MyFeeds.log('TinyTinyRss.prototype.setToken()', arguments);
@@ -101,6 +116,7 @@ TinyTinyRss.prototype.login = function(url, user, password) {
 
     this.post(_url, _params).then(function(response) {
         if (_TinyTinyRss.setToken(response)) {
+            _TinyTinyRss._saveParams(); // Save user name & server URL
             response.lastModified = Math.floor(new Date().getTime() / 1000);
             _TinyTinyRss._save('cache/tinytinyrss/access_token.json', 'application/json', JSON.stringify(response));
             document.body.dispatchEvent(new CustomEvent('TinyTinyRss.login.done', {"detail": response}));
@@ -127,7 +143,7 @@ TinyTinyRss.prototype.getSubscriptions = function () {
     
     var _url = _TinyTinyRss.tinytinyrss.url + '/api/';
     
-    var _params = JSON.stringify({"op": 'getFeeds', "sid": _TinyTinyRss.getToken().content.session_id, "user": _TinyTinyRss.tinytinyrss.user, "password": _TinyTinyRss.tinytinyrss.password});
+    var _params = JSON.stringify({"op": 'getFeeds', "sid": _TinyTinyRss.getToken().content.session_id});
 
     this.post(_url, _params).then(function(response) {
         _TinyTinyRss.tinytinyrss.subscriptions = response;
@@ -151,18 +167,11 @@ TinyTinyRss.prototype.deleteSubscription = function (feedId) {
     
     return new Promise(function(resolve, reject) {
         
-        var _url = _TinyTinyRss.tinytinyrss.host + '/reader/api/0/subscription/edit';
-            
-        var _params = 'output=json' + 
-            '&ac=unsubscribe' + 
-            '&s=' + encodeURIComponent(feedId);
+        var _url = _TinyTinyRss.tinytinyrss.url + '/api/';
         
-        /*if (params.settings.proxy.use) {
-            _urlParams = '&method=post&myAuth=' + _TinyTinyRss.tinytinyrss.token.Auth + '&url=' + encodeURIComponent(_TinyTinyRss.tinytinyrss.host + '/reader/api/0/subscription/edit' + '?output=' + encodeURIComponent(_TinyTinyRss.tinytinyrss.output) + '&ac=unsubscribe&s=' + encodeURIComponent(feedId));
-            _url = 'http://' + params.settings.proxy.host + '/proxy/tinytinyrss/?' + _urlParams;
-        }*/       
-        
-        _TinyTinyRss._delete(_url, _params).then(function(response) {
+        var _params = JSON.stringify({"op": 'unsubscribeFeed', "sid": _TinyTinyRss.getToken().content.session_id, "feed_id": feedId});
+
+        _TinyTinyRss.post(_url, _params).then(function(response) {
             resolve(response);
         }).catch(function(error) {
             reject(Error(JSON.stringify(error)));

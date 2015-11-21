@@ -113,7 +113,7 @@
                                                 // - search keyword value
             },
             "search": {
-                "visible": false                // Form search entries by keyword is visible or not
+                "visible": false                // Set if form "search entries by keyword" is visible or not
             },
             "imagesPreviouslyDisplayed": []     // Store images previously displayed. 
                                                 // Used for displaying images in offline mode.
@@ -278,13 +278,20 @@
             });
         }
 
+        // Get and set Tiny Tiny Rss server URL from cache 
         // Get end set Tiny Tiny Rss token (session_id) from cache
         // then try to update token (session_id)
         // then try to update subscriptions
         
         if (params.accounts.tinytinyrss.logged) {
-            my._load('cache/tinytinyrss/access_token.json').then(function(_token){
             
+            // Set server url from "cache/tinytinyrss/params.json"
+
+            my._load("cache/tinytinyrss/params.json").then(function(response){
+                tinytinyrss.tinytinyrss.url = response.url;
+            }).catch(function(error){
+                tinytinyrss.tinytinyrss.url = '';
+            }).then(function(){return my._load('cache/tinytinyrss/access_token.json');}).then(function(_token){
                 tinytinyrss.setToken(_token);
                 
                 var _now = Math.floor(new Date().getTime() / 1000);
@@ -313,6 +320,7 @@
                 _disableAccount('tinytinyrss');
                 my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Tiny Tiny Rss"}));
             });
+
         }
 
         // ---
@@ -1159,6 +1167,16 @@
         '       <aside class="pack-end"><label class="pack-switch"><input id="logsScreen" type="checkbox"' + _logsScreen + '><span></span></label></aside>',
         '       <a href="#"><p class="double">Logs screen</p></a>',
         '   </li>',
+        
+        '   <li>',
+        '       <aside class="icon"><span data-icon="bug"></span></aside>',
+        '       <aside class="pack-end">',
+        '           <a href="#">',
+        '               <p class="double"><button id="TinyTinyRss_getSubscriptions"><span>Tiny Tiny Rss</span></button></p>',
+        '           </a>',
+        '       </aside>',
+        '       <a href="#"><p class="double">Load subscriptions</p></a>',
+        '   </li>',
 
         '</ul>',
         '</section>'
@@ -1304,6 +1322,12 @@
             }
         }*/
         
+        // Load subscriptions Tiny Tiny RSS
+        
+        document.getElementById("TinyTinyRss_getSubscriptions").onclick = function(event) {
+            tinytinyrss.getSubscriptions();
+        } 
+
         // Save subscriptions
 
         document.getElementById("saveSubscriptions").onclick = function(event) {
@@ -2267,20 +2291,15 @@
             gf.deleteOldEntries(_timestampMax);
         }, 60000);
         
-        // ============================
-        // --- Load visibles images ---
-        // ============================
+        // =============================================
+        // --- Load visibles images & localize times ---
+        // =============================================
         
         setInterval(function() {
-            ui.loadImages();
-        }, 200);
-        
-        // ======================
-        // --- Localize times ---
-        // ======================
-        
-        setInterval(function() {
-            localizeTimes();
+            if (!liveValues.screens.feedsList.opened) {
+                ui.loadImages();
+                localizeTimes();
+            }
         }, 500);
 
         // ==============
