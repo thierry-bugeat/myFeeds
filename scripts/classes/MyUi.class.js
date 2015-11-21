@@ -51,6 +51,7 @@ var dom = {
 };
 var search                  = document.getElementById("search");
 var settingsOpen            = document.getElementById("settingsOpen");
+var settingsClose           = document.getElementById("settingsClose");
 var find_feeds              = document.getElementById("find-feeds");
 var findFeedsOpen           = document.getElementById("findFeedsOpen");
 var findFeedsClose          = document.getElementById("findFeedsClose");
@@ -64,7 +65,7 @@ var searchEntries           = document.getElementById("searchEntries");
 var resetSearchEntries      = document.getElementById("resetSearchEntries");
 var findFeedsReset          = document.getElementById("findFeedsReset");
 var useAnimations           = document.getElementById("useAnimations");
-    
+
 /* ============ */
 /* --- MyUi --- */
 /* ============ */
@@ -93,26 +94,30 @@ MyUi.prototype.init = function() {
     
     setInterval(function() {
         
-        // Scroll in progress
+        if (!liveValues.animations.inProgress) {
+        
+            // Scroll in progress
 
-        if (feeds_list.scrollTop != _topupFeedsList['previousScrollTop']) {
+            if (feeds_list.scrollTop != _topupFeedsList['previousScrollTop']) {
+                
+                if (_topupFeedsList['previousScrollTop'] == 0) { 
+                    _MyUi._onclick(dom.topups['feeds'], 'enable'); 
+                    _topupFeedsList['previousStatus'] = 'enabled'; 
+                }
+                
+                _topupFeedsList['previousScrollTop'] = feeds_list.scrollTop;
+            } 
             
-            if (_topupFeedsList['previousScrollTop'] == 0) { 
-                _MyUi._onclick(dom.topups['feeds'], 'enable'); 
-                _topupFeedsList['previousStatus'] = 'enabled'; 
+            // End scroll
+            
+            else {
+                
+                if ((_topupFeedsList['previousStatus'] == 'enabled') && (feeds_list.scrollTop == 0)) {
+                    _MyUi._onclick(dom.topups['feeds'], 'disable'); 
+                    _topupFeedsList['previousStatus'] = 'disabled';
+                }
             }
-            
-            _topupFeedsList['previousScrollTop'] = feeds_list.scrollTop;
-        } 
-        
-        // End scroll
-        
-        else {
-            
-            if ((_topupFeedsList['previousStatus'] == 'enabled') && (feeds_list.scrollTop == 0)) {
-                _MyUi._onclick(dom.topups['feeds'], 'disable'); 
-                _topupFeedsList['previousStatus'] = 'disabled';
-            }
+
         }
         
     }, 500);
@@ -134,26 +139,30 @@ MyUi.prototype.init = function() {
     
     setInterval(function() {
         
-        // Scroll in progress
+        if (!liveValues.animations.inProgress) {
         
-        if (feeds_entries.scrollTop != _topup['previousScrollTop']) {
+            // Scroll in progress
             
-            if (_topup['previousScrollTop'] == 0) { 
-                _MyUi._onclick(dom.topups['entries'], 'enable'); 
-                _topup['previousStatus'] = 'enabled'; 
+            if (feeds_entries.scrollTop != _topup['previousScrollTop']) {
+                
+                if (_topup['previousScrollTop'] == 0) { 
+                    _MyUi._onclick(dom.topups['entries'], 'enable'); 
+                    _topup['previousStatus'] = 'enabled'; 
+                }
+                
+                _topup['previousScrollTop'] = feeds_entries.scrollTop;
+            } 
+            
+            // End scroll
+            
+            else {
+                
+                if ((_topup['previousStatus'] == 'enabled') && (feeds_entries.scrollTop == 0)) {
+                    _MyUi._onclick(dom.topups['entries'], 'disable'); 
+                    _topup['previousStatus'] = 'disabled';
+                }
             }
-            
-            _topup['previousScrollTop'] = feeds_entries.scrollTop;
-        } 
-        
-        // End scroll
-        
-        else {
-            
-            if ((_topup['previousStatus'] == 'enabled') && (feeds_entries.scrollTop == 0)) {
-                _MyUi._onclick(dom.topups['entries'], 'disable'); 
-                _topup['previousStatus'] = 'disabled';
-            }
+
         }
         
     }, 500);
@@ -486,3 +495,36 @@ MyUi.prototype.isInViewport = function (element) {
 
     return rect.bottom > 0 && rect.top < windowHeight && rect.right > 0 && rect.left < windowWidth
 }
+
+/* ================= */
+/* --- UI Events --- */
+/* ================= */
+
+settingsOpen.onclick    = function(event) {ui._vibrate(); ui._translate(dom['screens']['settings'], 'left');}
+settingsClose.onclick   = function(event) {ui._vibrate(); ui._translate(dom['screens']['settings'], 'right');}
+
+menu.onclick            = function(event) {
+    ui._vibrate();
+    liveValues.screens.feedsList.opened = !liveValues.screens.feedsList.opened;
+    (liveValues.screens.feedsList.opened) ? ui._scrollTo(-1) : ui._scrollTo(0);
+}
+
+closeFeedsList.onclick  = function(event) { 
+    ui._vibrate(); ui._scrollTo(0); 
+    liveValues.screens.feedsList.opened = !liveValues.screens.feedsList.opened;
+}
+
+/* Class _startAnimation_ */
+
+var _animations = document.querySelectorAll("._startAnimation_");
+
+for (var i = 0; i < _animations.length; i++) {
+    _animations[i].onmousedown = function() { 
+        liveValues.animations.inProgress = true;
+    }
+}
+
+/* Detect end of animation */
+
+document.addEventListener("transitionend", function(){liveValues.animations.inProgress = false;}, false);
+

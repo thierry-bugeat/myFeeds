@@ -122,6 +122,9 @@
             "feedsList": {
                 "opened": false                 // Slide right or left entries screen
             }
+        },
+        "animations": {
+            "inProgress": false                 // Set to "true" when user click on elements with "_startAnimation_" class.
         }
     }
     
@@ -351,16 +354,9 @@
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }
     }
-    menu.onclick            = function(event) {
-        liveValues.screens.feedsList.opened = !liveValues.screens.feedsList.opened;
-        ui._vibrate();
-        (liveValues.screens.feedsList.opened) ? ui._scrollTo(-1) : ui._scrollTo(0);
-    }
+
     closeMainEntry.onclick  = function(event) { ui._vibrate(); ui._quickScrollTo(0); ui.echo("browser", "", ""); }
-    closeFeedsList.onclick  = function(event) { 
-        ui._vibrate(); ui._scrollTo(0); 
-        liveValues.screens.feedsList.opened = !liveValues.screens.feedsList.opened;
-    }
+
     findFeedsOpen.onclick   = function(event) { ui._vibrate(); ui._scrollTo(-2); }
     findFeedsClose.onclick  = function(event) { ui._vibrate(); ui._scrollTo(-1); }
     
@@ -378,8 +374,7 @@
     }
     
     findFeedsReset.onclick  = function(event) { ui._vibrate(); ui.echo('find-feeds', '', ''); }
-    settingsOpen.onclick    = function(event) { ui._vibrate(); ui._translate(dom['screens']['settings'], 'left'); }
-    settingsClose.onclick   = function(event) { ui._vibrate(); ui._translate(dom['screens']['settings'], 'right'); }
+
     displayGrid.onclick     = function(event) {
         if (params.entries.theme != 'grid') {
             params.entries.theme = "grid";
@@ -1441,8 +1436,9 @@
         var _feedlyAccessToken = feedly.getToken().access_token;
         var _theoldreaderAuth = theoldreader.getToken().Auth;
         var _aolreaderAccessToken = aolreader.getToken().access_token;
-        var _tinytinyrssAuth = (params.accounts.tinytinyrss.logged == true) ? tinytinyrss.getToken().content.session_id : undefined;
-        
+        var _tinytinyrssAuth = (params.accounts.tinytinyrss.logged == true && tinytinyrss.getToken().content !== undefined) ? tinytinyrss.getToken().content.session_id : undefined;
+        // @todo: Why "content" above is sometimes undefined ?
+
         // ========================
         // --- Display keywords ---
         // ========================
@@ -2296,7 +2292,7 @@
         // =============================================
         
         setInterval(function() {
-            if (!liveValues.screens.feedsList.opened) {
+            if (!liveValues.animations.inProgress) {
                 ui.loadImages();
                 localizeTimes();
             }
