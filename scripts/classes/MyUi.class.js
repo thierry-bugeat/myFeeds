@@ -324,6 +324,12 @@ MyUi.prototype._loading = function(percentage) {
  * 1 : Entry        (main)
  * */
 MyUi.prototype._scrollTo = function(screenX) {
+    if (screenX == 0) {
+        liveValues.screens.feedsList.opened = false;
+    } else if (screenX == -1) {
+        liveValues.screens.feedsList.opened = true;
+    }
+
     if (params.settings.ui.animations) {
         _MyUi._smoothScrollTo(screenX, 250);
     } else {
@@ -505,14 +511,10 @@ settingsClose.onclick   = function(event) {ui._vibrate(); ui._translate(dom['scr
 
 menu.onclick            = function(event) {
     ui._vibrate();
-    liveValues.screens.feedsList.opened = !liveValues.screens.feedsList.opened;
-    (liveValues.screens.feedsList.opened) ? ui._scrollTo(-1) : ui._scrollTo(0);
+    (liveValues.screens.feedsList.opened) ? ui._scrollTo(0) : ui._scrollTo(-1);
 }
 
-closeFeedsList.onclick  = function(event) { 
-    ui._vibrate(); ui._scrollTo(0); 
-    liveValues.screens.feedsList.opened = !liveValues.screens.feedsList.opened;
-}
+closeFeedsList.onclick  = function(event) {ui._vibrate(); ui._scrollTo(0);}
 
 /* Class _startAnimation_ */
 
