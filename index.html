@@ -24,6 +24,7 @@
     <meta name="theme-color" content="#CD6723" id="theme-color">
     <title data-l10n-id="app-title">my Feeds</title>
     <link rel="icon" type="image/png" href="images/icon-128.png">
+    <link href="style/ffos1.4.css" type="text/css" rel="stylesheet">
     <link href="style/vars.css" type="text/css" rel="stylesheet">
     <link href="style/colors.css" type="text/css" rel="stylesheet">
     <link href="style/fonts.css" type="text/css" rel="stylesheet">
@@ -47,8 +48,6 @@
 <body>
 
     <div id="loading"></div>
-    
-    <div id="main">
     
     <!-- ================= -->
     <!-- Find feeds screen -->
@@ -98,18 +97,20 @@
         
         <section role="myFooter" class="">
             <header>
-                <button id="closeFeedsList"><span data-icon="close"></span></button>
+                <button id="closeFeedsList" class="_startAnimation_"><span data-icon="close"></span></button>
                 <button id="findFeedsOpen" class="_online_"><span data-icon="add"></span></button>
                 <button id="topupFeedsList"><span data-icon="topup"></span></button>
             </header>
         </section>
         
     </div>
-    
+
     <!-- =========== -->
     <!-- Main screen -->
     <!-- =========== -->
     
+    <div id="main">
+
     <div id="feeds-entries-container">
 
         <section role="myHeader">
@@ -143,38 +144,17 @@
     
         <section role="myFooter" class="">
             <header>
-                <button id="menu"><span data-icon="menu"></span></button>
+                <button id="menu" class="_startAnimation_"><span data-icon="menu"></span></button>
                 <button id="sync" class="_online_"><span data-icon="sync"></span></button>
                 <button id="topup"><span data-icon="topup"></span></button>
                 <button id="searchEntries"><span data-icon="search"></span></button>
-                <button id="settingsOpen"><span data-icon="settings"></span></button>
+                <button id="settingsOpen" class="_startAnimation_"><span data-icon="settings"></span></button>
             </header>
         </section>
     
     </div>
     
-    <!-- =============== -->
-    <!-- Settings screen -->
-    <!-- =============== -->
-    
-    <div role="region" data-type="sidebar" id="settings-container">
-        
-        <section role="myHeader">
-            <header class="mySystemHeader">
-                <h1 data-l10n-id="my-settings">my Settings</h1>
-            </header>
-        </section>
-    
-        <div id="settings" class="scrollable"></div>
-        
-        <section role="myFooter" class="">
-            <header>
-                <button id="settingsClose"><span data-icon="close"></span></button>
-            </header>
-        </section>
-        
-    </div>
-    
+   
     <!-- =============== -->
     <!-- One news screen -->
     <!-- =============== -->
@@ -211,6 +191,28 @@
     
     </div>
 
+    <!-- =============== -->
+    <!-- Settings screen -->
+    <!-- =============== -->
+    
+    <div role="region" data-type="sidebar" id="settings-container">
+        
+        <section role="myHeader">
+            <header class="mySystemHeader">
+                <h1 data-l10n-id="my-settings">my Settings</h1>
+            </header>
+        </section>
+    
+        <div id="settings" class="scrollable"></div>
+        
+        <section role="myFooter" class="">
+            <header>
+                <button id="settingsClose" class="_startAnimation_"><span data-icon="close"></span></button>
+            </header>
+        </section>
+        
+    </div>
+ 
 </body>
 
 <!-- Inline CSS -->
@@ -234,6 +236,7 @@
 <script type="text/javascript" src="scripts/classes/MyUi.class.js"></script>
 <script type="text/javascript" src="scripts/classes/MyFeeds/Feedly.class.js"></script>
 <script type="text/javascript" src="scripts/classes/MyFeeds/TheOldReader.class.js"></script>
+<script type="text/javascript" src="scripts/classes/MyFeeds/TinyTinyRss.class.js"></script>
 <script type="text/javascript" src="scripts/classes/MyFeeds/AolReader.class.js"></script>
 <script type="text/javascript" src="scripts/classes/MyFeeds/GoogleFeed.class.js"></script>
 

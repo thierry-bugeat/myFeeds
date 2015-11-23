@@ -24,13 +24,15 @@
     var theoldreader = new TheOldReader();
     var feedly = new Feedly();
     var aolreader = new AolReader();
+    var tinytinyrss = new TinyTinyRss();
 
     var gf = new GoogleFeed();
 
-    var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': []} ; // Store informations about feeds (urls)
+    var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': [], 'tinytinyrss': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 2.1,
+        "version": 2.4,
+        "changelog": "https://git.framasoft.org/thierry-bugeat/myFeeds/raw/master/CHANGELOG",
         "feeds": {
             "selectedFeed": "",                 // Display all feeds if empty otherwise display specified feed url
             "defaultPulsations": 5              // Default feed pulsations
@@ -59,6 +61,10 @@
             "aolreader": {
                 "title": "Aol Reader",
                 "logged": false
+            },
+            "tinytinyrss": {
+                "title": "Tiny Tiny Rss",
+                "logged": false
             }
         },
         "settings": {
@@ -77,7 +83,18 @@
             "update": {
                 "every": [300, 900, 1800, 3600] // In seconds 5mn, 15mn, 30mn, 60mn
             },
-            "days": [3, 5, 7, 10]
+            "days": [3, 5, 7, 10],
+            "proxy": {
+                "use": false,                   // Use proxy to get url content
+                "host": "54.229.143.103",
+                "availability": {
+                    "local": true,
+                    "feedly": false,            // Not yet implemented
+                    "theoldreader": true,
+                    "aolreader": false,         // Not yet implemented
+                    "tinytinyrss": false        // Not yet implemented
+                }
+            }
         }
     }
     
@@ -96,10 +113,19 @@
                                                 // - search keyword value
             },
             "search": {
-                "visible": false                // Form search entries by keyword is visible or not
+                "visible": false                // Set if form "search entries by keyword" is visible or not
             },
-            "imagesPreviouslyDisplayed": []     // Store images previously displayed. 
+            "imagesPreviouslyDisplayed": [],    // Store images previously displayed. 
                                                 // Used for displaying images in offline mode.
+            "html": []
+        },
+        "screens": {
+            "feedsList": {
+                "opened": false                 // Slide right or left entries screen
+            }
+        },
+        "animations": {
+            "inProgress": false                 // Set to "true" when user click on elements with "_startAnimation_" class.
         }
     }
     
@@ -109,7 +135,7 @@
     
     var _dspEntriesTimeout = '';
     
-    var _loginInProgress = {"local": false, "feedly": false, "theoldreader": false, "aolreader": false}
+    var _loginInProgress = {"local": false, "feedly": false, "theoldreader": false, "aolreader": false, "tinytinyrss": false}
 
     // Network Connection
 
@@ -256,6 +282,51 @@
             });
         }
 
+        // Get and set Tiny Tiny Rss server URL from cache 
+        // Get end set Tiny Tiny Rss token (session_id) from cache
+        // then try to update token (session_id)
+        // then try to update subscriptions
+        
+        if (params.accounts.tinytinyrss.logged) {
+            
+            // Set server url from "cache/tinytinyrss/params.json"
+
+            my._load("cache/tinytinyrss/params.json").then(function(response){
+                tinytinyrss.tinytinyrss.url = response.url;
+            }).catch(function(error){
+                tinytinyrss.tinytinyrss.url = '';
+            }).then(function(){return my._load('cache/tinytinyrss/access_token.json');}).then(function(_token){
+                tinytinyrss.setToken(_token);
+                
+                var _now = Math.floor(new Date().getTime() / 1000);
+                var _expires_in = _token.expires_in || 604800;
+                var _tokenIsExpired = ((_now - _token.lastModified) > _expires_in) ? true : false;
+                
+                if ((!navigator.onLine) && (_tokenIsExpired)) {
+                    _disableAccount('tinytinyrss');
+                }
+                    
+                if (navigator.onLine) {
+                    if (_tokenIsExpired) {
+                        tinytinyrss.updateToken().catch(function(error) {
+                            _disableAccount('tinytinyrss');
+                        }).then(function(){
+                            if (params.accounts.tinytinyrss.logged) {
+                                tinytinyrss.getSubscriptions();
+                            }
+                        });
+                    } else {
+                        tinytinyrss.getSubscriptions();
+                    }
+                }
+                
+            }).catch(function(error) {
+                _disableAccount('tinytinyrss');
+                my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Tiny Tiny Rss"}));
+            });
+
+        }
+
         // ---
         
     }).catch(function(error) {
@@ -284,11 +355,11 @@
             gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
         }
     }
-    menu.onclick            = function(event) { ui._vibrate(); ui._scrollTo(1); }
-    closeMainEntry.onclick  = function(event) { ui._vibrate(); ui._quickScrollTo(2); ui.echo("browser", "", ""); }
-    closeFeedsList.onclick  = function(event) { ui._vibrate(); ui._scrollTo(2); }
-    findFeedsOpen.onclick   = function(event) { ui._vibrate(); ui._scrollTo(0); }
-    findFeedsClose.onclick  = function(event) { ui._vibrate(); ui._scrollTo(1); }
+
+    closeMainEntry.onclick  = function(event) { ui._vibrate(); ui._quickScrollTo(0); ui.echo("browser", "", ""); }
+
+    findFeedsOpen.onclick   = function(event) { ui._vibrate(); ui._scrollTo(-2); }
+    findFeedsClose.onclick  = function(event) { ui._vibrate(); ui._scrollTo(-1); }
     
     findFeedsSubmit.onclick = function(event) { 
         ui._vibrate();
@@ -304,8 +375,7 @@
     }
     
     findFeedsReset.onclick  = function(event) { ui._vibrate(); ui.echo('find-feeds', '', ''); }
-    settingsOpen.onclick    = function(event) { ui._vibrate(); ui._scrollTo(3); }
-    settingsClose.onclick   = function(event) { ui._vibrate(); ui._scrollTo(2); }
+
     displayGrid.onclick     = function(event) {
         if (params.entries.theme != 'grid') {
             params.entries.theme = "grid";
@@ -345,6 +415,8 @@
             
             _nb = _divs.length;
             
+            var _o = document.createElement('div'); // v4 
+
             for (var i = 0; i < _nb; i++) {
                 if ((_divs[i].classList.contains("_small_")) && (!params.entries.displaySmallEntries)) {
                     _divs[i].classList.remove('_show');
@@ -360,9 +432,27 @@
                     */
 
                     // v2 Search only in entries titles
-                    var _text = "";
+                    /*var _text = "";
                     var childrens = _divs[i].children;
                     for (var j = 0; j < childrens.length; j++) {
+                        //console.log(i + ' / ' + j + ' / ' + childrens[j].textContent.toLowerCase());
+                        if (childrens[j].className == 'my-'+params.entries.theme+'-title') {
+                            _text = childrens[j].textContent.toLowerCase();
+                            break;
+                        }
+                    }*/
+
+                    // v4 Search
+                                        
+                    var _i = _divs[i].getAttribute('i');
+                    
+                    _o.innerHTML = liveValues['entries']['html'][_i]; 
+                    
+                    var _text = "";
+                    var childrens = _o.children;
+                    
+                    for (var j = 0; j < childrens.length; j++) {
+                        //console.log(i + ' / ' + j + ' / ' + childrens[j].textContent.toLowerCase());
                         if (childrens[j].className == 'my-'+params.entries.theme+'-title') {
                             _text = childrens[j].textContent.toLowerCase();
                             break;
@@ -380,6 +470,7 @@
                     }
                 }
             }
+            delete _o; // v4
         }
     }
     
@@ -481,7 +572,8 @@
             if ((myFeedsSubscriptions.local.length > 0) ||
                 (myFeedsSubscriptions.feedly.length > 0) ||
                 (myFeedsSubscriptions.theoldreader.length > 0) || 
-                (myFeedsSubscriptions.aolreader.length > 0)
+                (myFeedsSubscriptions.aolreader.length > 0) ||
+                (myFeedsSubscriptions.tinytinyrss.length > 0)
             ){
                 gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
             } else {
@@ -540,6 +632,9 @@
                         my.alert("ERROR saving file " + error.filename);
                     });
                 }).catch(function(error) {
+                    my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
+                        my.log('Save subscriptions.' + _account + '.json');
+                    }).catch(function(error) {});
                     my.message(document.webL10n.get('error-cant-delete-this-feed'));
                     my.error(error);
                 });
@@ -557,6 +652,9 @@
                         my.alert("ERROR saving file " + error.filename);
                     });
                 }).catch(function(error) {
+                    my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
+                        my.log('Save subscriptions.' + _account + '.json');
+                    }).catch(function(error) {});
                     my.message(document.webL10n.get('error-cant-delete-this-feed'));
                     my.error(error);
                 });
@@ -574,11 +672,34 @@
                         my.alert("ERROR saving file " + error.filename);
                     });
                 }).catch(function(error) {
+                    my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
+                        my.log('Save subscriptions.' + _account + '.json');
+                    }).catch(function(error) {});
                     my.message(document.webL10n.get('error-cant-delete-this-feed'));
                     my.error(error);
                 });
             }
             
+            // (3e) Delete from Tiny Tiny Rss
+
+            if (_account == 'tinytinyrss') {
+                tinytinyrss.deleteSubscription(_feedId).then(function(response){
+                    my.message(document.webL10n.get('feed-has-been-deleted'));
+                    my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
+                        my.log('Save subscriptions.' + _account + '.json');
+                    }).catch(function(error) {
+                        my.error("ERROR saving file ", error);
+                        my.alert("ERROR saving file " + error.filename);
+                    });
+                }).catch(function(error) {
+                    my._save("subscriptions." + _account + ".json", "application/json", JSON.stringify(myFeedsSubscriptions[_account])).then(function(results) {
+                        my.log('Save subscriptions.' + _account + '.json');
+                    }).catch(function(error) {});
+                    my.message(document.webL10n.get('error-cant-delete-this-feed'));
+                    my.error(error);
+                });
+            }
+
             // (4) Delete entries
             
             gf.deleteEntries(_account, _feedId);
@@ -588,7 +709,8 @@
             if ((myFeedsSubscriptions.local.length > 0) ||
                 (myFeedsSubscriptions.feedly.length > 0) ||
                 (myFeedsSubscriptions.theoldreader.length > 0) || 
-                (myFeedsSubscriptions.aolreader.length > 0)
+                (myFeedsSubscriptions.aolreader.length > 0) ||
+                (myFeedsSubscriptions.tinytinyrss.length > 0) 
             ){
                 gf.setFeedsSubscriptions(myFeedsSubscriptions);
                 gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
@@ -735,6 +857,14 @@
             _aolreaderAccount = "";
         }
 
+        // Tiny Tiny Rss selector
+
+        if (params.accounts.tinytinyrss.logged) {
+            _tinytinyrssAccount = 'checked=""';
+        } else {
+            _tinytinyrssAccount = "";
+        }
+
         // Use animations selector
 
         if (params.settings.ui.animations) {
@@ -754,6 +884,12 @@
         params.settings.developper_menu.logs.screen ?
             _logsScreen = 'checked=""':
             _logsScreen = "";
+
+        // Proxy selector
+
+        params.settings.proxy.use ?
+            _useProxy = 'checked=""':
+            _useProxy = "";
 
         // Update every
 
@@ -814,54 +950,253 @@
         // ---
 
         var _htmlSettings = [
-        '<h2 data-l10n-id="settings-feeds">' + document.webL10n.get('settings-feeds') + '</h2>                                                                                            ',
-        '<ul>                                                                                                                                               ',
-        '   <li class="_online_"><span data-icon="reload"></span><my data-l10n-id="settings-last-update">' + document.webL10n.get('settings-last-update') + '</my>' + _now.toLocaleTimeString(userLocale) + '</li>      ',
-        '   <li class="_online_"><span data-icon="sync"></span><my data-l10n-id="settings-update-every">' + document.webL10n.get('settings-update-every') + '</my>' + _htmlSelectUpdateEvery + '</li>          ',
-        '   <li><span data-icon="sd-card"></span><my data-l10n-id="my-subscriptions-opml">' + document.webL10n.get('my-subscriptions-opml') + '</my><div><button id="saveSubscriptions"><span data-l10n-id="save">save</span></button></div></li>',
-        '</ul>                                                                                                                                              ',
-        '<h2 data-l10n-id="settings-news">' + document.webL10n.get('settings-news') + '</h2>                                                                ',
-        '<ul>                                                                                                                                               ',
-        '   <li><span data-icon="messages"></span><my data-l10n-id="settings-small-news">' + document.webL10n.get('settings-small-news') + '</my><div><label class="pack-switch"><input id="toggleDisplaySmallEntries" type="checkbox" ' + _displaySmallEntriesChecked + '><span></span></label></div></li>',
-        '   <li><span data-icon="messages"></span><my data-l10n-id="settings-number-of-days">' + document.webL10n.get('settings-number-of-days') + '</my>' + _htmlMaxNbDays + '</li>',
-        '</ul>                                                                                                                                              ',
-        '<h2 data-l10n-id="settings-online-accounts">' + document.webL10n.get('settings-online-accounts') + '</h2>                                                                                  ',
-        '<ul class="feedly theoldreader aolreader">                                                                                                                   ',
-        '   <li class="_online_"><span data-icon="messages"></span>Aol Reader<div><label class="pack-switch"><input id="aolreaderLogin" type="checkbox" ' + _aolreaderAccount + '><span></span></label></div></li>',
-        '   <li class="_online_"><span data-icon="messages"></span>Feedly<div><label class="pack-switch"><input id="feedlyLogin" type="checkbox" ' + _feedlyAccount + '><span></span></label></div></li>',
+        '<h2 data-l10n-id="settings-feeds">' + document.webL10n.get('settings-feeds') + '</h2>',
+        '<section data-type="list">',
+        '<ul>',
+        
         '   <li class="_online_">',
-        '       <span data-icon="messages"></span>The Old Reader<div><label class="pack-switch"><input id="theoldreaderCheckbox" type="checkbox" ' + _theoldreaderAccount + '><span></span></label></div>',
-        '       <div id="theoldreaderForm">                                                                                                                 ',
-        '           <p><input id="theoldreaderEmail" required="" placeholder="Email" name="theoldreaderEmail" type="email" value=""></p>                    ',
-        '           <p><input id="theoldreaderPasswd" required="" placeholder="Password" name="theoldreaderPasswd" type="password" value=""><p>             ',
-        '       </divn>                                                                                                                                     ',
-        '   </li>                                                                                                                                           ',
-        '</ul>                                                                                                                                              ',
-        '<h2 data-l10n-id="user-interface">' + document.webL10n.get('user-interface') + '</h2>                                                                                            ',
-        '<ul>                                                                                                                                               ',
-        '   <li><span data-icon="vibrate"></span><my data-l10n-id="vibrate-on-click">' + document.webL10n.get('vibrate-on-click') + '</my><div><label class="pack-switch"><input id="toggleVibrate" type="checkbox" ' + _vibrateOnClick + '><span></span></label></div></li>',
-        '   <li><span data-icon="languages"></span><my data-l10n-id="settings-ui-language">' + document.webL10n.get('settings-ui-language') + '</my>' +  _htmlLanguages + '</li>',
-        '</ul>                                                                                                                                              ',
-        '<h2 data-l10n-id="about">' + document.webL10n.get('about') + '</h2>                                                                                ',
-        '<ul>                                                                                                                                               ',
-        '   <li id="appVersion"><span data-icon="messages"></span><my data-l10n-id="app-title">' + document.webL10n.get('app-title') + '</my><div>' + myManifest.version + '</div></li>',
-        '   <li><span data-icon="messages"></span><my data-l10n-id="author">' + document.webL10n.get('author') + '</my><div>' + myManifest.developer.name + '</div></li>                   ',
-        '   <li class="about _online_"><span data-icon="messages"></span><my data-l10n-id="website">' + document.webL10n.get('website') + '</my><div><a href="' + myManifest.developer.url + '" target="_blank">url</a></div></li>',
-        '   <li class="about _online_"><span data-icon="messages"></span><my data-l10n-id="git-repository">' + document.webL10n.get('git-repository') + '</my><div><a href="' + document.webL10n.get('git-url') + '" target="_blank">url</a></div></li>',
-        '   <li class="about _online_"><span data-icon="messages"></span><my data-l10n-id="settings-translations">' + document.webL10n.get('settings-translations') + '</my><ul><a href="https://github.com/Sergio-Muriel" target="_blank">Sergio Muriel (es)</a><br><a href="https://github.com/evertton" target="_blank">Evertton de Lima (pt)</a><br><a>Пётр Жоря (ru)</a></ul></li>',
-        '</ul>                                                                                                                                              ',
-        '<h2 class="developper-menu" data-l10n-id="settings-developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>                                                          ',
-        '<ul class="developper-menu">                                                                                                                       ',
-        '   <li><span data-icon="wifi-4"></span><my data-l10n-id="settings-connection">' + document.webL10n.get('settings-connection') + '</my><div id="onLine">NA</div></li>',
-        '   <li><span data-icon="play-circle"></span><my data-l10n-id="settings-use-animations">' + document.webL10n.get('settings-use-animations') + '</my><div><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></div></li>',
-        '   <li><span data-icon="sd-card"></span><my data-l10n-id="my-subscriptions">' + document.webL10n.get('my-subscriptions') + '</my><div><button id="loadSubscriptions"><span data-l10n-id="load">load</span></button></div></li>',
-        '   <li><span data-icon="bug"></span>Logs console<div><label class="pack-switch"><input id="logsConsole" type="checkbox" ' + _logsConsole + '><span></span></label></div></li>',
-        '   <li><span data-icon="bug"></span>Logs screen<div><label class="pack-switch"><input id="logsScreen" type="checkbox" ' + _logsScreen + '><span></span></label></div></li>',
-        '</ul>                                                                                                                                              '
+        '       <aside class="icon"><span data-icon="reload"></span></aside>',
+        '       <aside class="pack-end"><p class="double">' + _now.toLocaleTimeString(userLocale) + '</p></aside>',
+        '       <a href="#"><p class="double"><my data-l10n-id="settings-last-update">' + document.webL10n.get('settings-last-update') + '</my></p></a>',
+        '   </li>',
+
+        '   <li class="_online_">',
+        '       <aside class="icon"><span data-icon="sync"></span></aside>',
+        '       <a>',
+        '           <p class="double"><my data-l10n-id="settings-update-every">' + document.webL10n.get('settings-update-every') + '</my></p>',
+        '       </a>',
+        '       ' + _htmlSelectUpdateEvery,
+        '   </li>',
+
+
+
+        '   <li>',
+        '       <aside class="icon"><span data-icon="sd-card"></span></aside>',
+        '       <aside class="pack-end"><button id="saveSubscriptions"><span data-l10n-id="save">' + document.webL10n.get('save') + '</span></button></aside>',
+        '       <a><p class="double"><my data-l10n-id="my-subscriptions-opml">' + document.webL10n.get('my-subscriptions-opml') + '</my></p></a>',
+        '   </li>',
+
+        '</ul>',
+        '</section>',
+        
+        '<h2 data-l10n-id="settings-news">' + document.webL10n.get('settings-news') + '</h2>',
+        '<section data-type="list">',
+        '<ul>',
+        
+        '   <li>',
+        '       <aside class="icon"><span data-icon="messages"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="toggleDisplaySmallEntries" type="checkbox"' + _displaySmallEntriesChecked + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double"><my data-l10n-id="settings-small-news">' + document.webL10n.get('settings-small-news') + '</my></p>',
+        '       </a>',
+        '   </li>',
+
+        '   <li>',
+        '       <aside class="icon"><span data-icon="time"></span></aside>',
+        '       <a>',
+        '           <p class="double"><my data-l10n-id="settings-number-of-days">' + document.webL10n.get('settings-number-of-days') + '</my></p>',
+        '       </a>',
+        '       ' + _htmlMaxNbDays,
+        '   </li>',
+        
+        '</ul>',
+        '</section>',
+        
+        '<h2 data-l10n-id="settings-online-accounts">' + document.webL10n.get('settings-online-accounts') + '</h2>',
+        '<section data-type="list">',
+        '<ul class="feedly theoldreader aolreader">',
+        
+        '   <li class="_online_ _onlineAccount_ ' + (params.settings.proxy.availability.aolreader ? '' : '_proxyNotAvailable_') + '">',
+        '       <aside class="icon"><span data-icon="addons"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="aolreaderLogin" type="checkbox"' + _aolreaderAccount + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double">Aol Reader</p>',
+        '       </a>',
+        '   </li>',
+
+        '   <li class="_online_ _onlineAccount_ ' + (params.settings.proxy.availability.feedly ? '' : '_proxyNotAvailable_') + '">',
+        '       <aside class="icon"><span data-icon="addons"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="feedlyLogin" type="checkbox"' + _feedlyAccount + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double">Feedly</p>',
+        '       </a>',
+        '   </li>',
+
+        '   <li class="_online_ _onlineAccount_ ' + (params.settings.proxy.availability.theoldreader ? '' : '_proxyNotAvailable_') + '">',
+        '       <aside class="icon"><span data-icon="addons"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="theoldreaderCheckbox" type="checkbox"' + _theoldreaderAccount + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double">The Old Reader</p>',
+        '       </a>',
+        '       <div id="theoldreaderForm">',
+        '           <p><input id="theoldreaderEmail" required="" placeholder="Email" name="theoldreaderEmail" type="email" value=""></p>',
+        '           <p><input id="theoldreaderPasswd" required="" placeholder="Password" name="theoldreaderPasswd" type="password" value=""><p>',
+        '       </div>',
+        '   </li>',
+ 
+        '   <li class="_online_ _onlineAccount_ ' + (params.settings.proxy.availability.tinytinyrss ? '' : '_proxyNotAvailable_') + '">',
+        '       <aside class="icon"><span data-icon="addons"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="tinytinyrssCheckbox" type="checkbox"' + _tinytinyrssAccount + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double">Tiny Tiny Rss</p>',
+        '       </a>',
+        '       <div id="tinytinyrssForm">',
+        '           <p><input id="tinytinyrssUrl" required="" placeholder="Url" name="tinytinyrssUrl" type="text" value=""></p>',
+        '           <p><input id="tinytinyrssUser" required="" placeholder="Login" name="tinytinyrssUser" type="text" value=""></p>',
+        '           <p><input id="tinytinyrssPasswd" required="" placeholder="Password" name="tinytinyrssPasswd" type="password" value=""><p>',
+        '       </div>',
+        '   </li>',
+        
+        '</ul>',
+        '</section>',
+        
+        '<h2 data-l10n-id="user-interface">' + document.webL10n.get('user-interface') + '</h2>',
+        '<section data-type="list">',
+        '<ul>',
+        
+        '   <li>',
+        '       <aside class="icon"><span data-icon="play-circle"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="useAnimations" type="checkbox" ' + _useAnimations + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double"><my data-l10n-id="settings-use-animations">' + document.webL10n.get('settings-use-animations') + '</my></p>',
+        '       </a>',
+        '   </li>',
+        
+        '   <li>',
+        '       <aside class="icon"><span data-icon="vibrate"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="toggleVibrate" type="checkbox"' + _vibrateOnClick + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double"><my data-l10n-id="vibrate-on-click">' + document.webL10n.get('vibrate-on-click') + '</my></p>',
+        '       </a>',
+        '   </li>',
+
+        '   <li>',
+        '       <aside class="icon"><span data-icon="languages"></span></aside>',
+        '       <a>',
+        '           <p class="double"><my data-l10n-id="settings-ui-language">' + document.webL10n.get('settings-ui-language') + '</my></p>',
+        '       </a>',
+        '       ' + _htmlLanguages,
+        '   </li>',
+        
+        '</ul>',
+        '</section>',
+        
+        '<h2 data-l10n-id="about">' + document.webL10n.get('about') + '</h2>',
+        '<section data-type="list">',
+        '<ul>',
+
+        '   <li id="appVersion">',
+        '       <aside class="icon"><span data-icon="wifi-4"></span></aside>',
+        '       <aside class="pack-end"><p class="double">' + myManifest.version + '</p></aside>',
+        '       <a href="#"><p class="double"><my data-l10n-id="app-title">' + document.webL10n.get('app-title') + '</my></p></a>',
+        '   </li>',
+ 
+        '   <li>',
+        '       <aside class="icon"><span data-icon="contacts"></span></aside>',
+        '       <aside class="pack-end"><p class="double">' + myManifest.developer.name + '</p></aside>',
+        '       <a href="#"><p class="double"><my data-l10n-id="author">' + document.webL10n.get('author') + '</my></p></a>',
+        '   </li>',
+ 
+        '   <li class="_online_">',
+        '       <aside class="icon"><span data-icon="help"></span></aside>',
+        '       <aside class="pack-end">',
+        '           <a href="' + params.changelog + '" target="_blank">',
+        '               <p class="double"><button><span>www</span></button></p>',
+        '           </a>',
+        '       </aside>',
+        '       <a href="' + params.changelog + '" target="_blank">',
+        '           <p class="double"><my data-l10n-id="settings-release-notes">' + document.webL10n.get('settings-release-notes') + '</my></p>',
+        '       </a>',
+        '   </li>',
+ 
+        '   <li class="about _online_">',
+        '       <aside class="icon"><span data-icon="firefox"></span></aside>',
+        '       <aside class="pack-end">',
+        '           <a href="' + myManifest.developer.url + '" target="_blank">',
+        '               <p class="double"><button><span>www</span></button></p>',
+        '           </a>',
+        '       </aside>',
+        '       <a href="' + myManifest.developer.url + '" target="_blank">',
+        '           <p class="double"><my data-l10n-id="website">' + document.webL10n.get('website') + '</my></p>',
+                '</a>',
+        '   </li>',
+        
+        '   <li class="about _online_">',
+        '       <aside class="icon"><span data-icon="firefox"></span></aside>',
+        '       <aside class="pack-end">',
+        '           <a href="' + document.webL10n.get('git-url') + '" target="_blank">',
+        '               <p class="double"><button><span>www</span></button></p>',
+        '           </a>',
+        '       </aside>',
+        '       <a href="' + document.webL10n.get('git-url') + '" target="_blank">',
+        '           <p class="double"><my data-l10n-id="git-repository">' + document.webL10n.get('git-repository') + '</my></p>',
+        '       </a>',
+        '   </li>',
+ 
+        '   <li class="about _online_">',
+        '       <aside class="icon"><span data-icon="languages"></span></aside>',
+        '       <a href="#">',
+        '           <p class="double"><my data-l10n-id="settings-translations">' + document.webL10n.get('settings-translations') + '</my></p>',
+        '       </a>',
+        '       <ul>',
+        '           <li><a href="https://github.com/Sergio-Muriel" target="_blank">Sergio Muriel (es)</a></li>',
+        '           <li><a href="https://github.com/evertton" target="_blank">Evertton de Lima (pt)</a></li>',
+        '           <li><a>Пётр Жоря (ru)</a></li>',
+        '       </ul>',
+        '   </li>',
+
+        '</ul>',
+        '</section>',
+        
+        '<h2 class="developper-menu" data-l10n-id="settings-developper-menu">' + document.webL10n.get('settings-developper-menu') + '</h2>',
+        '<section data-type="list">',
+        '<ul class="developper-menu">',
+
+        '   <li>',
+        '       <aside class="icon"><span data-icon="wifi-4"></span></aside>',
+        '       <aside class="pack-end"><p class="double" id="onLine">NA</p></aside>',
+        '       <a href="#"><p class="double"><my data-l10n-id="settings-connection">' + document.webL10n.get('settings-connection') + '</my></p></a>',
+        '   </li>',
+
+        '   <li class="_online_">',
+        '       <aside class="icon"><span data-icon="addons"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="useProxy" type="checkbox" ' + _useProxy + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p><my data-l10n-id="settings-use-proxy">' + document.webL10n.get('settings-use-proxy') + '</my></p>',
+        '           <p><my data-l10n-id="settings-proxy-not-available">' + document.webL10n.get('settings-proxy-not-available') + '</my></p>',
+        '       </a>',
+        '   </li>',
+
+        '   <!-- li>',
+        '       <aside class="icon"><span data-icon="sd-card"></span></aside>',
+        '       <aside class="pack-end"><div><button id="loadSubscriptions"><span data-l10n-id="load">load</span></button></div></aside>',
+        '       <a href="#"><p class="double"><my data-l10n-id="my-subscriptions">' + document.webL10n.get('my-subscriptions') + '</my></p></a>',
+        '   </li -->',
+
+        '   <li>',
+        '       <aside class="icon"><span data-icon="bug"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="logsConsole" type="checkbox"' + _logsConsole + '><span></span></label></aside>',
+        '       <a href="#"><p class="double">Logs console</p></a>',
+        '   </li>',
+
+        '   <li>',
+        '       <aside class="icon"><span data-icon="bug"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="logsScreen" type="checkbox"' + _logsScreen + '><span></span></label></aside>',
+        '       <a href="#"><p class="double">Logs screen</p></a>',
+        '   </li>',
+        
+        '</ul>',
+        '</section>'
         ].join('');
 
         ui.echo("settings", _htmlSettings, "");
         
+        // ==========================================
+        // --- Enable / Disable online account(s) ---
+        // ==========================================
+        
+        ui.toggleProxy(); // If proxy is in use, disable online account(s) who does not support proxy.
+
         // =======================================
         // --- Hide / show The old reader form ---
         // =======================================
@@ -869,6 +1204,14 @@
         params.accounts.theoldreader.logged ?
             document.getElementById('theoldreaderForm').style.cssText = 'display: none':
             document.getElementById('theoldreaderForm').style.cssText = 'display: block';
+ 
+        // ======================================
+        // --- Hide / show Tiny Tiny Rss form ---
+        // ======================================
+        
+        params.accounts.tinytinyrss.logged ?
+            document.getElementById('tinytinyrssForm').style.cssText = 'display: none':
+            document.getElementById('tinytinyrssForm').style.cssText = 'display: block';
         
         // ============================
         // --- Show developper menu ---
@@ -956,9 +1299,17 @@
             _saveParams();
         }
         
+        // UI proxy checkbox
+
+        document.getElementById("useProxy").onclick = function() {
+            params.settings.proxy.use = !params.settings.proxy.use;
+            _saveParams();
+            ui.toggleProxy();
+        }
+        
         // Load subscriptions
         
-        document.getElementById("loadSubscriptions").onclick = function(event) {
+        /*document.getElementById("loadSubscriptions").onclick = function(event) {
             if (window.confirm(document.webL10n.get('confirm-load-subscriptions'))) {
                 my._load('subscriptions.local.json').then(
                     function (_mySubscriptions) {
@@ -976,7 +1327,7 @@
                     my.message(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
                 });
             }
-        }
+        }*/
         
         // Save subscriptions
 
@@ -1041,6 +1392,23 @@
                 gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
             }
         }
+ 
+        // Tiny Tiny Rss login checkbox
+
+        document.getElementById('tinytinyrssCheckbox').onclick = function() {
+            if (this.checked) {
+                this.checked = false; // False until CustomEvent TinyTinyRss.login.done
+                var _url = document.getElementById("tinytinyrssUrl").value;
+                var _user = document.getElementById("tinytinyrssUser").value;
+                var _passwd = document.getElementById("tinytinyrssPasswd").value;
+                tinytinyrss.login(_url, _user, _passwd);
+            } else {
+                params.accounts.tinytinyrss.logged = false;
+                _disableAccount('tinytinyrss');
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                document.getElementById('tinytinyrssForm').style.cssText = 'display: block';
+            }
+        }        
         
         // =========================
         // --- App start offline ---
@@ -1066,13 +1434,16 @@
             'local': '',
             'aolreader': '',
             'feedly': '',
-            'theoldreader': ''
+            'theoldreader': '',
+            'tinytinyrss': ''
         };
         var _htmlFeeds = "";
         var _htmlKeywords = '';
         var _feedlyAccessToken = feedly.getToken().access_token;
         var _theoldreaderAuth = theoldreader.getToken().Auth;
         var _aolreaderAccessToken = aolreader.getToken().access_token;
+        var _tinytinyrssAuth = (params.accounts.tinytinyrss.logged == true && tinytinyrss.getToken().content !== undefined) ? tinytinyrss.getToken().content.session_id : undefined;
+        // @todo: Why "content" above is sometimes undefined ?
 
         // ========================
         // --- Display keywords ---
@@ -1104,9 +1475,14 @@
             if ((_account == 'local') ||
                 ((_account == 'feedly') && (_feedlyAccessToken !== undefined)) ||
                 ((_account == 'theoldreader') && (_theoldreaderAuth !== undefined)) || 
-                ((_account == 'aolreader') && (_aolreaderAccessToken !== undefined))
+                ((_account == 'aolreader') && (_aolreaderAccessToken !== undefined)) ||
+                ((_account == 'tinytinyrss') && (_tinytinyrssAuth !== undefined)) 
             ){
                 var _class = (_account == 'local') ? "delete" : "delete _online_";
+                
+                if (!params.settings.proxy.availability[_account]) {
+                    _class = _class + ' _proxyNotAvailable_'; // Proxy not available for "aolreader" & "feedly". Not yet implemented.
+                }
                     
                 _deleteIcone = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed._myFeedId + '"><span data-icon="delete"></span></button>';
             }
@@ -1157,7 +1533,7 @@
             _opens[i].onclick = function() {
                 liveValues['entries']['search']['visible'] = true;
                 ui._vibrate();
-                ui._scrollTo(2);
+                ui._scrollTo(0);
                 ui._onclick(nextDay, 'disable');
                 ui._onclick(previousDay, 'enable');
                 params.entries.nbDaysAgo = 0;
@@ -1193,7 +1569,7 @@
                 liveValues['entries']['search']['visible'] = false;
                 document.getElementById('inputSearchEntries').value = "";
                 ui._vibrate();
-                ui._scrollTo(2);
+                ui._scrollTo(0);
                 ui._onclick(nextDay, 'disable');
                 ui._onclick(previousDay, 'enable');
                 params.entries.nbDaysAgo = 0;
@@ -1215,6 +1591,12 @@
         my.log("dspFeeds() " + (end - start) + " milliseconds.");
     }
 
+    /**
+     * Display entries.
+     * Only "box" of entries are displayed.
+     * Content of entries are displayed when entries are in viewport.
+     * See function "showEntries" in class "MyUi"
+     * */
     function dspEntries(entries, nbDaysAgo, feedUrl) {
 
         var feedsEntriesScrollTop = feeds_entries.scrollTop;
@@ -1326,63 +1708,78 @@
 
                         // Content ( Normal / Small )
 
-                        var _content = "";
+                        var _content = [];
+                        var _html = [];
 
                         if ((params.entries.theme == 'list') && (!_isSmallEntry)) {
-                            _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
-                            _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>';
-                            _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
-                            _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
-                            _content = _content + '<div class="my-'+_theme+'-footer"></div>';
-                            _content = _content + '</div>';
-
+                            _html.push(
+                                '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>',
+                                '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>',
+                                '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>',
+                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>',
+                                '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>',
+                                '<div class="my-'+_theme+'-footer"></div>'
+                            );
+                            _content.push(
+                                '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">',
+                                '</div>'
+                            );
                             _nbEntriesDisplayed['large']++;
 
                         } else if (params.entries.theme == 'list') {
-                            _content = _content + '<div class="_online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
-                            _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>';
-                            _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
-                            _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
-                            _content = _content + '<div class="my-'+_theme+'-footer"></div>';
-                            _content = _content + '</div>';
-
+                            _html.push(
+                                '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>',
+                                '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>',
+                                '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>',
+                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>',
+                                '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>',
+                                '<div class="my-'+_theme+'-footer"></div>'
+                            );
+                            _content.push(
+                                '<div class="_online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">',
+                                '</div>'
+                            );
                             _nbEntriesDisplayed['small']++;
 
                         } else if (!_isSmallEntry) {
-                            _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
-                            _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                            _content = _content + _imageUrl;
-                            _content = _content + '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
-                            _content = _content + '</div>';
-
+                            _html.push(
+                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>',
+                                '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>',
+                                _imageUrl,
+                                '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>',
+                                '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>'
+                            );
+                            _content.push(
+                                '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">',
+                                '</div>'
+                            );
                             _nbEntriesDisplayed['large']++;
 
                         } else {
-                            _content = _content + '<div class="_online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
-                            _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                            _content = _content + _imageUrl;
-                            _content = _content + '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>';
-                            _content = _content + '</div>';
-
+                            _html.push(
+                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>',
+                                '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>',
+                                _imageUrl,
+                                '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>'
+                            );
+                            _content.push(
+                                '<div class="_online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">',
+                                '</div>'
+                            );
                             _nbEntriesDisplayed['small']++;
                         }
 
                         // Add to html entries
 
-                        _htmlEntries = _htmlEntries + _content;
+                        _htmlEntries = _htmlEntries + _content.join('');
+                        
+                        liveValues['entries']['html'][i] = _html.join('');
 
                 } else if ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0) { break; }
             }
 
             // --- Display Today / Yesterday / Nb days ago ---
-
+            
             if (nbDaysAgo == 0) {
                 _daySeparator = document.webL10n.get('nb-days-ago-today');
             } else if (nbDaysAgo == 1) {
@@ -1395,6 +1792,8 @@
 
             // Display entries:
             
+            var start2 = performance.now();
+
             if (params.entries.displaySmallEntries && ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0)) {
                 ui.echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
             } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] > 0)) {
@@ -1406,6 +1805,8 @@
             } else {
                 ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification" data-l10n-id="error-no-network-connection">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
             } 
+            
+            var end2 = performance.now();
             
             // Hide/show small entries:
             
@@ -1433,7 +1834,8 @@
             for (var i = 0; i < _nb; i++) {
                 _small_entries[i].onclick = function() {
                     ui._vibrate(); 
-                    ui.fade(this); 
+                    ui.fade(this);
+                    liveValues.screens.feedsList.opened = false; 
                     mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
                 }
             }
@@ -1447,7 +1849,8 @@
             for (var i = 0; i < _nb; i++) {
                 _entries[i].onclick = function() { 
                     ui._vibrate(); 
-                    ui.fade(this); 
+                    ui.fade(this);
+                    liveValues.screens.feedsList.opened = false;
                     mainEntryOpenInBrowser(this.getAttribute("i"), ""); 
                 }
             }
@@ -1466,6 +1869,7 @@
             
             var end = performance.now();
             my.log("dspEntries() " + (end - start) + " milliseconds.");
+            my.log("dspEntries() " + (end2 - start2) + " milliseconds (echo).");
         
         }, 250); // Schedule the execution for later
     }
@@ -1573,7 +1977,7 @@
         
         document.body.dispatchEvent(new CustomEvent('mainEntryOpen.done', {"detail": {"entryId": entryId, "url": url, "_mySha256_link": sortedEntries[entryId]['_mySha256_link'], "_mySha256_title": sortedEntries[entryId]['_mySha256_title']}}));
 
-        ui._quickScrollTo(4);
+        ui._quickScrollTo(1);
     }
 
     /**
@@ -1641,6 +2045,7 @@
         // subscriptions.feedly.json
         // subscriptions.theoldreader.json
         // subscriptions.aolreader.json
+        // subscriptions.tinytinyrss.json
         // ...
 
         for (var i = 0; i < subscriptions.length; i++) {
@@ -1731,7 +2136,7 @@
     
     /**
      * Disable online account
-     * @param {string} feedly, theoldreader, aolreader
+     * @param {string} feedly, theoldreader, aolreader, tinytinyrss
      * */
     function _disableAccount(_account) {
         my.log('_disableAccount', arguments);
@@ -1844,7 +2249,10 @@
         var promise4 = my._load('subscriptions.aolreader.json').then(function(results) {return results;}
         ).catch(function(error) {_disableAccount('aolreader'); return {};});
 
-        var arrayPromises = [promise1, promise2, promise3, promise4];
+        var promise5 = my._load('subscriptions.tinytinyrss.json').then(function(results) {return results;}
+        ).catch(function(error) {_disableAccount('tinytinyrss'); return {};});
+ 
+        var arrayPromises = [promise1, promise2, promise3, promise4, promise5];
 
         Promise.all(arrayPromises).then(function(arrayOfResults) {
             initAndLoadFeeds(arrayOfResults);
@@ -1911,20 +2319,16 @@
             gf.deleteOldEntries(_timestampMax);
         }, 60000);
         
-        // ============================
-        // --- Load visibles images ---
-        // ============================
+        // =============================================
+        // --- Load visibles images & localize times ---
+        // =============================================
         
         setInterval(function() {
-            ui.loadImages();
-        }, 200);
-        
-        // ======================
-        // --- Localize times ---
-        // ======================
-        
-        setInterval(function() {
-            localizeTimes();
+            if (!liveValues.animations.inProgress) {
+                ui.showEntries();
+                ui.loadImages();
+                localizeTimes();
+            }
         }, 500);
 
         // ==============
@@ -2075,10 +2479,12 @@
         // ---
         
         dom['entry']['next']['button'].onclick = function() {
+            ui._vibrate();
             mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
         }
         
         dom['entry']['previous']['button'].onclick = function() {
+            ui._vibrate();
             mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
         }
         
@@ -2114,6 +2520,7 @@
         };
         
         // Search entries after "dspEntries"
+        // Display form then do a search.
         
         document.body.addEventListener('dspEntries.done', function(event){
             if (liveValues['entries']['search']['visible']) {
@@ -2122,6 +2529,7 @@
                 searchEntries.classList.add('enable-fxos-blue');
                 document.getElementById('formSearchEntries').classList.remove('_hide');
                 document.getElementById('formSearchEntries').classList.add('_show');
+                //_search(''); // @todo Test to display all entries
                 _search(document.getElementById('inputSearchEntries').value);
             }
         });
@@ -2153,7 +2561,8 @@
                     if ((myFeedsSubscriptions.local.length > 0) ||
                         (myFeedsSubscriptions.feedly.length > 0) ||
                         (myFeedsSubscriptions.theoldreader.length > 0) || 
-                        (myFeedsSubscriptions.aolreader.length > 0)
+                        (myFeedsSubscriptions.aolreader.length > 0) || 
+                        (myFeedsSubscriptions.tinytinyrss.length > 0)
                     ){
                         gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
                     } else {
@@ -2445,10 +2854,70 @@
             my.alert(document.webL10n.get('aolreader-get-subscriptions-error') + JSON.stringify(response.detail.message));
         });
 
+        /* ============================ */
+        /* --- Tiny Tiny Rss Events --- */
+        /* ============================ */
+
+        document.body.addEventListener('TinyTinyRss.login.done', function(response){
+            _loginInProgress['tinytinyrss'] = true;
+            my.log('TinyTinyRss.getToken()', tinytinyrss.getToken());
+            params.accounts.tinytinyrss.logged = true;
+            _saveParams();
+            document.getElementById('tinytinyrssCheckbox').checked = true; // Enable settings checkbox
+            document.getElementById('tinytinyrssForm').style.cssText = 'display: none';
+            tinytinyrss.getSubscriptions(); // CustomEvent TinyTinyRss.getSubscriptions.done, TinyTinyRss.getSubscriptions.error
+        });
+
+        document.body.addEventListener('TinyTinyRss.login.error', function(response){
+            my.log('CustomEvent : TinyTinyRss.login.error', arguments);
+            my.message('Tiny Tiny Rss login error');
+        });
+
+        document.body.addEventListener('TinyTinyRss.getSubscriptions.done', function(response){
+            my.log('CustomEvent : TinyTinyRss.getSubscriptions.done', response);
+            var _subscriptions = response.detail.content;
+            var _feed = '';
+            var _newFeeds = [];
+            for (var i = 0; i < _subscriptions.length; i++) {
+                _feed = {
+                    'url': _subscriptions[i].feed_url,
+                    'pulsations': params['feeds']['defaultPulsations'],
+                    'account': 'tinytinyrss',
+                    'id': _subscriptions[i].id
+                };
+                _newFeeds.push(_feed);
+            }
+            addNewSubscriptions(_newFeeds);
+            gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            
+            if (_loginInProgress['tinytinyrss'] == true ) {
+                _loginInProgress['tinytinyrss'] = false;
+                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            }
+            
+            my._save("subscriptions.tinytinyrss.json", "application/json", JSON.stringify(myFeedsSubscriptions.tinytinyrss)).then(function(results) {
+                my.log("Save file subscriptions.tinytinyrss.json");
+            }).catch(function(error) {
+                my.error("ERROR saving file subscriptions.tinytinyrss.json", error);
+                my.alert("ERROR saving file subscriptions.tinytinyrss.json");
+            });
+            my._save("cache/tinytinyrss/subscriptions.json", "application/json", JSON.stringify(_subscriptions)).then(function(results) {
+                my.log("Save file cache/tinytinyrss/subscriptions.json");
+            }).catch(function(error) {
+                my.error("ERROR saving file cache/tinytinyrss/subscriptions.json", error);
+                my.alert("ERROR saving file cache/tinytinyrss/subscriptions.json");
+            });
+        });
+
+        document.body.addEventListener('TinyTinyRss.getSubscriptions.error', function(response) {
+            my.log('CustomEvent : TinyTinyRss.getSubscriptions.error', arguments);
+            my.alert(document.webL10n.get('tinytinyrss-get-subscriptions-error') + JSON.stringify(response.detail.message));
+        });
+
         // ============
         // --- Main ---
         // ============
 
         ui.init();
-        ui._quickScrollTo(2);
+        ui._quickScrollTo(0);
     };

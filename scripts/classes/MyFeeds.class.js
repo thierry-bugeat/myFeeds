@@ -36,37 +36,47 @@ MyFeeds.prototype._load = function(filename, callback) {
     _MyFeeds.log("MyFeeds.prototype._load()", arguments);
     
     return new Promise(function(resolve, reject) {
-        var sdcard      = navigator.getDeviceStorage('sdcard');
-        var request     = sdcard.get('myFeeds/' + filename);
-        var dataType    = filename.split('.').pop();            // ".json"
-        var results     = "";
+        try {
+            var sdcard      = navigator.getDeviceStorage('sdcard');
+            var request     = sdcard.get('myFeeds/' + filename);
+            var dataType    = filename.split('.').pop();            // ".json"
+            var results     = "";
 
-        request.onsuccess = function () {
-            var file = this.result;
-            _MyFeeds.log("MyFeeds.prototype._load()", file);
-            var _fr = new FileReader();
-            
-            _fr.onloadend = function(event) {
-                if (event.target.readyState == FileReader.DONE) {
-                    if (dataType == "json") {
-                        results = JSON.parse(event.target.result);
-                        _MyFeeds.log(JSON.parse(event.target.result));
-                    } else {
-                        results = event.target.result;
-                        _MyFeeds.log(event.target.result);
+            request.onsuccess = function () {
+                var file = this.result;
+                _MyFeeds.log("MyFeeds.prototype._load()", file);
+                var _fr = new FileReader();
+                
+                _fr.onloadend = function(event) {
+                    if (event.target.readyState == FileReader.DONE) {
+                        if (dataType == "json") {
+                            results = JSON.parse(event.target.result);
+                            _MyFeeds.log(JSON.parse(event.target.result));
+                        } else {
+                            results = event.target.result;
+                            _MyFeeds.log(event.target.result);
+                        }
+                        //callback(results);
+                        _MyFeeds.log("MyFeeds.prototype._load() " + filename, results);
+                        resolve(results);
                     }
-                    //callback(results);
-                    _MyFeeds.log("MyFeeds.prototype._load() " + filename, results);
-                    resolve(results);
-                }
-            };
-            
-            _fr.readAsText(file);
-        }
+                };
+                
+                _fr.readAsText(file);
+            }
 
-        request.onerror = function () {
-            _MyFeeds.warn("Unable to get file: " + filename, this.error);
-            reject(Error());
+            request.onerror = function () {
+                _MyFeeds.warn("Unable to get file: " + filename, this.error);
+                reject(Error());
+            }
+        } catch (e) {
+            if (typeof localStorage.getItem(filename) === 'string') { 
+                var results = JSON.parse(localStorage.getItem(filename));
+                _MyFeeds.log("MyFeeds.prototype._load() " + filename, results);
+                resolve(results);
+            } else {
+                reject("");
+            }
         }
     });
 }
@@ -95,35 +105,39 @@ MyFeeds.prototype._loadJSON = function(filename) {
 MyFeeds.prototype._save = function(filename, mimetype, content) {
 
     return new Promise(function(resolve, reject) {
-        
-        var sdcard = navigator.getDeviceStorage("sdcard");
-        var file   = new Blob([content], {type: mimetype});
+        try {
+            var sdcard = navigator.getDeviceStorage("sdcard");
+            var file   = new Blob([content], {type: mimetype});
 
-        // Delete previous file
-        
-        var request = sdcard.delete("myFeeds/" + filename);
-        request.onsuccess = function() {
-            _MyFeeds.log("File deleted");
+            // Delete previous file
             
-            // Save new file
-        
-            var request = sdcard.addNamed(file, "myFeeds/" + filename);
-
-            request.onsuccess = function () {
-                resolve(this.result);
-            }
-
-            request.onerror = function (error) {
-                var _myError = {
-                    "filename": filename,
-                    "message": "Unable to write the file",
-                    "error": error
-                };
-                reject(Error(JSON.stringify(_myError)));
-            }
+            var request = sdcard.delete("myFeeds/" + filename);
+            request.onsuccess = function() {
+                _MyFeeds.log("File deleted");
+                
+                // Save new file
             
-        };
-        request.onerror = function() { reject(Error(JSON.stringify(error))); };
+                var request = sdcard.addNamed(file, "myFeeds/" + filename);
+
+                request.onsuccess = function () {
+                    resolve(this.result);
+                }
+
+                request.onerror = function (error) {
+                    var _myError = {
+                        "filename": filename,
+                        "message": "Unable to write the file",
+                        "error": error
+                    };
+                    reject(Error(JSON.stringify(_myError)));
+                }
+                
+            };
+            request.onerror = function() { reject(Error(JSON.stringify(error))); };
+        } catch (e) {
+            localStorage.setItem(filename, content);
+            resolve("");
+        }
     });
 
 }

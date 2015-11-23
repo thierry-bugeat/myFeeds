@@ -22,7 +22,7 @@ var _srcDocCss = [
 '.entrie-contentSnippet {font-size: 1.7rem; color: #5F5F5F;}        ',
 'a                      {text-decoration: none; color: #00AACC;}    ',
 'a:hover                {text-decoration: underline;}               ',
-'p                      {margin: 5% 0 5% 0;}                        ',
-'li                     {padding: 2.5%}                             ',
+'p                      {margin: 2rem 0 2rem 0;}                    ',
+'li                     {padding: 2rem}                             ',
 '</style>                                                           '
 ].join(''); 

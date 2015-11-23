@@ -23,7 +23,7 @@
 
 var TheOldReader = function() {
     
-    MyFeeds.call(this); /* Appel du constructeur de la classe parente */
+    //MyFeeds.call(this); /* Call the constructor of parent class. */
 
     this.tor = {
         "host"          : "https://theoldreader.com",
@@ -63,11 +63,11 @@ TheOldReader.prototype.getToken = function() {
 }
 
 /**
+ * updateToken()
  * Use "refresh_token" to obtain a new "access_token"
  * @todo Not yet implemented
  * @param   {null}
  * @return  {CustomEvent} TheOldReader.getNewToken.done | TheOldReader.getNewToken.error
-
  * */
 
 TheOldReader.prototype.updateToken = function() {
@@ -79,6 +79,8 @@ TheOldReader.prototype.updateToken = function() {
 }
 
 /**
+ * login(email, password)
+ *
  * @param   {string} email
  * @param   {string} password
  * @return  {CustomEvent} TheOldReader.login.done | TheOldReader.login.error
@@ -98,6 +100,11 @@ TheOldReader.prototype.login = function(email, password) {
         '&accountType=' + encodeURIComponent(_TheOldReader.tor.accountType) +
         '&output=' + encodeURIComponent(_TheOldReader.tor.output);
 
+    if (params.settings.proxy.use) {
+        _urlParams = '&method=post&url=' + encodeURIComponent(_TheOldReader.tor.host + '/accounts/ClientLogin?client=' + encodeURIComponent(_TheOldReader.tor.client) + '&Email=' + encodeURIComponent(_TheOldReader.tor.email) + '&Passwd=' + encodeURIComponent(_TheOldReader.tor.password) + '&accountType=' + encodeURIComponent(_TheOldReader.tor.accountType) + '&output=' + encodeURIComponent(_TheOldReader.tor.output));
+        _url = 'http://' + params.settings.proxy.host + '/proxy/theoldreader/?' + _urlParams;
+    }   
+ 
     this.post(_url, _params, function(response) {
         if (_TheOldReader.setToken(response)) {
             response.lastModified = Math.floor(new Date().getTime() / 1000);
@@ -113,6 +120,8 @@ TheOldReader.prototype.login = function(email, password) {
 };
 
 /**
+ * getSubscriptions()
+ *
  * @param   {null}
  * @return  {CustomEvent} TheOldReader.getSubscriptions.done | TheOldReader.getSubscriptions.error
  * */
@@ -123,9 +132,12 @@ TheOldReader.prototype.getSubscriptions = function () {
     var _url = _TheOldReader.tor.host + '/reader/api/0/subscription/list' + 
             '?output=json';
     
-    var promise = this.get(_url, '');
+    if (params.settings.proxy.use) {
+        _urlParams = '&method=get&myAuth=' + _TheOldReader.tor.token.Auth + '&url=' + encodeURIComponent(_TheOldReader.tor.host + '/reader/api/0/subscription/list' + '?output=' + encodeURIComponent(_TheOldReader.tor.output));
+        _url = 'http://' + params.settings.proxy.host + '/proxy/theoldreader/?' + _urlParams;
+    }   
     
-    promise.then(function(response) {
+    this.get(_url, '').then(function(response) {
         _TheOldReader.tor.subscriptions = response;
         document.body.dispatchEvent(new CustomEvent('TheOldReader.getSubscriptions.done', {"detail": response}));
         _MyFeeds.log("CustomEvent : TheOldReader.getSubscriptions.done");
@@ -136,6 +148,8 @@ TheOldReader.prototype.getSubscriptions = function () {
 }
 
 /**
+ * deleteSubscription(feedId)
+ *
  * @param   {feedId} String Feed id
  * @return  {CustomEvent} TheOldReader.deleteSubscription.done | TheOldReader.deleteSubscription.error
  * */
@@ -151,9 +165,12 @@ TheOldReader.prototype.deleteSubscription = function (feedId) {
             '&ac=unsubscribe' + 
             '&s=' + encodeURIComponent(feedId);
         
-        var promise = _TheOldReader._delete(_url, _params, '');
+        if (params.settings.proxy.use) {
+            _urlParams = '&method=post&myAuth=' + _TheOldReader.tor.token.Auth + '&url=' + encodeURIComponent(_TheOldReader.tor.host + '/reader/api/0/subscription/edit' + '?output=' + encodeURIComponent(_TheOldReader.tor.output) + '&ac=unsubscribe&s=' + encodeURIComponent(feedId));
+            _url = 'http://' + params.settings.proxy.host + '/proxy/theoldreader/?' + _urlParams;
+        }       
         
-        promise.then(function(response) {
+        _TheOldReader._delete(_url, _params).then(function(response) {
             resolve(response);
         }).catch(function(error) {
             reject(Error(JSON.stringify(error)));
@@ -163,21 +180,21 @@ TheOldReader.prototype.deleteSubscription = function (feedId) {
 }
 
 /**
- * get(url, myParams)
+ * get(_url, myParams)
  * 
- * @param string url Url to load.
- * @param object myParams You can retrieve this object in response.
+ * @param {_url} string Url to load.
+ * @param {myParams} object You can retrieve this object in response.
  * 
  * */
  
-TheOldReader.prototype.get = function (url, myParams) {
+TheOldReader.prototype.get = function (_url, myParams) {
     _MyFeeds.log('TheOldReader.prototype.get()', arguments);
     
     return new Promise(function(resolve, reject) {
         
         var xhr = new XMLHttpRequest({ mozSystem: true });
         
-        xhr.open('GET', url);
+        xhr.open('GET', _url, true);
         
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
@@ -191,12 +208,8 @@ TheOldReader.prototype.get = function (url, myParams) {
                 var _response = JSON.parse(xhr.response);
 
                 try {
-                    //_response.responseData._myParams = myParams; // Add extra values
                     resolve(_response);
                 } catch(err) {
-                    //reject(Error(xhr.statusText));
-                    //var _response = {"responseData": {"_myParams": myParams}};
-                    //reject(Error(_response));
                     reject(Error(err));
                 }
                 
@@ -223,23 +236,24 @@ TheOldReader.prototype.get = function (url, myParams) {
  * 
  * */
  
-TheOldReader.prototype.post = function (url, params, callback) {
+TheOldReader.prototype.post = function (_url, _params, callback) {
     _MyFeeds.log('TheOldReader.prototype.post()', arguments);
     
     return new Promise(function(resolve, reject) {
 
         var xhr = new XMLHttpRequest({ mozSystem: true });
 
-        xhr.open('POST', url, true);
+        xhr.open('POST', _url, true);
 
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        
+     
         if (_TheOldReader.tor.token) {
             xhr.setRequestHeader("Authorization", "GoogleLogin auth=" + _TheOldReader.tor.token.Auth);
         }
 
         xhr.onload = function() {
             var _response;
+
             try {
                 _response = JSON.parse(xhr.response);
             } catch (e) {
@@ -252,13 +266,12 @@ TheOldReader.prototype.post = function (url, params, callback) {
             typeof callback === 'function' && callback(Error(e));
         };
         
-        xhr.send(params);
+        xhr.send(_params);
     });
 }
 
-
-TheOldReader.prototype._delete = function (url, params, callback) {
-    _MyFeeds.log('TheOldReader.prototype.post222()', arguments);
+TheOldReader.prototype._delete = function (url, params) {
+    _MyFeeds.log('TheOldReader.prototype._delete()', arguments);
     
     return new Promise(function(resolve, reject) {
 
@@ -276,7 +289,6 @@ TheOldReader.prototype._delete = function (url, params, callback) {
             
             if (xhr.status == 200) {
 
-                //var _response = JSON.parse(xhr.response);
                 var _response = xhr.response;
 
                 try {
@@ -290,8 +302,8 @@ TheOldReader.prototype._delete = function (url, params, callback) {
             }
         };
 
-        xhr.onerror = function(err) {
-            reject(Error(JSON.stringify(err)));
+        xhr.onerror = function(error) {
+            reject(Error(JSON.stringify(error)));
         };
         
         xhr.send(params);

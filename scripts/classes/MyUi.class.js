@@ -42,16 +42,23 @@ var dom = {
             "button":   document.getElementById("previousEntry"),
             "title":    document.getElementById("previousEntryTitle")
         }
+    },
+    "screens": {
+        "settings": document.getElementById('settings-container'),
+        "feeds": document.getElementById('feeds-list-container'),
+        "find": document.getElementById('find-feeds-container')
     }
 };
 var search                  = document.getElementById("search");
 var settingsOpen            = document.getElementById("settingsOpen");
+var settingsClose           = document.getElementById("settingsClose");
 var find_feeds              = document.getElementById("find-feeds");
 var findFeedsOpen           = document.getElementById("findFeedsOpen");
 var findFeedsClose          = document.getElementById("findFeedsClose");
 var findFeedsSubmit         = document.getElementById("findFeedsSubmit");
 var share                   = document.getElementById("share");
 var feedsEntriesNbDaysAgo   = document.getElementById("feedsEntriesNbDaysAgo");
+var feedsEntriesFooter      = document.getElementById("feeds-entries-footer");
 var displayGrid             = document.getElementById("displayGrid");
 var displayCard             = document.getElementById("displayCard");
 var displayList             = document.getElementById("displayList");
@@ -59,7 +66,7 @@ var searchEntries           = document.getElementById("searchEntries");
 var resetSearchEntries      = document.getElementById("resetSearchEntries");
 var findFeedsReset          = document.getElementById("findFeedsReset");
 var useAnimations           = document.getElementById("useAnimations");
-    
+
 /* ============ */
 /* --- MyUi --- */
 /* ============ */
@@ -88,26 +95,30 @@ MyUi.prototype.init = function() {
     
     setInterval(function() {
         
-        // Scroll in progress
+        if (!liveValues.animations.inProgress) {
+        
+            // Scroll in progress
 
-        if (feeds_list.scrollTop != _topupFeedsList['previousScrollTop']) {
+            if (feeds_list.scrollTop != _topupFeedsList['previousScrollTop']) {
+                
+                if (_topupFeedsList['previousScrollTop'] == 0) { 
+                    _MyUi._onclick(dom.topups['feeds'], 'enable'); 
+                    _topupFeedsList['previousStatus'] = 'enabled'; 
+                }
+                
+                _topupFeedsList['previousScrollTop'] = feeds_list.scrollTop;
+            } 
             
-            if (_topupFeedsList['previousScrollTop'] == 0) { 
-                _MyUi._onclick(dom.topups['feeds'], 'enable'); 
-                _topupFeedsList['previousStatus'] = 'enabled'; 
+            // End scroll
+            
+            else {
+                
+                if ((_topupFeedsList['previousStatus'] == 'enabled') && (feeds_list.scrollTop == 0)) {
+                    _MyUi._onclick(dom.topups['feeds'], 'disable'); 
+                    _topupFeedsList['previousStatus'] = 'disabled';
+                }
             }
-            
-            _topupFeedsList['previousScrollTop'] = feeds_list.scrollTop;
-        } 
-        
-        // End scroll
-        
-        else {
-            
-            if ((_topupFeedsList['previousStatus'] == 'enabled') && (feeds_list.scrollTop == 0)) {
-                _MyUi._onclick(dom.topups['feeds'], 'disable'); 
-                _topupFeedsList['previousStatus'] = 'disabled';
-            }
+
         }
         
     }, 500);
@@ -129,26 +140,30 @@ MyUi.prototype.init = function() {
     
     setInterval(function() {
         
-        // Scroll in progress
+        if (!liveValues.animations.inProgress) {
         
-        if (feeds_entries.scrollTop != _topup['previousScrollTop']) {
+            // Scroll in progress
             
-            if (_topup['previousScrollTop'] == 0) { 
-                _MyUi._onclick(dom.topups['entries'], 'enable'); 
-                _topup['previousStatus'] = 'enabled'; 
+            if (feeds_entries.scrollTop != _topup['previousScrollTop']) {
+                
+                if (_topup['previousScrollTop'] == 0) { 
+                    _MyUi._onclick(dom.topups['entries'], 'enable'); 
+                    _topup['previousStatus'] = 'enabled'; 
+                }
+                
+                _topup['previousScrollTop'] = feeds_entries.scrollTop;
+            } 
+            
+            // End scroll
+            
+            else {
+                
+                if ((_topup['previousStatus'] == 'enabled') && (feeds_entries.scrollTop == 0)) {
+                    _MyUi._onclick(dom.topups['entries'], 'disable'); 
+                    _topup['previousStatus'] = 'disabled';
+                }
             }
-            
-            _topup['previousScrollTop'] = feeds_entries.scrollTop;
-        } 
-        
-        // End scroll
-        
-        else {
-            
-            if ((_topup['previousStatus'] == 'enabled') && (feeds_entries.scrollTop == 0)) {
-                _MyUi._onclick(dom.topups['entries'], 'disable'); 
-                _topup['previousStatus'] = 'disabled';
-            }
+
         }
         
     }, 500);
@@ -230,6 +245,42 @@ MyUi.prototype.toggle = function(_status) {
     // 1) Update settings message
                 
     _MyUi.echo("onLine", _status, "");
+
+    // =============
+    // --- Proxy ---
+    // =============
+    // If proxy is in use, disable online account(s) who
+    // does not support proxy.
+
+    if (_status == 'enable') { 
+        _MyUi.toggleProxy();
+    }
+}
+
+/**
+ * Change opacity of UI elements when proxy checkbox change.
+ * Affect elements with class _proxyNotAvailable_
+ * */
+MyUi.prototype.toggleProxy = function() {
+    
+    // Enable online accounts when proxy is not used.
+    
+    if (!params.settings.proxy.use) {
+        var _items = document.querySelectorAll("._proxyNotAvailable_");
+        for (var i = 0; i < _items.length; i++) {
+            _MyUi._onclick(_items[i], 'enable');
+        }
+    }
+
+    // Disable elements for which proxy is not yet implemented
+    
+    else {
+        var _items = document.querySelectorAll("._proxyNotAvailable_");
+        for (var i = 0; i < _items.length; i++) {
+            _MyUi._onclick(_items[i], 'disable');
+        }
+    }
+
 }
 
 /**
@@ -268,13 +319,18 @@ MyUi.prototype._loading = function(percentage) {
 /**
  * Scroll main div to specified screen.
  * @param {screenX} int
- * 0 : Search feed
- * 1 : Feeds list
- * 2 : Entries list
- * 3 : Settings screen
- * 4 : Entry
+ * 0 : Search feed  (mainLeft)
+ * 1 : Feeds list   (mainLeft)
+ * 0 : Entries list (main)
+ * 1 : Entry        (main)
  * */
 MyUi.prototype._scrollTo = function(screenX) {
+    if (screenX == 0) {
+        liveValues.screens.feedsList.opened = false;
+    } else if (screenX == -1) {
+        liveValues.screens.feedsList.opened = true;
+    }
+
     if (params.settings.ui.animations) {
         _MyUi._smoothScrollTo(screenX, 250);
     } else {
@@ -285,21 +341,53 @@ MyUi.prototype._scrollTo = function(screenX) {
 MyUi.prototype._quickScrollTo = function(screenX) {
     window.setTimeout(function() {
         
-        var _x = ('-' + (screenX * 20) + '%').toString();
+        if (screenX == -1) {
+            var _x = (dom['screens']['feeds'].scrollWidth + 'px').toString();   /* Screen feeds list */
+            dom['screens']['feeds'].classList.remove('back');
+        } else if (screenX == -2) {
+            dom['screens']['feeds'].classList.add('back'); return;              /* Screen find feeds */
+        } else {
+            var _x = ('-' + (screenX * 50) + '%').toString();                   /* Screens entries or main entry */
+        }
 
         main.style.cssText = 'transform: translateX('+_x+');';
         
     }); // Schedule the execution for later
 }
 
-MyUi.prototype._smoothScrollTo = function (screenX, duration) {
+MyUi.prototype._smoothScrollTo = function(screenX, duration) {
     
     window.setTimeout(function() {
         
-        var _x = ('-' + (screenX * 20) + '%').toString();
+        if (screenX == -1) {
+            var _x = (dom['screens']['feeds'].scrollWidth + 'px').toString();
+            dom['screens']['feeds'].classList.remove('back');
+        } else if (screenX == -2) {
+            dom['screens']['feeds'].classList.add('back'); return;
+        } else {
+            var _x = ('-' + (screenX * 50) + '%').toString();
+        }
 
-        main.style.cssText = 'transition: transform 0.25s linear; transform: translateX('+_x+');';
+        main.style.cssText = 'transition: transform 0.25s ease; transform: translateX('+_x+');';
         
+    }); // Schedule the execution for later
+}
+
+MyUi.prototype._translate = function(id, direction) {
+    window.setTimeout(function() {
+        
+        if (direction == 'left') {
+            var _x = '-100%';
+        } else {
+            var _x = '100%';
+        }
+           
+        if (params.settings.ui.animations) {
+            id.style.cssText = 'transition: transform 0.25s ease; transform: translateX('+_x+');';
+        } else {
+            id.style.cssText = 'transform: translateX(' + _x + ');';
+        }
+
     }); // Schedule the execution for later
 }
 
@@ -360,7 +448,10 @@ MyUi.prototype.selectThemeIcon = function () {
 
 MyUi.prototype._vibrate = function () {
     if (params.settings.ui.vibrate) {
-        window.navigator.vibrate(50);
+        try {
+            window.navigator.vibrate(50);
+        } catch (e) {
+        }
     }
 }
 
@@ -400,6 +491,22 @@ MyUi.prototype.loadImages = function () {
 }
 
 /**
+ * Show entries who are in viewport.
+ * Content of entry is displayed only when entry is in viewport.
+ * */
+MyUi.prototype.showEntries = function () {
+    var _divs = document.querySelectorAll("div.my-list-entry-s, div.my-list-entry-m, div.my-list-entry-l, div.my-grid-entry-s, div.my-grid-entry-m, div.my-grid-entry-l, div.my-card-entry-s, div.my-card-entry-m, div.my-card-entry-l");
+
+    for (var i = 0; i < _divs.length; i++) {
+        var rect = _divs[i].getBoundingClientRect(); 
+        if ((_divs[i].innerHTML === '') && ui.isInViewport(_divs[i])) {
+            var j = _divs[i].getAttribute('i');
+            _divs[i].innerHTML = liveValues['entries']['html'][j];
+        }
+    }
+}
+
+/**
  * Check if element is visible in viewport
  * @param {object} elem DOM element
  * @return {boolean} true / false
@@ -411,3 +518,32 @@ MyUi.prototype.isInViewport = function (element) {
 
     return rect.bottom > 0 && rect.top < windowHeight && rect.right > 0 && rect.left < windowWidth
 }
+
+/* ================= */
+/* --- UI Events --- */
+/* ================= */
+
+settingsOpen.onclick    = function(event) {ui._vibrate(); ui._translate(dom['screens']['settings'], 'left');}
+settingsClose.onclick   = function(event) {ui._vibrate(); ui._translate(dom['screens']['settings'], 'right');}
+
+menu.onclick            = function(event) {
+    ui._vibrate();
+    (liveValues.screens.feedsList.opened) ? ui._scrollTo(0) : ui._scrollTo(-1);
+}
+
+closeFeedsList.onclick  = function(event) {ui._vibrate(); ui._scrollTo(0);}
+
+/* Class _startAnimation_ */
+
+var _animations = document.querySelectorAll("._startAnimation_");
+
+for (var i = 0; i < _animations.length; i++) {
+    _animations[i].onmousedown = function() { 
+        liveValues.animations.inProgress = true;
+    }
+}
+
+/* Detect end of animation */
+
+document.addEventListener("transitionend", function(){liveValues.animations.inProgress = false;}, false);
+

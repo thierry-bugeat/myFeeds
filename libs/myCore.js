@@ -41,3 +41,17 @@ Array.prototype.last = function() {
 String.prototype.htmlentities = function() {
     return String(this).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
+
+String.prototype.isJSON = function() {
+    try {
+        var obj = JSON.parse(this);
+        if (obj && typeof obj === "object" && obj !== null) {
+            return obj;
+        }
+    } catch (e) {
+        // ---
+    }
+
+    return false;
+}
+

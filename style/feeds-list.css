@@ -8,13 +8,14 @@
  
 #feeds-list-container{
     display: block;
-    width:20%;
+    width:100%;
+    max-width: 480px;
     height:100%;
     /*margin:0px auto;*/
-    /*position: fixed;*/
-    top:0%;
-    left:100%;
-    z-index:10;
+    position: absolute;
+    top:0;
+    left:0;
+    z-index:2;
     box-sizing: border-box;
 }
 
@@ -26,11 +27,11 @@
     height: calc(100% - 9.5rem) !important;
     overflow-x:hidden;
     overflow-y:auto;
-    padding: var(--my-spacing);
+    padding: 0;
 }
 
 #feeds-list > h2 {
-    color: var(--fxos-orange);
+    color: var(--fxos-grey);
     overflow: auto;
     list-style: none outside none;
     margin: 0;
@@ -50,7 +51,7 @@
 }
 
 #feeds-list > ul {
-    background-color: var(--fxos-white);
+    background-color: var(--fxos-light-grey);
     overflow: auto;
     list-style: none outside none;
     margin: 0;

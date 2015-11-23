@@ -23,7 +23,7 @@
 
 var AolReader = function() {
     
-    MyFeeds.call(this); /* Appel du constructeur de la classe parente */
+    //MyFeeds.call(this); /* Appel du constructeur de la classe parente */
 
     this.aolreader = {
         "host_auth"     : "",
@@ -94,6 +94,13 @@ AolReader.prototype.login = function() {
         '&response_type=code' + 
         '&scope=' + encodeURIComponent('subscriptions');
 
+    /*if (params.settings.proxy.use) {
+        _urlParams = '&method=get&url=' + encodeURIComponent(_AolReader.aolreader.host_auth + '/auth/authorize?client_id=' + encodeURIComponent(_AolReader.aolreader.client_id) + '&redirect_uri=' + encodeURIComponent('http://localhost:8080') + '&response_type=code&scope=' + encodeURIComponent('subscriptions'));
+
+        //_url = 'http://' + params.settings.proxy.host + '/proxy/aolreader/?' + _urlParams;
+        _url = 'http://' + params.settings.proxy.host + '/proxy/aolreader/example.php';
+    }*/
+
     window.open(_url);
     return false;
 };
@@ -101,21 +108,28 @@ AolReader.prototype.login = function() {
 AolReader.prototype._loginCallback = function(url) {
     _MyFeeds.log('AolReader.prototype._loginCallback()', arguments);
 
-    var params = [];
+    var _params = [];
 
-    if (params = url.match(/code=([^&]+)/)) {
+    if (_params = url.match(/code=([^&]+)/)) {
         
-        _AolReader.aolreader.code = params[1];
+        _AolReader.aolreader.code = _params[1];
         
         var _url = _AolReader.aolreader.host_auth + '/auth/access_token';
         
-        var _params = 'code=' + encodeURIComponent(params[1]) + 
+        var _params = 'code=' + encodeURIComponent(_params[1]) + 
                 '&client_id=' + encodeURIComponent(_AolReader.aolreader.client_id) +
                 '&client_secret=' + encodeURIComponent(_AolReader.aolreader.client_secret) +
                 '&redirect_uri=' + encodeURIComponent('http://localhost:8080') +
-                '&state=' + encodeURIComponent(params[0]) +
+                '&state=' + encodeURIComponent(_params[0]) +
                 '&grant_type=authorization_code';
         
+        /*if (params.settings.proxy.use) {
+            _urlParams = '&method=post&url=' + encodeURIComponent(_AolReader.aolreader.host_auth + '/auth/access_token?code=' + encodeURIComponent(_params[1]) +  '&client_id=' + encodeURIComponent(_AolReader.aolreader.client_id) + '&client_secret=' + encodeURIComponent(_AolReader.aolreader.client_secret) + '&redirect_uri=' + encodeURIComponent('http://localhost:8080') + '&state=' + encodeURIComponent(_params[0]) + '&grant_type=authorization_code');
+
+            //_url = 'http://' + params.settings.proxy.host + '/proxy/aolreader/?' + _urlParams;
+            _url = 'http://' + params.settings.proxy.host + '/proxy/aolreader/example.php';
+        }*/
+
         this.post(_url, _params, function(response) {
             if (_AolReader.setToken(response)) {
                 response.lastModified = Math.floor(new Date().getTime() / 1000);
@@ -145,6 +159,11 @@ AolReader.prototype.getSubscriptions = function () {
     
     var _url = _AolReader.aolreader.host + '/reader/api/0/subscription/list' + 
         '?access_token=' + _AolReader.aolreader.token.access_token;
+
+    /*if (params.settings.proxy.use) {
+        _urlParams = '&method=get&myAuth=' + _AolReader.aolreader.token.Auth + '&url=' + encodeURIComponent(_AolReader.aolreader.host_auth + '/reader/api/0/subscription/list?access_token=' + _AolReader.aolreader.token.Auth);
+        _url = 'http://' + params.settings.proxy.host + '/proxy/aolreader/?' + _urlParams;
+    }*/
 
     var promise = this.get(_url, '');
     

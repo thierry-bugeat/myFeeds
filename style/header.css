@@ -9,7 +9,7 @@
  /* ====================== */
  
 section[role="myHeader"] {
-    width: 100%;
+    /*width: auto;*/
     height: 5rem;
     margin:0;
     position: relative;
@@ -18,14 +18,14 @@ section[role="myHeader"] {
 }
 
 section[role="myHeader"] > header:first-child {
-    background-color: #f97c17;
+    background-color: var(--fxos-orange-light);
     padding:0;
     height:5rem;
     border:medium none;
 }
 
 section[role="myHeader"] > header:first-child h1 {
-    color: var(--fxos-white);
+    color: var(--fxos-grey);
     font-size: 2.3rem;
     line-height: 5rem;
     white-space: nowrap;
@@ -45,8 +45,8 @@ section[role="myHeader"] > header button {
     color: var(--fxos-white);
     box-sizing: border-box;
     overflow: hidden;
-    min-width: 20%;
-    width: auto;
+    width: 20%;
+    max-width: 100px;
     height: 5rem;
     border: medium none;
     background: transparent none repeat scroll 0% 0%;
@@ -93,6 +93,5 @@ section[role="myHeader"]._fixed{
  /* ================================= */
 
 section[role="myHeader"] > header.mySystemHeader{
-    color: var(--fxos-white);
-    background-color: var(--fxos-grey);
+    background-color: var(--fxos-light-grey);
 }
