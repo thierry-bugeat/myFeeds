@@ -415,6 +415,8 @@
             
             _nb = _divs.length;
             
+            var _o = document.createElement('div'); // v4 
+
             for (var i = 0; i < _nb; i++) {
                 if ((_divs[i].classList.contains("_small_")) && (!params.entries.displaySmallEntries)) {
                     _divs[i].classList.remove('_show');
@@ -430,8 +432,25 @@
                     */
 
                     // v2 Search only in entries titles
-                    var _text = "";
+                    /*var _text = "";
                     var childrens = _divs[i].children;
+                    for (var j = 0; j < childrens.length; j++) {
+                        //console.log(i + ' / ' + j + ' / ' + childrens[j].textContent.toLowerCase());
+                        if (childrens[j].className == 'my-'+params.entries.theme+'-title') {
+                            _text = childrens[j].textContent.toLowerCase();
+                            break;
+                        }
+                    }*/
+
+                    // v4 Search
+                                        
+                    var _i = _divs[i].getAttribute('i');
+                    
+                    _o.innerHTML = liveValues['entries']['html'][_i]; 
+                    
+                    var _text = "";
+                    var childrens = _o.children;
+                    
                     for (var j = 0; j < childrens.length; j++) {
                         //console.log(i + ' / ' + j + ' / ' + childrens[j].textContent.toLowerCase());
                         if (childrens[j].className == 'my-'+params.entries.theme+'-title') {
@@ -451,6 +470,7 @@
                     }
                 }
             }
+            delete _o; // v4
         }
     }
     
