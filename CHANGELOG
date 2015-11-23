@@ -1,5 +1,5 @@
 --------------------------------------------------------- 
-#myFeeds 1.3.0 (2015-11-23) 
+#myFeeds 1.3.0 (2015-11-24) 
 
 ### New feature(s) 
  
@@ -15,7 +15,8 @@
     - Increase UI performances 
     
 ### Misc 
-    
+
+    - #40 Add vibration on buttons next and previous entries    
     - #35 Add local storage for future desktop version 
     - #34 Add proxy (The Old Reader) for future desktop version
     
