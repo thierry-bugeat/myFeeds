@@ -23,7 +23,7 @@
 
 var Feedly = function() {
     
-    MyFeeds.call(this); /* Appel du constructeur de la classe parente */
+    //MyFeeds.call(this); /* Appel du constructeur de la classe parente */
 
     this.feedly = {
         "host"          : "",

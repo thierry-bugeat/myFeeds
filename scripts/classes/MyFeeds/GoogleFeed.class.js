@@ -26,7 +26,7 @@
 
 var GoogleFeed = function() {
     
-    MyFeeds.call(this); /* Appel du constructeur de la classe parente */
+    //MyFeeds.call(this); /* Appel du constructeur de la classe parente */
 
     this.gf = {
         "output"        : "json",                                                   // Output format: json, xml, json_xml

@@ -23,7 +23,7 @@
 
 var TheOldReader = function() {
     
-    MyFeeds.call(this); /* Call the constructor of parent class. */
+    //MyFeeds.call(this); /* Call the constructor of parent class. */
 
     this.tor = {
         "host"          : "https://theoldreader.com",
