@@ -1185,16 +1185,6 @@
         '       <a href="#"><p class="double">Logs screen</p></a>',
         '   </li>',
         
-        '   <li>',
-        '       <aside class="icon"><span data-icon="bug"></span></aside>',
-        '       <aside class="pack-end">',
-        '           <a href="#">',
-        '               <p class="double"><button id="TinyTinyRss_getSubscriptions"><span>Tiny Tiny Rss</span></button></p>',
-        '           </a>',
-        '       </aside>',
-        '       <a href="#"><p class="double">Load subscriptions</p></a>',
-        '   </li>',
-
         '</ul>',
         '</section>'
         ].join('');
@@ -1339,12 +1329,6 @@
             }
         }*/
         
-        // Load subscriptions Tiny Tiny RSS
-        
-        document.getElementById("TinyTinyRss_getSubscriptions").onclick = function(event) {
-            tinytinyrss.getSubscriptions();
-        } 
-
         // Save subscriptions
 
         document.getElementById("saveSubscriptions").onclick = function(event) {
@@ -2495,10 +2479,12 @@
         // ---
         
         dom['entry']['next']['button'].onclick = function() {
+            ui._vibrate();
             mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
         }
         
         dom['entry']['previous']['button'].onclick = function() {
+            ui._vibrate();
             mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
         }
         
