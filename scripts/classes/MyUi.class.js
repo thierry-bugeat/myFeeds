@@ -58,6 +58,7 @@ var findFeedsClose          = document.getElementById("findFeedsClose");
 var findFeedsSubmit         = document.getElementById("findFeedsSubmit");
 var share                   = document.getElementById("share");
 var feedsEntriesNbDaysAgo   = document.getElementById("feedsEntriesNbDaysAgo");
+var feedsEntriesFooter      = document.getElementById("feeds-entries-footer");
 var displayGrid             = document.getElementById("displayGrid");
 var displayCard             = document.getElementById("displayCard");
 var displayList             = document.getElementById("displayList");
@@ -485,6 +486,22 @@ MyUi.prototype.loadImages = function () {
                 images[i].setAttribute('src', _dataSrc);
             }
             
+        }
+    }
+}
+
+/**
+ * Show entries who are in viewport.
+ * Content of entry is displayed only when entry is in viewport.
+ * */
+MyUi.prototype.showEntries = function () {
+    var _divs = document.querySelectorAll("div.my-list-entry-s, div.my-list-entry-m, div.my-list-entry-l, div.my-grid-entry-s, div.my-grid-entry-m, div.my-grid-entry-l, div.my-card-entry-s, div.my-card-entry-m, div.my-card-entry-l");
+
+    for (var i = 0; i < _divs.length; i++) {
+        var rect = _divs[i].getBoundingClientRect(); 
+        if ((_divs[i].innerHTML === '') && ui.isInViewport(_divs[i])) {
+            var j = _divs[i].getAttribute('i');
+            _divs[i].innerHTML = liveValues['entries']['html'][j];
         }
     }
 }

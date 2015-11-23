@@ -115,8 +115,9 @@
             "search": {
                 "visible": false                // Set if form "search entries by keyword" is visible or not
             },
-            "imagesPreviouslyDisplayed": []     // Store images previously displayed. 
+            "imagesPreviouslyDisplayed": [],    // Store images previously displayed. 
                                                 // Used for displaying images in offline mode.
+            "html": []
         },
         "screens": {
             "feedsList": {
@@ -432,6 +433,7 @@
                     var _text = "";
                     var childrens = _divs[i].children;
                     for (var j = 0; j < childrens.length; j++) {
+                        //console.log(i + ' / ' + j + ' / ' + childrens[j].textContent.toLowerCase());
                         if (childrens[j].className == 'my-'+params.entries.theme+'-title') {
                             _text = childrens[j].textContent.toLowerCase();
                             break;
@@ -1585,6 +1587,12 @@
         my.log("dspFeeds() " + (end - start) + " milliseconds.");
     }
 
+    /**
+     * Display entries.
+     * Only "box" of entries are displayed.
+     * Content of entries are displayed when entries are in viewport.
+     * See function "showEntries" in class "MyUi"
+     * */
     function dspEntries(entries, nbDaysAgo, feedUrl) {
 
         var feedsEntriesScrollTop = feeds_entries.scrollTop;
@@ -1696,63 +1704,78 @@
 
                         // Content ( Normal / Small )
 
-                        var _content = "";
+                        var _content = [];
+                        var _html = [];
 
                         if ((params.entries.theme == 'list') && (!_isSmallEntry)) {
-                            _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
-                            _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>';
-                            _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
-                            _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
-                            _content = _content + '<div class="my-'+_theme+'-footer"></div>';
-                            _content = _content + '</div>';
-
+                            _html.push(
+                                '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>',
+                                '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>',
+                                '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>',
+                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>',
+                                '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>',
+                                '<div class="my-'+_theme+'-footer"></div>'
+                            );
+                            _content.push(
+                                '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">',
+                                '</div>'
+                            );
                             _nbEntriesDisplayed['large']++;
 
                         } else if (params.entries.theme == 'list') {
-                            _content = _content + '<div class="_online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
-                            _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>';
-                            _content = _content + '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>';
-                            _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
-                            _content = _content + '<div class="my-'+_theme+'-footer"></div>';
-                            _content = _content + '</div>';
-
+                            _html.push(
+                                '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>',
+                                '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>',
+                                '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>',
+                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>',
+                                '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>',
+                                '<div class="my-'+_theme+'-footer"></div>'
+                            );
+                            _content.push(
+                                '<div class="_online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">',
+                                '</div>'
+                            );
                             _nbEntriesDisplayed['small']++;
 
                         } else if (!_isSmallEntry) {
-                            _content = _content + '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">';
-                            _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                            _content = _content + _imageUrl;
-                            _content = _content + '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>';
-                            _content = _content + '</div>';
-
+                            _html.push(
+                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>',
+                                '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>',
+                                _imageUrl,
+                                '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>',
+                                '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>'
+                            );
+                            _content.push(
+                                '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">',
+                                '</div>'
+                            );
                             _nbEntriesDisplayed['large']++;
 
                         } else {
-                            _content = _content + '<div class="_online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">';
-                            _content = _content + '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>';
-                            _content = _content + '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>';
-                            _content = _content + _imageUrl;
-                            _content = _content + '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>';
-                            _content = _content + '</div>';
-
+                            _html.push(
+                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>',
+                                '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>',
+                                _imageUrl,
+                                '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>'
+                            );
+                            _content.push(
+                                '<div class="_online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">',
+                                '</div>'
+                            );
                             _nbEntriesDisplayed['small']++;
                         }
 
                         // Add to html entries
 
-                        _htmlEntries = _htmlEntries + _content;
+                        _htmlEntries = _htmlEntries + _content.join('');
+                        
+                        liveValues['entries']['html'][i] = _html.join('');
 
                 } else if ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0) { break; }
             }
 
             // --- Display Today / Yesterday / Nb days ago ---
-
+            
             if (nbDaysAgo == 0) {
                 _daySeparator = document.webL10n.get('nb-days-ago-today');
             } else if (nbDaysAgo == 1) {
@@ -1765,6 +1788,8 @@
 
             // Display entries:
             
+            var start2 = performance.now();
+
             if (params.entries.displaySmallEntries && ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0)) {
                 ui.echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
             } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] > 0)) {
@@ -1776,6 +1801,8 @@
             } else {
                 ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification" data-l10n-id="error-no-network-connection">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
             } 
+            
+            var end2 = performance.now();
             
             // Hide/show small entries:
             
@@ -1838,6 +1865,7 @@
             
             var end = performance.now();
             my.log("dspEntries() " + (end - start) + " milliseconds.");
+            my.log("dspEntries() " + (end2 - start2) + " milliseconds (echo).");
         
         }, 250); // Schedule the execution for later
     }
@@ -2293,6 +2321,7 @@
         
         setInterval(function() {
             if (!liveValues.animations.inProgress) {
+                ui.showEntries();
                 ui.loadImages();
                 localizeTimes();
             }
@@ -2485,6 +2514,7 @@
         };
         
         // Search entries after "dspEntries"
+        // Display form then do a search.
         
         document.body.addEventListener('dspEntries.done', function(event){
             if (liveValues['entries']['search']['visible']) {
@@ -2493,6 +2523,7 @@
                 searchEntries.classList.add('enable-fxos-blue');
                 document.getElementById('formSearchEntries').classList.remove('_hide');
                 document.getElementById('formSearchEntries').classList.add('_show');
+                //_search(''); // @todo Test to display all entries
                 _search(document.getElementById('inputSearchEntries').value);
             }
         });
