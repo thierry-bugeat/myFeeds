@@ -538,8 +538,12 @@ closeFeedsList.onclick  = function(event) {ui._vibrate(); ui._scrollTo(0);}
 var _animations = document.querySelectorAll("._startAnimation_");
 
 for (var i = 0; i < _animations.length; i++) {
-    _animations[i].onmousedown = function() { 
-        liveValues.animations.inProgress = true;
+    _animations[i].onmousedown = function() {
+        if (params.settings.ui.animations) {
+            liveValues.animations.inProgress = true;
+        } else {
+            liveValues.animations.inProgress = false;
+        }
     }
 }
 
