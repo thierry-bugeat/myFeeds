@@ -305,7 +305,7 @@ MyFeeds.prototype.error = function (message, arguments) {
  * @return {boolean} true, false
  * */
 MyFeeds.prototype.isSmallEntry = function (entry) {
-
+    return false;
     var _out;
     var _diff = entry.content.length - entry.contentSnippet.length;
     

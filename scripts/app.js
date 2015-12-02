@@ -26,7 +26,7 @@
     var aolreader = new AolReader();
     var tinytinyrss = new TinyTinyRss();
 
-    var gf = new GoogleFeed();
+    var gf = new SimplePie();
 
     var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': [], 'tinytinyrss': []} ; // Store informations about feeds (urls)
 
@@ -2329,7 +2329,7 @@
                 ui.loadImages();
                 localizeTimes();
             }
-        }, 500);
+        }, 350);
 
         // ==============
         // --- Events ---
@@ -2581,17 +2581,18 @@
             }
         }
 
-        /* ===================== */
-        /* --- Google Events --- */
-        /* ===================== */
+        /* ======================== */
+        /* --- SimplePie Events --- */
+        /* ======================== */
 
-        document.body.addEventListener('GoogleFeed.load.done', function(event){
+        document.body.addEventListener('SimplePie.load.done', function(event){
 
             // Save feed as file
 
             if (navigator.onLine) {
-                my._save('cache/google/feeds/' + btoa(event.detail.responseData.feed.feedUrl) + ".json", "application/json", JSON.stringify(event.detail.responseData.feed)).then(function(results) {
-                    my.log('GoogleFeed.load.done > Saving feed in cache ok : ' + event.detail.responseData.feed.feedUrl + ' ('+btoa(event.detail.responseData.feed.feedUrl)+')');
+                console.log(event);
+                my._save('cache/simplepie/feeds/' + btoa(event.detail.responseData.feed.feedUrl) + ".json", "application/json", JSON.stringify(event.detail.responseData.feed)).then(function(results) {
+                    my.log('SimplePie.load.done > Saving feed in cache ok : ' + event.detail.responseData.feed.feedUrl + ' ('+btoa(event.detail.responseData.feed.feedUrl)+')');
                 }).catch(function(error) {
                     my.error("ERROR saving feed in cache : " + event.detail.responseData.feed.feedUrl + ' ('+btoa(event.detail.responseData.feed.feedUrl)+')');
                     my.alert("ERROR saving feed in cache :\n" + event.detail.responseData.feed.feedUrl);
@@ -2600,7 +2601,8 @@
 
             // Add feed entries to array "unsortedEntries"
 
-                gf.addFeed(event.detail.responseData.feed);
+                //gf.addFeed(event.detail.responseData.feed);
+                gf.addFeed(event.detail);
 
             // Check if all feeds were loaded
 
@@ -2632,7 +2634,7 @@
 
         }, true);
 
-        document.body.addEventListener('GoogleFeed.load.error', function(event){
+        document.body.addEventListener('SimplePie.load.error', function(event){
 
             // Check if all feeds were loaded
 
