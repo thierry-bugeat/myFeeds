@@ -1,4 +1,4 @@
-#IMPORTANT MESSAGE 2015.12.02# 
+# IMPORTANT MESSAGE 2015.12.02 
 Due to the end of Google Feeds API this app no longer works. 
 I hope to be back soon with a new version 1.4 
 Sorry for the inconvenience. 
