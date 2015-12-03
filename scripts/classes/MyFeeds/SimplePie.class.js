@@ -403,7 +403,6 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
                 try {
                     var _message = JSON.parse(error.message);
                 } catch (e) {
-                    //window.alert("ERROR 100: Loading from cache\n" + e.message + ' / ' + JSON.stringify(error));
                     error._myParams = _params;
                     error._myFeedUrl = _myFeed.url;
                     document.body.dispatchEvent(new CustomEvent('SimplePie.load.error', {"detail": error}));

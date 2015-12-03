@@ -2019,7 +2019,6 @@
 
                         _url        = _feeds[j].feedUrl;
                         _pulsations = _feeds[j]._myPulsations;
-                        _account    = _feeds[j]._myAccount; // test
 
                         if (isNaN(_pulsations)) {
                             // do nothing
@@ -2609,12 +2608,11 @@
             // Save feed as file
 
             if (navigator.onLine) {
-                console.log(event);
-                my._save('cache/simplepie/feeds/' + btoa(event.detail.feed.feedUrl) + ".json", "application/json", JSON.stringify(event.detail.feed)).then(function(results) {
-                    my.log('SimplePie.load.done > Saving feed in cache ok : ' + event.detail.feed.feedUrl + ' ('+btoa(event.detail.feed.feedUrl)+')');
+                my._save('cache/simplepie/feeds/' + btoa(event.detail.feedUrl) + ".json", "application/json", JSON.stringify(event.detail)).then(function(results) {
+                    my.log('SimplePie.load.done > Saving feed in cache ok : ' + event.detail.feed.feedUrl + ' ('+btoa(event.detail.feedUrl)+')');
                 }).catch(function(error) {
-                    my.error("ERROR saving feed in cache : " + event.detail.feed.feedUrl + ' ('+btoa(event.detail.feed.feedUrl)+')');
-                    my.alert("ERROR saving feed in cache :\n" + event.detail.feed.feedUrl);
+                    my.error("ERROR saving feed in cache : " + event.detail.feedUrl + ' ('+btoa(event.detail.feedUrl)+')');
+                    my.alert("ERROR saving feed in cache :\n" + event.detail.feedUrl);
                 });
             }
 
