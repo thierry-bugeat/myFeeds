@@ -33,7 +33,7 @@ var SimplePie = function() {
         "v"             : "1.0" ,                                                   // Google API version
         "scoring"       : "h",                                                      // Include historical entries
         "ServiceBase"   : "http://54.229.143.103/simplepie/?",                      //
-        "ServiceFind"   : "https://ajax.googleapis.com/ajax/services/feed/find?",   // @todo
+        "ServiceFind"   : "http://54.229.143.103/simplepie/?",                      //
         "method"        : "GET"
     };
     
@@ -427,38 +427,30 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
 }
 
 /**
- * findFeeds(keywords)
+ * isValidUrl(url)
+ * Check if feed exists.
  * 
- * @param {string} keywords
+ * @param {string} url
+ * @return {boolean}
  * 
- * Documentation : https://developers.google.com/feed/v1/jsondevguide
  * */
-SimplePie.prototype.findFeeds = function(keywords) {
+SimplePie.prototype.isValidUrl = function(url) {
     
-    _MyFeeds.log('SimplePie.prototype.findFeeds()', arguments);
+    _MyFeeds.log('SimplePie.prototype.isValidUrl()', arguments);
     
     return new Promise(function(resolve, reject) {
         
-        var _params     = {};
-        var _urlParams  = '&q=' + encodeURIComponent(keywords) + '&v=' + _SimplePie.gf.v;
-        var _url        = _SimplePie.gf.ServiceFind + _urlParams;
-
-        if (params.settings.proxy.use) {
-            _urlParams = '&url=' + encodeURIComponent(_SimplePie.gf.ServiceFind + '&q=' + encodeURIComponent(keywords) + '&v=' + _SimplePie.gf.v);
-            _url = 'http://' + params.settings.proxy.host + '/proxy/?' + _urlParams;
-        }
-
-        var promise     = _SimplePie.get(_url, _params);
+        var _urlParams  = 'url=' + encodeURIComponent(url) + '&num=1';
+        var _url        = _SimplePie.gf.ServiceBase + _urlParams;
+        
+        var promise = _SimplePie.get(_url, {});
 
         promise.then(function(response) {
-            _MyFeeds.log(response);
-            document.body.dispatchEvent(new CustomEvent('SimplePie.find.done', {"detail": response}));
-            resolve(response);
-        }).catch(function(error) {
-            error._myParams = _params;
-            document.body.dispatchEvent(new CustomEvent('SimplePie.find.error', {"detail": error}));
-            _MyFeeds.error("ERROR ", error);
-            reject(Error(JSON.stringify(error)));
+            console.log(response); // @todo remove
+            document.body.dispatchEvent(new CustomEvent('SimplePie.isValidUrl.done', {"detail": response}));
+        }).catch(function(error){
+            console.log(error); // @todo remove
+            document.body.dispatchEvent(new CustomEvent('SimplePie.isValidUrl.error', {"detail": error}));
         });
 
     });

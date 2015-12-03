@@ -367,11 +367,11 @@
     
     findFeedsSubmit.onclick = function(event) { 
         ui._vibrate();
-        var _keywords = document.getElementById("findFeedsText").value; 
-        if (_keywords) {
+        var _url = document.getElementById("findFeedsText").value; 
+        if (_url) {
             ui.echo("find-feeds", "Loading...", ""); 
-            gf.findFeeds(_keywords).then(function(results) {
-                my.log("Find feed ok", results);
+            gf.isValidUrl(_url).then(function(results) {
+                my.log("Is a valid url OK", results);
             }).catch(function(error) {
                 my.message(document.webL10n.get("find-feeds-error") + JSON.stringify(error));
             });
@@ -730,32 +730,28 @@
         my.log('findFeedsDisplayResults()', arguments);
         my.log(event);
 
-        if ((event.detail.responseStatus == 200) && (event.detail.responseData.entries.length > 0)) {
-            var _results = event.detail.responseData.entries;
+        if (typeof event.detail.feedUrl !== 'null') {
             var _htmlResults = "<ul>";
 
-            for (var i = 0 ; i < _results.length; i++) {
-                
-                // Is feed already in subscriptions ?
-                
-                var _feedAlreadySubscribed = false;
-                
-                for (var _account in myFeedsSubscriptions) {
-                    for (var j = 0; j < myFeedsSubscriptions[_account].length; j++) {
-                        if (_results[i].url == myFeedsSubscriptions[_account][j]["url"]) {
-                            _feedAlreadySubscribed = true;
-                            break;
-                        }
+            // Is feed already in subscriptions ?
+
+            var _feedAlreadySubscribed = false;
+
+            for (var _account in myFeedsSubscriptions) {
+                for (var j = 0; j < myFeedsSubscriptions[_account].length; j++) {
+                    if (event.detail.feedUrl == myFeedsSubscriptions[_account][j]["url"]) {
+                        _feedAlreadySubscribed = true;
+                        break;
                     }
                 }
-                
-                // ---
-                
-                if (!_feedAlreadySubscribed) {
-                    _htmlResults = _htmlResults + '<li><a><button class="addNewFeed" feedUrl="' + _results[i].url + '" feedId="' + _results[i].url + '" ><span data-icon="add"></span></button><p>' + _results[i].title + '</p><p><time>' + _results[i].url + '</time></p></a></li>';
-                } else {
-                    _htmlResults = _htmlResults + '<li><a><button class="cantAddNewFeed warning"><span class="fa fa-ban fa-2x"></span></button><p>' + _results[i].title + '</p><p><time>' + _results[i].url + '</time></p><p class="warning">' + document.webL10n.get('feed-already-subscribed') + '</p></a></li>';
-                }
+            }
+
+            // ---
+
+            if (!_feedAlreadySubscribed) {
+                _htmlResults = _htmlResults + '<li><a><button class="addNewFeed" feedUrl="' + event.detail.feedUrl + '" feedId="' + event.detail.url + '" ><span data-icon="add"></span></button><p>' + event.detail.title + '</p><p><time>' + event.detail.description + '</time></p></a></li>';
+            } else {
+                _htmlResults = _htmlResults + '<li><a><button class="cantAddNewFeed warning"><span class="fa fa-ban fa-2x"></span></button><p>' + event.detail.title + '</p><p><time>' + event.detail.feedUrl + '</time></p><p class="warning">' + document.webL10n.get('feed-already-subscribed') + '</p></a></li>';
             }
 
             _htmlResults = _htmlResults + "</ul>";
@@ -776,7 +772,7 @@
                     findFeedsAddNewFeed(this);
                 }
             }
-        } else if (event.detail.responseData.entries.length == 0) {
+        } else if (event.detail.entries.length == 0) {
             ui.echo("find-feeds", document.webL10n.get('find-feeds-no-results'), "");
         } else {
             ui.echo("find-feeds", "Find feeds : Network error", "prepend");
@@ -2679,7 +2675,7 @@
 
         }, true);
 
-        document.body.addEventListener('GoogleFeed.find.done', findFeedsDisplayResults, true);
+        document.body.addEventListener('SimplePie.isValidUrl.done', findFeedsDisplayResults, true);
 
         /* ===================== */
         /* --- Feedly Events --- */
