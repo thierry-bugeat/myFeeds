@@ -420,7 +420,6 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
                 });
                 // ---
             }).catch(function(error){
-                window.alert(JSON.stringify(error));
                 document.body.dispatchEvent(new CustomEvent('SimplePie.load.error', {"detail": error}));
             });
         }

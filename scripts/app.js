@@ -1721,8 +1721,8 @@
 
                         var _accountIcone = '';
 
-                        if (_entrie._myFeedInformations._myAccount != 'local') {
-                            _accountIcone = '<img src="images/' + _entrie._myFeedInformations._myAccount + '.' + _theme + '.png" data-src="images/' + _entrie._myFeedInformations._myAccount + '.' + _theme + '.png" />';
+                        if (_entrie._myFeedInformations._myParams.account != 'local') {
+                            _accountIcone = '<img src="images/' + _entrie._myFeedInformations._myParams.account + '.' + _theme + '.png" data-src="images/' + _entrie._myFeedInformations._myParams.account + '.' + _theme + '.png" />';
                         }
 
                         // Content ( Normal / Small )
