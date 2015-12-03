@@ -21,9 +21,6 @@
 /* --- SimplePie Class --- */
 /* ======================= */
 
-// Call example :
-// https://www.google.com/uds/Gfeeds?&num=4&hl=en&output=json&q=http%3A%2F%2Fwww.nextinpact.com%2Frss%2Fnews.xml&key=notsupplied&v=1.0
-
 var SimplePie = function() {
     
     //MyFeeds.call(this); /* Appel du constructeur de la classe parente */
@@ -36,7 +33,7 @@ var SimplePie = function() {
         "v"             : "1.0" ,                                                   // Google API version
         "scoring"       : "h",                                                      // Include historical entries
         "ServiceBase"   : "http://54.229.143.103/simplepie/?",                      //
-        "ServiceFind"   : "https://ajax.googleapis.com/ajax/services/feed/find?",   //
+        "ServiceFind"   : "https://ajax.googleapis.com/ajax/services/feed/find?",   // @todo
         "method"        : "GET"
     };
     
@@ -378,7 +375,7 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
 
             this._setNum(1 + Math.floor(_myFeed.pulsations * nbDaysToLoad)); // Pulsations = Estimation of news per day.
 
-            var _urlParams = 'url=' + encodeURIComponent(this.gf.q);
+            var _urlParams = 'url=' + encodeURIComponent(this.gf.q) + '&num=' + this.gf.num;
             var _url    = this.gf.ServiceBase + _urlParams;
 
             if (params.settings.proxy.use) {
@@ -394,9 +391,9 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
             var promise = this.get(_url, _params);
         
             promise.then(function(response) {
-                response.responseData.feed = {};
-                response.responseData.feed._myAccount = response.responseData._myParams.account; // Add _myAccount value
-                response.responseData.feed._myFeedId = response.responseData._myParams.id; // Add __id value
+                response.feed = {};
+                response.feed._myAccount = response._myParams.account; // Add _myAccount value
+                response.feed._myFeedId = response._myParams.id; // Add __id value
                 _MyFeeds.log("SimplePie.prototype.loadFeeds() > get > response : ", response);
                 document.body.dispatchEvent(new CustomEvent('SimplePie.load.done', {"detail": response}));
                 //_MyFeeds._save('cache/simplepie/feeds/' + btoa(response.detail.feedUrl) + ".0.json", "application/json", JSON.stringify(response)); 
@@ -406,14 +403,14 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
                 try {
                     var _message = JSON.parse(error.message);
                 } catch (e) {
-                    window.alert("ERROR: Loading from cache\n" + e.message + ' / ' + JSON.stringify(error));
+                    //window.alert("ERROR 100: Loading from cache\n" + e.message + ' / ' + JSON.stringify(error));
                     error._myParams = _params;
                     error._myFeedUrl = _myFeed.url;
                     document.body.dispatchEvent(new CustomEvent('SimplePie.load.error', {"detail": error}));
                 }
                 
-                my._load('cache/simplepie/feeds/' + btoa(_message.responseData._myParams.url) + ".json").then(function(_cacheContent){
-                    _message.responseData.feed = _cacheContent;
+                my._load('cache/simplepie/feeds/' + btoa(_message._myParams.url) + ".json").then(function(_cacheContent){
+                    _message.feed = _cacheContent;
                     document.body.dispatchEvent(new CustomEvent('SimplePie.load.done', {"detail": _message}));
                 }).catch(function(error) {
                     // @todo
@@ -422,6 +419,9 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
                     document.body.dispatchEvent(new CustomEvent('SimplePie.load.error', {"detail": error}));
                 });
                 // ---
+            }).catch(function(error){
+                window.alert(JSON.stringify(error));
+                document.body.dispatchEvent(new CustomEvent('SimplePie.load.error', {"detail": error}));
             });
         }
     }
@@ -492,12 +492,15 @@ SimplePie.prototype.get = function (url, myParams) {
                 if (xhr.status == 200) {
 
                     var _response = JSON.parse(xhr.response);
-                    console.log('===========================>');
-                    console.log(_response); //@todo remove
-                    console.log('<===========================');
+
+                    if ((_response.entries.length == 0) || (typeof _response.feedUrl === 'null')) {
+                       _MyFeeds.error('ERROR 110 ' + url);
+                        var _response = {"responseData": {"_myParams": myParams}};
+                        reject(Error(JSON.stringify(_response)));
+                    }
+
                     try {
-                        _response.responseData = {}; // myParams; // Add extra values
-                        _response.responseData._myParams = myParams; // myParams; // Add extra values
+                        _response._myParams = myParams; // myParams; // Add extra values
                         resolve(_response);
                     } catch(err) {
                         var _response = {"responseData": {"_myParams": myParams}};
@@ -505,14 +508,14 @@ SimplePie.prototype.get = function (url, myParams) {
                     }
                     
                 } else {
-                    _MyFeeds.error('ERROR ' + url);
+                    _MyFeeds.error('ERROR 111 ' + url);
                     var _response = {"responseData": {"_myParams": myParams}};
                     reject(Error(JSON.stringify(_response)));
                 }
             };
 
             xhr.onerror = function(e) {
-                _MyFeeds.error('ERROR ' + url);
+                _MyFeeds.error('ERROR 112 ' + url);
                 _MyFeeds.error(e);
                 var _response = {"responseData": {"_myParams": myParams}};
                 reject(Error(JSON.stringify(_response)));
