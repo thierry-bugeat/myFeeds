@@ -730,7 +730,7 @@
         my.log('findFeedsDisplayResults()', arguments);
         my.log(event);
 
-        if (typeof event.detail.feedUrl !== 'null') {
+        if ((typeof event.detail.feedUrl !== 'null') && (event.detail.entries.length > 0)) {
             var _htmlResults = "<ul>";
 
             // Is feed already in subscriptions ?
@@ -749,7 +749,7 @@
             // ---
 
             if (!_feedAlreadySubscribed) {
-                _htmlResults = _htmlResults + '<li><a><button class="addNewFeed" feedUrl="' + event.detail.feedUrl + '" feedId="' + event.detail.url + '" ><span data-icon="add"></span></button><p>' + event.detail.title + '</p><p><time>' + event.detail.description + '</time></p></a></li>';
+                _htmlResults = _htmlResults + '<li><a><button class="addNewFeed" feedUrl="' + event.detail.feedUrl + '" feedId="' + event.detail.url + '" ><span data-icon="add"></span></button><p>' + event.detail.title + '</p><p><time>' + event.detail.feedUrl + '</time></p></a></li>';
             } else {
                 _htmlResults = _htmlResults + '<li><a><button class="cantAddNewFeed warning"><span class="fa fa-ban fa-2x"></span></button><p>' + event.detail.title + '</p><p><time>' + event.detail.feedUrl + '</time></p><p class="warning">' + document.webL10n.get('feed-already-subscribed') + '</p></a></li>';
             }
@@ -1499,7 +1499,7 @@
                     _class = _class + ' _proxyNotAvailable_'; // Proxy not available for "aolreader" & "feedly". Not yet implemented.
                 }
                     
-                _deleteIcone = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed._myFeedId + '"><span data-icon="delete"></span></button>';
+                _deleteIcone = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed.feed._myFeedId + '"><span data-icon="delete"></span></button>';
             }
 
             var _myLastPublishedDate = (_feed._myLastTimestamp == 0) ? "No news" : _feed._myLastPublishedDate;
@@ -2676,6 +2676,10 @@
         }, true);
 
         document.body.addEventListener('SimplePie.isValidUrl.done', findFeedsDisplayResults, true);
+
+        document.body.addEventListener('SimplePie.isValidUrl.error', function(){
+            ui.echo("find-feeds", "Invalid URL", "");
+        }, true);
 
         /* ===================== */
         /* --- Feedly Events --- */
