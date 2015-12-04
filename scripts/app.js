@@ -2629,15 +2629,14 @@
                 // ---
 
                 if (liveValues.feeds.nbFeedsLoaded >= liveValues.feeds.nbFeedsToLoad) {
-                    ui._loading(100); ui.echo("loading", "", "");
-                    if (navigator.onLine) {
-                        ui._onclick(sync, 'enable');
-                    }
                     dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
                     dspFeeds(gf.getFeeds());
                     dspSettings();
                     updateFeedsPulsations();
-                    
+                    ui._loading(100); ui.echo("loading", "", "");
+                    if (navigator.onLine) {
+                        ui._onclick(sync, 'enable');
+                    }
                 }
 
             // ---
@@ -2651,7 +2650,7 @@
                 my.error(event);
 
                 //liveValues.feeds.nbFeedsToLoad = event.detail._myParams.nbFeeds; // different de "done"
-                liveValues.feeds,nbFeedsLoaded = gf.getNbFeedsLoaded();
+                liveValues.feeds.nbFeedsLoaded = gf.getNbFeedsLoaded();
                 gf.setNbFeedsLoaded(++liveValues.feeds.nbFeedsLoaded);
 
                 // Percentage of loading ?
@@ -2661,14 +2660,14 @@
                 // ---
 
                 if (liveValues.feeds.nbFeedsLoaded >= liveValues.feeds.nbFeedsToLoad) {
-                    ui._loading(100); ui.echo("loading", "", "");
-                    if (navigator.onLine) {
-                        ui._onclick(sync, 'enable');
-                    }
                     dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
                     dspFeeds(gf.getFeeds());
                     dspSettings();
                     updateFeedsPulsations();
+                    ui._loading(100); ui.echo("loading", "", "");
+                    if (navigator.onLine) {
+                        ui._onclick(sync, 'enable');
+                    }
                 }
 
             // ---
