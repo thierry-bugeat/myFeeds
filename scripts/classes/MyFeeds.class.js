@@ -129,11 +129,11 @@ MyFeeds.prototype._save = function(filename, mimetype, content) {
                         "message": "Unable to write the file",
                         "error": error
                     };
-                    reject(Error(JSON.stringify(_myError)));
+                    reject(JSON.stringify(_myError));
                 }
                 
             };
-            request.onerror = function() { reject(Error(JSON.stringify(error))); };
+            request.onerror = function() { reject(JSON.stringify(this.error)); };
         } catch (e) {
             localStorage.setItem(filename, content);
             resolve("");
@@ -305,8 +305,16 @@ MyFeeds.prototype.error = function (message, arguments) {
  * @return {boolean} true, false
  * */
 MyFeeds.prototype.isSmallEntry = function (entry) {
-    return false;
     var _out;
+
+    if (entry.content == null) {
+        entry.content = '';
+    }
+
+    if (entry.contentSnippet == null) {
+        entry.contentSnippet = '';
+    }
+
     var _diff = entry.content.length - entry.contentSnippet.length;
     
     if (_diff < params.entries.maxLengthForSmallEntries) {

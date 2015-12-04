@@ -2600,14 +2600,15 @@
         /* ======================== */
 
         document.body.addEventListener('SimplePie.load.done', function(event){
-
+            //my.alert('SimplePie.load.done');
+            
             // Save feed as file
 
             if (navigator.onLine) {
                 my._save('cache/simplepie/feeds/' + btoa(event.detail.feedUrl) + ".json", "application/json", JSON.stringify(event.detail)).then(function(results) {
                     my.log('SimplePie.load.done > Saving feed in cache ok : ' + event.detail.feed.feedUrl + ' ('+btoa(event.detail.feedUrl)+')');
                 }).catch(function(error) {
-                    my.error("ERROR saving feed in cache : " + event.detail.feedUrl + ' ('+btoa(event.detail.feedUrl)+')');
+                    my.error("ERROR saving feed in cache : " + event.detail.feedUrl + ' ('+btoa(event.detail.feedUrl)+') ' + error);
                     my.alert("ERROR saving feed in cache :\n" + event.detail.feedUrl);
                 });
             }
@@ -2618,9 +2619,7 @@
 
             // Check if all feeds were loaded
 
-                //liveValues.feeds.nbFeedsToLoad = event.detail._myParams.nbFeeds;
-                liveValues.feeds.nbFeedsLoaded = gf.getNbFeedsLoaded();
-                gf.setNbFeedsLoaded(++liveValues.feeds.nbFeedsLoaded);
+                liveValues.feeds.nbFeedsLoaded++;
 
                 // Percentage of loading ?
 
@@ -2628,11 +2627,16 @@
 
                 // ---
 
-                if (liveValues.feeds.nbFeedsLoaded >= liveValues.feeds.nbFeedsToLoad) {
+                if (liveValues.feeds.nbFeedsLoaded == liveValues.feeds.nbFeedsToLoad) {
                     dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
                     dspFeeds(gf.getFeeds());
-                    dspSettings();
+                    //dspSettings();
                     updateFeedsPulsations();
+                }
+                
+                if (liveValues.feeds.nbFeedsLoaded >= liveValues.feeds.nbFeedsToLoad) {
+                    liveValues.feeds.nbFeedsToLoad = 0;
+                    liveValues.feeds.nbFeedsLoaded = 0;
                     ui._loading(100); ui.echo("loading", "", "");
                     if (navigator.onLine) {
                         ui._onclick(sync, 'enable');
@@ -2644,14 +2648,12 @@
         }, true);
 
         document.body.addEventListener('SimplePie.load.error', function(event){
-
+            //my.alert('SimplePie.load.error');
             // Check if all feeds were loaded
 
                 my.error(event);
 
-                //liveValues.feeds.nbFeedsToLoad = event.detail._myParams.nbFeeds; // different de "done"
-                liveValues.feeds.nbFeedsLoaded = gf.getNbFeedsLoaded();
-                gf.setNbFeedsLoaded(++liveValues.feeds.nbFeedsLoaded);
+                liveValues.feeds.nbFeedsLoaded++;
 
                 // Percentage of loading ?
 
@@ -2659,11 +2661,16 @@
 
                 // ---
 
-                if (liveValues.feeds.nbFeedsLoaded >= liveValues.feeds.nbFeedsToLoad) {
+                if (liveValues.feeds.nbFeedsLoaded == liveValues.feeds.nbFeedsToLoad) {
                     dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
                     dspFeeds(gf.getFeeds());
-                    dspSettings();
+                    //dspSettings();
                     updateFeedsPulsations();
+                }
+                
+                if (liveValues.feeds.nbFeedsLoaded >= liveValues.feeds.nbFeedsToLoad) {
+                    liveValues.feeds.nbFeedsToLoad = 0;
+                    liveValues.feeds.nbFeedsLoaded = 0;
                     ui._loading(100); ui.echo("loading", "", "");
                     if (navigator.onLine) {
                         ui._onclick(sync, 'enable');

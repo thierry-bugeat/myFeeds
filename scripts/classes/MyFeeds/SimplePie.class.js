@@ -369,7 +369,7 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
 
     if (this.myFeedsSubscriptions.length > 0) {
         for (var i = 0; i < this.myFeedsSubscriptions.length; i++) {
-
+            
             var _myFeed = this.myFeedsSubscriptions[i];
             this._setUrl(_myFeed.url);
 
