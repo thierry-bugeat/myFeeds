@@ -26,7 +26,7 @@
     var aolreader = new AolReader();
     var tinytinyrss = new TinyTinyRss();
 
-    var gf = new GoogleFeed();
+    var gf = new SimplePie();
 
     var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': [], 'tinytinyrss': []} ; // Store informations about feeds (urls)
 
@@ -118,6 +118,10 @@
             "imagesPreviouslyDisplayed": [],    // Store images previously displayed. 
                                                 // Used for displaying images in offline mode.
             "html": []
+        },
+        "feeds": {
+            "nbFeedsLoaded": 0,
+            "nbFeedsToLoad": 0,
         },
         "screens": {
             "feedsList": {
@@ -352,7 +356,7 @@
         if (navigator.onLine) {
             ui._vibrate();
             ui._onclick(this, 'disable');
-            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            loadFeeds();
         }
     }
 
@@ -363,11 +367,11 @@
     
     findFeedsSubmit.onclick = function(event) { 
         ui._vibrate();
-        var _keywords = document.getElementById("findFeedsText").value; 
-        if (_keywords) {
+        var _url = document.getElementById("findFeedsText").value; 
+        if (_url) {
             ui.echo("find-feeds", "Loading...", ""); 
-            gf.findFeeds(_keywords).then(function(results) {
-                my.log("Find feed ok", results);
+            gf.isValidUrl(_url).then(function(results) {
+                my.log("Is a valid url OK", results);
             }).catch(function(error) {
                 my.message(document.webL10n.get("find-feeds-error") + JSON.stringify(error));
             });
@@ -575,7 +579,7 @@
                 (myFeedsSubscriptions.aolreader.length > 0) ||
                 (myFeedsSubscriptions.tinytinyrss.length > 0)
             ){
-                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                loadFeeds();
             } else {
                 ui.echo("feeds-list", "", "");
                 ui.echo("feeds-entries", "", "");
@@ -713,7 +717,7 @@
                 (myFeedsSubscriptions.tinytinyrss.length > 0) 
             ){
                 gf.setFeedsSubscriptions(myFeedsSubscriptions);
-                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                loadFeeds();
             } else {
                 ui.echo("feeds-list", "", "");
                 ui.echo("feeds-entries", "", "");
@@ -726,32 +730,28 @@
         my.log('findFeedsDisplayResults()', arguments);
         my.log(event);
 
-        if ((event.detail.responseStatus == 200) && (event.detail.responseData.entries.length > 0)) {
-            var _results = event.detail.responseData.entries;
+        if ((typeof event.detail.feedUrl !== 'null') && (event.detail.entries.length > 0)) {
             var _htmlResults = "<ul>";
 
-            for (var i = 0 ; i < _results.length; i++) {
-                
-                // Is feed already in subscriptions ?
-                
-                var _feedAlreadySubscribed = false;
-                
-                for (var _account in myFeedsSubscriptions) {
-                    for (var j = 0; j < myFeedsSubscriptions[_account].length; j++) {
-                        if (_results[i].url == myFeedsSubscriptions[_account][j]["url"]) {
-                            _feedAlreadySubscribed = true;
-                            break;
-                        }
+            // Is feed already in subscriptions ?
+
+            var _feedAlreadySubscribed = false;
+
+            for (var _account in myFeedsSubscriptions) {
+                for (var j = 0; j < myFeedsSubscriptions[_account].length; j++) {
+                    if (event.detail.feedUrl == myFeedsSubscriptions[_account][j]["url"]) {
+                        _feedAlreadySubscribed = true;
+                        break;
                     }
                 }
-                
-                // ---
-                
-                if (!_feedAlreadySubscribed) {
-                    _htmlResults = _htmlResults + '<li><a><button class="addNewFeed" feedUrl="' + _results[i].url + '" feedId="' + _results[i].url + '" ><span data-icon="add"></span></button><p>' + _results[i].title + '</p><p><time>' + _results[i].url + '</time></p></a></li>';
-                } else {
-                    _htmlResults = _htmlResults + '<li><a><button class="cantAddNewFeed warning"><span class="fa fa-ban fa-2x"></span></button><p>' + _results[i].title + '</p><p><time>' + _results[i].url + '</time></p><p class="warning">' + document.webL10n.get('feed-already-subscribed') + '</p></a></li>';
-                }
+            }
+
+            // ---
+
+            if (!_feedAlreadySubscribed) {
+                _htmlResults = _htmlResults + '<li><a><button class="addNewFeed" feedUrl="' + event.detail.feedUrl + '" feedId="' + event.detail.url + '" ><span data-icon="add"></span></button><p>' + event.detail.title + '</p><p><time>' + event.detail.feedUrl + '</time></p></a></li>';
+            } else {
+                _htmlResults = _htmlResults + '<li><a><button class="cantAddNewFeed warning"><span class="fa fa-ban fa-2x"></span></button><p>' + event.detail.title + '</p><p><time>' + event.detail.feedUrl + '</time></p><p class="warning">' + document.webL10n.get('feed-already-subscribed') + '</p></a></li>';
             }
 
             _htmlResults = _htmlResults + "</ul>";
@@ -772,7 +772,7 @@
                     findFeedsAddNewFeed(this);
                 }
             }
-        } else if (event.detail.responseData.entries.length == 0) {
+        } else if (event.detail.entries.length == 0) {
             ui.echo("find-feeds", document.webL10n.get('find-feeds-no-results'), "");
         } else {
             ui.echo("find-feeds", "Find feeds : Network error", "prepend");
@@ -798,7 +798,7 @@
             // (2) Reload UI
 
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
-            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            loadFeeds();
             
             // (3) Save subscriptions.local.json
             
@@ -1282,7 +1282,7 @@
             _saveParams();
             document.webL10n.setLanguage(params.settings.ui.language, "");
             //dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
-            //gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            //loadFeeds();
         }
         
         // UI vibrate
@@ -1321,7 +1321,7 @@
                             my.alert(err.message);
                         }
                         gf.setFeedsSubscriptions(myFeedsSubscriptions);
-                        gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                        loadFeeds();
                     }
                 ).catch(function(error) {
                     my.message(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
@@ -1360,7 +1360,7 @@
             } else {
                 params.accounts.feedly.logged = false;
                 _disableAccount('feedly');
-                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                loadFeeds();
             }
         }
 
@@ -1375,7 +1375,7 @@
             } else {
                 params.accounts.theoldreader.logged = false;
                 _disableAccount('theoldreader');
-                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                loadFeeds();
                 document.getElementById('theoldreaderForm').style.cssText = 'display: block';
             }
         }
@@ -1389,7 +1389,7 @@
             } else {
                 params.accounts.aolreader.logged = false;
                 _disableAccount('aolreader');
-                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                loadFeeds();
             }
         }
  
@@ -1405,7 +1405,7 @@
             } else {
                 params.accounts.tinytinyrss.logged = false;
                 _disableAccount('tinytinyrss');
-                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                loadFeeds();
                 document.getElementById('tinytinyrssForm').style.cssText = 'display: block';
             }
         }        
@@ -1424,10 +1424,25 @@
         my.log("dspSettings() " + (end - start) + " milliseconds.");
     }
 
+    function setNbFeedsToLoad() {
+        var _nbFeedsToLoad = 0;
+        for (var _account in myFeedsSubscriptions) {
+            if (params.accounts[_account].logged) {
+                _nbFeedsToLoad = _nbFeedsToLoad + myFeedsSubscriptions[_account].length;
+            }
+        }
+        liveValues.feeds.nbFeedsToLoad = _nbFeedsToLoad;
+    }
+
+    function loadFeeds() {
+        setNbFeedsToLoad();
+        gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+    }
+
     function dspFeeds(feeds) {
         var start = performance.now();
         
-        my.log('dspFeeds()', arguments);
+        my.log('dspFeeds()', feeds);
         my.log(feeds.length + ' feeds');
 
         var _html = {
@@ -1469,7 +1484,7 @@
 
         for (var i = 0; i < feeds.length; i++) {
             var _feed = feeds[i];
-            var _account = _feed._myAccount;
+            var _account = _feed._myParams.account;
             var _deleteIcone = '';
 
             if ((_account == 'local') ||
@@ -1484,7 +1499,7 @@
                     _class = _class + ' _proxyNotAvailable_'; // Proxy not available for "aolreader" & "feedly". Not yet implemented.
                 }
                     
-                _deleteIcone = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed._myFeedId + '"><span data-icon="delete"></span></button>';
+                _deleteIcone = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed.feed._myFeedId + '"><span data-icon="delete"></span></button>';
             }
 
             var _myLastPublishedDate = (_feed._myLastTimestamp == 0) ? "No news" : _feed._myLastPublishedDate;
@@ -1702,8 +1717,8 @@
 
                         var _accountIcone = '';
 
-                        if (_entrie._myFeedInformations._myAccount != 'local') {
-                            _accountIcone = '<img src="images/' + _entrie._myFeedInformations._myAccount + '.' + _theme + '.png" data-src="images/' + _entrie._myFeedInformations._myAccount + '.' + _theme + '.png" />';
+                        if (_entrie._myFeedInformations._myParams.account != 'local') {
+                            _accountIcone = '<img src="images/' + _entrie._myFeedInformations._myParams.account + '.' + _theme + '.png" data-src="images/' + _entrie._myFeedInformations._myParams.account + '.' + _theme + '.png" />';
                         }
 
                         // Content ( Normal / Small )
@@ -2000,7 +2015,6 @@
 
                         _url        = _feeds[j].feedUrl;
                         _pulsations = _feeds[j]._myPulsations;
-                        _account    = _feeds[j]._myAccount; // test
 
                         if (isNaN(_pulsations)) {
                             // do nothing
@@ -2104,7 +2118,7 @@
 
         if (_nbFeedsSubscriptions > 0) {
             gf.setFeedsSubscriptions(myFeedsSubscriptions);
-            gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+            loadFeeds();
         }
 
         // ---
@@ -2329,7 +2343,7 @@
                 ui.loadImages();
                 localizeTimes();
             }
-        }, 500);
+        }, 350);
 
         // ==============
         // --- Events ---
@@ -2368,7 +2382,7 @@
             if (navigator.onLine && ((_nowInterval - _startInterval) >= (params.entries.updateEvery * 1000))) {
                 _startInterval = _nowInterval;
                 ui._onclick(sync, 'disable');
-                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                loadFeeds();
             }
         }, 59000); // 59s Less than minimal Firefox OS sleep time (60s)
         
@@ -2564,7 +2578,7 @@
                         (myFeedsSubscriptions.aolreader.length > 0) || 
                         (myFeedsSubscriptions.tinytinyrss.length > 0)
                     ){
-                        gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                        loadFeeds();
                     } else {
                         ui.echo("feeds-list", "", "");
                         ui.echo("feeds-entries", "", "");
@@ -2581,47 +2595,48 @@
             }
         }
 
-        /* ===================== */
-        /* --- Google Events --- */
-        /* ===================== */
+        /* ======================== */
+        /* --- SimplePie Events --- */
+        /* ======================== */
 
-        document.body.addEventListener('GoogleFeed.load.done', function(event){
-
+        document.body.addEventListener('SimplePie.load.done', function(event){
+            //my.alert('SimplePie.load.done');
+            
             // Save feed as file
 
             if (navigator.onLine) {
-                my._save('cache/google/feeds/' + btoa(event.detail.responseData.feed.feedUrl) + ".json", "application/json", JSON.stringify(event.detail.responseData.feed)).then(function(results) {
-                    my.log('GoogleFeed.load.done > Saving feed in cache ok : ' + event.detail.responseData.feed.feedUrl + ' ('+btoa(event.detail.responseData.feed.feedUrl)+')');
+                my._save('cache/simplepie/feeds/' + btoa(event.detail.feedUrl) + ".json", "application/json", JSON.stringify(event.detail)).then(function(results) {
+                    my.log('SimplePie.load.done > Saving feed in cache ok : ' + event.detail.feed.feedUrl + ' ('+btoa(event.detail.feedUrl)+')');
                 }).catch(function(error) {
-                    my.error("ERROR saving feed in cache : " + event.detail.responseData.feed.feedUrl + ' ('+btoa(event.detail.responseData.feed.feedUrl)+')');
-                    my.alert("ERROR saving feed in cache :\n" + event.detail.responseData.feed.feedUrl);
+                    my.error("ERROR saving feed in cache : " + event.detail.feedUrl + ' ('+btoa(event.detail.feedUrl)+') ' + error);
+                    my.alert("ERROR saving feed in cache :\n" + event.detail.feedUrl);
                 });
             }
 
             // Add feed entries to array "unsortedEntries"
 
-                gf.addFeed(event.detail.responseData.feed);
+                gf.addFeed(event.detail);
 
             // Check if all feeds were loaded
 
-                var _nbFeedsToLoad = event.detail.responseData._myParams.nbFeeds;
-                var _nbFeedsLoaded = gf.getNbFeedsLoaded();
-                gf.setNbFeedsLoaded(++_nbFeedsLoaded);
+                liveValues.feeds.nbFeedsLoaded++;
 
                 // Percentage of loading ?
 
-                ui._loading(Math.round((100 * _nbFeedsLoaded) / _nbFeedsToLoad));
+                ui._loading(Math.round((100 * liveValues.feeds.nbFeedsLoaded) / liveValues.feeds.nbFeedsToLoad));
 
                 // ---
 
-                if (_nbFeedsLoaded == _nbFeedsToLoad) {
+                if (liveValues.feeds.nbFeedsLoaded == liveValues.feeds.nbFeedsToLoad) {
                     dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
                     dspFeeds(gf.getFeeds());
-                    dspSettings();
+                    //dspSettings();
                     updateFeedsPulsations();
                 }
-
-                if (_nbFeedsLoaded >= _nbFeedsToLoad) {
+                
+                if (liveValues.feeds.nbFeedsLoaded >= liveValues.feeds.nbFeedsToLoad) {
+                    liveValues.feeds.nbFeedsToLoad = 0;
+                    liveValues.feeds.nbFeedsLoaded = 0;
                     ui._loading(100); ui.echo("loading", "", "");
                     if (navigator.onLine) {
                         ui._onclick(sync, 'enable');
@@ -2632,30 +2647,30 @@
 
         }, true);
 
-        document.body.addEventListener('GoogleFeed.load.error', function(event){
-
+        document.body.addEventListener('SimplePie.load.error', function(event){
+            //my.alert('SimplePie.load.error');
             // Check if all feeds were loaded
 
                 my.error(event);
 
-                var _nbFeedsToLoad = event.detail._myParams.nbFeeds; // different de "done"
-                var _nbFeedsLoaded = gf.getNbFeedsLoaded();
-                gf.setNbFeedsLoaded(++_nbFeedsLoaded);
+                liveValues.feeds.nbFeedsLoaded++;
 
                 // Percentage of loading ?
 
-                ui._loading(Math.round((100 * _nbFeedsLoaded) / _nbFeedsToLoad));
+                ui._loading(Math.round((100 * liveValues.feeds.nbFeedsLoaded) / liveValues.feeds.nbFeedsToLoad));
 
                 // ---
 
-                if (_nbFeedsLoaded == _nbFeedsToLoad) {
+                if (liveValues.feeds.nbFeedsLoaded == liveValues.feeds.nbFeedsToLoad) {
                     dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
                     dspFeeds(gf.getFeeds());
-                    dspSettings();
+                    //dspSettings();
                     updateFeedsPulsations();
                 }
-
-                if (_nbFeedsLoaded >= _nbFeedsToLoad) {
+                
+                if (liveValues.feeds.nbFeedsLoaded >= liveValues.feeds.nbFeedsToLoad) {
+                    liveValues.feeds.nbFeedsToLoad = 0;
+                    liveValues.feeds.nbFeedsLoaded = 0;
                     ui._loading(100); ui.echo("loading", "", "");
                     if (navigator.onLine) {
                         ui._onclick(sync, 'enable');
@@ -2666,7 +2681,11 @@
 
         }, true);
 
-        document.body.addEventListener('GoogleFeed.find.done', findFeedsDisplayResults, true);
+        document.body.addEventListener('SimplePie.isValidUrl.done', findFeedsDisplayResults, true);
+
+        document.body.addEventListener('SimplePie.isValidUrl.error', function(){
+            ui.echo("find-feeds", "Invalid URL", "");
+        }, true);
 
         /* ===================== */
         /* --- Feedly Events --- */
@@ -2705,7 +2724,7 @@
             
             if (_loginInProgress['feedly'] == true ) {
                 _loginInProgress['feedly'] = false;
-                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                loadFeeds();
             }
             
             my._save("subscriptions.feedly.json", "application/json", JSON.stringify(myFeedsSubscriptions.feedly)).then(function(results) {
@@ -2765,7 +2784,7 @@
             
             if (_loginInProgress['theoldreader'] == true ) {
                 _loginInProgress['theoldreader'] = false;
-                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                loadFeeds();
             }
             
             my._save("subscriptions.theoldreader.json", "application/json", JSON.stringify(myFeedsSubscriptions.theoldreader)).then(function(results) {
@@ -2832,7 +2851,7 @@
             
             if (_loginInProgress['aolreader'] == true ) {
                 _loginInProgress['aolreader'] = false;
-                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                loadFeeds();
             }
 
             my._save("subscriptions.aolreader.json", "application/json", JSON.stringify(myFeedsSubscriptions.aolreader)).then(function(results) {
@@ -2892,7 +2911,7 @@
             
             if (_loginInProgress['tinytinyrss'] == true ) {
                 _loginInProgress['tinytinyrss'] = false;
-                gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+                loadFeeds();
             }
             
             my._save("subscriptions.tinytinyrss.json", "application/json", JSON.stringify(myFeedsSubscriptions.tinytinyrss)).then(function(results) {

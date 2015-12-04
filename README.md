@@ -1,10 +1,4 @@
-# IMPORTANT MESSAGE 2015.12.02 
-Due to the end of Google Feeds API this app no longer works.  
-I hope to be back soon with a new version 1.4  
-Sorry for the inconvenience.  
-Thierry  
-  
-# myFeeds 1.3.1: RSS reader for Firefox OS  
+# myFeeds 1.4.0 (2015-12-04): RSS reader for Firefox OS  
 This project is now hosted by Framasoft.  
 The main GIT repository URL is now : 
 https://git.framasoft.org/thierry-bugeat/myFeeds

@@ -17,14 +17,11 @@
  * along with myFeeds.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ======================== */
-/* --- GoogleFeed Class --- */
-/* ======================== */
+/* ======================= */
+/* --- SimplePie Class --- */
+/* ======================= */
 
-// Call example :
-// https://www.google.com/uds/Gfeeds?&num=4&hl=en&output=json&q=http%3A%2F%2Fwww.nextinpact.com%2Frss%2Fnews.xml&key=notsupplied&v=1.0
-
-var GoogleFeed = function() {
+var SimplePie = function() {
     
     //MyFeeds.call(this); /* Appel du constructeur de la classe parente */
 
@@ -35,8 +32,8 @@ var GoogleFeed = function() {
         "key"           : "notsupplied",                                            // Google API key
         "v"             : "1.0" ,                                                   // Google API version
         "scoring"       : "h",                                                      // Include historical entries
-        "ServiceBase"   : "https://www.google.com/uds/Gfeeds?",                     //
-        "ServiceFind"   : "https://ajax.googleapis.com/ajax/services/feed/find?",   //
+        "ServiceBase"   : "http://54.229.143.103/simplepie/?",                      //
+        "ServiceFind"   : "http://54.229.143.103/simplepie/?",                      //
         "method"        : "GET"
     };
     
@@ -48,24 +45,24 @@ var GoogleFeed = function() {
     this.unsortedFeeds = [];
     this.nbFeedsLoaded = 0;
 
-    _GoogleFeed = this;
+    _SimplePie = this;
 }
-GoogleFeed.prototype = new MyFeeds();
+SimplePie.prototype = new MyFeeds();
 
 /* ================ */
 /* --- Methodes --- */
 /* ================ */
 
-GoogleFeed.prototype.getVersion         = function()        { return this.gf.version;       }
-GoogleFeed.prototype.getOuput           = function()        { return this.gf.output;        }
-GoogleFeed.prototype.getNum             = function()        { return this.gf.num;           }
-GoogleFeed.prototype.getEntries         = function()        { this._sortEntries();  return this.gf_sortedEntries;   }
-GoogleFeed.prototype.getFeeds           = function()        { this._sortFeeds();    return this.sortedFeeds;        }
-GoogleFeed.prototype.getNbFeedsLoaded   = function()        { return this.nbFeedsLoaded;    }
+SimplePie.prototype.getVersion         = function()        { return this.gf.version;       }
+SimplePie.prototype.getOuput           = function()        { return this.gf.output;        }
+SimplePie.prototype.getNum             = function()        { return this.gf.num;           }
+SimplePie.prototype.getEntries         = function()        { this._sortEntries();  return this.gf_sortedEntries;   }
+SimplePie.prototype.getFeeds           = function()        { this._sortFeeds();    return this.sortedFeeds;        }
+SimplePie.prototype.getNbFeedsLoaded   = function()        { return this.nbFeedsLoaded;    }
 
-GoogleFeed.prototype._setUrl            = function(q)       { this.gf.q = q;                }
+SimplePie.prototype._setUrl            = function(q)       { this.gf.q = q;                }
 
-GoogleFeed.prototype._sortEntries       = function() {
+SimplePie.prototype._sortEntries       = function() {
     
     // Sort entries by "_myTimestampInMs" 
     
@@ -123,12 +120,12 @@ GoogleFeed.prototype._sortEntries       = function() {
     //_MyFeeds.log(this.gf_sortedEntries);
 }
 
-GoogleFeed.prototype._sortFeeds = function() { 
+SimplePie.prototype._sortFeeds = function() { 
     this.sortedFeeds = this.unsortedFeeds;
     this.sortedFeeds.sort(function(a, b){ return b.title < a.title });
 }
 
-GoogleFeed.prototype._setNum = function(num) { 
+SimplePie.prototype._setNum = function(num) { 
     if (num == "Infinity") {
         this.gf.num = 1;
         _MyFeeds.warn("_setNum : incorrect value " + num + " => Set to 1");
@@ -140,8 +137,8 @@ GoogleFeed.prototype._setNum = function(num) {
     }
 }
 
-GoogleFeed.prototype.setFeedsSubscriptions = function(myFeedsSubscriptions) { 
-    _MyFeeds.log('GoogleFeed.prototype.setFeedsSubscriptions()', arguments);
+SimplePie.prototype.setFeedsSubscriptions = function(myFeedsSubscriptions) { 
+    _MyFeeds.log('SimplePie.prototype.setFeedsSubscriptions()', arguments);
     
     var _tmp = [];
     
@@ -155,11 +152,11 @@ GoogleFeed.prototype.setFeedsSubscriptions = function(myFeedsSubscriptions) {
     this.myFeedsSubscriptions = _tmp;
 }
 
-GoogleFeed.prototype.setNbFeedsLoaded   = function()        { this.nbFeedsLoaded++;         }
+SimplePie.prototype.setNbFeedsLoaded   = function()        { this.nbFeedsLoaded++;         }
 
-GoogleFeed.prototype.addEntries = function(entries) {
+SimplePie.prototype.addEntries = function(entries) {
     var start = performance.now();
-    _MyFeeds.log('GoogleFeed.prototype.addEntries', arguments);
+    _MyFeeds.log('SimplePie.prototype.addEntries', arguments);
     
     var _nb = entries.length;
     
@@ -214,10 +211,10 @@ GoogleFeed.prototype.addEntries = function(entries) {
         }
     }
     _MyFeeds.log(this.gf_mySha256);
-    _MyFeeds.log('GoogleFeed.prototype.addEntries : ' + this.gf_unsortedEntries.length + ' entrie(s)');
+    _MyFeeds.log('SimplePie.prototype.addEntries : ' + this.gf_unsortedEntries.length + ' entrie(s)');
     
     var end = performance.now();
-    _MyFeeds.log("GoogleFeed.prototype.addEntries() " + (end - start) + " milliseconds.");
+    _MyFeeds.log("SimplePie.prototype.addEntries() " + (end - start) + " milliseconds.");
 }
 
 /**
@@ -225,7 +222,7 @@ GoogleFeed.prototype.addEntries = function(entries) {
  * @param {string} account "local", "feedly", "theoldreader"...
  * @param {string} feedId or empty value "" for all feeds
  * */
-GoogleFeed.prototype.deleteEntries = function(account, feedId) {
+SimplePie.prototype.deleteEntries = function(account, feedId) {
     _MyFeeds.log('deleteEntries(' + account + ', ' + feedId + ')');
     
     var start = performance.now();
@@ -258,7 +255,7 @@ GoogleFeed.prototype.deleteEntries = function(account, feedId) {
  * @param {int} timestamp 
  * @return {null}
  * */
-GoogleFeed.prototype.deleteOldEntries = function(timestamp) {
+SimplePie.prototype.deleteOldEntries = function(timestamp) {
     _MyFeeds.log('deleteOldEntries(' + timestamp + ')');
     
     var date = new Date(timestamp * 1000);
@@ -283,12 +280,12 @@ GoogleFeed.prototype.deleteOldEntries = function(timestamp) {
     _MyFeeds.log('deleteOldEntries(' + timestamp + ') => ' + _oldEntries + ' old entrie(s) has been deleted');
 }
 
-GoogleFeed.prototype.addFeed = function(feed) {
+SimplePie.prototype.addFeed = function(feed) {
     var start = performance.now();
-    _MyFeeds.group('GoogleFeed.prototype.addFeed()', feed.title);
-    _MyFeeds.log('GoogleFeed.prototype.addFeed()', arguments);
-    _MyFeeds.log('GoogleFeed.prototype.addFeed()', feed.entries);
-    console.groupEnd();
+    //_MyFeeds.group('SimplePie.prototype.addFeed()', feed.title);
+    _MyFeeds.log('SimplePie.prototype.addFeed()', feed);
+    //_MyFeeds.log('SimplePie.prototype.addFeed()', feed.entries);
+    //console.groupEnd();
 
     var _myNewfeed = feed;
     var _myNewEntries = feed.entries;
@@ -360,9 +357,9 @@ GoogleFeed.prototype.addFeed = function(feed) {
  * Load all feeds
  * @param {int} nbDaysToLoad Limit loading to N days.
  * */
-GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
+SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
     
-    _MyFeeds.log('GoogleFeed.prototype.loadFeeds()', this.myFeedsSubscriptions);
+    _MyFeeds.log('SimplePie.prototype.loadFeeds()', this.myFeedsSubscriptions);
 
     this.nbFeedsLoaded = 0;
     //this.gf_unsortedEntries = []; // Store all entries of all feeds
@@ -372,54 +369,57 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
 
     if (this.myFeedsSubscriptions.length > 0) {
         for (var i = 0; i < this.myFeedsSubscriptions.length; i++) {
-
+            
             var _myFeed = this.myFeedsSubscriptions[i];
             this._setUrl(_myFeed.url);
 
             this._setNum(1 + Math.floor(_myFeed.pulsations * nbDaysToLoad)); // Pulsations = Estimation of news per day.
 
-            var _urlParams = '&output=' + this.gf.output + '&num=' + this.gf.num + '&scoring=' + this.gf.scoring + '&q=' + encodeURIComponent(this.gf.q) + '&key=' + this.gf.key + '&v=' + this.gf.v + "&rnd=" + Math.random();
+            var _urlParams = 'url=' + encodeURIComponent(this.gf.q) + '&num=' + this.gf.num;
             var _url    = this.gf.ServiceBase + _urlParams;
 
             if (params.settings.proxy.use) {
-                _urlParams = '&url=' + encodeURIComponent(this.gf.ServiceBase + '&output=' + this.gf.output + '&num=' + this.gf.num + '&scoring=' + this.gf.scoring + '&q=' + encodeURIComponent(this.gf.q) + '&key=' + this.gf.key + '&v=' + this.gf.v + "&rnd=" + Math.random());
+                _urlParams = '&url=' + encodeURIComponent(this.gf.ServiceBase);
                 _url = 'http://' + params.settings.proxy.host + '/proxy/?' + _urlParams;
             }
 
-            //_MyFeeds.log("GoogleFeed.load.done : " + _url);
-            //_MyFeeds.log("GoogleFeed.load.done : ", _myFeed);
+            //_MyFeeds.log("SimplePie.load.done : " + _url);
+            //_MyFeeds.log("SimplePie.load.done : ", _myFeed);
             
             var _params = {"nbFeeds": this.myFeedsSubscriptions.length, "account": _myFeed.account, "url": _myFeed.url, "id": _myFeed.id, "pulsations": _myFeed.pulsations};
             
             var promise = this.get(_url, _params);
         
             promise.then(function(response) {
-                response.responseData.feed._myAccount = response.responseData._myParams.account; // Add _myAccount value
-                response.responseData.feed._myFeedId = response.responseData._myParams.id; // Add __id value
-                _MyFeeds.log("GoogleFeed.prototype.loadFeeds() > get > response : ", response);
-                document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": response}));
+                response.feed = {};
+                response.feed._myAccount = response._myParams.account; // Add _myAccount value
+                response.feed._myFeedId = response._myParams.id; // Add __id value
+                _MyFeeds.log("SimplePie.prototype.loadFeeds() > get > response : ", response);
+                document.body.dispatchEvent(new CustomEvent('SimplePie.load.done', {"detail": response}));
+                //_MyFeeds._save('cache/simplepie/feeds/' + btoa(response.detail.feedUrl) + ".0.json", "application/json", JSON.stringify(response)); 
             }, function(error) {
                 // Network error then try to load feed from cache
                 
                 try {
                     var _message = JSON.parse(error.message);
                 } catch (e) {
-                    window.alert("ERROR: Loading from cache\n" + e.message + ' / ' + JSON.stringify(error));
                     error._myParams = _params;
                     error._myFeedUrl = _myFeed.url;
-                    document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.error', {"detail": error}));
+                    document.body.dispatchEvent(new CustomEvent('SimplePie.load.error', {"detail": error}));
                 }
                 
-                my._load('cache/google/feeds/' + btoa(_message.responseData._myParams.url) + ".json").then(function(_cacheContent){
-                    _message.responseData.feed = _cacheContent;
-                    document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.done', {"detail": _message}));
+                my._load('cache/simplepie/feeds/' + btoa(_message._myParams.url) + ".json").then(function(_cacheContent){
+                    _message.feed = _cacheContent;
+                    document.body.dispatchEvent(new CustomEvent('SimplePie.load.done', {"detail": _message}));
                 }).catch(function(error) {
                     // @todo
                     error._myParams = _params;
                     error._myFeedUrl = _myFeed.url;
-                    document.body.dispatchEvent(new CustomEvent('GoogleFeed.load.error', {"detail": error}));
+                    document.body.dispatchEvent(new CustomEvent('SimplePie.load.error', {"detail": error}));
                 });
                 // ---
+            }).catch(function(error){
+                document.body.dispatchEvent(new CustomEvent('SimplePie.load.error', {"detail": error}));
             });
         }
     }
@@ -427,38 +427,30 @@ GoogleFeed.prototype.loadFeeds = function(nbDaysToLoad) {
 }
 
 /**
- * findFeeds(keywords)
+ * isValidUrl(url)
+ * Check if feed exists.
  * 
- * @param {string} keywords
+ * @param {string} url
+ * @return {boolean}
  * 
- * Documentation : https://developers.google.com/feed/v1/jsondevguide
  * */
-GoogleFeed.prototype.findFeeds = function(keywords) {
+SimplePie.prototype.isValidUrl = function(url) {
     
-    _MyFeeds.log('GoogleFeed.prototype.findFeeds()', arguments);
+    _MyFeeds.log('SimplePie.prototype.isValidUrl()', arguments);
     
     return new Promise(function(resolve, reject) {
         
-        var _params     = {};
-        var _urlParams  = '&q=' + encodeURIComponent(keywords) + '&v=' + _GoogleFeed.gf.v;
-        var _url        = _GoogleFeed.gf.ServiceFind + _urlParams;
-
-        if (params.settings.proxy.use) {
-            _urlParams = '&url=' + encodeURIComponent(_GoogleFeed.gf.ServiceFind + '&q=' + encodeURIComponent(keywords) + '&v=' + _GoogleFeed.gf.v);
-            _url = 'http://' + params.settings.proxy.host + '/proxy/?' + _urlParams;
-        }
-
-        var promise     = _GoogleFeed.get(_url, _params);
+        var _urlParams  = 'url=' + encodeURIComponent(url) + '&num=1';
+        var _url        = _SimplePie.gf.ServiceBase + _urlParams;
+        
+        var promise = _SimplePie.get(_url, {});
 
         promise.then(function(response) {
-            _MyFeeds.log(response);
-            document.body.dispatchEvent(new CustomEvent('GoogleFeed.find.done', {"detail": response}));
-            resolve(response);
-        }).catch(function(error) {
-            error._myParams = _params;
-            document.body.dispatchEvent(new CustomEvent('GoogleFeed.find.error', {"detail": error}));
-            _MyFeeds.error("ERROR ", error);
-            reject(Error(JSON.stringify(error)));
+            console.log(response); // @todo remove
+            document.body.dispatchEvent(new CustomEvent('SimplePie.isValidUrl.done', {"detail": response}));
+        }).catch(function(error){
+            console.log(error); // @todo remove
+            document.body.dispatchEvent(new CustomEvent('SimplePie.isValidUrl.error', {"detail": error}));
         });
 
     });
@@ -472,9 +464,9 @@ GoogleFeed.prototype.findFeeds = function(keywords) {
  * 
  * */
  
-GoogleFeed.prototype.get = function (url, myParams) {
+SimplePie.prototype.get = function (url, myParams) {
     
-    _MyFeeds.log('GoogleFeed.prototype.get()', arguments);
+    _MyFeeds.log('SimplePie.prototype.get()', arguments);
     
     return new Promise(function(resolve, reject) {
         
@@ -484,15 +476,21 @@ GoogleFeed.prototype.get = function (url, myParams) {
 
             xhr.open("GET", url);
 
-            _MyFeeds.log('GoogleFeed.prototype.get()', url);
+            _MyFeeds.log('SimplePie.prototype.get()', url);
 
             xhr.onload = function() {
                 if (xhr.status == 200) {
 
                     var _response = JSON.parse(xhr.response);
 
+                    if ((_response.entries.length == 0) || (typeof _response.feedUrl === 'null')) {
+                       _MyFeeds.error('ERROR 110 ' + url);
+                        var _response = {"responseData": {"_myParams": myParams}};
+                        reject(Error(JSON.stringify(_response)));
+                    }
+
                     try {
-                        _response.responseData._myParams = myParams; // Add extra values
+                        _response._myParams = myParams; // myParams; // Add extra values
                         resolve(_response);
                     } catch(err) {
                         var _response = {"responseData": {"_myParams": myParams}};
@@ -500,14 +498,14 @@ GoogleFeed.prototype.get = function (url, myParams) {
                     }
                     
                 } else {
-                    _MyFeeds.error('ERROR ' + url);
+                    _MyFeeds.error('ERROR 111 ' + url);
                     var _response = {"responseData": {"_myParams": myParams}};
                     reject(Error(JSON.stringify(_response)));
                 }
             };
 
             xhr.onerror = function(e) {
-                _MyFeeds.error('ERROR ' + url);
+                _MyFeeds.error('ERROR 112 ' + url);
                 _MyFeeds.error(e);
                 var _response = {"responseData": {"_myParams": myParams}};
                 reject(Error(JSON.stringify(_response)));
@@ -524,7 +522,7 @@ GoogleFeed.prototype.get = function (url, myParams) {
  * @param {object} entry
  * @return {boolean} true, false
  * */
-GoogleFeed.prototype.isSmallEntry = function (entry) {
+SimplePie.prototype.isSmallEntry = function (entry) {
 
     var _out;
     var _diff = entry.content.length - entry.contentSnippet.length;

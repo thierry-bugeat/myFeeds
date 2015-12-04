@@ -1,12 +1,27 @@
 --------------------------------------------------------- 
-#myFeeds 1.3.1 (2015-11-24) 
+# myFeeds 1.4.0 (2015-12-04) 
+
+### Severe Bug(s) 
+ 
+    - #45 Remove usage of Google Feeds API 
+ 
+--------------------------------------------------------- 
+# Important message 2015.12.02 
+  
+Due to the usage of deprecated Google Feeds API, versions
+of myFeeds prior to 1.3.x no longer works.  
+Sorry for the inconvenience.  
+Please download version 1.4.0
+
+--------------------------------------------------------- 
+# myFeeds 1.3.1 (2015-11-24) 
 
 ### Bug(s) 
  
     - Bug in news display when animations are off 
  
 --------------------------------------------------------- 
-#myFeeds 1.3.0 (2015-11-24) 
+# myFeeds 1.3.0 (2015-11-24) 
 
 ### New feature(s) 
  
