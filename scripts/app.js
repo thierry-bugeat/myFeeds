@@ -130,6 +130,9 @@
         },
         "animations": {
             "inProgress": false                 // Set to "true" when user click on elements with "_startAnimation_" class.
+        },
+        "network": {
+            "online": "NA"
         }
     }
     
@@ -141,10 +144,6 @@
     
     var _loginInProgress = {"local": false, "feedly": false, "theoldreader": false, "aolreader": false, "tinytinyrss": false}
 
-    // Network Connection
-
-    var _onLine = "NA";
-    
     var _previousNbDaysAgo = -1;
 
     // Load params from SDCard.
@@ -954,9 +953,9 @@
         '<section data-type="list">',
         '<ul>',
         
-        '   <li class="_online_">',
+        '   <li class="_online_" id="lastUpdate">',
         '       <aside class="icon"><span data-icon="reload"></span></aside>',
-        '       <aside class="pack-end"><p class="double">' + _now.toLocaleTimeString(userLocale) + '</p></aside>',
+        '       <aside class="pack-end"><p class="double" id="lastUpdateTime">' + _now.toLocaleTimeString(userLocale) + '</p></aside>',
         '       <a href="#"><p class="double"><my data-l10n-id="settings-last-update">' + document.webL10n.get('settings-last-update') + '</my></p></a>',
         '   </li>',
 
@@ -1435,6 +1434,11 @@
     }
 
     function loadFeeds() {
+        try {
+            var _now = new Date();
+            document.getElementById('lastUpdateTime').innerHTML = _now.toLocaleTimeString(userLocale); 
+        } catch (error) {}
+
         setNbFeedsToLoad();
         gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
     }
@@ -2306,18 +2310,23 @@
         // ===============================================
 
         setInterval(function() {
-            if (_onLine != navigator.onLine) {
+            if (liveValues.network.online != navigator.onLine) {
                 var _status = navigator.onLine == true ? 'enable' : 'disable';
 
-                document.body.dispatchEvent(new CustomEvent('networkConnection.change', {"detail": _onLine}));
+                document.body.dispatchEvent(new CustomEvent('networkConnection.change', {"detail": liveValues.network.online}));
 
                 ui.toggle(_status);
 
                 // Store current connection status
 
-                _onLine = navigator.onLine;
+                liveValues.network.online = navigator.onLine;
 
                 // ---
+            }
+            // --- Fix some network change issues
+            // Sync button is disabled but navigator is online & no synchro is in progress !
+            if (((ui._status(sync) == 'disable') || (ui._status(lastUpdate) == 'disable')) && (liveValues.feeds.nbFeedsToLoad == 0) && (navigator.onLine) && (liveValues.network.online == 'enable')) {
+                ui._enable();
             }
         }, 5000);
         
