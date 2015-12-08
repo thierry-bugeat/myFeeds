@@ -209,11 +209,35 @@ MyUi.prototype._onclick = function(_this, pointerEvents) {
 }
 
 /**
- * Disable UI elements.
- * Used when app is offline as startup.
- * @param {sting} _status "disable"
+ * Return status of specified element id
+ * @param {string} _this
+ * @return {string} enable|disable|
  * */
-MyUi.prototype._disable = function(_status) {
+MyUi.prototype._status = function(_this) {
+    var _status = "";
+
+    if (_this !== null) {
+        if (_this.classList.contains("enable")) {
+            _status = "enable";
+        } else {
+            _status = "disable";
+        }
+    }
+
+    return _status;
+}
+
+/**
+ * Enable UI elements.
+ * */
+MyUi.prototype._enable = function() {
+    _MyUi.toggle('enable');
+}
+
+/**
+ * Disable UI elements.
+ * */
+MyUi.prototype._disable = function() {
     _MyUi.toggle('disable');
 }
 
