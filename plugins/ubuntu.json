@@ -1,0 +1,45 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {
+            "config.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<preference name=\"AndroidPersistentFileLocation\" value=\"Internal\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Camera\"><param policy_group=\"connectivity\" policy_version=\"1\" /></feature>",
+                            "count": 1
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "installed_plugins": {
+        "cordova-plugin-device": {
+            "PACKAGE_NAME": "com.bugeat.myfeeds"
+        },
+        "cordova-plugin-file": {
+            "PACKAGE_NAME": "com.bugeat.myfeeds"
+        },
+        "cordova-plugin-inappbrowser": {
+            "PACKAGE_NAME": "com.bugeat.myfeeds"
+        },
+        "cordova-plugin-network-information": {
+            "PACKAGE_NAME": "com.bugeat.myfeeds"
+        },
+        "cordova-plugin-vibration": {
+            "PACKAGE_NAME": "com.bugeat.myfeeds"
+        },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.bugeat.myfeeds"
+        }
+    },
+    "dependent_plugins": {}
+}

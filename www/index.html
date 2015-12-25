@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+    <head>
+        <!--
+            Customize this policy to fit your own app's needs. For more guidance, see:
+            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+            Some notes:
+            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+            * Enable inline JS: add 'unsafe-inline' to default-src
+        -->
+        <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+
+        <meta charset="UTF-8">
+        <meta name="theme-color" content="#CD6723" id="theme-color">
+        <title data-l10n-id="app-title">my Feeds</title>
+        <link rel="icon" type="image/png" href="images/icon-128.png">
+        <link href="css/ffos1.4.css" type="text/css" rel="stylesheet">
+        <link href="css/vars.css" type="text/css" rel="stylesheet">
+        <link href="css/colors.css" type="text/css" rel="stylesheet">
+        <link href="css/fonts.css" type="text/css" rel="stylesheet">
+        <link href="css/gaia-icons.css" type="text/css" rel="stylesheet">
+        <link href="css/font-awesome.css" type="text/css" rel="stylesheet">
+        <link href="css/header.css" type="text/css" rel="stylesheet">
+        <link href="css/subheader.css" type="text/css" rel="stylesheet">
+        <link href="css/footer.css" type="text/css" rel="stylesheet">
+        <link href="css/browser.css" type="text/css" rel="stylesheet">
+        <link href="css/feeds-list.css" type="text/css" rel="stylesheet">
+        <link href="css/find-feeds.css" type="text/css" rel="stylesheet">
+        <link href="css/settings.css" type="text/css" rel="stylesheet">
+        <link href="css/style.css" type="text/css" rel="stylesheet">
+        <link href="css/entries-list.css" type="text/css" rel="stylesheet">
+        <link href="css/switches.css" type="text/css" rel="stylesheet">
+        <link href="css/buttons.css" type="text/css" rel="stylesheet">
+        <link href="css/input_areas.css" type="text/css" rel="stylesheet">
+        <link href="css/main-entry.css" type="text/css" rel="stylesheet">
+        <link href="css/in-app-browser.css" type="text/css" rel="stylesheet">
+
+    </head>
+
+    <body>
+
+        <div id="loading"></div>
+
+        <!-- ================= -->
+        <!-- Find feeds screen -->
+        <!-- ================= -->
+
+        <div role="region" data-type="sidebar" id="find-feeds-container">
+
+            <section role="myHeader">
+                <header class="mySystemHeader">
+                    <h1 data-l10n-id="add-feed">Add Feed</h1>
+                </header>
+            </section>
+
+            <section role="mySubHeader">
+                <header class="mySystemHeader">
+                    <form id="findFeeds" action="#" class="_online_">
+                        <input type="text" required="required" placeholder="http://" id="findFeedsText">
+                        <button type="reset" id="findFeedsReset"><span data-icon="delete"></span></button>
+                        <button type="submit" id="findFeedsSubmit"><span data-icon="search"></span></button>
+                    </form>
+                </header>
+            </section>
+
+            <div id="find-feeds" class="scrollable"></div>
+
+            <section role="myFooter" class="">
+                <header>
+                    <button id="findFeedsClose"><span data-icon="close"></span></button>
+                </header>
+            </section>
+
+        </div>
+
+        <!-- ==================== -->
+        <!-- Subscriptions screen -->
+        <!-- ==================== -->
+
+        <div role="region" data-type="sidebar" id="feeds-list-container">
+
+            <section role="myHeader">
+                <header class="mySystemHeader">
+                    <h1 data-l10n-id="my-subscriptions">my Subscriptions</h1>
+                </header>
+            </section>
+
+            <div id="feeds-list" class="scrollable"></div>
+
+            <section role="myFooter" class="">
+                <header>
+                    <button id="closeFeedsList" class="_startAnimation_"><span data-icon="close"></span></button>
+                    <button id="findFeedsOpen" class="_online_"><span data-icon="add"></span></button>
+                    <button id="topupFeedsList"><span data-icon="topup"></span></button>
+                </header>
+            </section>
+
+        </div>
+
+        <!-- =========== -->
+        <!-- Main screen -->
+        <!-- =========== -->
+
+        <div id="main">
+
+            <div id="feeds-entries-container">
+
+                <section role="myHeader">
+                    <header>
+                        <button id="nextDay"><span data-icon="back"></span></button>
+                        <h1 data-l10n-id="app-title">my Feeds</h1>
+                        <button id="previousDay"><span data-icon="forward"></span></button>
+                    </header>
+                </section>
+
+                <section role="mySubHeader">
+                    <header class="mySystemHeader">
+                        <h2 id="feedsEntriesNbDaysAgo"></h2>
+                        <span id="displayGrid" class="icone grid"></span>
+                        <span id="displayList" class="icone list"></span>
+                        <span id="displayCard" class="icone card"></span>
+                    </header>
+                </section>
+
+                <div id="feeds-entries" class="scrollable"></div>
+
+                <section role="mySubHeader" id="formSearchEntries" class="_hide">
+                    <header class="mySystemHeader">
+                        <form action="#">
+                            <input type="text" required="required" placeholder="search" id="inputSearchEntries">
+                            <button type="reset" id="resetSearchEntries"><span data-icon="delete"></span></button>
+                            <button id="addKeyword"><span data-icon="add"></span></button>
+                        </form>
+                    </header>
+                </section>
+
+                <section role="myFooter" class="">
+                    <header>
+                        <button id="menu" class="_startAnimation_"><span data-icon="menu"></span></button>
+                        <button id="sync" class="_online_"><span data-icon="sync"></span></button>
+                        <button id="topup"><span data-icon="topup"></span></button>
+                        <button id="searchEntries"><span data-icon="search"></span></button>
+                        <button id="settingsOpen" class="_startAnimation_"><span data-icon="settings"></span></button>
+                    </header>
+                </section>
+
+            </div>
+
+
+            <!-- =============== -->
+            <!-- One news screen -->
+            <!-- =============== -->
+
+            <div id="main-entry-container">
+
+                <section role="myHeader">
+                    <header>
+                        <h1 data-l10n-id="my-news">my News</h1>
+                    </header>
+                </section>
+
+                <div id="main-entry" class="scrollable">
+                    <div id="browser"></div>
+                </div>
+
+                <section role="mySubEntry">
+                    <header class="mySystemHeader">
+                        <span><div id="nextEntryTitle"></div></span>
+                        <span><div id="previousEntryTitle"></div></span>
+                    </header>
+                </section>
+
+                <section role="myFooter" class="">
+                    <header>
+                        <button id="closeMainEntry"><span data-icon="close"></span></button>
+                        <button id="share"><span data-icon="share"></span></button>
+                        <button id="nextEntry"><span data-icon="back"></span></button>
+                        <button id="previousEntry"><span data-icon="forward"></span></button>
+                    </header>
+                </section>
+
+            </div>
+
+        </div>
+
+        <!-- =============== -->
+        <!-- Settings screen -->
+        <!-- =============== -->
+
+        <div role="region" data-type="sidebar" id="settings-container">
+
+            <section role="myHeader">
+                <header class="mySystemHeader">
+                    <h1 data-l10n-id="my-settings">my Settings</h1>
+                </header>
+            </section>
+
+            <div id="settings" class="scrollable"></div>
+
+            <section role="myFooter" class="">
+                <header>
+                    <button id="settingsClose" class="_startAnimation_"><span data-icon="close"></span></button>
+                </header>
+            </section>
+
+        </div>
+
+
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+    </body>
+
+    <!-- Inline CSS -->
+
+    <script type="text/javascript" src="css/inline.css.js"></script>
+
+    <!-- App localization -->
+
+    <script src="js/libs/l10n.js"></script>
+    <link rel="resource" type="application/l10n" href="js/locales/locales.ini" />
+    <script type="text/javascript" src="js/locales/locales.js"></script>
+
+    <!-- Libs -->
+
+    <script type="text/javascript" src="js/libs/myCore.js"></script>
+
+    <!-- classes -->
+
+    <script type="text/javascript" src="js/classes/MyFeeds.class.js"></script>
+    <script type="text/javascript" src="js/classes/MyUi.class.js"></script>
+    <script type="text/javascript" src="js/classes/MyFeeds/Feedly.class.js"></script>
+    <script type="text/javascript" src="js/classes/MyFeeds/TheOldReader.class.js"></script>
+    <script type="text/javascript" src="js/classes/MyFeeds/TinyTinyRss.class.js"></script>
+    <script type="text/javascript" src="js/classes/MyFeeds/AolReader.class.js"></script>
+    <script type="text/javascript" src="js/classes/MyFeeds/SimplePie.class.js"></script>
+
+    <script type="text/javascript" src="js/gestures.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
+
+</html>
