@@ -81,11 +81,16 @@ section[role="myFooter"] > header:first-child button {color: #FFFFFF;} /* --fxos
 /* --- Entries --- */
 
 #feeds-entries-container {background: #EAEAE7;} /*--fxos-ivory */
-
 #feeds-entries-container h1 {color: #FFFFFF;} /* --fxos-white */
+
+#feeds-entries h2 {
+    color: #FF4E00; /*--fxos-orange */
+    padding: 0 2.5% 0 2.5%; /* --my-spacing */
+}
 
 /* --- Main entry --- */
 
+#main-entry-container {background: #EAEAE7;} /* --fxos-ivory*/
 #main-entry-container h1 {color: #FFFFFF;} /* --fxos-white*/
 
 /* --- Settings --- */
@@ -166,4 +171,10 @@ count{
 }
 #find-feeds > ul > li > a {color: #EAEAE7;} /*--fxos-ivory */
 #find-feeds button {margin-right: 2.5%;} /* --my-spacing */
+
+/* --- MISC --- */
+
+.notification {
+    padding: 2.5%; /* --my-spacing */
+}
 
