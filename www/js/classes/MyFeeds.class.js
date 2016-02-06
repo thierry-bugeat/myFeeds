@@ -100,7 +100,12 @@ MyFeeds.prototype._loadJSON = function(filename) {
     var xhr = new XMLHttpRequest();
         
     xhr.open('GET', filename, false);
-    xhr.send(null);
+
+    try {
+        xhr.send();
+    } catch (err) {
+        xhr.send(null);
+    }
 
     if (xhr.status === 200) {
         try {
