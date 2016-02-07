@@ -194,7 +194,7 @@ MyUi.prototype.bind = function() {
  * https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events
  * */
 MyUi.prototype._onclick = function(_this, pointerEvents) {
-    console.log(_this);
+    //console.log(_this);
     
     if (_this !== null) {
         if (pointerEvents == 'enable') {
@@ -268,8 +268,12 @@ MyUi.prototype.toggle = function(_status) {
     // =======================
     
     // 1) Update settings message
-                
-    _MyUi.echo("onLine", _status, "");
+
+       try {
+            _MyUi.echo("onLine", _status+'|'+navigator.connection.type, "");
+       } catch(e) {
+            _MyUi.echo("onLine", _status, "");
+       }
 
     // =============
     // --- Proxy ---
@@ -520,12 +524,14 @@ MyUi.prototype.loadImages = function () {
  * Content of entry is displayed only when entry is in viewport.
  * */
 MyUi.prototype.showEntries = function () {
-    var _divs = document.querySelectorAll("div.my-list-entry-s, div.my-list-entry-m, div.my-list-entry-l, div.my-grid-entry-s, div.my-grid-entry-m, div.my-grid-entry-l, div.my-card-entry-s, div.my-card-entry-m, div.my-card-entry-l");
+    //var _divs = document.querySelectorAll("div.my-list-entry-s, div.my-list-entry-m, div.my-list-entry-l, div.my-grid-entry-s, div.my-grid-entry-m, div.my-grid-entry-l, div.my-card-entry-s, div.my-card-entry-m, div.my-card-entry-l");
+    var _divs = document.querySelectorAll("div.i");
 
     for (var i = 0; i < _divs.length; i++) {
         var rect = _divs[i].getBoundingClientRect(); 
         if ((_divs[i].innerHTML === '') && ui.isInViewport(_divs[i])) {
             var j = _divs[i].getAttribute('i');
+            _MyFeeds.log('MyUi.prototype.showEntries()', j);
             _divs[i].innerHTML = liveValues['entries']['html'][j];
         }
     }
@@ -537,8 +543,10 @@ MyUi.prototype.showEntries = function () {
  * @return {boolean} true / false
  * */
 MyUi.prototype.isInViewport = function (element) {
+    //var firstElementHeight = feeds_entries.children[0].clientHeight;
     var rect = element.getBoundingClientRect()
-    var windowHeight = window.innerHeight || document.documentElement.clientHeight
+    
+    var windowHeight = (window.innerHeight || document.documentElement.clientHeight) * 2;
     var windowWidth = window.innerWidth || document.documentElement.clientWidth
 
     return rect.bottom > 0 && rect.top < windowHeight && rect.right > 0 && rect.left < windowWidth
