@@ -136,12 +136,15 @@ Feedly.prototype.login = function() {
         _url = 'http://' + params.settings.proxy.host + '/proxy/?' + _urlParams;
     }*/   
  
-    var _inAppBrowser = cordova.InAppBrowser.open(_url, '_blank', 'location=yes');
+    var _inAppBrowser = window.open(_url, '_blank', 'location=yes');
     
     _inAppBrowser.addEventListener('loadstart', function(event) {
-        if (event.url.match(/code=([^&]+)/)) {
-            _inAppBrowser.close();
-            _Feedly._loginCallback(event.url);
+        //_MyFeeds.log(event);
+        if (event.url.match(/^http:\/\/localhost/)) {
+            if (event.url.match(/code=([^&]+)/)) {
+                _inAppBrowser.close();
+                _Feedly._loginCallback(event.url);
+            }
         }
     });
 
