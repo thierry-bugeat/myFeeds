@@ -75,7 +75,10 @@ section[role="myFooter"] > header:first-child button {color: #FFFFFF;} /* --fxos
 /* --- Theme GRID --- */
 
 .my-grid-entry-s, .my-grid-entry-l {background-color: #EAEAE7;} /*--fxos-ivory */
-.my-grid-title{color: #EAEAE7;} /* --fxos-ivory */
+.my-grid-title{
+    color: #EAEAE7; /* --fxos-ivory */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0) 100%);
+} 
 .my-grid-title img{margin-right: 2.5%;} /* --my-spacing */
 
 /* --- Entries --- */
