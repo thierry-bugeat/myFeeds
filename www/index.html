@@ -37,7 +37,7 @@
         <meta charset="UTF-8">
         <meta name="theme-color" content="#CD6723" id="theme-color">
         <title data-l10n-id="app-title">my Feeds</title>
-        <link rel="icon" type="image/png" href="images/icon-128.png">
+        <link rel="icon" type="image/png" href="img/icon-128.png">
         <link href="css/ffos1.4.css" type="text/css" rel="stylesheet">
         <link href="css/vars.css" type="text/css" rel="stylesheet">
         <link href="css/colors.css" type="text/css" rel="stylesheet">
@@ -87,7 +87,7 @@
                 </header>
             </section>
 
-            <div id="find-feeds" class="scrollable"></div>
+            <div id="find-feeds" class="scrollable scroll"></div>
 
             <section role="myFooter" class="">
                 <header>
@@ -109,7 +109,7 @@
                 </header>
             </section>
 
-            <div id="feeds-list" class="scrollable"></div>
+            <div id="feeds-list" class="scrollable scroll"></div>
 
             <section role="myFooter" class="">
                 <header>
@@ -146,7 +146,10 @@
                     </header>
                 </section>
 
-                <div id="feeds-entries" class="scrollable"></div>
+                <div id="feeds-entries-scroll" class="scrollable scroll">
+                    <div id="feeds-entries-top"></div>
+                    <div id="feeds-entries-content"></div>
+                </div>
 
                 <section role="mySubHeader" id="formSearchEntries" class="_hide">
                     <header class="mySystemHeader">
@@ -183,7 +186,7 @@
                     </header>
                 </section>
 
-                <div id="main-entry" class="scrollable">
+                <div id="main-entry" class="scrollable scroll">
                     <div id="browser"></div>
                 </div>
 
@@ -219,7 +222,7 @@
                 </header>
             </section>
 
-            <div id="settings" class="scrollable"></div>
+            <div id="settings" class="scrollable scroll"></div>
 
             <section role="myFooter" class="">
                 <header>

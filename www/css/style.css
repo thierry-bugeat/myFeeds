@@ -151,7 +151,7 @@ form{
 /* --- */
 
 .scrollable {
-    overflow: auto;
+    //overflow: auto;
     height: calc(100% - 9.5rem);
     box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -162,6 +162,14 @@ form{
 .scrollable.header {
     height: calc(100% - 5rem);
     top: 5rem;
+}
+
+.noscroll {
+   overflow: hidden !important; 
+}
+
+.scroll {
+    overflow: auto;
 }
 
 /* --- Enable / Disable element(s) --- */

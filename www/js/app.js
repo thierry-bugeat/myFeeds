@@ -492,7 +492,7 @@
         //liveValues['entries']['search']['visible'] = !liveValues['entries']['search']['visible'];
         
         if (liveValues['entries']['search']['visible']) {
-            feeds_entries.style.height = "calc(100% - 17.5rem)";
+            dom['screens']['entries']['scroll'].style.height = "calc(100% - 17.5rem)";
             searchEntries.classList.remove('enable-fxos-white');
             searchEntries.classList.add('enable-fxos-blue');
             document.getElementById('formSearchEntries').classList.remove('_hide');
@@ -500,7 +500,7 @@
             document.getElementById('inputSearchEntries').focus();
             _search(document.getElementById('inputSearchEntries').value);
         } else {
-            feeds_entries.style.height = "calc(100% - 13.5rem)";
+            dom['screens']['entries']['scroll'].style.height = "calc(100% - 13.5rem)";
             searchEntries.classList.remove('enable-fxos-blue');
             searchEntries.classList.add('enable-fxos-white');
             document.getElementById('formSearchEntries').classList.remove('_show');
@@ -527,7 +527,7 @@
             ui._onclick(nextDay, 'enable');
         }
         dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
-        feeds_entries.scrollTop = 0;
+        dom['screens']['entries']['scroll'].scrollTop = 0;
     }
 
     previousDay.onclick = function(event) {
@@ -542,7 +542,7 @@
             ui._onclick(previousDay, 'enable');
         }
         dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
-        feeds_entries.scrollTop = 0;
+        dom['screens']['entries']['scroll'].scrollTop = 0;
     }
     
     function deleteKeyword(_this) {
@@ -581,7 +581,7 @@
                 loadFeeds();
             } else {
                 ui.echo("feeds-list", "", "");
-                ui.echo("feeds-entries", "", "");
+                ui.echo("feeds-entries-content", "", "");
                 ui._onclick(sync, 'disable');
             }
         }
@@ -719,7 +719,7 @@
                 loadFeeds();
             } else {
                 ui.echo("feeds-list", "", "");
-                ui.echo("feeds-entries", "", "");
+                ui.echo("feeds-entries-content", "", "");
                 ui._onclick(sync, 'disable');
             }
         }
@@ -1262,7 +1262,7 @@
                 params.entries.nbDaysAgo = params.entries.dontDisplayEntriesOlderThan;
                 ui._onclick(nextDay, 'enable');         // [<]
                 ui._onclick(previousDay, 'disable');    // [>]
-                feeds_entries.scrollTop = 0;
+                dom['screens']['entries']['scroll'].scrollTop = 0;
                 dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             }
             
@@ -1616,10 +1616,10 @@
      * */
     function dspEntries(entries, nbDaysAgo, feedUrl) {
 
-        var feedsEntriesScrollTop = feeds_entries.scrollTop;
+        var feedsEntriesScrollTop = dom['screens']['entries']['scroll'].scrollTop;
         
         ui.echo('feedsEntriesNbDaysAgo', document.webL10n.get('loading'), '');
-        ui.echo('feeds-entries', '', '');
+        ui.echo('feeds-entries-content', '', '');
         
         clearTimeout(_dspEntriesTimeout);
         
@@ -1812,15 +1812,15 @@
             var start2 = performance.now();
 
             if (params.entries.displaySmallEntries && ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0)) {
-                ui.echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
+                ui.echo("feeds-entries-content", _htmlFeedTitle + _htmlEntries, "");
             } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] > 0)) {
-                ui.echo("feeds-entries", _htmlFeedTitle + _htmlEntries, "");
+                ui.echo("feeds-entries-content", _htmlFeedTitle + _htmlEntries, "");
             } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] == 0)) {
-                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification" data-l10n-id="no-news-today">' + document.webL10n.get('no-news-today') + '</div>', "");
+                ui.echo("feeds-entries-content", _htmlFeedTitle + '<div class="notification" data-l10n-id="no-news-today">' + document.webL10n.get('no-news-today') + '</div>', "");
             } else if ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) == 0) {
-                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification" data-l10n-id="no-news-today">' + document.webL10n.get('no-news-today') + '</div>', "");
+                ui.echo("feeds-entries-content", _htmlFeedTitle + '<div class="notification" data-l10n-id="no-news-today">' + document.webL10n.get('no-news-today') + '</div>', "");
             } else {
-                ui.echo("feeds-entries", _htmlFeedTitle + '<div class="notification" data-l10n-id="error-no-network-connection">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
+                ui.echo("feeds-entries-content", _htmlFeedTitle + '<div class="notification" data-l10n-id="error-no-network-connection">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
             } 
             
             var end2 = performance.now();
@@ -1833,7 +1833,7 @@
             // Scroll if you stay in same day.
             
             if (_previousNbDaysAgo == nbDaysAgo) {
-                feeds_entries.scrollTop = feedsEntriesScrollTop;
+                dom['screens']['entries']['scroll'].scrollTop = feedsEntriesScrollTop;
             }
             
             _previousNbDaysAgo = nbDaysAgo;
@@ -2250,7 +2250,7 @@
     window.onload = function () {
 
         _swipe(dom['screens']['feeds'], "");
-        _swipe(dom['screens']['entries'], "");
+        _swipe(dom['screens']['entries']['scroll'], "");
         _swipe(dom['screens']['settings'], "");
         
         // Promises V1 
@@ -2531,6 +2531,7 @@
             
             var _entry = sortedEntries[_entryId];
             my.log(_entry);
+            
             new MozActivity({
                 name: "new",
                 data: {
@@ -2540,6 +2541,7 @@
                     body: _entry.title + "\n" + _entry.link
                 }
             });
+    
         };
         
         // Search entries after "dspEntries"
@@ -2547,7 +2549,7 @@
         
         document.body.addEventListener('dspEntries.done', function(event){
             if (liveValues['entries']['search']['visible']) {
-                feeds_entries.style.height = "calc(100% - 17.5rem)";
+                dom['screens']['entries']['scroll'].style.height = "calc(100% - 17.5rem)";
                 searchEntries.classList.remove('enable-fxos-white');
                 searchEntries.classList.add('enable-fxos-blue');
                 document.getElementById('formSearchEntries').classList.remove('_hide');
@@ -2590,7 +2592,7 @@
                         loadFeeds();
                     } else {
                         ui.echo("feeds-list", "", "");
-                        ui.echo("feeds-entries", "", "");
+                        ui.echo("feeds-entries-content", "", "");
                         ui._onclick(sync, 'disable');
                     }
                     
@@ -2615,9 +2617,9 @@
 
             if (navigator.onLine) {
                 my._save('cache/simplepie/feeds/' + btoa(event.detail.feedUrl) + ".json", "application/json", JSON.stringify(event.detail)).then(function(results) {
-                    my.log('SimplePie.load.done > Saving feed in cache ok : ' + event.detail.feed.feedUrl + ' ('+btoa(event.detail.feedUrl)+')');
+                    my.log('SimplePie.load.done > Saving feed in cache ok : ' + event.detail.feed.feedUrl + ' (' + btoa(event.detail.feedUrl) + ')');
                 }).catch(function(error) {
-                    my.error("ERROR saving feed in cache : " + event.detail.feedUrl + ' ('+btoa(event.detail.feedUrl)+') ' + error);
+                    my.error("ERROR saving feed in cache : " + event.detail.feedUrl + ' (' + btoa(event.detail.feedUrl) + ') ' + error);
                     my.alert("ERROR saving feed in cache :\n" + event.detail.feedUrl);
                 });
             }

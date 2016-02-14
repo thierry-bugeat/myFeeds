@@ -24,7 +24,6 @@ var main_entry_container    = document.getElementById("main-entry-container");
 var main_entry              = document.getElementById("main-entry");
 var browser                 = document.getElementById("browser");
 var loading                 = document.getElementById("loading");
-var feeds_entries           = document.getElementById("feeds-entries");
 var feeds_list              = document.getElementById("feeds-list");
 var sync                    = document.getElementById("sync");
 var menu                    = document.getElementById("menu");
@@ -44,7 +43,10 @@ var dom = {
         }
     },
     "screens": {
-        "entries": document.getElementById("feeds-entries"),
+        "entries": {
+            "scroll":   document.getElementById("feeds-entries-scroll"),
+            "content":  document.getElementById("feeds-entries-content"),
+        },
         "settings": document.getElementById('settings-container'),
         "feeds": document.getElementById('feeds-list-container'),
         "find": document.getElementById('find-feeds-container')
@@ -59,7 +61,7 @@ var findFeedsClose          = document.getElementById("findFeedsClose");
 var findFeedsSubmit         = document.getElementById("findFeedsSubmit");
 var share                   = document.getElementById("share");
 var feedsEntriesNbDaysAgo   = document.getElementById("feedsEntriesNbDaysAgo");
-var feedsEntriesFooter      = document.getElementById("feeds-entries-footer");
+//var feedsEntriesFooter      = document.getElementById("feeds-entries-footer");
 var displayGrid             = document.getElementById("displayGrid");
 var displayCard             = document.getElementById("displayCard");
 var displayList             = document.getElementById("displayList");
@@ -145,21 +147,21 @@ MyUi.prototype.init = function() {
         
             // Scroll in progress
             
-            if (feeds_entries.scrollTop != _topup['previousScrollTop']) {
+            if (dom['screens']['entries']['scroll'].scrollTop != _topup['previousScrollTop']) {
                 
                 if (_topup['previousScrollTop'] == 0) { 
                     _MyUi._onclick(dom.topups['entries'], 'enable'); 
                     _topup['previousStatus'] = 'enabled'; 
                 }
                 
-                _topup['previousScrollTop'] = feeds_entries.scrollTop;
+                _topup['previousScrollTop'] = dom['screens']['entries']['scroll'].scrollTop;
             } 
             
             // End scroll
             
             else {
                 
-                if ((_topup['previousStatus'] == 'enabled') && (feeds_entries.scrollTop == 0)) {
+                if ((_topup['previousStatus'] == 'enabled') && (dom['screens']['entries']['scroll'].scrollTop == 0)) {
                     _MyUi._onclick(dom.topups['entries'], 'disable'); 
                     _topup['previousStatus'] = 'disabled';
                 }
@@ -172,7 +174,7 @@ MyUi.prototype.init = function() {
     topup.onclick = function(event) { 
         _MyUi._vibrate();
         _MyUi._onclick(dom.topups['entries'], 'disable'); 
-        feeds_entries.scrollTop = 0; 
+        dom['screens']['entries']['scroll'].scrollTop = 0; 
     }
     
     // ==============
@@ -543,7 +545,7 @@ MyUi.prototype.showEntries = function () {
  * @return {boolean} true / false
  * */
 MyUi.prototype.isInViewport = function (element) {
-    //var firstElementHeight = feeds_entries.children[0].clientHeight;
+    //var firstElementHeight = dom['screens']['entries']['content'].children[0].clientHeight;
     var rect = element.getBoundingClientRect()
     
     var windowHeight = (window.innerHeight || document.documentElement.clientHeight) * 2;
