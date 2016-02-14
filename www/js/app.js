@@ -970,7 +970,7 @@
 
 
         '   <li>',
-        '       <aside class="icon"><span data-icon="sd-card"></span></aside>',
+        '       <aside class="icon"><span data-icon="share"></span></aside>',
         '       <aside class="pack-end"><button id="saveSubscriptions"><span data-l10n-id="my-subscriptions-share">' + document.webL10n.get('my-subscriptions-share') + '</span></button></aside>',
         '       <a><p class="double"><my data-l10n-id="my-subscriptions-opml">' + document.webL10n.get('my-subscriptions-opml') + '</my></p></a>',
         '   </li>',
