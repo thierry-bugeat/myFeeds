@@ -2325,7 +2325,7 @@
             }
             // --- Fix some network change issues
             // Sync button is disabled but navigator is online & no synchro is in progress !
-            if (((ui._status(sync) == 'disable') || (ui._status(lastUpdate) == 'disable')) && (liveValues.feeds.nbFeedsToLoad == 0) && (navigator.onLine) && (liveValues.network.online == 'enable')) {
+            if (((ui._status(sync) == 'disable') || ((typeof(lastUpdate) == "object") && ui._status(lastUpdate) == 'disable')) && (liveValues.feeds.nbFeedsToLoad == 0) && (navigator.onLine) && (liveValues.network.online == 'enable')) {
                 ui._enable();
             }
         }, 5000);
