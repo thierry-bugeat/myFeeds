@@ -194,7 +194,7 @@ function _getDirection(_myGesture) {
         
     // Vertical gesture
     
-    else ((_distanceY > _distanceX) && (_distanceY > _minY)) {
+    else if ((_distanceY > _distanceX) && (_distanceY > _minY)) {
         
         if ((_myGesture._endY > _myGesture._startY) && (_myGesture._mouseV == 'down')) {
             _direction = "down";
