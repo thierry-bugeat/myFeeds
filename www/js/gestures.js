@@ -25,6 +25,7 @@ function _swipe(_element, callback) {
         myGesture._mouseX       = 0;
         myGesture._mouseY       = 0;
         myGesture._mouseH       = "";
+        myGesture._mouseV       = "";
         myGesture._startX       = 0;
         myGesture._startY       = 0;
         myGesture._endX         = 0;
@@ -42,10 +43,8 @@ function _swipe(_element, callback) {
     
     _element.addEventListener('touchmove', function(event) {
         
-        if (document.getElementById('feeds-entries').scrollTop == 0) {
+        if (document.getElementById('feeds-entries-scroll').scrollTop <= 10) {
             myGesture._scrollTop = true;
-        } else {
-            myGesture._scrollTop = false;
         }
 
         var t = event.touches[0];
@@ -54,6 +53,13 @@ function _swipe(_element, callback) {
             myGesture._mouseH = 'right';
         } else if (t.screenX < myGesture._mouseX) {
             myGesture._mouseH = 'left';
+        } else {
+        }
+        
+        if (t.screenY > myGesture._mouseY) { // Mouse direction
+            myGesture._mouseV = 'down';
+        } else if (t.screenY < myGesture._mouseY) {
+            myGesture._mouseV = 'up';
         } else {
         }
         
@@ -66,12 +72,14 @@ function _swipe(_element, callback) {
         
         // Screen entries : Sync / Open Feeds / Open Settings
         
-        if (myGesture._id == 'feeds-entries') {
+        if (myGesture._id == 'feeds-entries-scroll') {
+                    
             if ((myGesture._scrollTop) && (myGesture._direction == "down")) {
                 if (navigator.onLine) {
                     ui._loading(1);
                     sync.classList.add("rotation");
                     myGesture._action = 'sync';
+                    document.getElementById('feeds-entries-scroll').classList.remove('scroll');
                 }
             } else {
                 ui._loading(0);
@@ -82,14 +90,13 @@ function _swipe(_element, callback) {
         
         // Logs
 
-        my.log('gestures touchmove: id= ' + myGesture._id + ' / startX,Y = ' + myGesture._startX + ',' + myGesture._startY + ' / endX,Y = ' + myGesture._endX + ',' + myGesture._endY + " / mouseH = " + myGesture._mouseH); 
+        my.log('gestures touchmove: id= ' + myGesture._id + ' / direction = ' + myGesture._direction + ' / startX,Y = ' + myGesture._startX + ',' + myGesture._startY + ' / endX,Y = ' + myGesture._endX + ',' + myGesture._endY + " / mouseH = " + myGesture._mouseH + " / mouseV = " + myGesture._mouseV); 
 
     }, false);
 
     _element.addEventListener('touchend', function(event) {
 
         my.log('gestures touchend: id = ' + myGesture._id + ' / scrollTop = ' + myGesture._scrollTop + " / direction = " + myGesture._direction + " / gesture = " + myGesture._action + " / pointerEvents = " + sync.style.pointerEvents + " / mouseH = " + myGesture._mouseH); 
-        //my.alert('Gesture touchend');
         ui._loading(0);
 
         // ===============
@@ -102,10 +109,11 @@ function _swipe(_element, callback) {
             }
         }
 
-        if (myGesture._id == 'feeds-entries') {
+        if (myGesture._id == 'feeds-entries-scroll') {
+            
             // Sync : Launch a sync if no synchro is in progress
 
-            if ((myGesture._action == "sync") && sync.classList.contains("enable")) {
+            if ((myGesture._scrollTop) && (myGesture._direction == 'down') && sync.classList.contains("enable")) {
                 ui._onclick(sync, 'disable');
                 loadFeeds();
             }
@@ -121,6 +129,10 @@ function _swipe(_element, callback) {
             if (myGesture._direction == 'left') {
                 ui._translate(dom['screens']['settings'], 'left');
             }
+            
+            // Re-enable scroll
+            
+            document.getElementById('feeds-entries-scroll').classList.add('scroll');
         }
         
         if (myGesture._id == 'settings-container') {
@@ -140,6 +152,7 @@ function _swipe(_element, callback) {
         myGesture._mouseX       = 0;
         myGesture._mouseY       = 0;
         myGesture._mouseH       = "";
+        myGesture._mouseV       = "";
         myGesture._startX       = 0;
         myGesture._startY       = 0;
         myGesture._endX         = 0;
@@ -181,12 +194,14 @@ function _getDirection(_myGesture) {
         
     // Vertical gesture
     
-    else if ((_distanceY > _distanceX) && (_distanceY > _minY)) {
+    else ((_distanceY > _distanceX) && (_distanceY > _minY)) {
         
-        if (_myGesture._endY > _myGesture._startY) {
+        if ((_myGesture._endY > _myGesture._startY) && (_myGesture._mouseV == 'down')) {
             _direction = "down";
-        } else {
+        } else if ((_myGesture._endY < _myGesture._startY) && (_myGesture._mouseV == 'up')) { 
             _direction = "up";
+        } else {
+            _direction = "";
         }
         
     }
