@@ -1738,7 +1738,7 @@
                                 '<div class="my-'+_theme+'-footer"></div>'
                             );
                             _content.push(
-                                '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">',
+                                '<div class="i my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">',
                                 '</div>'
                             );
                             _nbEntriesDisplayed['large']++;
@@ -1753,7 +1753,7 @@
                                 '<div class="my-'+_theme+'-footer"></div>'
                             );
                             _content.push(
-                                '<div class="_online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">',
+                                '<div class="i _online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">',
                                 '</div>'
                             );
                             _nbEntriesDisplayed['small']++;
@@ -1767,7 +1767,7 @@
                                 '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>'
                             );
                             _content.push(
-                                '<div class="my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">',
+                                '<div class="i my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">',
                                 '</div>'
                             );
                             _nbEntriesDisplayed['large']++;
@@ -1780,7 +1780,7 @@
                                 '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>'
                             );
                             _content.push(
-                                '<div class="_online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">',
+                                '<div class="i _online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">',
                                 '</div>'
                             );
                             _nbEntriesDisplayed['small']++;
