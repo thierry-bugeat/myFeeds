@@ -214,21 +214,41 @@ MyFeeds.prototype._saveFXOS = function(filename, mimetype, content) {
     
     _output = _output + "    </outline>\n  </body>\n</opml>\n";
 
-    // Share by email
-
-    var _blob = new Blob([_output], {type : 'text/x-opml+xml'});
-
-    new MozActivity({
-        name: "new",
-        data: {
-            type: ["mail"],
-            number: 0,
-            url: "mailto:?subject=[" + document.webL10n.get('app-title') + "] " + document.webL10n.get('my-subscriptions-opml') + "&body=" + document.webL10n.get('my-subscriptions-message'),
-            body: "",
-            filenames: ['myFeeds.subscriptions.opml'],
-            blobs: [_blob]
-        }
-    });
+    // Share by email : FxOS
+    
+    if (cordova.platformId === 'firefoxos') {
+    
+        var _blob = new Blob([_output], {type : 'text/x-opml+xml'});
+    
+        new MozActivity({
+            name: "new",
+            data: {
+                type: ["mail"],
+                number: 0,
+                url: "mailto:?subject=[" + document.webL10n.get('app-title') + "] " + document.webL10n.get('my-subscriptions-opml') + "&body=" + document.webL10n.get('my-subscriptions-message'),
+                body: "",
+                filenames: ['myFeeds.subscriptions.opml'],
+                blobs: [_blob]
+            }
+        });
+        
+    }
+    
+    // Cordova share via plugin    
+    // https://www.npmjs.com/package/cordova-plugin-x-socialsharing
+    
+    else {
+        window.plugins.socialsharing.shareViaEmail(
+            document.webL10n.get('my-subscriptions-message'), // Message
+            'myFeeds.subscriptions.opml', // Subject
+            null, // TO: must be null or an array
+            null, // CC: must be null or an array
+            null, // BCC: must be null or an array
+            'data:text/xml;base64,' + btoa(unescape(encodeURIComponent(_output))), //text/x-opml+xml
+            function(){console.log('ok');}, // Called when email was sent or canceled, no way to differentiate
+            function(){console.log('ko');}  // Called when something unexpected happened
+        );
+    }
 
 }
 
