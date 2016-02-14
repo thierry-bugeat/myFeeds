@@ -2532,15 +2532,33 @@
             var _entry = sortedEntries[_entryId];
             my.log(_entry);
             
-            new MozActivity({
-                name: "new",
-                data: {
-                    type: ["websms/sms", "mail"],
-                    number: 0,
-                    url: "mailto:?subject=" + encodeURIComponent(_entry.title) + "&body=" + encodeURIComponent(_entry.link),
-                    body: _entry.title + "\n" + _entry.link
-                }
-            });
+            if (cordova.platformId === 'firefoxos') {
+                new MozActivity({
+                    name: "new",
+                    data: {
+                        type: ["websms/sms", "mail"],
+                        number: 0,
+                        url: "mailto:?subject=" + encodeURIComponent(_entry.title) + "&body=" + encodeURIComponent(_entry.link),
+                        body: _entry.title + "\n" + _entry.link
+                    }
+                });
+            }
+            
+            // Cordova share via plugin    
+            // https://www.npmjs.com/package/cordova-plugin-x-socialsharing
+            
+            else {
+                window.plugins.socialsharing.shareViaEmail(
+                    _entry.title + "\n" + _entry.link, // Message
+                    _entry.title, // Subject
+                    null, // TO: must be null or an array
+                    null, // CC: must be null or an array
+                    null, // BCC: must be null or an array
+                    null, // FILES: null, a string, or an array
+                    function(){console.log('ok');}, // Called when email was sent or canceled, no way to differentiate
+                    function(){console.log('ko');}  // Called when something unexpected happened
+                );
+            }
     
         };
         
