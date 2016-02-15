@@ -2657,7 +2657,9 @@
                 // ---
 
                 if (liveValues.feeds.nbFeedsLoaded == liveValues.feeds.nbFeedsToLoad) {
-                    dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                    if (params.entries.nbDaysAgo == 0) {
+                        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                    }
                     dspFeeds(gf.getFeeds());
                     //dspSettings();
                     updateFeedsPulsations();
@@ -2691,7 +2693,9 @@
                 // ---
 
                 if (liveValues.feeds.nbFeedsLoaded == liveValues.feeds.nbFeedsToLoad) {
-                    dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                    if (params.entries.nbDaysAgo == 0) {
+                        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                    }
                     dspFeeds(gf.getFeeds());
                     //dspSettings();
                     updateFeedsPulsations();
