@@ -199,7 +199,9 @@ SimplePie.prototype.addEntries = function(entries) {
         
         _entry['_mySha256_title']       = (_entry['_myFeedInformations']['_myFeedId'] + _entry['title']).toString();
         _entry['_mySha256_link']        = (_entry['_myFeedInformations']['_myFeedId'] + _entry['link']).toString();
-        
+        //_entry['_mySha256_title']       = btoa(encodeURI(_entry['_myFeedInformations']['_myFeedId'] + _entry['title'])).toString();
+        //_entry['_mySha256_link']        = btoa(_entry['_myFeedInformations']['_myFeedId'] + _entry['link']).toString();
+
         if (this.gf_mySha256.contains(_entry['_mySha256_link'])) {
             // Old news same link: Do nothing.
         } else if (this.gf_mySha256.contains(_entry['_mySha256_title'])) {
@@ -362,10 +364,7 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
     _MyFeeds.log('SimplePie.prototype.loadFeeds()', this.myFeedsSubscriptions);
 
     this.nbFeedsLoaded = 0;
-    //this.gf_unsortedEntries = []; // Store all entries of all feeds
     this.unsortedFeeds = [];
-    
-    //var _params = {"nbFeeds": this.myFeedsSubscriptions.length};
 
     if (this.myFeedsSubscriptions.length > 0) {
         for (var i = 0; i < this.myFeedsSubscriptions.length; i++) {
@@ -382,9 +381,6 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
                 _urlParams = '&url=' + encodeURIComponent(this.gf.ServiceBase);
                 _url = 'http://' + params.settings.proxy.host + '/proxy/?' + _urlParams;
             }
-
-            //_MyFeeds.log("SimplePie.load.done : " + _url);
-            //_MyFeeds.log("SimplePie.load.done : ", _myFeed);
             
             var _params = {"nbFeeds": this.myFeedsSubscriptions.length, "account": _myFeed.account, "url": _myFeed.url, "id": _myFeed.id, "pulsations": _myFeed.pulsations};
             
@@ -396,29 +392,28 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
                 response.feed._myFeedId = response._myParams.id; // Add __id value
                 _MyFeeds.log("SimplePie.prototype.loadFeeds() > get > response : ", response);
                 document.body.dispatchEvent(new CustomEvent('SimplePie.load.done', {"detail": response}));
-                //_MyFeeds._save('cache/simplepie/feeds/' + btoa(response.detail.feedUrl) + ".0.json", "application/json", JSON.stringify(response)); 
-            }, function(error) {
-                // Network error then try to load feed from cache
+            }, function(error) { // Network error then try to load feed from cache
+
+                _MyFeeds.error('### Load feed from cache ###');
                 
                 try {
-                    var _message = JSON.parse(error.message);
+                    var _message = (JSON.parse(error.message)).responseData;
                 } catch (e) {
                     error._myParams = _params;
                     error._myFeedUrl = _myFeed.url;
                     document.body.dispatchEvent(new CustomEvent('SimplePie.load.error', {"detail": error}));
                 }
                 
-                my._load('cache/simplepie/feeds/' + btoa(_message._myParams.url) + ".json").then(function(_cacheContent){
-                    _message.feed = _cacheContent;
-                    document.body.dispatchEvent(new CustomEvent('SimplePie.load.done', {"detail": _message}));
+                _MyFeeds._load('cache/simplepie/feeds/' + btoa(_message._myParams.url) + ".json").then(function(_cacheContent){
+                    document.body.dispatchEvent(new CustomEvent('SimplePie.load.done', {"detail": _cacheContent}));
                 }).catch(function(error) {
-                    // @todo
                     error._myParams = _params;
                     error._myFeedUrl = _myFeed.url;
                     document.body.dispatchEvent(new CustomEvent('SimplePie.load.error', {"detail": error}));
                 });
-                // ---
+
             }).catch(function(error){
+                _MyFeeds.error('###(6)###');
                 document.body.dispatchEvent(new CustomEvent('SimplePie.load.error', {"detail": error}));
             });
             
@@ -483,6 +478,7 @@ SimplePie.prototype.get = function (url, myParams) {
                 if (xhr.status == 200) {
 
                     var _response = JSON.parse(xhr.response);
+                    _MyFeeds.error(_response);
 
                     if ((typeof _response.entries == 'undefined') || (_response.entries.length == 0) || (typeof _response.feedUrl === 'null')) {
                        _MyFeeds.error('ERROR 110 ' + url);
@@ -514,7 +510,9 @@ SimplePie.prototype.get = function (url, myParams) {
            
             xhr.timeout = 10000; // Set timeout to 10 seconds
             xhr.ontimeout = function() { 
-                reject('{"error": "timeout"}');
+                _MyFeeds.error('ERROR 113 ' + url);
+                var _response = {"responseData": {"_myParams": myParams}};
+                reject(Error(JSON.stringify(_response)));
             }
 
             xhr.send();
