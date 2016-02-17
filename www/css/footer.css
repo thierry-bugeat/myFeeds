@@ -11,7 +11,7 @@ section[role="myFooter"] {
 section[role="myFooter"] > header:first-child {
     z-index:10;
     padding:0;
-    height:5rem;
+    height:4.5rem;
     border:medium none;
     /*max-width:500px; margin:0px auto;*/ /* For centering icones */
 }
