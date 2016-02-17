@@ -180,6 +180,8 @@ count{
 
 /* --- MISC --- */
 
+#loading {background-color: #00AACC;} /* --fxos-blue) */
+
 .notification {
     padding: 2.5%; /* --my-spacing */
 }
