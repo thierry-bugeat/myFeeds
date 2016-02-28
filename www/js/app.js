@@ -117,15 +117,24 @@
             },
             "imagesPreviouslyDisplayed": [],    // Store images previously displayed. 
                                                 // Used for displaying images in offline mode.
-            "html": []
+            "html": [],
+            "last": ""                          // Store last recent entry.
         },
-        "feeds": {
-            "nbFeedsLoaded": 0,
-            "nbFeedsToLoad": 0,
+        "sync": {                               // Store informations about last synchro
+            "nbFeedsLoaded": 0,                 // Used during synchro
+            "nbFeedsToLoad": 0,                 // Used during synchro
+            "nbDaysAgo": -1,
+            "theme": "",
+            "timestamps": {
+                "max": -1
+            }
         },
         "screens": {
             "feedsList": {
                 "opened": false                 // Slide right or left entries screen
+            },
+            "entries": {
+                "scrollPosition": 0
             }
         },
         "animations": {
@@ -447,9 +456,9 @@
 
                     // v4 Search
                                         
-                    var _i = _divs[i].getAttribute('i');
+                    var _tsms = _divs[i].getAttribute('tsms');
                     
-                    _o.innerHTML = liveValues['entries']['html'][_i]; 
+                    _o.innerHTML = liveValues['entries']['html'][_tsms]; 
                     
                     var _text = "";
                     var childrens = _o.children;
@@ -1428,7 +1437,7 @@
                 _nbFeedsToLoad = _nbFeedsToLoad + myFeedsSubscriptions[_account].length;
             }
         }
-        liveValues.feeds.nbFeedsToLoad = _nbFeedsToLoad;
+        liveValues.sync.nbFeedsToLoad = _nbFeedsToLoad;
     }
 
     function loadFeeds() {
@@ -1619,25 +1628,34 @@
         var feedsEntriesScrollTop = dom['screens']['entries']['scroll'].scrollTop;
         
         ui.echo('feedsEntriesNbDaysAgo', document.webL10n.get('loading'), '');
-        ui.echo('feeds-entries-content', '', '');
+        //ui.echo('feeds-entries-content', '', '');
         
         clearTimeout(_dspEntriesTimeout);
         
         _dspEntriesTimeout = window.setTimeout(function() {
-
+            
+            _setTimestamps();
+            
             var start = performance.now();
+            
+            var _timestampMax = liveValues['timestamps']['max'] - (86400 * nbDaysAgo);
+            var _partialRendering = ((nbDaysAgo == 0) && (liveValues.sync.nbDaysAgo == nbDaysAgo) && (liveValues.sync.theme == params.entries.theme) && (liveValues.sync.timestamps.max == _timestampMax)) ? true : false;
+            //my.alert('Partial rendering: '+_partialRendering);
+            
+            var _timestampMin = (_partialRendering) ? 
+                liveValues['entries']['last']['_myTimestamp'] + 1 :
+                liveValues['timestamps']['max'] - (86400 * nbDaysAgo) - 86400 + 1;
+            
+            my.log("dspEntries() between " + _timestampMin + " (00:00:00) & " + _timestampMax + " (23:59:59)");
+        
+            liveValues.sync.nbDaysAgo = nbDaysAgo;
+            liveValues.sync.theme = params.entries.theme;
+            liveValues.sync.timestamps.max = _timestampMax;
             
             my.log("dspEntries()", arguments);
             my.log(entries);
 
             sortedEntries = entries;
-
-            _setTimestamps();
-
-            var _timestampMin = liveValues['timestamps']['max'] - (86400 * nbDaysAgo) - 86400 + 1;
-            var _timestampMax = liveValues['timestamps']['max'] - (86400 * nbDaysAgo);
-            
-            my.log("dspEntries() beetween " + _timestampMin + " (00:00:00) & " + _timestampMax + " (23:59:59)");
 
             var _previousDaysAgo    = -1; // Count days to groups entries by day.
             var _entrieNbDaysAgo    = 0;
@@ -1652,10 +1670,17 @@
             var _htmlFeedTitle = "";
             var _firstEntrie = true;
             var _theme = params.entries.theme;
+            var _nb = 0;
             
-            var _nb = sortedEntries.length;
-
-            for (var i = 0; i < _nb; i++) {
+            for (var i in sortedEntries) {
+                
+                // Store informations about last recent entry
+                
+                if (_nb == 0) {
+                    liveValues['entries']['last'] = sortedEntries[i];
+                }
+                
+                _nb++;
 
                 // Get entries of specific feed or get all entries.
 
@@ -1738,7 +1763,7 @@
                                 '<div class="my-'+_theme+'-footer"></div>'
                             );
                             _content.push(
-                                '<div class="i my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">',
+                                '<div class="i my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '" tsms="' + _entrie._myTimestampInMs + '">',
                                 '</div>'
                             );
                             _nbEntriesDisplayed['large']++;
@@ -1753,7 +1778,7 @@
                                 '<div class="my-'+_theme+'-footer"></div>'
                             );
                             _content.push(
-                                '<div class="i _online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">',
+                                '<div class="i _online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" tsms="' + _entrie._myTimestampInMs + '" entry_link="' + _entrie.link + '">',
                                 '</div>'
                             );
                             _nbEntriesDisplayed['small']++;
@@ -1767,7 +1792,7 @@
                                 '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>'
                             );
                             _content.push(
-                                '<div class="i my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '">',
+                                '<div class="i my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '" tsms="' + _entrie._myTimestampInMs + '">',
                                 '</div>'
                             );
                             _nbEntriesDisplayed['large']++;
@@ -1780,7 +1805,7 @@
                                 '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>'
                             );
                             _content.push(
-                                '<div class="i _online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" entry_link="' + _entrie.link + '">',
+                                '<div class="i _online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" tsms="' + _entrie._myTimestampInMs + '" entry_link="' + _entrie.link + '">',
                                 '</div>'
                             );
                             _nbEntriesDisplayed['small']++;
@@ -1790,7 +1815,7 @@
 
                         _htmlEntries = _htmlEntries + _content.join('');
                         
-                        liveValues['entries']['html'][i] = _html.join('');
+                        liveValues['entries']['html'][_entrie._myTimestampInMs] = _html.join('');
 
                 } else if ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0) { break; }
             }
@@ -1810,18 +1835,22 @@
             // Display entries:
             
             var start2 = performance.now();
-
-            if (params.entries.displaySmallEntries && ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0)) {
-                ui.echo("feeds-entries-content", _htmlFeedTitle + _htmlEntries, "");
-            } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] > 0)) {
-                ui.echo("feeds-entries-content", _htmlFeedTitle + _htmlEntries, "");
-            } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] == 0)) {
-                ui.echo("feeds-entries-content", _htmlFeedTitle + '<div class="notification" data-l10n-id="no-news-today">' + document.webL10n.get('no-news-today') + '</div>', "");
-            } else if ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) == 0) {
-                ui.echo("feeds-entries-content", _htmlFeedTitle + '<div class="notification" data-l10n-id="no-news-today">' + document.webL10n.get('no-news-today') + '</div>', "");
+            
+            if (_partialRendering) {
+                ui.echo("feeds-entries-content", _htmlEntries + "<br> ("+_nbEntriesDisplayed['small']+"/"+_nbEntriesDisplayed['large']+")"+_timestampMin+"/"+_timestampMax, "prepend");
             } else {
-                ui.echo("feeds-entries-content", _htmlFeedTitle + '<div class="notification" data-l10n-id="error-no-network-connection">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
-            } 
+                if (params.entries.displaySmallEntries && ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0)) {
+                    ui.echo("feeds-entries-content", _htmlFeedTitle + _htmlEntries, "");
+                } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] > 0)) {
+                    ui.echo("feeds-entries-content", _htmlFeedTitle + _htmlEntries, "");
+                } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] == 0)) {
+                    ui.echo("feeds-entries-content", _htmlFeedTitle + '<div class="notification" data-l10n-id="no-news-today">' + document.webL10n.get('no-news-today') + '</div>', "");
+                } else if ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) == 0) {
+                    ui.echo("feeds-entries-content", _htmlFeedTitle + '<div class="notification" data-l10n-id="no-news-today">' + document.webL10n.get('no-news-today') + '</div>', "");
+                } else {
+                    ui.echo("feeds-entries-content", _htmlFeedTitle + '<div class="notification" data-l10n-id="error-no-network-connection">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
+                } 
+            }
             
             var end2 = performance.now();
             
@@ -1853,7 +1882,7 @@
                     ui._vibrate(); 
                     ui.fade(this);
                     liveValues.screens.feedsList.opened = false; 
-                    mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
+                    mainEntryOpenInBrowser(this.getAttribute("tsms"), this.getAttribute("entry_link")); 
                 }
             }
 
@@ -1868,7 +1897,7 @@
                     ui._vibrate(); 
                     ui.fade(this);
                     liveValues.screens.feedsList.opened = false;
-                    mainEntryOpenInBrowser(this.getAttribute("i"), ""); 
+                    mainEntryOpenInBrowser(this.getAttribute("tsms"), ""); 
                 }
             }
             
@@ -2325,7 +2354,7 @@
             }
             // --- Fix some network change issues
             // Sync button is disabled but navigator is online & no synchro is in progress !
-            if (((ui._status(sync) == 'disable') || ((typeof(lastUpdate) == "object") && ui._status(lastUpdate) == 'disable')) && (liveValues.feeds.nbFeedsToLoad == 0) && (navigator.onLine) && (liveValues.network.online == 'enable')) {
+            if (((ui._status(sync) == 'disable') || ((typeof(lastUpdate) == "object") && ui._status(lastUpdate) == 'disable')) && (liveValues.sync.nbFeedsToLoad == 0) && (navigator.onLine) && (liveValues.network.online == 'enable')) {
                 ui._enable();
             }
         }, 5000);
@@ -2348,9 +2377,12 @@
         
         setInterval(function() {
             if (!liveValues.animations.inProgress) {
-                ui.showEntries();
-                ui.loadImages();
-                localizeTimes();
+                //if (liveValues['screens']['entries']['scrollPosition'] != dom['screens']['entries']['scroll'].scrollTop) {
+                    ui.showEntries();
+                    ui.loadImages();
+                    localizeTimes();
+                    //liveValues['screens']['entries']['scrollPosition'] = dom['screens']['entries']['scroll'].scrollTop;
+                //}
             }
         }, 350);
 
@@ -2503,12 +2535,12 @@
         
         dom['entry']['next']['button'].onclick = function() {
             ui._vibrate();
-            mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
+            mainEntryOpenInBrowser(this.getAttribute("tsms"), this.getAttribute("entry_link")); 
         }
         
         dom['entry']['previous']['button'].onclick = function() {
             ui._vibrate();
-            mainEntryOpenInBrowser(this.getAttribute("i"), this.getAttribute("entry_link")); 
+            mainEntryOpenInBrowser(this.getAttribute("tsms"), this.getAttribute("entry_link")); 
         }
         
         // Share entry :
@@ -2648,15 +2680,15 @@
 
             // Check if all feeds were loaded
 
-                liveValues.feeds.nbFeedsLoaded++;
+                liveValues.sync.nbFeedsLoaded++;
 
                 // Percentage of loading ?
 
-                ui._loading(Math.round((100 * liveValues.feeds.nbFeedsLoaded) / liveValues.feeds.nbFeedsToLoad));
+                ui._loading(Math.round((100 * liveValues.sync.nbFeedsLoaded) / liveValues.sync.nbFeedsToLoad));
 
                 // ---
 
-                if (liveValues.feeds.nbFeedsLoaded == liveValues.feeds.nbFeedsToLoad) {
+                if (liveValues.sync.nbFeedsLoaded == liveValues.sync.nbFeedsToLoad) {
                     if (params.entries.nbDaysAgo == 0) {
                         dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
                     }
@@ -2665,9 +2697,9 @@
                     updateFeedsPulsations();
                 }
                 
-                if (liveValues.feeds.nbFeedsLoaded >= liveValues.feeds.nbFeedsToLoad) {
-                    liveValues.feeds.nbFeedsToLoad = 0;
-                    liveValues.feeds.nbFeedsLoaded = 0;
+                if (liveValues.sync.nbFeedsLoaded >= liveValues.sync.nbFeedsToLoad) {
+                    liveValues.sync.nbFeedsToLoad = 0;
+                    liveValues.sync.nbFeedsLoaded = 0;
                     ui._loading(100); ui.echo("loading", "", "");
                     if (navigator.onLine) {
                         ui._onclick(sync, 'enable');
@@ -2684,15 +2716,15 @@
 
                 my.error(event);
 
-                liveValues.feeds.nbFeedsLoaded++;
+                liveValues.sync.nbFeedsLoaded++;
 
                 // Percentage of loading ?
 
-                ui._loading(Math.round((100 * liveValues.feeds.nbFeedsLoaded) / liveValues.feeds.nbFeedsToLoad));
+                ui._loading(Math.round((100 * liveValues.sync.nbFeedsLoaded) / liveValues.sync.nbFeedsToLoad));
 
                 // ---
 
-                if (liveValues.feeds.nbFeedsLoaded == liveValues.feeds.nbFeedsToLoad) {
+                if (liveValues.sync.nbFeedsLoaded == liveValues.sync.nbFeedsToLoad) {
                     if (params.entries.nbDaysAgo == 0) {
                         dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
                     }
@@ -2701,9 +2733,9 @@
                     updateFeedsPulsations();
                 }
                 
-                if (liveValues.feeds.nbFeedsLoaded >= liveValues.feeds.nbFeedsToLoad) {
-                    liveValues.feeds.nbFeedsToLoad = 0;
-                    liveValues.feeds.nbFeedsLoaded = 0;
+                if (liveValues.sync.nbFeedsLoaded >= liveValues.sync.nbFeedsToLoad) {
+                    liveValues.sync.nbFeedsToLoad = 0;
+                    liveValues.sync.nbFeedsLoaded = 0;
                     ui._loading(100); ui.echo("loading", "", "");
                     if (navigator.onLine) {
                         ui._onclick(sync, 'enable');

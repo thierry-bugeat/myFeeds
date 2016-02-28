@@ -41,7 +41,7 @@ MyFeeds.prototype._load = function(filename, callback) {
             _MyFeeds.log("MyFeeds.prototype._load() " + filename, results);
             resolve(results);
         } else {
-            reject("");
+            reject("{}");
         }
     });
 }

@@ -98,7 +98,8 @@ SimplePie.prototype._sortEntries       = function() {
     // In this function for values "_myTimestampInMs" I add a random 
     // number between 0 & 500. (I add 0 to 0.5 seconde)
     
-    this.gf_sortedEntries = [];
+    //this.gf_sortedEntries = [];
+    this.gf_sortedEntries = {};
     var _tmp = []; // It will contain all timestamps in ms.
     
     for (var i = 0; i < this.gf_unsortedEntries.length; i++) {
@@ -111,13 +112,15 @@ SimplePie.prototype._sortEntries       = function() {
 
         for (var j = 0; j < this.gf_unsortedEntries.length; j++) {
             if (_tmp[i] == this.gf_unsortedEntries[j]._myTimestampInMs) {
-                this.gf_sortedEntries.push(this.gf_unsortedEntries[j]);
+                //this.gf_sortedEntries.push(this.gf_unsortedEntries[j]);
+                this.gf_sortedEntries[(this.gf_unsortedEntries[j]._myTimestampInMs)] = this.gf_unsortedEntries[j];
                 break;
             }
         }
     }
 
-    //_MyFeeds.log(this.gf_sortedEntries);
+    _MyFeeds.log('_sortEntries()', this.gf_sortedEntries);
+    _MyFeeds.log(this.gf_sortedEntries);
 }
 
 SimplePie.prototype._sortFeeds = function() { 
@@ -189,10 +192,21 @@ SimplePie.prototype.addEntries = function(entries) {
         // Dans le timestamp en "ms" j'ajoute une valeur aléatoire pour ne pas avoir 2 dates de publication identiques.
         // J'ajoute une valeur comprise entre 0 et 500 (0 à 0.5 seconde).
         //
-        var _date = new Date(_entry.publishedDate);
         
+        var _date = new Date(_entry.publishedDate);
+
         _entry['_myTimestamp']          = Math.round(_date.getTime()/1000);
-        _entry['_myTimestampInMs']      = Math.round(_date.getTime()) + (Math.floor(Math.random()*500));
+        _entry['_myTimestampInMs']      = Math.round(_date.getTime()) + Math.floor(Math.random()*500);
+        
+        // If date is not correctly set
+        
+        if (_entry['_myTimestamp'] == 0) {
+            var _now = new Date();
+            var _timestamp = Math.round(_now.getTime()/1000);
+            var _timestampInMs = Math.round(_now.getTime());
+            _entry['_myTimestamp']      = _timestamp;
+            _entry['_myTimestampInMs']  += _timestampInMs;
+        }
 
         _entry['_myLocalizedDate']      = ""; // Due to severe performances issues dates are generated later
         _entry['_myLocalizedTime']      = ""; // Due to severe performances issues times are generated later

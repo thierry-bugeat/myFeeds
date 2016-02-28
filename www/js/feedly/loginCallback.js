@@ -17,6 +17,5 @@
  * along with myFeeds.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-window.alert('feedly login callback');
 //opener.feedly._loginCallback(location.href);
 window.close();

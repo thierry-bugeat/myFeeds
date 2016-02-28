@@ -323,12 +323,14 @@ MyUi.prototype.toggleProxy = function() {
  * */
 MyUi.prototype.echo = function(divId, msg, placement) {
     var _out = document.getElementById(divId);
-    if(!_out) { return; }
+    if (!_out) { return; }
     
     if (placement == 'prepend') {
-        _out.innerHTML = msg + _out.innerHTML;
+        //_out.innerHTML = msg + _out.innerHTML;
+        _out.insertAdjacentHTML('afterbegin', msg);
     } else if (Boolean(placement)) {
-        _out.innerHTML = _out.innerHTML + msg;
+        //_out.innerHTML = _out.innerHTML + msg;
+        _out.insertAdjacentHTML('beforeend', msg);
     } else {
         _out.innerHTML = msg;
     }
@@ -529,14 +531,28 @@ MyUi.prototype.showEntries = function () {
     //var _divs = document.querySelectorAll("div.my-list-entry-s, div.my-list-entry-m, div.my-list-entry-l, div.my-grid-entry-s, div.my-grid-entry-m, div.my-grid-entry-l, div.my-card-entry-s, div.my-card-entry-m, div.my-card-entry-l");
     var _divs = document.querySelectorAll("div.i");
 
+    // --- v1
+
     for (var i = 0; i < _divs.length; i++) {
-        var rect = _divs[i].getBoundingClientRect(); 
         if ((_divs[i].innerHTML === '') && ui.isInViewport(_divs[i])) {
-            var j = _divs[i].getAttribute('i');
-            _MyFeeds.log('MyUi.prototype.showEntries()', j);
-            _divs[i].innerHTML = liveValues['entries']['html'][j];
+            var _tsms = _divs[i].getAttribute('tsms');
+            _MyFeeds.log('MyUi.prototype.showEntries()', _tsms);
+            _divs[i].innerHTML = liveValues['entries']['html'][_tsms];
         }
     }
+    
+    // --- v2
+    
+    // Estimate starting "i" value :
+    
+    /*var _scrollHeight = dom['screens']['entries']['scroll'].scrollHeight;
+    var _scrollPosition = dom['screens']['entries']['scroll'].scrollTop;
+    
+    var _i = Math.round(_divs.length * (_scrollPosition / _scrollHeight));
+    
+    var j = _divs[_i].getAttribute('i');
+    _divs[_i].innerHTML = liveValues['entries']['html'][j];*/
+    
 }
 
 /**
