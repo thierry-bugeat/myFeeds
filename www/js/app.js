@@ -1941,22 +1941,23 @@
         
         _setTimestamps();
 
-        var _nb     = sortedEntries.length - 1;
+        var _keys   = Object.keys(sortedEntries); _keys.reverse();
+        var _nb     = _keys.length - 1;
         var _string = document.getElementById('inputSearchEntries').value || "";
 
-        while ((sortedEntries[_nb]._myTimestamp < liveValues['timestamps']['min'])
-            || (!params.entries.displaySmallEntries && my.isSmallEntry(sortedEntries[_nb]))
-            || (_string !== "" && liveValues['entries']['search']['visible'] && (((sortedEntries[_nb].title).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
+        while ((sortedEntries[_keys[_nb]]._myTimestamp < liveValues['timestamps']['min'])
+            || (!params.entries.displaySmallEntries && my.isSmallEntry(sortedEntries[_keys[_nb]]))
+            || (_string !== "" && liveValues['entries']['search']['visible'] && (((sortedEntries[_keys[_nb]].title).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
         ){
-            _nb = _nb - 1;
+            _nb--;
             if (_nb < 0) { break; }
         }
         
         my.log('setEntriesIds() entries = ', sortedEntries);
         my.log('setEntriesIds() search = ' + _string);
-        my.log('setEntriesIds() result = ', sortedEntries[_nb]);
+        my.log('setEntriesIds() result = ', sortedEntries[_keys[_nb]]);
         
-        liveValues['entries']['id']['max'] = _nb;
+        liveValues['entries']['id']['max'] = _keys[_nb];
         
         // ID min
 
@@ -1965,19 +1966,19 @@
         var _nb     = 0;
         var _string = document.getElementById('inputSearchEntries').value || "";
 
-        while ((sortedEntries[_nb]._myTimestamp > liveValues['timestamps']['max'])
-            || ((params.entries.displaySmallEntries == false) && (my.isSmallEntry(sortedEntries[_nb]) == true)) 
-            || (_string !== "" && liveValues['entries']['search']['visible'] && (((sortedEntries[_nb].title).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
+        while ((sortedEntries[_keys[_nb]]._myTimestamp > liveValues['timestamps']['max'])
+            || ((params.entries.displaySmallEntries == false) && (my.isSmallEntry(sortedEntries[_keys[_nb]]) == true)) 
+            || (_string !== "" && liveValues['entries']['search']['visible'] && (((sortedEntries[_keys[_nb]].title).toLowerCase()).indexOf(_string.toLowerCase()) == -1))
         ){
-            _nb = _nb + 1;
-            if (_nb >= sortedEntries.length) { break; }
+            _nb++;
+            if (_nb >= _keys.length) { break; }
         }
         
         my.log('setEntriesIds() entries = ', sortedEntries);
         my.log('setEntriesIds() search = ' + _string);
-        my.log('setEntriesIds() result = ', sortedEntries[_nb]);
+        my.log('setEntriesIds() result = ', sortedEntries[_keys[_nb]]);
         
-        liveValues['entries']['id']['min'] = _nb;
+        liveValues['entries']['id']['min'] = _keys[_nb];
     }
 
     /**
@@ -2432,22 +2433,27 @@
         // Update next & previous entries titles
         
         document.body.addEventListener('mainEntryOpen.done', function(event){
-            
+
             setEntriesIds(); // Set values liveValues['entries']['id']['max'] & liveValues['entries']['id']['min']
             
-            var _entryId = 0;
             var _mySha256_title = event.detail["_mySha256_title"];
             var _mySha256_link  = event.detail["_mySha256_link"];
-            var _nb = sortedEntries.length;
+            
             var _string = document.getElementById('inputSearchEntries').value || "";
-
-            for (var i = 0; i < _nb; i++) {
-                if ((sortedEntries[i]['_mySha256_title']== _mySha256_title) ||
-                    (sortedEntries[i]['_mySha256_link'] == _mySha256_link)) {
-
-                    var _entryId = i;
-                    var _previousEntryId = i + 1;
-                    var _nextEntryId = i - 1;
+            
+            var _previousEntryId = 0;
+            var _entryId = 0;
+            var _nextEntryId = 0;
+            
+            var _keys = Object.keys(sortedEntries);
+            
+            for (var k = 0; k < _keys.length; k++) {
+                if ((sortedEntries[_keys[k]]['_mySha256_title']== _mySha256_title) ||
+                    (sortedEntries[_keys[k]]['_mySha256_link'] == _mySha256_link)
+                ){
+                    var _entryId = _keys[k];
+                    var _previousEntryId = _keys[(k+1)];
+                    var _nextEntryId = _keys[(k-1)] || _entryId;
 
                     // [>] previous news ?
                     
@@ -2455,12 +2461,13 @@
                         _previousEntryId = _entryId;
                     } else {
                         var _content = (sortedEntries[_previousEntryId]._myFeedInformations.title + ' ' + sortedEntries[_previousEntryId].title + ' ' + sortedEntries[_previousEntryId].contentSnippet).toLowerCase();
-                        
+                        var _i = k;
                         while ((sortedEntries[_previousEntryId]._myTimestamp < liveValues['timestamps']['min'])
                             || (!params.entries.displaySmallEntries && my.isSmallEntry(sortedEntries[_previousEntryId]))
                             || (_string !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_string.toLowerCase()) == -1))
                         ){
-                            _previousEntryId = _previousEntryId + 1;
+                            _i++;
+                            _previousEntryId = _keys[_i];
                             if (_previousEntryId > liveValues['entries']['id']['max']) { _previousEntryId = _entryId; break; }
                             _content = (sortedEntries[_previousEntryId]._myFeedInformations.title + ' ' + sortedEntries[_previousEntryId].title + ' ' + sortedEntries[_previousEntryId].contentSnippet).toLowerCase();
                         }
@@ -2472,12 +2479,13 @@
                         _nextEntryId = _entryId; 
                     } else {
                         var _content = (sortedEntries[_nextEntryId]._myFeedInformations.title + ' ' + sortedEntries[_nextEntryId].title + ' ' + sortedEntries[_nextEntryId].contentSnippet).toLowerCase();
-                        
+                        var _i = k;
                         while ((sortedEntries[_nextEntryId]._myTimestamp > liveValues['timestamps']['max'])
                             || (!params.entries.displaySmallEntries && my.isSmallEntry(sortedEntries[_nextEntryId]))
                             || (_string !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_string.toLowerCase()) == -1))
                         ){
-                            _nextEntryId = _nextEntryId - 1;
+                            _i--;
+                            _nextEntryId = _keys[_i];
                             if (_nextEntryId < 0) {_nextEntryId = _entryId; break; }
                             _content = (sortedEntries[_nextEntryId]._myFeedInformations.title + ' ' + sortedEntries[_nextEntryId].title + ' ' + sortedEntries[_nextEntryId].contentSnippet).toLowerCase();
                         }
@@ -2487,31 +2495,31 @@
                 }
             }
             
-            //my.message(_nextEntryId+ ' [<] '+ _entryId +' [>]' +_previousEntryId);
+            my.log(_nextEntryId+ ' [<] '+ _entryId +' [>] ' +_previousEntryId);
 
             // [<]
             
             if (my.isSmallEntry(sortedEntries[_nextEntryId])) {
-                dom['entry']['next']['button'].setAttribute("i", _nextEntryId);
+                dom['entry']['next']['button'].setAttribute("tsms", _nextEntryId);
                 dom['entry']['next']['button'].setAttribute("entry_link", sortedEntries[_nextEntryId].link);
             } else {
-                dom['entry']['next']['button'].setAttribute("i", _nextEntryId);
+                dom['entry']['next']['button'].setAttribute("tsms", _nextEntryId);
                 dom['entry']['next']['button'].setAttribute("entry_link", "");
             }
             
             // [>]
             
             if (my.isSmallEntry(sortedEntries[_previousEntryId])) {
-                dom['entry']['previous']['button'].setAttribute("i", _previousEntryId);
+                dom['entry']['previous']['button'].setAttribute("tsms", _previousEntryId);
                 dom['entry']['previous']['button'].setAttribute("entry_link", sortedEntries[_previousEntryId].link);
             } else {
-                dom['entry']['previous']['button'].setAttribute("i", _previousEntryId);
+                dom['entry']['previous']['button'].setAttribute("tsms", _previousEntryId);
                 dom['entry']['previous']['button'].setAttribute("entry_link", "");
             }
             
             // Disable / enable button [<]
 
-            if ((_nextEntryId < liveValues['entries']['id']['min']) || (_nextEntryId == _entryId)) {
+            if ((_nextEntryId > liveValues['entries']['id']['max']) || (_nextEntryId == _entryId)) {
                 ui._onclick(dom['entry']['next']['button'], 'disable');
                 ui.echo("nextEntryTitle", "", "");
             } else {
@@ -2521,7 +2529,7 @@
             
             // Disable / enable button [>]
             
-            if ((_previousEntryId > liveValues['entries']['id']['max']) || (_previousEntryId == _entryId)) {
+            if ((_previousEntryId < liveValues['entries']['id']['min']) || (_previousEntryId == _entryId)) {
                 ui._onclick(dom.entry['previous']['button'], 'disable');
                 ui.echo("previousEntryTitle", "", "");
             } else {
@@ -2553,7 +2561,7 @@
             var _mySha256_title = this.getAttribute("_mySha256_title");
             var _mySha256_link  = this.getAttribute("_mySha256_link");
             
-            for (var i = 0; i < sortedEntries.length; i++) {
+            for (var i in sortedEntries) {
                 if ((sortedEntries[i]['_mySha256_title']== _mySha256_title) ||
                     (sortedEntries[i]['_mySha256_link'] == _mySha256_link)) {
                     var _entryId = i;
