@@ -1837,7 +1837,7 @@
             var start2 = performance.now();
             
             if (_partialRendering) {
-                ui.echo("feeds-entries-content", _htmlEntries + "<br> ("+_nbEntriesDisplayed['small']+"/"+_nbEntriesDisplayed['large']+")"+_timestampMin+"/"+_timestampMax, "prepend");
+                ui.echo("feeds-entries-content", _htmlEntries, "prepend");
             } else {
                 if (params.entries.displaySmallEntries && ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0)) {
                     ui.echo("feeds-entries-content", _htmlFeedTitle + _htmlEntries, "");
