@@ -1698,7 +1698,7 @@
 
                 // ---
 
-                if ((_entrie._myTimestamp >= _timestampMin) && (_entrie._myTimestamp < _timestampMax)) {
+                if ((_entrie._myTimestamp > _timestampMin) && (_entrie._myTimestamp < _timestampMax)) {
 
                         // Time
                         

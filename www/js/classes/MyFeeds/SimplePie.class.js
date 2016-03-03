@@ -44,6 +44,9 @@ var SimplePie = function() {
     this.gf_mySha256 = [];          // Store sha256 sum for each news(entry), based on _entry.feedId + _entry.link
     this.unsortedFeeds = [];
     this.nbFeedsLoaded = 0;
+    this.timestampMax = 0;          // Timestamp of most recent news.
+    this.timestampMin = 0;          // Timestamp of beginning of day.
+    this.firstSync = true;
 
     _SimplePie = this;
 }
@@ -153,24 +156,45 @@ SimplePie.prototype.setFeedsSubscriptions = function(myFeedsSubscriptions) {
     this.myFeedsSubscriptions = _tmp;
 }
 
-SimplePie.prototype.setNbFeedsLoaded   = function()        { this.nbFeedsLoaded++;         }
+SimplePie.prototype.setNbFeedsLoaded = function() { this.nbFeedsLoaded++; }
+
+/* 
+ * addEntries
+ * Les "entries" sont ajoutées par flux. 
+ * Les fluxs arrivent de manière aléatoire.
+ * Entries as added once ONE feed has been downloaded.
+ * */
 
 SimplePie.prototype.addEntries = function(entries) {
     var start = performance.now();
     _MyFeeds.log('SimplePie.prototype.addEntries', arguments);
     
+    var _currentTimestamp = Date.now();
     var _nb = entries.length;
+    
+    this._setTimestampMin();
     
     for (var i = 0; i < _nb; i++) {
         var _entry = entries[i];
         
-        // Detect & update bad images urls in content
-        // Transform '<img src="//...' to '<img src="http://...'
-        
-        _entry.content = _entry.content.replace(/src="\/\//g, 'src="http:\/\/');
-        
-        // 1st image extraction
-        
+        _entry['_mySha256_title']       = (_entry['_myFeedInformations']['feed']['_myFeedId'] + _entry['title']).toString().toLowerCase();
+        _entry['_mySha256_link']        = (_entry['_myFeedInformations']['feed']['_myFeedId'] + _entry['link']).toString().toLowerCase();
+        //_entry['_mySha256_title']       = btoa(encodeURI(_entry['_myFeedInformations']['_myFeedId'] + _entry['title'])).toString();
+        //_entry['_mySha256_link']        = btoa(_entry['_myFeedInformations']['_myFeedId'] + _entry['link']).toString();
+
+        if (this.gf_mySha256.contains(_entry['_mySha256_link'])) {
+            // Old news same link: Do nothing.
+        } else if (this.gf_mySha256.contains(_entry['_mySha256_title'])) {
+            // Old news same title: Do nothing.
+        } else {
+            // New entry.
+            // Detect & update bad images urls in content
+            // Transform '<img src="//...' to '<img src="http://...'
+            
+            _entry.content = _entry.content.replace(/src="\/\//g, 'src="http:\/\/');
+            
+            // 1st image extraction
+            
             _entry['_myFirstImageUrl'] = "";
         
             var _results    = [];
@@ -183,43 +207,50 @@ SimplePie.prototype.addEntries = function(entries) {
                 _entry['_myFirstImageUrl'] = _results[1];
             }
 
-        // ---
+            // ---
 
-        // @todo
-        // A changer...
-        // Dans le timestamp en "ms" j'ajoute une valeur aléatoire pour ne pas avoir 2 dates de publication identiques.
-        // J'ajoute une valeur comprise entre 0 et 500 (0 à 0.5 seconde).
-        //
-        
-        var _date = new Date(_entry.publishedDate);
+            // @todo
+            // A changer...
+            // Dans le timestamp en "ms" j'ajoute une valeur aléatoire pour ne pas avoir 2 dates de publication identiques.
+            // J'ajoute une valeur comprise entre 0 et 500 (0 à 0.5 seconde).
+            //
+            
+            var _date = new Date(_entry.publishedDate);
 
-        _entry['_myTimestamp']          = Math.round(_date.getTime()/1000);
-        _entry['_myTimestampInMs']      = Math.round(_date.getTime()) + Math.floor(Math.random()*500);
-        
-        // If date is not correctly set
-        
-        if (_entry['_myTimestamp'] == 0) {
-            _entry['_myTimestampInMs']  = Math.floor(Math.random()*500);
-        }
+            _entry['_myTimestamp']          = Math.round(_date.getTime()/1000);
+            _entry['_myTimestampInMs']      = Math.round(_date.getTime()) + Math.floor(Math.random()*500);
 
-        _entry['_myLocalizedDate']      = ""; // Due to severe performances issues dates are generated later
-        _entry['_myLocalizedTime']      = ""; // Due to severe performances issues times are generated later
+            _entry['_myLocalizedDate']      = ""; // Due to severe performances issues dates are generated later
+            _entry['_myLocalizedTime']      = ""; // Due to severe performances issues times are generated later
         
-        _entry['_mySha256_title']       = (_entry['_myFeedInformations']['_myFeedId'] + _entry['title']).toString();
-        _entry['_mySha256_link']        = (_entry['_myFeedInformations']['_myFeedId'] + _entry['link']).toString();
-        //_entry['_mySha256_title']       = btoa(encodeURI(_entry['_myFeedInformations']['_myFeedId'] + _entry['title'])).toString();
-        //_entry['_mySha256_link']        = btoa(_entry['_myFeedInformations']['_myFeedId'] + _entry['link']).toString();
-
-        if (this.gf_mySha256.contains(_entry['_mySha256_link'])) {
-            // Old news same link: Do nothing.
-        } else if (this.gf_mySha256.contains(_entry['_mySha256_title'])) {
-            // Old news same title: Do nothing.
-        } else {
-            this.gf_mySha256.push(_entry['_mySha256_link']);
-            this.gf_mySha256.push(_entry['_mySha256_title']);
-            this.gf_unsortedEntries.push(_entry);
+            // Don't keep entries in the future.
+            // Keep only entries in the past (Before now).
+            
+            if (_entry['_myTimestamp'] < _currentTimestamp) {
+                
+                // New news but in the past.
+                // Feed was outdated during previous synchro.
+                // @todo : => Change published date
+                // Ne fonctionne pas au premier sync, toutes les news sont mises en désordre.
+                
+                if ((!this.firstSync) && (_entry['_myTimestamp'] < this.timestampMax) && (_entry['_myTimestamp'] > this.timestampMin)) {
+                    _MyFeeds.log('SimplePie.prototype.addEntries : ' + this.timestampMin + ' < ' + _entry['_myTimestamp'] + ' < ' + this.timestampMax + ' : ' + _entry.title);
+                    _entry['_myTimestamp'] = this.timestampMax;
+                    _entry['_myTimestampInMs'] = (this.timestampMax*1000) + Math.floor(Math.random()*500);
+                }
+                
+                this._setTimestampMax(_entry['_myTimestamp']); // Store timestamp of most recent entry.
+                
+                this.gf_mySha256.push(_entry['_mySha256_link']);
+                this.gf_mySha256.push(_entry['_mySha256_title']);
+                this.gf_unsortedEntries.push(_entry);
+            }
         }
     }
+    
+    // Change 1st sync status
+    if (this.getNbFeedsLoaded() == this.myFeedsSubscriptions.length) {this.firstSync = false;}
+    
     _MyFeeds.log(this.gf_mySha256);
     _MyFeeds.log('SimplePie.prototype.addEntries : ' + this.gf_unsortedEntries.length + ' entrie(s)');
     
@@ -359,6 +390,8 @@ SimplePie.prototype.addFeed = function(feed) {
     
     this.unsortedFeeds.push(_myNewfeed);
     
+    // ---
+    
     var end = performance.now();
     _MyFeeds.log("addFeed() " + (end - start) + " milliseconds.");
 }
@@ -483,6 +516,7 @@ SimplePie.prototype.get = function (url, myParams) {
             _MyFeeds.log('SimplePie.prototype.get()', url);
 
             xhr.onload = function() {
+                _SimplePie.setNbFeedsLoaded();
                 if (xhr.status == 200) {
 
                     var _response = JSON.parse(xhr.response);
@@ -510,6 +544,7 @@ SimplePie.prototype.get = function (url, myParams) {
             };
 
             xhr.onerror = function(e) {
+                _SimplePie.setNbFeedsLoaded();
                 _MyFeeds.error('ERROR 112 ' + url);
                 _MyFeeds.error(e);
                 var _response = {"responseData": {"_myParams": myParams}};
@@ -518,6 +553,7 @@ SimplePie.prototype.get = function (url, myParams) {
            
             xhr.timeout = 10000; // Set timeout to 10 seconds
             xhr.ontimeout = function() { 
+                _SimplePie.setNbFeedsLoaded();
                 _MyFeeds.error('ERROR 113 ' + url);
                 var _response = {"responseData": {"_myParams": myParams}};
                 reject(Error(JSON.stringify(_response)));
@@ -546,4 +582,42 @@ SimplePie.prototype.isSmallEntry = function (entry) {
     }
     
     return _out;
+}
+
+/**
+ * Set timestamp max from most recent news
+ * */
+SimplePie.prototype._setTimestampMax = function (timestamp) {
+    if (timestamp > this.timestampMax) {
+        this.timestampMax = timestamp;
+    }
+}
+
+/**
+ * Get timestamp max of most recent news
+ * */
+SimplePie.prototype._getTimestampMax = function () {
+    return this.timestampMax;
+}
+
+/**
+ * Set timestamp min. Beginning of the day.
+ * */
+SimplePie.prototype._setTimestampMin = function () {
+    
+    var _now    = new Date();
+    var _year   = _now.getFullYear();
+    var _month  = _now.getMonth();
+    var _day    = _now.getDate();
+
+    var _myDate = new Date(_year, _month, _day, '00','00','00');
+    
+    this.timestampMin = Math.floor(_myDate.getTime() / 1000);
+}
+
+/**
+ * Get timestamp min. Beginning of the day.
+ * */
+SimplePie.prototype._getTimestampMin = function () {
+    return this.timestampMin;
 }
