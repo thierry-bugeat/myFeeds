@@ -556,6 +556,19 @@ MyUi.prototype.showEntries = function () {
 }
 
 /**
+ * Change opacity of news previously displayed
+ * */
+MyUi.prototype.markAsRead = function () {
+    for (_tsms in liveValues.entries.newsPreviouslyDisplayed) { 
+        try {
+            ui.fade(document.getElementById(liveValues.entries.newsPreviouslyDisplayed[_tsms])); 
+        } catch (e) {
+            _MyFeeds.log('MyUi.prototype.markAsRead : Error ' + _tsms);
+        }
+    }
+}
+
+/**
  * Check if element is visible in viewport
  * @param {object} elem DOM element
  * @return {boolean} true / false

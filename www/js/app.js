@@ -117,6 +117,8 @@
             },
             "imagesPreviouslyDisplayed": [],    // Store images previously displayed. 
                                                 // Used for displaying images in offline mode.
+            "newsPreviouslyDisplayed": [],      // Store news previously displayed.
+                                                // Used to change entries opacity.
             "html": [],
             "last": ""                          // Store last recent entry.
         },
@@ -1763,7 +1765,7 @@
                                 '<div class="my-'+_theme+'-footer"></div>'
                             );
                             _content.push(
-                                '<div class="i my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '" tsms="' + _entrie._myTimestampInMs + '">',
+                                '<div class="i my-'+_theme+'-entry-l ' + _ratioClass + '" id="' + i + '" tsms="' + _entrie._myTimestampInMs + '">',
                                 '</div>'
                             );
                             _nbEntriesDisplayed['large']++;
@@ -1778,7 +1780,7 @@
                                 '<div class="my-'+_theme+'-footer"></div>'
                             );
                             _content.push(
-                                '<div class="i _online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" tsms="' + _entrie._myTimestampInMs + '" entry_link="' + _entrie.link + '">',
+                                '<div class="i _online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" id="' + i + '" tsms="' + _entrie._myTimestampInMs + '" entry_link="' + _entrie.link + '">',
                                 '</div>'
                             );
                             _nbEntriesDisplayed['small']++;
@@ -1792,7 +1794,7 @@
                                 '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>'
                             );
                             _content.push(
-                                '<div class="i my-'+_theme+'-entry-l ' + _ratioClass + '" i="' + i + '" tsms="' + _entrie._myTimestampInMs + '">',
+                                '<div class="i my-'+_theme+'-entry-l ' + _ratioClass + '" id="' + i + '" tsms="' + _entrie._myTimestampInMs + '">',
                                 '</div>'
                             );
                             _nbEntriesDisplayed['large']++;
@@ -1805,7 +1807,7 @@
                                 '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>'
                             );
                             _content.push(
-                                '<div class="i _online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" i="' + i + '" tsms="' + _entrie._myTimestampInMs + '" entry_link="' + _entrie.link + '">',
+                                '<div class="i _online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" id="' + i + '" tsms="' + _entrie._myTimestampInMs + '" entry_link="' + _entrie.link + '">',
                                 '</div>'
                             );
                             _nbEntriesDisplayed['small']++;
@@ -1866,6 +1868,10 @@
             }
             
             _previousNbDaysAgo = nbDaysAgo;
+            
+            // Mark as read
+            
+            ui.markAsRead();
             
             // ==================
             // --- Add Events ---
@@ -2063,7 +2069,7 @@
 
     /**
      * Set timestamps values Min & Max.
-     * Variable "liveValues['timestamps']['max']" Start of day timestamp. 
+     * Variable "liveValues['timestamps']['max']" End of day timestamp. 
      * Variable "liveValues['timestamps']['min']" Value beyond which an entry can't be displayed. (Too old)
      * @param {null}
      * */
@@ -2525,6 +2531,15 @@
                 ui._onclick(dom.entry['previous']['button'], 'enable');
                 ui.echo("previousEntryTitle", sortedEntries[_previousTsMs].title, "");
             }
+            
+            // Mark entry as read
+            
+            if (!liveValues.entries.newsPreviouslyDisplayed.contains(event.detail.entryId)) {
+                liveValues.entries.newsPreviouslyDisplayed.push(event.detail.entryId);
+                ui.fade(document.getElementById(event.detail.entryId));
+            }
+            
+            // ---
             
         });
         
