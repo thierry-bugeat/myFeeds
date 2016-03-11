@@ -2157,12 +2157,14 @@
      * @param {string} feedly, theoldreader, aolreader, tinytinyrss
      * */
     function _disableAccount(_account) {
-        my.log('_disableAccount', arguments);
-        params.accounts[_account].logged = false
-        myFeedsSubscriptions[_account] = [];
-        gf.setFeedsSubscriptions(myFeedsSubscriptions);
-        gf.deleteEntries(_account, '');
-        _saveParams();
+        if (_account !== 'local') {
+            my.log('_disableAccount', arguments);
+            params.accounts[_account].logged = false
+                myFeedsSubscriptions[_account] = [];
+            gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            gf.deleteEntries(_account, '');
+            _saveParams();
+        }
      }
 
     /**
