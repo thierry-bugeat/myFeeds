@@ -1640,7 +1640,7 @@
             
             var start = performance.now();
             
-            var _timestampMax = liveValues['timestamps']['max'] - (86400 * nbDaysAgo);
+            var _timestampMax = liveValues['timestamps']['max'] - (86400 * nbDaysAgo); // End of current day 23:59:59
             var _partialRendering = ((nbDaysAgo == 0) && (liveValues.sync.nbDaysAgo == nbDaysAgo) && (liveValues.sync.theme == params.entries.theme) && (liveValues.sync.timestamps.max == _timestampMax)) ? true : false;
             //my.alert('Partial rendering: '+_partialRendering);
             
@@ -1679,7 +1679,7 @@
                 // Store informations about last recent entry
                 
                 if (_nb == 0) {
-                    liveValues['entries']['last'] = sortedEntries[i];
+                    liveValues['entries']['last'] = sortedEntries[0];
                 }
                 
                 _nb++;
