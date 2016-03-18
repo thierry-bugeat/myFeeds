@@ -129,7 +129,8 @@
             "theme": "",
             "timestamps": {
                 "max": -1
-            }
+            },
+            "selectedFeed": ""
         },
         "screens": {
             "feedsList": {
@@ -1641,7 +1642,7 @@
             var start = performance.now();
             
             var _timestampMax = liveValues['timestamps']['max'] - (86400 * nbDaysAgo); // End of current day 23:59:59
-            var _partialRendering = ((nbDaysAgo == 0) && (liveValues.sync.nbDaysAgo == nbDaysAgo) && (liveValues.sync.theme == params.entries.theme) && (liveValues.sync.timestamps.max == _timestampMax)) ? true : false;
+            var _partialRendering = ((nbDaysAgo == 0) && (liveValues.sync.nbDaysAgo == nbDaysAgo) && (liveValues.sync.theme == params.entries.theme) && (liveValues.sync.timestamps.max == _timestampMax) && (liveValues.sync.selectedFeed == params.feeds.selectedFeed)) ? true : false;
             //my.alert('Partial rendering: '+_partialRendering);
             
             var _timestampMin = (_partialRendering) ? 
@@ -1653,6 +1654,7 @@
             liveValues.sync.nbDaysAgo = nbDaysAgo;
             liveValues.sync.theme = params.entries.theme;
             liveValues.sync.timestamps.max = _timestampMax;
+            liveValues.sync.selectedFeed = params.feeds.selectedFeed;
             
             my.log("dspEntries()", arguments);
             my.log(entries);
@@ -1664,6 +1666,10 @@
 
             var _nbEntriesDisplayed = {'small': 0, 'large': 0};
 
+            // Store informations about last recent entry
+                
+            liveValues['entries']['last'] = sortedEntries[Object.keys(sortedEntries)[0]];
+            
             // =======================
             // --- Display entries ---
             // =======================
@@ -1672,17 +1678,9 @@
             var _htmlFeedTitle = "";
             var _firstEntrie = true;
             var _theme = params.entries.theme;
-            var _nb = 0;
-            
+                
             for (var i in sortedEntries) {
                 
-                // Store informations about last recent entry
-                
-                if (_nb == 0) {
-                    liveValues['entries']['last'] = sortedEntries[0];
-                }
-                
-                _nb++;
 
                 // Get entries of specific feed or get all entries.
 
