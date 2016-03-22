@@ -43,7 +43,6 @@
     "type": "privileged",
     "csp": "default-src *; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'",
     "redirects": [
-        {"from": "http://localhost:8080/", "to": "/js/aolreader/loginCallback.html"}
     ],
     "permissions": {
         "desktop-notification": {

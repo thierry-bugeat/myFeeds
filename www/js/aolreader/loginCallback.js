@@ -17,5 +17,5 @@
  * along with myFeeds.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-opener.aolreader._loginCallback(location.href);
+//opener.aolreader._loginCallback(location.href);
 window.close();
