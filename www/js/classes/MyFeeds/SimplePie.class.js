@@ -41,12 +41,13 @@ var SimplePie = function() {
     this.gf_sortedEntries = [];
     this.sortedFeeds = [];
     this.gf_unsortedEntries = [];
-    this.gf_mySha256 = [];          // Store sha256 sum for each news(entry), based on _entry.feedId + _entry.link
+    this.gf_mySha256 = [];              // Store sha256 sum for each news(entry), based on _entry.feedId + _entry.link
     this.unsortedFeeds = [];
     this.nbFeedsLoaded = 0;
-    this.timestampMax = 0;          // Timestamp of most recent news.
-    this.timestampMin = 0;          // Timestamp of beginning of day.
+    this.timestampMax = 0;              // Timestamp of most recent news.
+    this.timestampMin = 0;              // Timestamp of beginning of day.
     this.firstSync = true;
+    this.currentSynchroTimestamp = 0;   // Timestamp of current synchro.
 
     _SimplePie = this;
 }
@@ -156,23 +157,24 @@ SimplePie.prototype.setFeedsSubscriptions = function(myFeedsSubscriptions) {
     this.myFeedsSubscriptions = _tmp;
 }
 
-SimplePie.prototype.setNbFeedsLoaded = function() { this.nbFeedsLoaded++; }
+SimplePie.prototype.setNbFeedsLoaded = function() { 
+    this.nbFeedsLoaded++; 
+}
 
 /* 
  * addEntries
- * Les "entries" sont ajoutées par flux. 
- * Les fluxs arrivent de manière aléatoire.
- * Entries as added once ONE feed has been downloaded.
+ * Entries (news) are added by feed.
+ * Feeds are loaded randomly.
+ * Entries are added once ONE feed has been downloaded.
  * */
 
 SimplePie.prototype.addEntries = function(entries) {
     var start = performance.now();
     _MyFeeds.log('SimplePie.prototype.addEntries', arguments);
     
-    var _currentTimestamp = Date.now();
     var _nb = entries.length;
     
-    this._setTimestampMin();
+    this._setTimestampMin(); // Store timestamp of beginning of day.
     
     for (var i = 0; i < _nb; i++) {
         var _entry = entries[i];
@@ -207,13 +209,10 @@ SimplePie.prototype.addEntries = function(entries) {
                 _entry['_myFirstImageUrl'] = _results[1];
             }
 
-            // ---
+            // Add custom values
 
-            // @todo
-            // A changer...
-            // Dans le timestamp en "ms" j'ajoute une valeur aléatoire pour ne pas avoir 2 dates de publication identiques.
-            // J'ajoute une valeur comprise entre 0 et 500 (0 à 0.5 seconde).
-            //
+            // To have an unique timestamp in "ms" for each entry (news),
+            // I had a random value between 0 and 500 (+0 to +0.5sec).
             
             var _date = new Date(_entry.publishedDate);
 
@@ -224,23 +223,23 @@ SimplePie.prototype.addEntries = function(entries) {
             _entry['_myLocalizedTime']      = ""; // Due to severe performances issues times are generated later
         
             // Don't keep entries in the future.
-            // Keep only entries in the past (Before now).
+            // Keep only entries before now (Current timestamp).
             
-            if (_entry['_myTimestamp'] < _currentTimestamp) {
+            if (_entry['_myTimestamp'] < this.currentSynchroTimestamp) {
                 
-                // New news but in the past.
-                // Feed was outdated during previous synchro.
-                // @todo : => Change published date
-                // Ne fonctionne pas au premier sync, toutes les news sont mises en désordre.
+                // Timestamp correction for very old news.
+                // (Before timestamp of most recent news in previous synchro).
+                // Maybe a network issue or feed was outdated during previous synchro.
+                // @todo : => Align published date on new timestamp.
                 
-                if ((!this.firstSync) && (_entry['_myTimestamp'] < this.timestampMax) && (_entry['_myTimestamp'] > this.timestampMin)) {
+                if ((!this.firstSync) && (_entry['_myTimestamp'] <= this.timestampMax) && (_entry['_myTimestamp'] >= this.timestampMin)) {
                     _MyFeeds.log('SimplePie.prototype.addEntries : ' + this.timestampMin + ' < ' + _entry['_myTimestamp'] + ' < ' + this.timestampMax + ' : ' + _entry.title);
-                    _entry['_myTimestamp'] = this.timestampMax;
-                    _entry['_myTimestampInMs'] = (this.timestampMax*1000) + Math.floor(Math.random()*500);
-                }
-                
-                this._setTimestampMax(_entry['_myTimestamp']); // Store timestamp of most recent entry.
-                
+                    _entry['_myTimestamp'] = (this.timestampMax) + 1;
+                    _entry['_myTimestampInMs'] = ((this.timestampMax + 1)*1000) + Math.floor(Math.random()*500);
+                } 
+
+                // Keep entry
+
                 this.gf_mySha256.push(_entry['_mySha256_link']);
                 this.gf_mySha256.push(_entry['_mySha256_title']);
                 this.gf_unsortedEntries.push(_entry);
@@ -248,8 +247,12 @@ SimplePie.prototype.addEntries = function(entries) {
         }
     }
     
-    // Change 1st sync status
-    if (this.getNbFeedsLoaded() == this.myFeedsSubscriptions.length) {this.firstSync = false;}
+    // All feeds has been loaded
+    
+    if (this.getNbFeedsLoaded() == this.myFeedsSubscriptions.length) {
+        this.firstSync = false; // Change 1st sync status 
+        this._setTimestampMax(); // Store timestamp of most recent entry.
+    }
     
     _MyFeeds.log(this.gf_mySha256);
     _MyFeeds.log('SimplePie.prototype.addEntries : ' + this.gf_unsortedEntries.length + ' entrie(s)');
@@ -263,6 +266,7 @@ SimplePie.prototype.addEntries = function(entries) {
  * @param {string} account "local", "feedly", "theoldreader"...
  * @param {string} feedId or empty value "" for all feeds
  * */
+
 SimplePie.prototype.deleteEntries = function(account, feedId) {
     _MyFeeds.log('deleteEntries(' + account + ', ' + feedId + ')');
     
@@ -404,6 +408,7 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
     
     _MyFeeds.log('SimplePie.prototype.loadFeeds()', this.myFeedsSubscriptions);
 
+    this.currentSynchroTimestamp = Math.floor(Date.now() / 1000);
     this.nbFeedsLoaded = 0;
     this.unsortedFeeds = [];
 
@@ -483,10 +488,8 @@ SimplePie.prototype.isValidUrl = function(url) {
         var promise = _SimplePie.get(_url, {});
 
         promise.then(function(response) {
-            console.log(response); // @todo remove
             document.body.dispatchEvent(new CustomEvent('SimplePie.isValidUrl.done', {"detail": response}));
         }).catch(function(error){
-            console.log(error); // @todo remove
             document.body.dispatchEvent(new CustomEvent('SimplePie.isValidUrl.error', {"detail": error}));
         });
 
@@ -587,9 +590,15 @@ SimplePie.prototype.isSmallEntry = function (entry) {
 /**
  * Set timestamp max from most recent news
  * */
-SimplePie.prototype._setTimestampMax = function (timestamp) {
-    if (timestamp > this.timestampMax) {
-        this.timestampMax = timestamp;
+SimplePie.prototype._setTimestampMax = function () {
+    _MyFeeds.log('SimplePie.prototype._setTimestampMax()');
+
+    var _entries = this.getEntries();
+    var _entryId = Object.keys(_entries)[0];
+    var _timestampMax = _entries[_entryId]['_myTimestamp'];
+    
+    if (_timestampMax > this.timestampMax) {
+        this.timestampMax = _timestampMax;
     }
 }
 

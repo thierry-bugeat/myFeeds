@@ -1631,7 +1631,6 @@
         var feedsEntriesScrollTop = dom['screens']['entries']['scroll'].scrollTop;
         
         ui.echo('feedsEntriesNbDaysAgo', document.webL10n.get('loading'), '');
-        //ui.echo('feeds-entries-content', '', '');
         
         clearTimeout(_dspEntriesTimeout);
         
@@ -1646,7 +1645,7 @@
             //my.alert('Partial rendering: '+_partialRendering);
             
             var _timestampMin = (_partialRendering) ? 
-                liveValues['entries']['last']['_myTimestamp'] + 1 :
+                liveValues['entries']['last']['_myTimestamp'] :
                 liveValues['timestamps']['max'] - (86400 * nbDaysAgo) - 86400 + 1;
             
             my.log("dspEntries() between " + _timestampMin + " (00:00:00) & " + _timestampMax + " (23:59:59)");
@@ -1666,10 +1665,6 @@
 
             var _nbEntriesDisplayed = {'small': 0, 'large': 0};
 
-            // Store informations about last recent entry
-                
-            liveValues['entries']['last'] = sortedEntries[Object.keys(sortedEntries)[0]];
-            
             // =======================
             // --- Display entries ---
             // =======================
@@ -1684,29 +1679,29 @@
 
                 // Get entries of specific feed or get all entries.
 
-                var _entrie = "";
+                var _entry = "";
 
                 if ((feedUrl !== "") && (feedUrl == sortedEntries[i]._myFeedInformations.feedUrl)) {
-                    var _entrie = sortedEntries[i];
+                    var _entry = sortedEntries[i];
                     if (_firstEntrie) {
-                        _htmlFeedTitle = _htmlFeedTitle + '<h2>' + _entrie._myFeedInformations.title + '</h2>'; // Specific feed title
+                        _htmlFeedTitle = _htmlFeedTitle + '<h2>' + _entry._myFeedInformations.title + '</h2>'; // Specific feed title
                         _firstEntrie = false;
                     }
                 } else if (feedUrl == "") {
-                    var _entrie = sortedEntries[i];
+                    var _entry = sortedEntries[i];
                 }
 
                 // ---
 
-                if ((_entrie._myTimestamp > _timestampMin) && (_entrie._myTimestamp < _timestampMax)) {
+                if ((_entry._myTimestamp > _timestampMin) && (_entry._myTimestamp < _timestampMax)) {
 
                         // Time
                         
-                        var _time = _entrie._myLocalizedTime;
+                        var _time = _entry._myLocalizedTime;
 
                         // Small article or not ?
 
-                        var _isSmallEntry = my.isSmallEntry(_entrie);
+                        var _isSmallEntry = my.isSmallEntry(_entry);
 
                         // 1st image
 
@@ -1714,17 +1709,17 @@
                         
                         // Try to detect broken image
                         /*var _img = new Image(); 
-                        _img.src = _entrie._myFirstImageUrl; 
+                        _img.src = _entry._myFirstImageUrl; 
 
                         if (!_img.complete) {
-                            _entrie._myFirstImageUrl = "";
+                            _entry._myFirstImageUrl = "";
                         }*/
 
-                        if (_entrie._myFirstImageUrl) {
+                        if (_entry._myFirstImageUrl) {
                             if (_isSmallEntry) {
-                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="img/loading.png" data-src="' + _entrie._myFirstImageUrl + '"/></span>';
+                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="img/loading.png" data-src="' + _entry._myFirstImageUrl + '"/></span>';
                             } else {
-                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="img/loading.png" data-src="' + _entrie._myFirstImageUrl + '"/></span>';
+                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="img/loading.png" data-src="' + _entry._myFirstImageUrl + '"/></span>';
                             }
                         }
 
@@ -1732,11 +1727,11 @@
 
                         var _ratioClass = _theme + '-ratio-entry-l';
 
-                        if (_isSmallEntry && (!_entrie._myFirstImageUrl)) {
+                        if (_isSmallEntry && (!_entry._myFirstImageUrl)) {
                             _ratioClass = _theme + '-ratio-entry-s';
                         }
 
-                        else if (_isSmallEntry || (!_entrie._myFirstImageUrl)) {
+                        else if (_isSmallEntry || (!_entry._myFirstImageUrl)) {
                             _ratioClass = _theme + '-ratio-entry-m';
                         }
 
@@ -1744,8 +1739,8 @@
 
                         var _accountIcone = '';
 
-                        if (_entrie._myFeedInformations._myParams.account != 'local') {
-                            _accountIcone = '<img src="img/' + _entrie._myFeedInformations._myParams.account + '.' + _theme + '.png" data-src="img/' + _entrie._myFeedInformations._myParams.account + '.' + _theme + '.png" />';
+                        if (_entry._myFeedInformations._myParams.account != 'local') {
+                            _accountIcone = '<img src="img/' + _entry._myFeedInformations._myParams.account + '.' + _theme + '.png" data-src="img/' + _entry._myFeedInformations._myParams.account + '.' + _theme + '.png" />';
                         }
 
                         // Content ( Normal / Small )
@@ -1755,57 +1750,57 @@
 
                         if ((params.entries.theme == 'list') && (!_isSmallEntry)) {
                             _html.push(
-                                '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>',
-                                '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>',
+                                '<span class="my-'+_theme+'-feed-title">' + _entry._myFeedInformations.title + '</span>',
+                                '<span class="my-'+_theme+'-date" publishedDate="' + _entry.publishedDate + '">' + _time + '</span>',
                                 '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>',
-                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>',
-                                '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>',
+                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entry.title + '</span>',
+                                '<span class="my-'+_theme+'-snippet">' + _entry.contentSnippet + '</span>',
                                 '<div class="my-'+_theme+'-footer"></div>'
                             );
                             _content.push(
-                                '<div class="i my-'+_theme+'-entry-l ' + _ratioClass + '" id="' + i + '" tsms="' + _entrie._myTimestampInMs + '">',
+                                '<div class="i my-'+_theme+'-entry-l ' + _ratioClass + '" id="' + i + '" tsms="' + _entry._myTimestampInMs + '">',
                                 '</div>'
                             );
                             _nbEntriesDisplayed['large']++;
 
                         } else if (params.entries.theme == 'list') {
                             _html.push(
-                                '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>',
-                                '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>',
+                                '<span class="my-'+_theme+'-feed-title">' + _entry._myFeedInformations.title + '</span>',
+                                '<span class="my-'+_theme+'-date" publishedDate="' + _entry.publishedDate + '">' + _time + '</span>',
                                 '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>',
-                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>',
-                                '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>',
+                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entry.title + '</span>',
+                                '<span class="my-'+_theme+'-snippet">' + _entry.contentSnippet + '</span>',
                                 '<div class="my-'+_theme+'-footer"></div>'
                             );
                             _content.push(
-                                '<div class="i _online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" id="' + i + '" tsms="' + _entrie._myTimestampInMs + '" entry_link="' + _entrie.link + '">',
+                                '<div class="i _online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" id="' + i + '" tsms="' + _entry._myTimestampInMs + '" entry_link="' + _entry.link + '">',
                                 '</div>'
                             );
                             _nbEntriesDisplayed['small']++;
 
                         } else if (!_isSmallEntry) {
                             _html.push(
-                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>',
-                                '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>',
+                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entry.title + '</span>',
+                                '<span class="my-'+_theme+'-feed-title">' + _entry._myFeedInformations.title + '</span>',
                                 _imageUrl,
-                                '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>',
-                                '<span class="my-'+_theme+'-snippet">' + _entrie.contentSnippet + '</span>'
+                                '<span class="my-'+_theme+'-date" publishedDate="' + _entry.publishedDate + '">' + _time + '</span>',
+                                '<span class="my-'+_theme+'-snippet">' + _entry.contentSnippet + '</span>'
                             );
                             _content.push(
-                                '<div class="i my-'+_theme+'-entry-l ' + _ratioClass + '" id="' + i + '" tsms="' + _entrie._myTimestampInMs + '">',
+                                '<div class="i my-'+_theme+'-entry-l ' + _ratioClass + '" id="' + i + '" tsms="' + _entry._myTimestampInMs + '">',
                                 '</div>'
                             );
                             _nbEntriesDisplayed['large']++;
 
                         } else {
                             _html.push(
-                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entrie.title + '</span>',
-                                '<span class="my-'+_theme+'-feed-title">' + _entrie._myFeedInformations.title + '</span>',
+                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entry.title + '</span>',
+                                '<span class="my-'+_theme+'-feed-title">' + _entry._myFeedInformations.title + '</span>',
                                 _imageUrl,
-                                '<span class="my-'+_theme+'-date" publishedDate="' + _entrie.publishedDate + '">' + _time + '</span>'
+                                '<span class="my-'+_theme+'-date" publishedDate="' + _entry.publishedDate + '">' + _time + '</span>'
                             );
                             _content.push(
-                                '<div class="i _online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" id="' + i + '" tsms="' + _entrie._myTimestampInMs + '" entry_link="' + _entrie.link + '">',
+                                '<div class="i _online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" id="' + i + '" tsms="' + _entry._myTimestampInMs + '" entry_link="' + _entry.link + '">',
                                 '</div>'
                             );
                             _nbEntriesDisplayed['small']++;
@@ -1815,7 +1810,7 @@
 
                         _htmlEntries = _htmlEntries + _content.join('');
                         
-                        liveValues['entries']['html'][_entrie._myTimestampInMs] = _html.join('');
+                        liveValues['entries']['html'][_entry._myTimestampInMs] = _html.join('');
 
                 } else if ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0) { break; }
             }
@@ -1871,6 +1866,10 @@
             
             ui.markAsRead();
             
+            // Store informations about last recent entry
+
+            liveValues['entries']['last'] = sortedEntries[Object.keys(sortedEntries)[0]];            
+ 
             // ==================
             // --- Add Events ---
             // ==================
