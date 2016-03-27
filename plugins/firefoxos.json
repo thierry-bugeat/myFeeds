@@ -13,9 +13,6 @@
         "cordova-plugin-device": {
             "PACKAGE_NAME": "com.bugeat.myfeeds"
         },
-        "cordova-plugin-vibration": {
-            "PACKAGE_NAME": "com.bugeat.myfeeds"
-        },
         "cordova-plugin-file": {
             "PACKAGE_NAME": "com.bugeat.myfeeds"
         },

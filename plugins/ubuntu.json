@@ -34,9 +34,6 @@
         "cordova-plugin-network-information": {
             "PACKAGE_NAME": "com.bugeat.myfeeds"
         },
-        "cordova-plugin-vibration": {
-            "PACKAGE_NAME": "com.bugeat.myfeeds"
-        },
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "com.bugeat.myfeeds"
         },
