@@ -24,6 +24,9 @@
         },
         "cordova-plugin-x-socialsharing": {
             "PACKAGE_NAME": "com.bugeat.myfeeds"
+        },
+        "cordova-plugin-vibration": {
+            "PACKAGE_NAME": "com.bugeat.myfeeds"
         }
     },
     "dependent_plugins": {}
