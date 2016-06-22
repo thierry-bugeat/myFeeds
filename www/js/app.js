@@ -76,8 +76,8 @@
             "developper_menu": {
                 "visible": false,               // Display or not developper menu in settings
                 "logs": {
-                    "console": false,           // Developper logs in console
-                    "screen": false             // Developper logs on screen
+                    "console": true,           // Developper logs in console
+                    "screen": true             // Developper logs on screen
                 }
             },
             "update": {
@@ -2672,7 +2672,10 @@
         /* ======================== */
 
         document.body.addEventListener('SimplePie.load.done', function(event){
-            //my.alert('SimplePie.load.done');
+            
+            liveValues.sync.nbFeedsLoaded++;
+            
+            my.log('SimplePie.load.done '+liveValues.sync.nbFeedsLoaded+'/'+liveValues.sync.nbFeedsToLoad);
             
             // Save feed as file
 
@@ -2691,7 +2694,6 @@
 
             // Check if all feeds were loaded
 
-                liveValues.sync.nbFeedsLoaded++;
 
                 // Percentage of loading ?
 
@@ -2722,12 +2724,14 @@
         }, true);
 
         document.body.addEventListener('SimplePie.load.error', function(event){
-            //my.alert('SimplePie.load.error');
+            
+            liveValues.sync.nbFeedsLoaded++;
+            
+            my.error('SimplePie.load.error '+liveValues.sync.nbFeedsLoaded+'/'+liveValues.sync.nbFeedsToLoad);
+            
             // Check if all feeds were loaded
 
                 my.error(event);
-
-                liveValues.sync.nbFeedsLoaded++;
 
                 // Percentage of loading ?
 

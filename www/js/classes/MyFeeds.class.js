@@ -23,6 +23,7 @@
 
 var MyFeeds = function() {
     _MyFeeds = this;
+    this.version = 16; // Load & Save version to use. (14: myFeeds 1.0.x to 1.4.x, 15: myFeeds 1.5, 16: myFeeds 1.6.x)
 }
 
 /* =============== */
@@ -32,11 +33,25 @@ var MyFeeds = function() {
 MyFeeds.prototype.base64_encode = function(str) { return btoa(str); }
 MyFeeds.prototype.base64_decode = function(str) { return atob(str); }
 
-/**
- * v1.5+
- * */
-MyFeeds.prototype._loadV15 = function(filename, callback) {
+MyFeeds.prototype._load = function(filename, callback) {
     _MyFeeds.log("MyFeeds.prototype._load()", arguments);
+
+    switch(this.version) {
+        case 14:
+            return _MyFeeds._loadV14(filename, callback); // myFeeds 1.0.x to 1.4.x (SD card storage)
+        case 15:
+            return _MyFeeds._loadV15(filename, callback); // myFeeds 1.5 (Transition from SD card storage to local storage)
+            break;
+        default:
+            return _MyFeeds._loadV16(filename, callback); // myFeeds 1.6.X (Local storage)
+    }
+}
+
+/**
+ * Load: v1.6+
+ * */
+MyFeeds.prototype._loadV16 = function(filename, callback) {
+    _MyFeeds.log("MyFeeds.prototype._loadV16()", arguments);
     
     return new Promise(function(resolve, reject) {
         if (typeof localStorage.getItem(filename) === 'string') { 
@@ -44,16 +59,18 @@ MyFeeds.prototype._loadV15 = function(filename, callback) {
             _MyFeeds.log("MyFeeds.prototype._load() " + filename, results);
             resolve(results);
         } else {
+            _MyFeeds.log("MyFeeds.prototype._load() ERROR Can't find '"+filename+"' in localStorage");
             reject("{}");
         }
     });
 }
 
 /**
- * Load: Migration from v1.4 to 1.5+
+ * Load: v1.5 
+ * Migration from v1.4 to 1.5+
  * */
-MyFeeds.prototype._load = function(filename, callback) {
-    _MyFeeds.log("MyFeeds.prototype._load()", arguments);
+MyFeeds.prototype._loadV15 = function(filename, callback) {
+    _MyFeeds.log("MyFeeds.prototype._loadV15()", arguments);
     
     return new Promise(function(resolve, reject) {
         if (typeof localStorage.getItem(filename) === 'string') { 
@@ -71,7 +88,7 @@ MyFeeds.prototype._load = function(filename, callback) {
 }
 
 /**
- * v1.0 to v1.4
+ * Load v1.0 to v1.4
  * Load user data from SD card
  * */
 MyFeeds.prototype._loadV14 = function(filename, callback) {
@@ -154,6 +171,51 @@ MyFeeds.prototype._save = function(filename, mimetype, content) {
     return new Promise(function(resolve, reject) {
         localStorage.setItem(filename, content);
         resolve("");
+    });
+
+}
+
+/**
+ * @param {string} filename
+ * @param {string} mimetype "text/plain" "application/json"
+ * @param {string} content
+ * */
+MyFeeds.prototype._save14 = function(filename, mimetype, content) {
+
+    return new Promise(function(resolve, reject) {
+        try {
+            var sdcard = navigator.getDeviceStorage("sdcard");
+            var file   = new Blob([content], {type: mimetype});
+
+            // Delete previous file
+            
+            var request = sdcard.delete("myFeeds/" + filename);
+            request.onsuccess = function() {
+                _MyFeeds.log("File deleted");
+                
+                // Save new file
+            
+                var request = sdcard.addNamed(file, "myFeeds/" + filename);
+
+                request.onsuccess = function () {
+                    resolve(this.result);
+                }
+
+                request.onerror = function (error) {
+                    var _myError = {
+                        "filename": filename,
+                        "message": "Unable to write the file",
+                        "error": error
+                    };
+                    reject(JSON.stringify(_myError));
+                }
+                
+            };
+            request.onerror = function() { reject(JSON.stringify(this.error)); };
+        } catch (e) {
+            localStorage.setItem(filename, content);
+            resolve("");
+        }
     });
 
 }
