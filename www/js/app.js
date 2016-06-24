@@ -144,7 +144,7 @@
             "inProgress": false                 // Set to "true" when user click on elements with "_startAnimation_" class.
         },
         "network": {
-            "online": "NA"
+            "status": "NA"
         }
     }
     
@@ -2343,26 +2343,31 @@
         // --- Network connection : online / offline ? ---
         // ===============================================
 
-        setInterval(function() {
-            if (liveValues.network.online != navigator.onLine) {
-                var _status = navigator.onLine == true ? 'enable' : 'disable';
-
-                document.body.dispatchEvent(new CustomEvent('networkConnection.change', {"detail": liveValues.network.online}));
+        function updateNetworkStatus(event) {
+            console.log("Network event ", event);
+            
+            if (liveValues.network.status != event.type) {
+                
+                var _status = (event.type == 'online') ? 'enable' : 'disable';
+                
+                document.body.dispatchEvent(new CustomEvent('networkConnection.change', {"detail": liveValues.network.status}));
 
                 ui.toggle(_status);
-
+                
                 // Store current connection status
-
-                liveValues.network.online = navigator.onLine;
-
-                // ---
+                
+                liveValues.network.status = event.type; 
             }
+            
             // --- Fix some network change issues
             // Sync button is disabled but navigator is online & no synchro is in progress !
-            if (((ui._status(sync) == 'disable') || ((typeof(lastUpdate) == "object") && ui._status(lastUpdate) == 'disable')) && (liveValues.sync.nbFeedsToLoad == 0) && (navigator.onLine) && (liveValues.network.online == 'enable')) {
+            if (((ui._status(sync) == 'disable') || ((typeof(lastUpdate) == "object") && ui._status(lastUpdate) == 'disable')) && (liveValues.sync.nbFeedsToLoad == 0) && (event.type == 'online') && (liveValues.network.status == 'online')) {
                 ui._enable();
             }
-        }, 5000);
+        }
+
+        window.addEventListener('online',  updateNetworkStatus);
+        window.addEventListener('offline', updateNetworkStatus);
         
         // ======================
         // --- Memory cleanup ---
