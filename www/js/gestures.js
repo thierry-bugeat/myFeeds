@@ -75,7 +75,7 @@ function _swipe(_element, callback) {
         if (myGesture._id == 'feeds-entries-scroll') {
                     
             if ((myGesture._scrollTop) && (myGesture._direction == "down")) {
-                if (navigator.onLine) {
+                if (liveValues.network.status == 'online') {
                     ui._loading(1);
                     sync.classList.add("rotation");
                     myGesture._action = 'sync';
