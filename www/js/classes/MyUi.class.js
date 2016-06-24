@@ -206,7 +206,7 @@ MyUi.prototype._onclick = function(_this, pointerEvents) {
         } else {
             _this.classList.remove("enable");
             _this.classList.add("disable");
-            if (_this.id == 'sync' && navigator.onLine) {sync.classList.add("rotation");}
+            if (_this.id == 'sync' && (liveValues.network.status == 'online')) {sync.classList.add("rotation");}
         }
     }
 }
@@ -446,7 +446,7 @@ MyUi.prototype._smallEntries = function (status) {
     // => Reset small entries opacity
     
     if (status == "show") {
-        var _tmp = (navigator.onLine) ? "enable" : "disable";
+        var _tmp = (liveValues.network.status == 'online') ? "enable" : "disable";
         for (var i = 0; i < _small_entries.length; i++) {
             _MyUi._onclick(_small_entries[i], _tmp); 
         }
@@ -499,7 +499,7 @@ MyUi.prototype.loadImages = function () {
         
         var _dataSrc = images[i].getAttribute('data-src');
         
-        if (navigator.onLine) {
+        if (liveValues.network.status == 'online') {
             
             if (_MyUi.isInViewport(images[i]) 
                 && (_dataSrc != "")
