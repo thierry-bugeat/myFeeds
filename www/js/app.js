@@ -145,14 +145,17 @@
         },
         "network": {
             "status": "NA"
+        }, 
+        "timeouts": {
+            "entries": {
+                "display": ""
+            }
         }
     }
     
     var keywords = [];
 
     var _entriesUpdateInterval = '';
-    
-    var _dspEntriesTimeout = '';
     
     var _loginInProgress = {"local": false, "feedly": false, "theoldreader": false, "aolreader": false, "tinytinyrss": false}
 
@@ -1632,9 +1635,9 @@
         
         ui.echo('feedsEntriesNbDaysAgo', document.webL10n.get('loading'), '');
         
-        clearTimeout(_dspEntriesTimeout);
+        clearTimeout(liveValues.timeouts.entries.display);
         
-        _dspEntriesTimeout = window.setTimeout(function() {
+        liveValues.timeouts.entries.display = window.setTimeout(function() {
             
             _setTimestamps();
             
@@ -2344,7 +2347,7 @@
         // ===============================================
 
         function updateNetworkStatus(event) {
-            console.log("Network event ", event);
+            my.log("Network event ", event);
             
             if (liveValues.network.status != event.type) {
                 
