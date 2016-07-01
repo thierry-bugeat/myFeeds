@@ -144,7 +144,7 @@
             "inProgress": false                 // Set to "true" when user click on elements with "_startAnimation_" class.
         },
         "network": {
-            "status": "NA"
+            "status": 'NA'
         }, 
         "timeouts": {
             "entries": {
@@ -202,11 +202,11 @@
                 var _expires_in = _token.expires_in || 604800;
                 var _tokenIsExpired = ((_now - _token.lastModified) > _expires_in) ? true : false;
                 
-                if ((!navigator.onLine) && (_tokenIsExpired)) {
+                if ((liveValues.network.status != 'online') && (_tokenIsExpired)) {
                     _disableAccount('feedly');
                 }
                     
-                if (navigator.onLine) {
+                if (liveValues.network.status == 'online') {
                     if (_tokenIsExpired) {
                         feedly.updateToken().catch(function(error) {
                             _disableAccount('feedly');
@@ -239,11 +239,11 @@
                 var _expires_in = _token.expires_in || 604800;
                 var _tokenIsExpired = ((_now - _token.lastModified) > _expires_in) ? true : false;
                 
-                if ((!navigator.onLine) && (_tokenIsExpired)) {
+                if ((liveValues.network.status != 'online') && (_tokenIsExpired)) {
                     _disableAccount('theoldreader');
                 }
                     
-                if (navigator.onLine) {
+                if (liveValues.network.status == 'online') {
                     if (_tokenIsExpired) {
                         theoldreader.updateToken().catch(function(error) {
                             _disableAccount('theoldreader');
@@ -276,11 +276,11 @@
                 var _expires_in = _token.expires_in || 604800;
                 var _tokenIsExpired = ((_now - _token.lastModified) > _expires_in) ? true : false;
                 
-                if ((!navigator.onLine) && (_tokenIsExpired)) {
+                if ((liveValues.network.status != 'online') && (_tokenIsExpired)) {
                     _disableAccount('aolreader');
                 }
                     
-                if (navigator.onLine) {
+                if (liveValues.network.status == 'online') {
                     if (_tokenIsExpired) {
                         aolreader.updateToken().catch(function(error) {
                             _disableAccount('aolreader');
@@ -320,11 +320,11 @@
                 var _expires_in = _token.expires_in || 604800;
                 var _tokenIsExpired = ((_now - _token.lastModified) > _expires_in) ? true : false;
                 
-                if ((!navigator.onLine) && (_tokenIsExpired)) {
+                if ((liveValues.network.status != 'online') && (_tokenIsExpired)) {
                     _disableAccount('tinytinyrss');
                 }
                     
-                if (navigator.onLine) {
+                if (liveValues.network.status == 'online') {
                     if (_tokenIsExpired) {
                         tinytinyrss.updateToken().catch(function(error) {
                             _disableAccount('tinytinyrss');
@@ -367,7 +367,7 @@
     var sortedFeeds = [];
 
     sync.onclick            = function(event) {
-        if (navigator.onLine) {
+        if (liveValues.network.status == 'online') {
             ui._vibrate();
             ui._onclick(this, 'disable');
             loadFeeds();
@@ -1168,7 +1168,7 @@
 
         '   <li>',
         '       <aside class="icon"><span data-icon222="wifi-4" class="fa fa-wifi fa-2x"></span></aside>',
-        '       <aside class="pack-end"><p class="double" id="onLine">NA</p></aside>',
+        '       <aside class="pack-end"><p class="double" id="onLine">' + liveValues.network.status + '</p></aside>',
         '       <a href="#"><p class="double"><my data-l10n-id="settings-connection">' + document.webL10n.get('settings-connection') + '</my></p></a>',
         '   </li>',
 
@@ -1426,7 +1426,7 @@
         // --- App start offline ---
         // =========================
         
-        if (!navigator.onLine) {
+        if (liveValues.network.status != 'online') {
             ui._disable();
         }
 
@@ -1615,7 +1615,7 @@
         // --- App start offline ---
         // =========================
 
-        if (!navigator.onLine) {
+        if (liveValues.network.status != 'online') {
             ui._disable();
         }
         
@@ -1911,7 +1911,7 @@
             // --- App start offline ---
             // =========================
             
-            if (!navigator.onLine) {
+            if (liveValues.network.status != 'online') {
                 ui._disable();
             }
             
@@ -2342,9 +2342,59 @@
             }
         });*/
 
-        // ===============================================
-        // --- Network connection : online / offline ? ---
-        // ===============================================
+        // ====================================================
+        // --- INIT Network connection : online / offline ? ---
+        // ====================================================
+        // Does not works !
+        // navigator.onLine is not correctly detected !!!!!!!!!
+ 
+        /*var _networkStatus = (navigator.onLine == true) ? 'online' : 'offline';
+
+        var _uiStatus = (_networkStatus == 'online') ? 'enable' : 'disable';
+
+        document.body.dispatchEvent(new CustomEvent('networkConnection.change', {"detail": liveValues.network.status}));
+
+        liveValues.network.status = _networkStatus; // Store current connection status
+
+        ui.toggle(_uiStatus);*/
+
+        // Workaround :(
+        
+        function isOnline(yes, no) {
+            var xhr = new XMLHttpRequest({ mozSystem: true });
+            xhr.onload = function() {
+                console.log('bugeat', xhr);
+                if (yes instanceof Function) {
+                    yes();
+                }
+            }
+            xhr.onerror = function(e){
+                console.log('bugeat thierry', xhr);
+                console.log('bugeat thierry', e);
+                if (no instanceof Function) {
+                    no();
+                }
+            }
+            xhr.open("GET", "https://duckduckgo.com/?" + (new Date()).getTime(), true);
+            xhr.send();
+        }
+
+        isOnline(
+            function() {
+                liveValues.network.status = 'online';
+                ui.toggle('enable');
+                my.alert('Network is online');
+            },
+            function() {
+                liveValues.network.status = 'offline';
+                ui.toggle('disable');
+                my.alert('Network is offline');
+            }
+        );
+
+        // ======================================================
+        // --- UPDATE Network connection : online / offline ? ---
+        // ======================================================
 
         function updateNetworkStatus(event) {
             my.log("Network event ", event);
@@ -2354,12 +2404,10 @@
                 var _status = (event.type == 'online') ? 'enable' : 'disable';
                 
                 document.body.dispatchEvent(new CustomEvent('networkConnection.change', {"detail": liveValues.network.status}));
-
+                
+                liveValues.network.status = event.type; // Store current connection status
+                
                 ui.toggle(_status);
-                
-                // Store current connection status
-                
-                liveValues.network.status = event.type; 
             }
             
             // --- Fix some network change issues
@@ -2433,7 +2481,7 @@
         
         _entriesUpdateInterval = window.setInterval(function() {
             var _nowInterval = performance.now();
-            if (navigator.onLine && ((_nowInterval - _startInterval) >= (params.entries.updateEvery * 1000))) {
+            if ((liveValues.network.status == 'online') && ((_nowInterval - _startInterval) >= (params.entries.updateEvery * 1000))) {
                 _startInterval = _nowInterval;
                 ui._onclick(sync, 'disable');
                 loadFeeds();
@@ -2541,10 +2589,11 @@
             
             // Mark entry as read
             
-            if (!liveValues.entries.newsPreviouslyDisplayed.contains(event.detail.entryId)) {
+            /*if (!liveValues.entries.newsPreviouslyDisplayed.contains(event.detail.entryId)) {
                 liveValues.entries.newsPreviouslyDisplayed.push(event.detail.entryId);
                 ui.fade(document.getElementById(event.detail.entryId));
-            }
+            }*/
+            ui.markAsRead(event.detail.entryId);
             
             // ---
             
@@ -2687,7 +2736,7 @@
             
             // Save feed as file
 
-            if (navigator.onLine) {
+            if (liveValues.network.status == 'online') {
                 my._save('cache/simplepie/feeds/' + btoa(event.detail.feedUrl) + ".json", "application/json", JSON.stringify(event.detail)).then(function(results) {
                     my.log('SimplePie.load.done > Saving feed in cache ok : ' + event.detail.feed.feedUrl + ' (' + btoa(event.detail.feedUrl) + ')');
                 }).catch(function(error) {
@@ -2722,7 +2771,7 @@
                     liveValues.sync.nbFeedsToLoad = 0;
                     liveValues.sync.nbFeedsLoaded = 0;
                     ui._loading(100); ui.echo("loading", "", "");
-                    if (navigator.onLine) {
+                    if (liveValues.network.status == 'online') {
                         ui._onclick(sync, 'enable');
                     }
                 }
@@ -2760,7 +2809,7 @@
                     liveValues.sync.nbFeedsToLoad = 0;
                     liveValues.sync.nbFeedsLoaded = 0;
                     ui._loading(100); ui.echo("loading", "", "");
-                    if (navigator.onLine) {
+                    if (liveValues.network.status == 'online') {
                         ui._onclick(sync, 'enable');
                     }
                 }
@@ -2901,7 +2950,7 @@
         // Due to quick expiration time (1h), Aol token is 
         // actualized every 14mn.
         setInterval(function() {
-            if ((navigator.onLine) && (params.accounts.aolreader.logged)) {
+            if ((liveValues.network.status == 'online') && (params.accounts.aolreader.logged)) {
                 aolreader.updateToken();
             }
         }, (60000 * 14));

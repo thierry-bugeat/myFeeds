@@ -272,7 +272,7 @@ MyUi.prototype.toggle = function(_status) {
     // 1) Update settings message
 
        try {
-            _MyUi.echo("onLine", _status+'|'+navigator.connection.type, "");
+            _MyUi.echo("onLine", liveValues.network.status, "");
        } catch(e) {
             _MyUi.echo("onLine", _status, "");
        }
@@ -558,12 +558,41 @@ MyUi.prototype.showEntries = function () {
 /**
  * Change opacity of news previously displayed
  * */
-MyUi.prototype.markAsRead = function () {
+MyUi.prototype.markAsReadV1 = function () {
     for (_tsms in liveValues.entries.newsPreviouslyDisplayed) { 
         try {
             ui.fade(document.getElementById(liveValues.entries.newsPreviouslyDisplayed[_tsms])); 
         } catch (e) {
             _MyFeeds.log('MyUi.prototype.markAsRead : Error ' + _tsms);
+        }
+    }
+}
+
+/**
+ * Mark news as read by changing CSS style.
+ * Change opacity of news previously displayed.
+ * @param {object} elem DOM element or not set
+ * @return null
+ * */
+MyUi.prototype.markAsRead = function (entryId) {
+    _MyFeeds.log('MyUi.prototype.markAsRead(' + entryId + ')');
+
+    if (typeof entryId !== 'undefined') {
+        if (!liveValues.entries.newsPreviouslyDisplayed.contains(entryId)) {
+            liveValues.entries.newsPreviouslyDisplayed.push(entryId);
+            try {
+                ui.fade(document.getElementById(entryId)); 
+            } catch(e) {
+                _MyFeeds.log('MyUi.prototype.markAsRead(' + entryId + ') Error ');
+            }
+        }
+    } else {
+        for (_tsms in liveValues.entries.newsPreviouslyDisplayed) { 
+            try {
+                ui.fade(document.getElementById(liveValues.entries.newsPreviouslyDisplayed[_tsms])); 
+            } catch (e) {
+                _MyFeeds.log('MyUi.prototype.markAsRead(' + _tsms + ') Error ');
+            }
         }
     }
 }
