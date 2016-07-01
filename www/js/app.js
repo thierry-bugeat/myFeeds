@@ -26,7 +26,7 @@
     var aolreader = new AolReader();
     var tinytinyrss = new TinyTinyRss();
 
-    var gf = new SimplePie();
+    var sp = new SimplePie();
 
     var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': [], 'tinytinyrss': []} ; // Store informations about feeds (urls)
 
@@ -384,7 +384,7 @@
         var _url = document.getElementById("findFeedsText").value; 
         if (_url) {
             ui.echo("find-feeds", "Loading...", ""); 
-            gf.isValidUrl(_url).then(function(results) {
+            sp.isValidUrl(_url).then(function(results) {
                 my.log("Is a valid url OK", results);
             }).catch(function(error) {
                 my.message(document.webL10n.get("find-feeds-error") + JSON.stringify(error));
@@ -399,7 +399,7 @@
             params.entries.theme = "grid";
             ui._vibrate();
             ui.selectThemeIcon();
-            dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+            dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             _saveParams();
         }
     }
@@ -408,7 +408,7 @@
             params.entries.theme = "card";
             ui._vibrate();
             ui.selectThemeIcon();
-            dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+            dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             _saveParams();
         }
     }
@@ -417,7 +417,7 @@
             params.entries.theme = "list";
             ui._vibrate();
             ui.selectThemeIcon();
-            dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+            dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             _saveParams();
         }
     }
@@ -541,7 +541,7 @@
         } else {
             ui._onclick(nextDay, 'enable');
         }
-        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+        dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
         dom['screens']['entries']['scroll'].scrollTop = 0;
     }
 
@@ -556,7 +556,7 @@
         } else {
             ui._onclick(previousDay, 'enable');
         }
-        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+        dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
         dom['screens']['entries']['scroll'].scrollTop = 0;
     }
     
@@ -720,7 +720,7 @@
 
             // (4) Delete entries
             
-            gf.deleteEntries(_account, _feedId);
+            sp.deleteEntries(_account, _feedId);
 
             // (5) Reload UI
 
@@ -730,7 +730,7 @@
                 (myFeedsSubscriptions.aolreader.length > 0) ||
                 (myFeedsSubscriptions.tinytinyrss.length > 0) 
             ){
-                gf.setFeedsSubscriptions(myFeedsSubscriptions);
+                sp.setFeedsSubscriptions(myFeedsSubscriptions);
                 loadFeeds();
             } else {
                 ui.echo("feeds-list", "", "");
@@ -811,7 +811,7 @@
 
             // (2) Reload UI
 
-            gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            sp.setFeedsSubscriptions(myFeedsSubscriptions);
             loadFeeds();
             
             // (3) Save subscriptions.local.json
@@ -1278,7 +1278,7 @@
                 ui._onclick(nextDay, 'enable');         // [<]
                 ui._onclick(previousDay, 'disable');    // [>]
                 dom['screens']['entries']['scroll'].scrollTop = 0;
-                dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             }
             
             if (params.entries.nbDaysAgo < params.entries.dontDisplayEntriesOlderThan) {
@@ -1295,7 +1295,7 @@
             params.settings.ui.language = _selectLanguage.options[_selectLanguage.selectedIndex].value;
             _saveParams();
             document.webL10n.setLanguage(params.settings.ui.language, "");
-            //dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+            //dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             //loadFeeds();
         }
         
@@ -1334,7 +1334,7 @@
                         } catch (err) {
                             my.alert(err.message);
                         }
-                        gf.setFeedsSubscriptions(myFeedsSubscriptions);
+                        sp.setFeedsSubscriptions(myFeedsSubscriptions);
                         loadFeeds();
                     }
                 ).catch(function(error) {
@@ -1453,7 +1453,7 @@
         } catch (error) {}
 
         setNbFeedsToLoad();
-        gf.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+        sp.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
     }
 
     function dspFeeds(feeds) {
@@ -1571,7 +1571,7 @@
                 params.entries.nbDaysAgo = 0;
                 params.feeds.selectedFeed = "";
                 document.getElementById('inputSearchEntries').value = this.getAttribute("myKeyword");
-                dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             }
         }
 
@@ -1607,7 +1607,7 @@
                 params.entries.nbDaysAgo = 0;
                 params.feeds.selectedFeed = this.getAttribute("feedUrl");
                 _saveParams();
-                dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             }
         }
         
@@ -2039,7 +2039,7 @@
      * */
     function updateFeedsPulsations() {
         var _tmp = [];
-        var _feeds = gf.getFeeds();
+        var _feeds = sp.getFeeds();
         var _pulsations;
         var _feed = '';
 
@@ -2155,7 +2155,7 @@
         my.log('========================');
 
         if (_nbFeedsSubscriptions > 0) {
-            gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            sp.setFeedsSubscriptions(myFeedsSubscriptions);
             loadFeeds();
         }
 
@@ -2195,8 +2195,8 @@
             my.log('_disableAccount', arguments);
             params.accounts[_account].logged = false
                 myFeedsSubscriptions[_account] = [];
-            gf.setFeedsSubscriptions(myFeedsSubscriptions);
-            gf.deleteEntries(_account, '');
+            sp.setFeedsSubscriptions(myFeedsSubscriptions);
+            sp.deleteEntries(_account, '');
             _saveParams();
         }
     }
@@ -2263,7 +2263,7 @@
     function count(keyword){
         var out = 0;
         
-        entries = gf.getEntries();
+        entries = sp.getEntries();
 
         var _regex = new RegExp(keyword, "gi");
 
@@ -2429,7 +2429,7 @@
         setInterval(function() {
             var _maxNbDaysAgo = params.settings.days.last();
             var _timestampMax = liveValues['timestamps']['max'] - (86400 * _maxNbDaysAgo);
-            gf.deleteOldEntries(_timestampMax);
+            sp.deleteOldEntries(_timestampMax);
         }, 60000);
         
         // =============================================
@@ -2747,7 +2747,7 @@
 
             // Add feed entries to array "unsortedEntries"
 
-                gf.addFeed(event.detail);
+                sp.addFeed(event.detail);
 
             // Check if all feeds were loaded
 
@@ -2760,9 +2760,9 @@
 
                 if (liveValues.sync.nbFeedsLoaded == liveValues.sync.nbFeedsToLoad) {
                     if (params.entries.nbDaysAgo == 0) {
-                        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                        dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
                     }
-                    dspFeeds(gf.getFeeds());
+                    dspFeeds(sp.getFeeds());
                     //dspSettings();
                     updateFeedsPulsations();
                 }
@@ -2798,9 +2798,9 @@
 
                 if (liveValues.sync.nbFeedsLoaded == liveValues.sync.nbFeedsToLoad) {
                     if (params.entries.nbDaysAgo == 0) {
-                        dspEntries(gf.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                        dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
                     }
-                    dspFeeds(gf.getFeeds());
+                    dspFeeds(sp.getFeeds());
                     //dspSettings();
                     updateFeedsPulsations();
                 }
@@ -2857,7 +2857,7 @@
                 _newFeeds.push(_feed);
             }
             addNewSubscriptions(_newFeeds);
-            gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            sp.setFeedsSubscriptions(myFeedsSubscriptions);
             
             if (_loginInProgress['feedly'] == true ) {
                 _loginInProgress['feedly'] = false;
@@ -2917,7 +2917,7 @@
                 _newFeeds.push(_feed);
             }
             addNewSubscriptions(_newFeeds);
-            gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            sp.setFeedsSubscriptions(myFeedsSubscriptions);
             
             if (_loginInProgress['theoldreader'] == true ) {
                 _loginInProgress['theoldreader'] = false;
@@ -2984,7 +2984,7 @@
                 _newFeeds.push(_feed);
             }
             addNewSubscriptions(_newFeeds);
-            gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            sp.setFeedsSubscriptions(myFeedsSubscriptions);
             
             if (_loginInProgress['aolreader'] == true ) {
                 _loginInProgress['aolreader'] = false;
@@ -3044,7 +3044,7 @@
                 _newFeeds.push(_feed);
             }
             addNewSubscriptions(_newFeeds);
-            gf.setFeedsSubscriptions(myFeedsSubscriptions);
+            sp.setFeedsSubscriptions(myFeedsSubscriptions);
             
             if (_loginInProgress['tinytinyrss'] == true ) {
                 _loginInProgress['tinytinyrss'] = false;
