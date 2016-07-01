@@ -241,7 +241,7 @@ MyFeeds.prototype._save14 = function(filename, mimetype, content) {
     
     for (var _account in myFeedsSubscriptions) {
 
-        var _feeds = gf.getFeeds();
+        var _feeds = sp.getFeeds();
         var _feed = "";
         var _outlines = "";
         var _nbOutlines = 0;
