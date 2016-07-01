@@ -23,10 +23,10 @@
         "is_top_level": true,
         "variables": {}
     },
-    "cordova-plugin-network-information": {
+    "cordova-plugin-x-socialsharing": {
         "source": {
             "type": "registry",
-            "id": "cordova-plugin-network-information"
+            "id": "cordova-plugin-x-socialsharing"
         },
         "is_top_level": true,
         "variables": {}
@@ -39,10 +39,10 @@
         "is_top_level": true,
         "variables": {}
     },
-    "cordova-plugin-x-socialsharing": {
+    "cordova-plugin-network-information": {
         "source": {
             "type": "registry",
-            "id": "cordova-plugin-x-socialsharing"
+            "id": "cordova-plugin-network-information"
         },
         "is_top_level": true,
         "variables": {}

@@ -7,22 +7,22 @@
         "files": {}
     },
     "installed_plugins": {
-        "cordova-plugin-whitelist": {
-            "PACKAGE_NAME": "com.bugeat.myfeeds"
-        },
         "cordova-plugin-device": {
             "PACKAGE_NAME": "com.bugeat.myfeeds"
         },
         "cordova-plugin-file": {
             "PACKAGE_NAME": "com.bugeat.myfeeds"
         },
-        "cordova-plugin-network-information": {
-            "PACKAGE_NAME": "com.bugeat.myfeeds"
-        },
         "cordova-plugin-inappbrowser": {
             "PACKAGE_NAME": "com.bugeat.myfeeds"
         },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.bugeat.myfeeds"
+        },
         "cordova-plugin-x-socialsharing": {
+            "PACKAGE_NAME": "com.bugeat.myfeeds"
+        },
+        "cordova-plugin-network-information": {
             "PACKAGE_NAME": "com.bugeat.myfeeds"
         },
         "cordova-plugin-vibration": {
