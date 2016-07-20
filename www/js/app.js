@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Thierry BUGEAT
+ * Copyright 2015,2016 Thierry BUGEAT
  * 
  * This file is part of myFeeds.
  * 
@@ -76,14 +76,14 @@
             "developper_menu": {
                 "visible": false,               // Display or not developper menu in settings
                 "logs": {
-                    "console": true,           // Developper logs in console
-                    "screen": true             // Developper logs on screen
+                    "console": true,            // Developper logs in console
+                    "screen": true              // Developper logs on screen
                 }
             },
             "update": {
                 "every": [300, 900, 1800, 3600] // In seconds 5mn, 15mn, 30mn, 60mn
             },
-            "days": [3, 5, 7, 10],
+            "days": [3, 5, 7, 10],              // Display news up to N days in the past
             "proxy": {
                 "use": false,                   // Use proxy to get url content
                 "host": "54.229.143.103",
@@ -146,7 +146,16 @@
         "network": {
             "status": 'NA'
         }, 
-        "timeouts": {
+        "login": {
+            "inProgress": {
+                "local": false, 
+                "feedly": false, 
+                "theoldreader": false, 
+                "aolreader": false, 
+                "tinytinyrss": false
+            }
+        },
+        "timeouts": {                           // Javascript timeouts
             "entries": {
                 "display": ""
             }
@@ -154,10 +163,6 @@
     }
     
     var keywords = [];
-
-    var _entriesUpdateInterval = '';
-    
-    var _loginInProgress = {"local": false, "feedly": false, "theoldreader": false, "aolreader": false, "tinytinyrss": false}
 
     var _previousNbDaysAgo = -1;
 
@@ -1530,9 +1535,13 @@
             '</ul>' +
             '' + _htmlKeywords;
         
+        my.log('dspFeeds()', _html);
+        
         for (var _account in _html) {
-            if (_html[_account] != "") {
+            if ((_html[_account] != "") && (_account != "undefined")) {
                 _htmlFeeds = _htmlFeeds + '<h2>' + params.accounts[_account].title + '</h2><ul class="' + _account + '">' + _html[_account] + '</ul>';
+            } else {
+                my.log('dspFeeds() Can\'t add account "'+ _account+'"');
             }
         }
         
@@ -1872,40 +1881,6 @@
             // Store informations about last recent entry
 
             liveValues['entries']['last'] = sortedEntries[Object.keys(sortedEntries)[0]];            
- 
-            // ==================
-            // --- Add Events ---
-            // ==================
-
-            // onclick Small Entries:
-
-            var _small_entries = document.querySelectorAll(".my-"+_theme+"-entry-s");
-            
-            _nb = _small_entries.length;
-
-            for (var i = 0; i < _nb; i++) {
-                _small_entries[i].onclick = function() {
-                    ui._vibrate(); 
-                    ui.fade(this);
-                    liveValues.screens.feedsList.opened = false; 
-                    mainEntryOpenInBrowser(this.getAttribute("tsms"), this.getAttribute("entry_link")); 
-                }
-            }
-
-            // onclick Normal Entries :
-
-            var _entries = document.querySelectorAll(".my-"+_theme+"-entry-l");
-
-            _nb = _entries.length;
-
-            for (var i = 0; i < _nb; i++) {
-                _entries[i].onclick = function() { 
-                    ui._vibrate(); 
-                    ui.fade(this);
-                    liveValues.screens.feedsList.opened = false;
-                    mainEntryOpenInBrowser(this.getAttribute("tsms"), ""); 
-                }
-            }
             
             // =========================
             // --- App start offline ---
@@ -2363,14 +2338,11 @@
         function isOnline(yes, no) {
             var xhr = new XMLHttpRequest({ mozSystem: true });
             xhr.onload = function() {
-                console.log('bugeat', xhr);
                 if (yes instanceof Function) {
                     yes();
                 }
             }
             xhr.onerror = function(e){
-                console.log('bugeat thierry', xhr);
-                console.log('bugeat thierry', e);
                 if (no instanceof Function) {
                     no();
                 }
@@ -2383,12 +2355,10 @@
             function() {
                 liveValues.network.status = 'online';
                 ui.toggle('enable');
-                my.alert('Network is online');
             },
             function() {
                 liveValues.network.status = 'offline';
                 ui.toggle('disable');
-                my.alert('Network is offline');
             }
         );
 
@@ -2438,12 +2408,9 @@
         
         setInterval(function() {
             if (!liveValues.animations.inProgress) {
-                //if (liveValues['screens']['entries']['scrollPosition'] != dom['screens']['entries']['scroll'].scrollTop) {
-                    ui.showEntries();
-                    ui.loadImages();
-                    localizeTimes();
-                    //liveValues['screens']['entries']['scrollPosition'] = dom['screens']['entries']['scroll'].scrollTop;
-                //}
+                ui.showEntries();
+                ui.loadImages();
+                localizeTimes();
             }
         }, 350);
 
@@ -2454,6 +2421,16 @@
         browser.addEventListener('mozbrowsererror', function (event) {
             console.dir("Moz Browser loading error : " + event.detail);
         });
+        
+        // Click on entry
+        
+        document.getElementById("feeds-entries-content").onclick = function(e) {
+            var _entry = e.target.parentNode;
+            ui._vibrate(); 
+            ui.fade(_entry);
+            liveValues.screens.feedsList.opened = false;
+            mainEntryOpenInBrowser(_entry.getAttribute("tsms"), ""); 
+        }
         
         // Keyboard
         
@@ -2479,7 +2456,7 @@
 
         var _startInterval = performance.now();
         
-        _entriesUpdateInterval = window.setInterval(function() {
+        window.setInterval(function() {
             var _nowInterval = performance.now();
             if ((liveValues.network.status == 'online') && ((_nowInterval - _startInterval) >= (params.entries.updateEvery * 1000))) {
                 _startInterval = _nowInterval;
@@ -2737,10 +2714,10 @@
             // Save feed as file
 
             if (liveValues.network.status == 'online') {
-                my._save('cache/simplepie/feeds/' + btoa(event.detail.feedUrl) + ".json", "application/json", JSON.stringify(event.detail)).then(function(results) {
-                    my.log('SimplePie.load.done > Saving feed in cache ok : ' + event.detail.feed.feedUrl + ' (' + btoa(event.detail.feedUrl) + ')');
+                my._save('cache/simplepie/feeds/' + event.detail._myParams.account + "/" + btoa(event.detail.feedUrl) + ".json", "application/json", JSON.stringify(event.detail)).then(function(results) {
+                    my.log('SimplePie.load.done > Saving feed in cache ok : ' + event.detail.feedUrl + ' (' + event.detail._myParams.account + "/" + btoa(event.detail.feedUrl) + ')');
                 }).catch(function(error) {
-                    my.error("ERROR saving feed in cache : " + event.detail.feedUrl + ' (' + btoa(event.detail.feedUrl) + ') ' + error);
+                    my.error("ERROR saving feed in cache : " + event.detail.feedUrl + ' (' + event.detail._myParams.account + "/" + btoa(event.detail.feedUrl) + ') ' + error);
                     my.alert("ERROR saving feed in cache :\n" + event.detail.feedUrl);
                 });
             }
@@ -2829,7 +2806,7 @@
         /* ===================== */
 
         document.body.addEventListener('Feedly.login.done', function(response){
-            _loginInProgress['feedly'] = true;
+            liveValues['login']['inProgress']['feedly'] = true;
             my.log(feedly.getToken());
             params.accounts.feedly.logged = true;
             _saveParams();
@@ -2859,8 +2836,8 @@
             addNewSubscriptions(_newFeeds);
             sp.setFeedsSubscriptions(myFeedsSubscriptions);
             
-            if (_loginInProgress['feedly'] == true ) {
-                _loginInProgress['feedly'] = false;
+            if (liveValues['login']['inProgress']['feedly'] == true ) {
+                liveValues['login']['inProgress']['feedly'] = false;
                 loadFeeds();
             }
             
@@ -2888,7 +2865,7 @@
         /* ============================= */
 
         document.body.addEventListener('TheOldReader.login.done', function(response){
-            _loginInProgress['theoldreader'] = true;
+            liveValues['login']['inProgress']['theoldreader'] = true;
             my.log('TheOldReader.getToken()', theoldreader.getToken());
             params.accounts.theoldreader.logged = true;
             _saveParams();
@@ -2919,8 +2896,8 @@
             addNewSubscriptions(_newFeeds);
             sp.setFeedsSubscriptions(myFeedsSubscriptions);
             
-            if (_loginInProgress['theoldreader'] == true ) {
-                _loginInProgress['theoldreader'] = false;
+            if (liveValues['login']['inProgress']['theoldreader'] == true ) {
+                liveValues['login']['inProgress']['theoldreader'] = false;
                 loadFeeds();
             }
             
@@ -2956,7 +2933,7 @@
         }, (60000 * 14));
   
         document.body.addEventListener('AolReader.login.done', function(response){
-            _loginInProgress['aolreader'] = true;
+            liveValues['login']['inProgress']['aolreader'] = true;
             my.log(aolreader.getToken());
             params.accounts.aolreader.logged = true;
             _saveParams();
@@ -2986,8 +2963,8 @@
             addNewSubscriptions(_newFeeds);
             sp.setFeedsSubscriptions(myFeedsSubscriptions);
             
-            if (_loginInProgress['aolreader'] == true ) {
-                _loginInProgress['aolreader'] = false;
+            if (liveValues['login']['inProgress']['aolreader'] == true ) {
+                liveValues['login']['inProgress']['aolreader'] = false;
                 loadFeeds();
             }
 
@@ -3015,7 +2992,7 @@
         /* ============================ */
 
         document.body.addEventListener('TinyTinyRss.login.done', function(response){
-            _loginInProgress['tinytinyrss'] = true;
+            liveValues['login']['inProgress']['tinytinyrss'] = true;
             my.log('TinyTinyRss.getToken()', tinytinyrss.getToken());
             params.accounts.tinytinyrss.logged = true;
             _saveParams();
@@ -3046,8 +3023,8 @@
             addNewSubscriptions(_newFeeds);
             sp.setFeedsSubscriptions(myFeedsSubscriptions);
             
-            if (_loginInProgress['tinytinyrss'] == true ) {
-                _loginInProgress['tinytinyrss'] = false;
+            if (liveValues['login']['inProgress']['tinytinyrss'] == true ) {
+                liveValues['login']['inProgress']['tinytinyrss'] = false;
                 loadFeeds();
             }
             

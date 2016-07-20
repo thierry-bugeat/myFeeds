@@ -60,7 +60,7 @@ MyFeeds.prototype._loadV16 = function(filename, callback) {
             resolve(results);
         } else {
             _MyFeeds.log("MyFeeds.prototype._load() ERROR Can't find '"+filename+"' in localStorage");
-            reject("{}");
+            reject({});
         }
     });
 }
