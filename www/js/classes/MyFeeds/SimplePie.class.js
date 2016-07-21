@@ -32,10 +32,12 @@ var SimplePie = function() {
         "key"           : "notsupplied",                                            // Google API key
         "v"             : "1.0" ,                                                   // Google API version
         "scoring"       : "h",                                                      // Include historical entries
-        "ServiceBase"   : "http://54.229.143.103/simplepie/?",                      //
-        "ServiceFind"   : "http://54.229.143.103/simplepie/?",                      //
-        //"ServiceBase"   : "http://thierry.bugeat.com/simplepie/?",                  //
-        //"ServiceFind"   : "http://thierry.bugeat.com/simplepie/?",                  //
+        "servers"       : [
+            {"id": 0, "name": "SimplePie @ Amazon EC2",     "url": "http://54.229.143.103/simplepie/?" }, 
+            {"id": 1, "name": "SimplePie @ OVH",            "url": "http://quiksiivjq.cluster002.ovh.net/simplepie/?" },
+            {"id": 2, "name": "SimplePie @ Home eeepc701",  "url": "http://thierry.bugeat.com/simplepie/?" }
+        ],
+        "serverId"      : 1,
         "method"        : "GET"
     };
     
@@ -65,6 +67,9 @@ SimplePie.prototype.getNum             = function()        { return this.gf.num;
 SimplePie.prototype.getEntries         = function()        { this._sortEntries();  return this.gf_sortedEntries;   }
 SimplePie.prototype.getFeeds           = function()        { this._sortFeeds();    return this.sortedFeeds;        }
 SimplePie.prototype.getNbFeedsLoaded   = function()        { return this.nbFeedsLoaded;    }
+SimplePie.prototype.getServers         = function()        { return this.gf.servers;       }
+SimplePie.prototype.getServerId        = function()        { return this.gf.serverId;      }
+SimplePie.prototype.setServerId        = function(serverId){ this.gf.serverId = serverId;  }
 
 SimplePie.prototype._setUrl            = function(q)       { this.gf.q = q;                }
 
@@ -425,10 +430,10 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
             this._setNum(1 + Math.floor(_myFeed.pulsations * nbDaysToLoad)); // Pulsations = Estimation of news per day.
 
             var _urlParams = 'url=' + encodeURIComponent(this.gf.q) + '&num=' + this.gf.num;
-            var _url    = this.gf.ServiceBase + _urlParams;
+            var _url    = this.gf.servers[this.gf.serverId].url + _urlParams;
 
             if (params.settings.proxy.use) {
-                _urlParams = '&url=' + encodeURIComponent(this.gf.ServiceBase);
+                _urlParams = '&url=' + encodeURIComponent(this.gf.servers[this.gf.serverId].url);
                 _url = 'http://' + params.settings.proxy.host + '/proxy/?' + _urlParams;
             }
             
@@ -504,9 +509,8 @@ SimplePie.prototype.isValidUrl = function(url) {
     _MyFeeds.log('SimplePie.prototype.isValidUrl()', arguments);
     
     return new Promise(function(resolve, reject) {
-        
         var _urlParams  = 'url=' + encodeURIComponent(url) + '&num=1';
-        var _url        = _SimplePie.gf.ServiceBase + _urlParams;
+        var _url        = _SimplePie.gf.servers[_SimplePie.gf.serverId].url + _urlParams;
         
         var promise = _SimplePie.get(_url, {});
 

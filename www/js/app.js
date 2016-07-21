@@ -928,6 +928,26 @@
         }
 
         _htmlSelectUpdateEvery = _htmlSelectUpdateEvery + '</select>';
+        
+        // Base service
+
+        var _servers = sp.getServers();
+        var _serverId = sp.getServerId();
+        var _htmlSelectServiceBase = "";
+        var _selected = "";
+
+        _htmlSelectServiceBase = _htmlSelectServiceBase + '<select id="selectServiceBase">';
+
+        for (var i = 0; i < _servers.length; i++) {
+            if (_serverId == _servers[i].id) {
+                _selected = "selected";
+            } else {
+                _selected = "";
+            }
+            _htmlSelectServiceBase = _htmlSelectServiceBase + '<option value="' + _servers[i].id + '" ' + _selected + ' >' + _servers[i].name + '</option>';
+        }
+
+        _htmlSelectServiceBase = _htmlSelectServiceBase + '</select>';
 
         // Select max nb Days
 
@@ -1204,6 +1224,14 @@
         '       <a href="#"><p class="double">Logs screen</p></a>',
         '   </li>',
         
+        '   <li class="_online_">',
+        '       <aside class="icon"><span data-icon="addons"></span></aside>',
+        '       <a>',
+        '           <p class="double"><my data-l10n-id="settings-service-base">' + document.webL10n.get('settings-service-base') + '</my></p>',
+        '       </a>',
+        '       ' + _htmlSelectServiceBase,
+        '   </li>',
+        
         '</ul>',
         '</section>'
         ].join('');
@@ -1272,6 +1300,11 @@
         _selectUpdateEvery.onchange = function(e) {
             params.entries.updateEvery = _selectUpdateEvery.options[_selectUpdateEvery.selectedIndex].value;
             _saveParams();
+        }
+        
+        var _selectServiceBase = document.getElementById('selectServiceBase');
+        _selectServiceBase.onchange = function(e) {
+            sp.setServerId(_selectServiceBase.options[_selectServiceBase.selectedIndex].value);
         }
 
         var _selectMaxNbDays = document.getElementById('selectMaxNbDays');
@@ -1524,9 +1557,11 @@
                 _deleteIcone = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed.feed._myFeedId + '"><span data-icon="delete"></span></button>';
             }
 
+            var _icone = (_feed.image.url != "") ? '<img src="'+_feed.image.url+'"/>' : '';
+            
             var _myLastPublishedDate = (_feed._myLastTimestamp == 0) ? "No news" : _feed._myLastPublishedDate;
 
-            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + _myLastPublishedDate + '</time></p></a></li>';
+            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + _icone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + _myLastPublishedDate + '</time></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds +
