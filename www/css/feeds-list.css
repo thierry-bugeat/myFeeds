@@ -107,7 +107,13 @@
 }
 
 #feeds-list > ul > li img {
-    height: 2rem;
+    /*height: 2rem;*/
+    background: var(--fxos-orange-light);
+    height: 4rem;
+    width: 4rem;
+    border-radius: 2rem;
+    vertical-align: middle;
+    margin-right: var(--my-spacing);
 }
 
 #feeds-list button {

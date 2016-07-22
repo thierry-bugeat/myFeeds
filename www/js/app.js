@@ -1490,6 +1490,7 @@
             document.getElementById('lastUpdateTime').innerHTML = _now.toLocaleTimeString(userLocale); 
         } catch (error) {}
 
+        _setTimestamps();
         setNbFeedsToLoad();
         sp.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
     }
@@ -1557,11 +1558,11 @@
                 _deleteIcone = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed.feed._myFeedId + '"><span data-icon="delete"></span></button>';
             }
 
-            var _icone = (_feed.image.url != "") ? '<img src="'+_feed.image.url+'"/>' : '';
-            
+            var _icone = ((typeof _feed.image === 'object') && (_feed.image.url != "")) ? '<img src="'+_feed.image.url+'"/>' : '';
+            var _count = '<count class="">' + _feed._myNbEntries + '</count>';
             var _myLastPublishedDate = (_feed._myLastTimestamp == 0) ? "No news" : _feed._myLastPublishedDate;
 
-            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + _icone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _feed.title + '</p><p><time>' + _myLastPublishedDate + '</time></p></a></li>';
+            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _count + _icone + _feed.title + '</p><p><time>' + _myLastPublishedDate + '</time></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds +
@@ -2093,7 +2094,7 @@
         
         liveValues['timestamps']['max'] = Math.floor(_myDate.getTime() / 1000);
 
-        liveValues['timestamps']['min'] = liveValues['timestamps']['max'] - (86400 * params.entries.dontDisplayEntriesOlderThan) - 86400 + 1;
+        liveValues['timestamps']['min'] = liveValues['timestamps']['max'] - (86400 * params.entries.dontDisplayEntriesOlderThan) + 1;
     }
 
     // Callback for ALL subscriptions promises

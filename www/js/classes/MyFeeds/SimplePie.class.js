@@ -344,15 +344,15 @@ SimplePie.prototype.addFeed = function(feed) {
     var _myNewEntries = feed.entries;
     var _lastUpdateTimestamp = 0;
     
+    // Add feed informations to each entry
+    
     for (var i = 0; i < _myNewEntries.length; i++) {
         _myNewEntries[i]._myFeedInformations = feed;
         delete _myNewEntries[i]._myFeedInformations.entries;
     }
 
     // Add custom values.
-    
-    _myNewfeed['_myNbEntries']          = _myNewEntries.length;
-    
+
     // Pulsations ?
     
     var _timestamps = [];
@@ -369,13 +369,29 @@ SimplePie.prototype.addFeed = function(feed) {
         }
     }
     
+    // Nb entries in feed 
+    // (Depends of nb days ago && small news)
+    // @todo : Don't count news in the future (Between "now" and "23:59:59")
+    //         Replace "liveValues.timestamps.max" below
+    
+    _myNewfeed['_myNbEntries'] = 0;
+    
+    for (var i = 0; i < _timestamps.length; i++) {
+        if ((_timestamps[i] > liveValues.timestamps.min) && (_timestamps[i] < liveValues.timestamps.max)) {
+            _myNewfeed['_myNbEntries'] += 1;
+        }
+    }
+    
+    // ---
+    
     var _timestampMin = Math.min.apply(Math, _timestamps);
     var _timestampMax = Math.max.apply(Math, _timestamps);
-    var _nbDaysInFeed = (_timestampMax - _timestampMin) / 86400; if (_nbDaysInFeed <= 0) { _nbDaysInFeed = 1; }
-    var _myPulsations = (_myNewEntries.length / _nbDaysInFeed).toFixed(2);
+    //_MyFeeds.log(feed.feedUrl+' ('+liveValues.timestamps.min+') Timestamps : ', _timestamps);
+
+    var _myPulsations = (_myNewfeed['_myNbEntries'] / params.entries.dontDisplayEntriesOlderThan).toFixed(2);
     
     _myNewfeed['_myPulsations'] = _myPulsations; // Estimation of news number per day
-    
+
     if      (isNaN(_myPulsations))  { _myNewfeed['_myPulsationsIcone'] = 'signal-0'; }
     else if (_myPulsations > 15)    { _myNewfeed['_myPulsationsIcone'] = 'wifi-4'; }
     else if (_myPulsations > 8 )    { _myNewfeed['_myPulsationsIcone'] = 'wifi-3'; }
