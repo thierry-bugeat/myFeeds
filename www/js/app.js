@@ -31,11 +31,12 @@
     var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': [], 'tinytinyrss': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 2.4,
+        "version": 2.41,                        // Don't forget to increase this value if do changes in "params" object
         "changelog": "https://git.framasoft.org/thierry-bugeat/myFeeds/raw/master/CHANGELOG",
         "feeds": {
             "selectedFeed": "",                 // Display all feeds if empty otherwise display specified feed url
-            "defaultPulsations": 5              // Default feed pulsations
+            "defaultPulsations": 5,             // Default feed pulsations
+            "count": false                      // Display count of entries in feeds list.
         },
         "entries": {
             "nbDaysAgo": 0,                     // Display only today's entries
@@ -844,6 +845,10 @@
             _vibrateOnClick = "";
         }
 
+        // Count entries selector
+
+        _displayCountEntriesChecked = (params.feeds.count) ? 'checked=""' : "";
+
         // Small entries selector
 
         if (params.entries.displaySmallEntries) {
@@ -1007,21 +1012,26 @@
         '       ' + _htmlSelectUpdateEvery,
         '   </li>',
 
-
-
         '   <li>',
         '       <aside class="icon"><span data-icon="share"></span></aside>',
         '       <aside class="pack-end"><button id="saveSubscriptions"><span data-l10n-id="my-subscriptions-share">' + document.webL10n.get('my-subscriptions-share') + '</span></button></aside>',
         '       <a><p class="double"><my data-l10n-id="my-subscriptions-opml">' + document.webL10n.get('my-subscriptions-opml') + '</my></p></a>',
-        '   </li>',
-
+ 
         '</ul>',
         '</section>',
         
         '<h2 data-l10n-id="settings-news">' + document.webL10n.get('settings-news') + '</h2>',
         '<section data-type="list">',
         '<ul>',
-        
+ 
+        '   <li>',
+        '       <aside class="icon"><span data-icon="messages"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="toggleCountEntries" type="checkbox"' + _displayCountEntriesChecked + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double"><my data-l10n-id="settings-feeds-count">' + document.webL10n.get('settings-feeds-count') + '</my></p>',
+        '       </a>',
+        '   </li>',
+       
         '   <li>',
         '       <aside class="icon"><span data-icon="messages"></span></aside>',
         '       <aside class="pack-end"><label class="pack-switch"><input id="toggleDisplaySmallEntries" type="checkbox"' + _displaySmallEntriesChecked + '><span></span></label></aside>',
@@ -1287,6 +1297,28 @@
         // --- Add Events ---
         // ==================
 
+        // --- Feeds ---
+
+        var _selectUpdateEvery = document.getElementById('selectUpdateEvery');
+        _selectUpdateEvery.onchange = function(e) {
+            params.entries.updateEvery = _selectUpdateEvery.options[_selectUpdateEvery.selectedIndex].value;
+            _saveParams();
+        }
+
+        // Share subscriptions
+
+        document.getElementById("saveSubscriptions").onclick = function(event) {
+            my.export('opml', true);
+        }
+         
+        document.getElementById('toggleCountEntries').onclick = function(e) {
+            params.feeds.count = !params.feeds.count;
+            _saveParams();
+            dspFeeds(sp.getFeeds());
+        }
+
+        // --- News ---
+
         document.getElementById('toggleDisplaySmallEntries').onclick = function(e) {
             document.body.dispatchEvent(new CustomEvent('settingsSmallNews.change', {"detail": ""}));
             params.entries.displaySmallEntries = !params.entries.displaySmallEntries;
@@ -1294,17 +1326,6 @@
             
             params.entries.displaySmallEntries ?
                 ui._smallEntries('show') : ui._smallEntries('hide');
-        }
-
-        var _selectUpdateEvery = document.getElementById('selectUpdateEvery');
-        _selectUpdateEvery.onchange = function(e) {
-            params.entries.updateEvery = _selectUpdateEvery.options[_selectUpdateEvery.selectedIndex].value;
-            _saveParams();
-        }
-        
-        var _selectServiceBase = document.getElementById('selectServiceBase');
-        _selectServiceBase.onchange = function(e) {
-            sp.setServerId(_selectServiceBase.options[_selectServiceBase.selectedIndex].value);
         }
 
         var _selectMaxNbDays = document.getElementById('selectMaxNbDays');
@@ -1325,81 +1346,8 @@
             
             _saveParams();
         }
-        
-        // UI select language
-
-        var _selectLanguage = document.getElementById('selectLanguage');
-        _selectLanguage.onchange = function(e) {
-            params.settings.ui.language = _selectLanguage.options[_selectLanguage.selectedIndex].value;
-            _saveParams();
-            document.webL10n.setLanguage(params.settings.ui.language, "");
-            //dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
-            //loadFeeds();
-        }
-        
-        // UI vibrate
-
-        document.getElementById("toggleVibrate").onclick = function() {
-            params.settings.ui.vibrate = !params.settings.ui.vibrate;
-            _saveParams();
-        }
-        
-        // UI animations checkbox
-
-        document.getElementById("useAnimations").onclick = function() {
-            params.settings.ui.animations = !params.settings.ui.animations;
-            _saveParams();
-        }
-        
-        // UI proxy checkbox
-
-        document.getElementById("useProxy").onclick = function() {
-            params.settings.proxy.use = !params.settings.proxy.use;
-            _saveParams();
-            ui.toggleProxy();
-        }
-        
-        // Load subscriptions
-        
-        /*document.getElementById("loadSubscriptions").onclick = function(event) {
-            if (window.confirm(document.webL10n.get('confirm-load-subscriptions'))) {
-                my._load('subscriptions.local.json').then(
-                    function (_mySubscriptions) {
-                        try{
-                            myFeedsSubscriptions['local'] = [];
-                            addNewSubscriptions(_mySubscriptions);
-                            my.message(document.webL10n.get('loading-subscriptions-done'));
-                        } catch (err) {
-                            my.alert(err.message);
-                        }
-                        sp.setFeedsSubscriptions(myFeedsSubscriptions);
-                        loadFeeds();
-                    }
-                ).catch(function(error) {
-                    my.message(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
-                });
-            }
-        }*/
-        
-        // Share subscriptions
-
-        document.getElementById("saveSubscriptions").onclick = function(event) {
-            my.export('opml', true);
-        }
-        
-        // Logs console checkbox
-
-        document.getElementById("logsConsole").onclick = function() {
-            params.settings.developper_menu.logs.console = !params.settings.developper_menu.logs.console;
-            _saveParams();
-        }
-        
-        // Logs console screen
-
-        document.getElementById("logsScreen").onclick = function() {
-            params.settings.developper_menu.logs.screen = !params.settings.developper_menu.logs.screen;
-            _saveParams();
-        }
+ 
+        // --- Online accounts ---
 
         // Feedly checkbox
 
@@ -1458,8 +1406,88 @@
                 loadFeeds();
                 document.getElementById('tinytinyrssForm').style.cssText = 'display: block';
             }
-        }        
+        }
         
+        // --- UI ---
+
+        // UI animations checkbox
+
+        document.getElementById("useAnimations").onclick = function() {
+            params.settings.ui.animations = !params.settings.ui.animations;
+            _saveParams();
+        }
+ 
+        // UI vibrate
+
+        document.getElementById("toggleVibrate").onclick = function() {
+            params.settings.ui.vibrate = !params.settings.ui.vibrate;
+            _saveParams();
+        }
+        
+        // UI select language
+
+        var _selectLanguage = document.getElementById('selectLanguage');
+        _selectLanguage.onchange = function(e) {
+            params.settings.ui.language = _selectLanguage.options[_selectLanguage.selectedIndex].value;
+            _saveParams();
+            document.webL10n.setLanguage(params.settings.ui.language, "");
+            //dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+            //loadFeeds();
+        }
+      
+        // --- Developer menu ---
+       
+        // Load subscriptions
+        
+        /*document.getElementById("loadSubscriptions").onclick = function(event) {
+            if (window.confirm(document.webL10n.get('confirm-load-subscriptions'))) {
+                my._load('subscriptions.local.json').then(
+                    function (_mySubscriptions) {
+                        try{
+                            myFeedsSubscriptions['local'] = [];
+                            addNewSubscriptions(_mySubscriptions);
+                            my.message(document.webL10n.get('loading-subscriptions-done'));
+                        } catch (err) {
+                            my.alert(err.message);
+                        }
+                        sp.setFeedsSubscriptions(myFeedsSubscriptions);
+                        loadFeeds();
+                    }
+                ).catch(function(error) {
+                    my.message(document.webL10n.get('error-cant-load-local-subscriptions') + JSON.stringify(error));
+                });
+            }
+        }*/
+ 
+        // Proxy checkbox
+
+        document.getElementById("useProxy").onclick = function() {
+            params.settings.proxy.use = !params.settings.proxy.use;
+            _saveParams();
+            ui.toggleProxy();
+        }
+       
+        // Logs console checkbox
+
+        document.getElementById("logsConsole").onclick = function() {
+            params.settings.developper_menu.logs.console = !params.settings.developper_menu.logs.console;
+            _saveParams();
+        }
+        
+        // Logs console screen
+
+        document.getElementById("logsScreen").onclick = function() {
+            params.settings.developper_menu.logs.screen = !params.settings.developper_menu.logs.screen;
+            _saveParams();
+        }
+        
+        // Service base
+
+        var _selectServiceBase = document.getElementById('selectServiceBase');
+        _selectServiceBase.onchange = function(e) {
+            sp.setServerId(_selectServiceBase.options[_selectServiceBase.selectedIndex].value);
+        }
+
         // =========================
         // --- App start offline ---
         // =========================
@@ -1526,9 +1554,11 @@
             _htmlKeywords = _htmlKeywords + '<h2 data-l10n-id="search-by-keywords">' + document.webL10n.get('search-by-keywords') + '</h2><ul class="keywords">';
             
             for (var i = 0; i < _sortedKeywords.length; i++) {
-                var _count = count(_sortedKeywords[i]);
-                var _deleteIcone = '<button class="deleteKeyword" myKeyword="' + _sortedKeywords[i] + '"><span data-icon="delete"></span></button>';
-                _htmlKeywords = _htmlKeywords + '<li><a class="openKeyword" myKeyword="' +  _sortedKeywords[i] + '"><p>' + _deleteIcone + '<button><span data-icon="search"></span></button><count class="count">'+_count+'</count>' + _sortedKeywords[i] + '</p></a></li>';
+                var _iconPulsations = (params.feeds.count) ? 
+                    '<count class="">'+count(_sortedKeywords[i])+'</count>' : 
+                    '<button><span data-icon="'+sp.getIconPulsations(count(_sortedKeywords[i]))+'"></span></button>';
+                var _iconDelete = '<button class="deleteKeyword" myKeyword="' + _sortedKeywords[i] + '"><span data-icon="delete"></span></button>';
+                _htmlKeywords = _htmlKeywords + '<li><a class="openKeyword" myKeyword="' +  _sortedKeywords[i] + '"><p>' + _iconDelete + _iconPulsations + _sortedKeywords[i] + '</p></a></li>';
             }
             
             _htmlKeywords = _htmlKeywords + '</ul>';
@@ -1541,7 +1571,11 @@
         for (var i = 0; i < feeds.length; i++) {
             var _feed = feeds[i];
             var _account = _feed._myParams.account;
-            var _deleteIcone = '';
+            var _iconFeed = ((typeof _feed.image === 'object') && (_feed.image.url != "")) ? '<img src="'+_feed.image.url+'"/>' : '';
+            var _iconPulsations = (params.feeds.count) ? 
+                '<count class="">'+_feed._myNbEntries+'</count>' : 
+                '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>';
+            var _iconDelete = '';
 
             if ((_account == 'local') ||
                 ((_account == 'feedly') && (_feedlyAccessToken !== undefined)) ||
@@ -1555,14 +1589,12 @@
                     _class = _class + ' _proxyNotAvailable_'; // Proxy not available for "aolreader" & "feedly". Not yet implemented.
                 }
                     
-                _deleteIcone = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed.feed._myFeedId + '"><span data-icon="delete"></span></button>';
+                _iconDelete = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed.feed._myFeedId + '"><span data-icon="delete"></span></button>';
             }
 
-            var _icone = ((typeof _feed.image === 'object') && (_feed.image.url != "")) ? '<img src="'+_feed.image.url+'"/>' : '';
-            var _count = '<count class="">' + _feed._myNbEntries + '</count>';
             var _myLastPublishedDate = (_feed._myLastTimestamp == 0) ? "No news" : _feed._myLastPublishedDate;
 
-            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _deleteIcone + '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>' + _count + _icone + _feed.title + '</p><p><time>' + _myLastPublishedDate + '</time></p></a></li>';
+            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _iconDelete + _iconPulsations + _iconFeed + _feed.title + '</p><p><time>' + _myLastPublishedDate + '</time></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds +
@@ -1696,7 +1728,7 @@
                 liveValues['entries']['last']['_myTimestamp'] :
                 liveValues['timestamps']['max'] - (86400 * nbDaysAgo) - 86400 + 1;
             
-            my.log("dspEntries() between " + _timestampMin + " (00:00:00) & " + _timestampMax + " (23:59:59)");
+            my.log("dspEntries() between " + _timestampMin + " (00:00:00) & " + _timestampMax + " (23:59:59) " + feedUrl);
         
             liveValues.sync.nbDaysAgo = nbDaysAgo;
             liveValues.sync.theme = params.entries.theme;

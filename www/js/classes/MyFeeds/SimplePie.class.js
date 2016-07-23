@@ -392,11 +392,7 @@ SimplePie.prototype.addFeed = function(feed) {
     
     _myNewfeed['_myPulsations'] = _myPulsations; // Estimation of news number per day
 
-    if      (isNaN(_myPulsations))  { _myNewfeed['_myPulsationsIcone'] = 'signal-0'; }
-    else if (_myPulsations > 15)    { _myNewfeed['_myPulsationsIcone'] = 'wifi-4'; }
-    else if (_myPulsations > 8 )    { _myNewfeed['_myPulsationsIcone'] = 'wifi-3'; }
-    else if (_myPulsations > 3 )    { _myNewfeed['_myPulsationsIcone'] = 'wifi-2'; }
-    else                            { _myNewfeed['_myPulsationsIcone'] = 'wifi-1'; }
+    _myNewfeed['_myPulsationsIcone'] = this.getIconPulsations(_myPulsations);
     
     // /!\ The 3 following values are false. Entries are not sorted by dates.
     
@@ -423,6 +419,23 @@ SimplePie.prototype.addFeed = function(feed) {
     var end = performance.now();
     _MyFeeds.log("addFeed() " + (end - start) + " milliseconds.");
 }
+
+/**
+ * Get icon for feed strength
+ * @param (int) _myPulsations
+ * */
+SimplePie.prototype.getIconPulsations = function(_myPulsations) {
+    var _icon = 'signal-0';
+    
+    if      (isNaN(_myPulsations))  { _icon = 'signal-0'; }
+    else if (_myPulsations > 15)    { _icon = 'wifi-4'; }
+    else if (_myPulsations > 8 )    { _icon = 'wifi-3'; }
+    else if (_myPulsations > 3 )    { _icon = 'wifi-2'; }
+    else if (_myPulsations > 0 )    { _icon = 'wifi-1'; }
+    else                            { _icon = 'signal-0'; }
+    
+    return _icon;
+} 
 
 /**
  * Load all feeds
