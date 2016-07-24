@@ -1744,8 +1744,11 @@
             liveValues.sync.timestamps.max = _timestampMax;
             liveValues.sync.selectedFeed.url = params.feeds.selectedFeed.url;
             liveValues.sync.selectedFeed.account = params.feeds.selectedFeed.account;
-            
-            my.log("dspEntries() between " + _timestampMin + " (00:00:00) & " + _timestampMax + " (23:59:59) " + feedAccount + " - " + feedUrl + " - " + nbDaysAgo + " days ago");
+
+            var _dateMin = new Date(_timestampMin*1000).toString();
+            var _dateMax = new Date(_timestampMax*1000).toString();
+
+            my.log("dspEntries() between " + _dateMin + ' - ' + _dateMax + ' - ' + feedAccount + " - " + feedUrl + " - " + nbDaysAgo + " days ago");
 
             var _previousDaysAgo    = -1; // Count days to groups entries by day.
             var _entrieNbDaysAgo    = 0;
@@ -1764,16 +1767,25 @@
                 
                 for (var tsms in entries) {
                     
+                    if (entries[tsms]._myTimestamp < _timestampMin) {break;}
+
                     if ((feedUrl !== "") 
                         && (feedUrl == entries[tsms]._myFeedInformations.feedUrl)
                         && (feedAccount == entries[tsms]._myFeedInformations.feed._myAccount)
+                        && (entries[tsms]._myTimestamp < _timestampMax)
                     ){
                         sortedEntries[tsms] = entries[tsms];
                     }
                     
                 }
+
             } else {
-                sortedEntries = entries;
+                for (var tsms in entries) {
+                    if (entries[tsms]._myTimestamp < _timestampMin) {break;}
+                    if (entries[tsms]._myTimestamp < _timestampMax) {
+                        sortedEntries[tsms] = entries[tsms];
+                    }
+                }
             }
 
             my.log('dspEntries()', sortedEntries);
