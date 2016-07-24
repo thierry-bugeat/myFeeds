@@ -31,10 +31,13 @@
     var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': [], 'tinytinyrss': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 2.41,                        // Don't forget to increase this value if do changes in "params" object
+        "version": 2.43,                        // Don't forget to increase this value if you do changes in "params" object
         "changelog": "https://git.framasoft.org/thierry-bugeat/myFeeds/raw/master/CHANGELOG",
         "feeds": {
-            "selectedFeed": "",                 // Display all feeds if empty otherwise display specified feed url
+            "selectedFeed": {
+                "url": "",                      // Display all feeds if empty otherwise display specified feed url
+                "account": ""
+            },                 
             "defaultPulsations": 5,             // Default feed pulsations
             "count": false                      // Display count of entries in feeds list.
         },
@@ -131,7 +134,10 @@
             "timestamps": {
                 "max": -1
             },
-            "selectedFeed": ""
+            "selectedFeed": {
+                "url": "",
+                "account": ""
+            }
         },
         "screens": {
             "feedsList": {
@@ -405,7 +411,7 @@
             params.entries.theme = "grid";
             ui._vibrate();
             ui.selectThemeIcon();
-            dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+            dspEntries();
             _saveParams();
         }
     }
@@ -414,7 +420,7 @@
             params.entries.theme = "card";
             ui._vibrate();
             ui.selectThemeIcon();
-            dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+            dspEntries();
             _saveParams();
         }
     }
@@ -423,7 +429,7 @@
             params.entries.theme = "list";
             ui._vibrate();
             ui.selectThemeIcon();
-            dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+            dspEntries();
             _saveParams();
         }
     }
@@ -547,7 +553,7 @@
         } else {
             ui._onclick(nextDay, 'enable');
         }
-        dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+        dspEntries();
         dom['screens']['entries']['scroll'].scrollTop = 0;
     }
 
@@ -562,7 +568,7 @@
         } else {
             ui._onclick(previousDay, 'enable');
         }
-        dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+        dspEntries();
         dom['screens']['entries']['scroll'].scrollTop = 0;
     }
     
@@ -1337,7 +1343,7 @@
                 ui._onclick(nextDay, 'enable');         // [<]
                 ui._onclick(previousDay, 'disable');    // [>]
                 dom['screens']['entries']['scroll'].scrollTop = 0;
-                dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                dspEntries();
             }
             
             if (params.entries.nbDaysAgo < params.entries.dontDisplayEntriesOlderThan) {
@@ -1431,7 +1437,6 @@
             params.settings.ui.language = _selectLanguage.options[_selectLanguage.selectedIndex].value;
             _saveParams();
             document.webL10n.setLanguage(params.settings.ui.language, "");
-            //dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
             //loadFeeds();
         }
       
@@ -1594,7 +1599,7 @@
 
             var _myLastPublishedDate = (_feed._myLastTimestamp == 0) ? "No news" : _feed._myLastPublishedDate;
 
-            _html[_account] = _html[_account] + '<li><a class="open" feedUrl="' + _feed.feedUrl + '"><p>' + _iconDelete + _iconPulsations + _iconFeed + _feed.title + '</p><p><time>' + _myLastPublishedDate + '</time></p></a></li>';
+            _html[_account] = _html[_account] + '<li><a class="open" account="' + _account + '" feedUrl="' + _feed.feedUrl + '"><p>' + _iconDelete + _iconPulsations + _iconFeed + _feed.title + '</p><p><time>' + _myLastPublishedDate + '</time></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds +
@@ -1646,9 +1651,10 @@
                 ui._onclick(nextDay, 'disable');
                 ui._onclick(previousDay, 'enable');
                 params.entries.nbDaysAgo = 0;
-                params.feeds.selectedFeed = "";
+                params.feeds.selectedFeed.url = "";
+                params.feeds.selectedFeed.account = "";
                 document.getElementById('inputSearchEntries').value = this.getAttribute("myKeyword");
-                dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                dspEntries();
             }
         }
 
@@ -1682,9 +1688,10 @@
                 ui._onclick(nextDay, 'disable');
                 ui._onclick(previousDay, 'enable');
                 params.entries.nbDaysAgo = 0;
-                params.feeds.selectedFeed = this.getAttribute("feedUrl");
+                params.feeds.selectedFeed.url = this.getAttribute("feedUrl");
+                params.feeds.selectedFeed.account = this.getAttribute("account");
                 _saveParams();
-                dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                dspEntries();
             }
         }
         
@@ -1706,8 +1713,13 @@
      * Content of entries are displayed when entries are in viewport.
      * See function "showEntries" in class "MyUi"
      * */
-    function dspEntries(entries, nbDaysAgo, feedUrl) {
+    function dspEntries() {
 
+        var entries = sp.getEntries();
+        var nbDaysAgo = params.entries.nbDaysAgo;
+        var feedUrl = params.feeds.selectedFeed.url;
+        var feedAccount = params.feeds.selectedFeed.account;
+        
         var feedsEntriesScrollTop = dom['screens']['entries']['scroll'].scrollTop;
         
         ui.echo('feedsEntriesNbDaysAgo', document.webL10n.get('loading'), '');
@@ -1721,29 +1733,50 @@
             var start = performance.now();
             
             var _timestampMax = liveValues['timestamps']['max'] - (86400 * nbDaysAgo); // End of current day 23:59:59
-            var _partialRendering = ((nbDaysAgo == 0) && (liveValues.sync.nbDaysAgo == nbDaysAgo) && (liveValues.sync.theme == params.entries.theme) && (liveValues.sync.timestamps.max == _timestampMax) && (liveValues.sync.selectedFeed == params.feeds.selectedFeed)) ? true : false;
-            //my.alert('Partial rendering: '+_partialRendering);
+            var _partialRendering = ((nbDaysAgo == 0) && (liveValues.sync.nbDaysAgo == nbDaysAgo) && (liveValues.sync.theme == params.entries.theme) && (liveValues.sync.timestamps.max == _timestampMax) && (liveValues.sync.selectedFeed.url == params.feeds.selectedFeed.url) && (liveValues.sync.selectedFeed.account = params.feeds.selectedFeed.account)) ? true : false;
             
             var _timestampMin = (_partialRendering) ? 
                 liveValues['entries']['last']['_myTimestamp'] :
                 liveValues['timestamps']['max'] - (86400 * nbDaysAgo) - 86400 + 1;
             
-            my.log("dspEntries() between " + _timestampMin + " (00:00:00) & " + _timestampMax + " (23:59:59) " + feedUrl);
-        
             liveValues.sync.nbDaysAgo = nbDaysAgo;
             liveValues.sync.theme = params.entries.theme;
             liveValues.sync.timestamps.max = _timestampMax;
-            liveValues.sync.selectedFeed = params.feeds.selectedFeed;
+            liveValues.sync.selectedFeed.url = params.feeds.selectedFeed.url;
+            liveValues.sync.selectedFeed.account = params.feeds.selectedFeed.account;
             
-            my.log("dspEntries()", arguments);
-            my.log(entries);
-
-            sortedEntries = entries;
+            my.log("dspEntries() between " + _timestampMin + " (00:00:00) & " + _timestampMax + " (23:59:59) " + feedAccount + " - " + feedUrl + " - " + nbDaysAgo + " days ago");
 
             var _previousDaysAgo    = -1; // Count days to groups entries by day.
             var _entrieNbDaysAgo    = 0;
 
             var _nbEntriesDisplayed = {'small': 0, 'large': 0};
+
+            // ===================
+            // --- Get entries ---
+            // ===================
+
+            // Get entries for specific feed or get all entries.
+            
+            sortedEntries = {};
+            
+            if (feedUrl !== "") {
+                
+                for (var tsms in entries) {
+                    
+                    if ((feedUrl !== "") 
+                        && (feedUrl == entries[tsms]._myFeedInformations.feedUrl)
+                        && (feedAccount == entries[tsms]._myFeedInformations.feed._myAccount)
+                    ){
+                        sortedEntries[tsms] = entries[tsms];
+                    }
+                    
+                }
+            } else {
+                sortedEntries = entries;
+            }
+
+            my.log('dspEntries()', sortedEntries);
 
             // =======================
             // --- Display entries ---
@@ -1756,19 +1789,16 @@
                 
             for (var i in sortedEntries) {
                 
+                var _entry = sortedEntries[i];
 
-                // Get entries of specific feed or get all entries.
-
-                var _entry = "";
-
-                if ((feedUrl !== "") && (feedUrl == sortedEntries[i]._myFeedInformations.feedUrl)) {
-                    var _entry = sortedEntries[i];
+                if ((feedUrl !== "") 
+                    && (feedUrl == _entry._myFeedInformations.feedUrl)
+                    && (feedAccount == _entry._myFeedInformations.feed._myAccount)
+                ){
                     if (_firstEntrie) {
                         _htmlFeedTitle = _htmlFeedTitle + '<h2>' + _entry._myFeedInformations.title + '</h2>'; // Specific feed title
                         _firstEntrie = false;
                     }
-                } else if (feedUrl == "") {
-                    var _entry = sortedEntries[i];
                 }
 
                 // ---
@@ -1892,7 +1922,7 @@
                         
                         liveValues['entries']['html'][_entry._myTimestampInMs] = _html.join('');
 
-                } else if ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0) { break; }
+                }
             }
 
             // --- Display Today / Yesterday / Nb days ago ---
@@ -2805,7 +2835,7 @@
 
                 if (liveValues.sync.nbFeedsLoaded == liveValues.sync.nbFeedsToLoad) {
                     if (params.entries.nbDaysAgo == 0) {
-                        dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                        dspEntries();
                     }
                     dspFeeds(sp.getFeeds());
                     //dspSettings();
@@ -2843,7 +2873,7 @@
 
                 if (liveValues.sync.nbFeedsLoaded == liveValues.sync.nbFeedsToLoad) {
                     if (params.entries.nbDaysAgo == 0) {
-                        dspEntries(sp.getEntries(), params.entries.nbDaysAgo, params.feeds.selectedFeed);
+                        dspEntries();
                     }
                     dspFeeds(sp.getFeeds());
                     //dspSettings();

@@ -386,7 +386,8 @@ SimplePie.prototype.addFeed = function(feed) {
     
     var _timestampMin = Math.min.apply(Math, _timestamps);
     var _timestampMax = Math.max.apply(Math, _timestamps);
-    //_MyFeeds.log(feed.feedUrl+' ('+liveValues.timestamps.min+') Timestamps : ', _timestamps);
+    
+    _MyFeeds.log(feed.feedUrl+' ('+liveValues.timestamps.min+') Timestamps : ', _timestamps);
 
     var _myPulsations = (_myNewfeed['_myNbEntries'] / params.entries.dontDisplayEntriesOlderThan).toFixed(2);
     
