@@ -1562,8 +1562,8 @@
                 var _iconPulsations = (params.feeds.count) ? 
                     '<count class="">'+count(_sortedKeywords[i])+'</count>' : 
                     '<button><span data-icon="'+sp.getIconPulsations(count(_sortedKeywords[i]))+'"></span></button>';
-                var _iconDelete = '<button class="deleteKeyword" myKeyword="' + _sortedKeywords[i] + '"><span data-icon="delete"></span></button>';
-                _htmlKeywords = _htmlKeywords + '<li><a class="openKeyword" myKeyword="' +  _sortedKeywords[i] + '"><p>' + _iconDelete + _iconPulsations + _sortedKeywords[i] + '</p></a></li>';
+                var _iconDelete = '<button class="deleteKeyword" action="delete" myKeyword="' + _sortedKeywords[i] + '"><span data-icon="delete"></span></button>';
+                _htmlKeywords = _htmlKeywords + '<li><a class="openKeyword" action="open" type="keyword" value="' +  _sortedKeywords[i] + '" myKeyword="' +  _sortedKeywords[i] + '"><p>' + _iconDelete + _iconPulsations + '<my>' + _sortedKeywords[i] + '</my></p></a></li>';
             }
             
             _htmlKeywords = _htmlKeywords + '</ul>';
@@ -1578,7 +1578,7 @@
             var _account = _feed._myParams.account;
             var _iconFeed = ((typeof _feed.image === 'object') && (_feed.image.url != "")) ? '<img src="'+_feed.image.url+'"/>' : '';
             var _iconPulsations = (params.feeds.count) ? 
-                '<count class="">'+_feed._myNbEntries+'</count>' : 
+                '<count class="">'+_feed._myNbEntries+'</count>' :  // @todo: FALSE Does not consider entries already in cache. 
                 '<button><span data-icon="' + _feed._myPulsationsIcone + '"></span></button>';
             var _iconDelete = '';
 
@@ -1594,17 +1594,17 @@
                     _class = _class + ' _proxyNotAvailable_'; // Proxy not available for "aolreader" & "feedly". Not yet implemented.
                 }
                     
-                _iconDelete = '<button class="' + _class + '" account="' + _account + '" feedId="' + _feed.feed._myFeedId + '"><span data-icon="delete"></span></button>';
+                _iconDelete = '<button class="' + _class + '" action="delete" account="' + _account + '" feedId="' + _feed.feed._myFeedId + '"><span data-icon="delete"></span></button>';
             }
 
             var _myLastPublishedDate = (_feed._myLastTimestamp == 0) ? "No news" : _feed._myLastPublishedDate;
 
-            _html[_account] = _html[_account] + '<li><a class="open" account="' + _account + '" feedUrl="' + _feed.feedUrl + '"><p>' + _iconDelete + _iconPulsations + _iconFeed + _feed.title + '</p><p><time>' + _myLastPublishedDate + '</time></p></a></li>';
+            _html[_account] = _html[_account] + '<li><a class="open" action="open" type="feed" value="' + _feed.feedUrl + '" account="' + _account + '"><p>' + _iconDelete + _iconPulsations + _iconFeed + '<my>' + _feed.title + '</my></p><p><time>' + _myLastPublishedDate + '</time></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds +
             '<ul>' +
-            '<li><a class="open" feedUrl=""><p><button><span data-icon="forward"></span></button><my data-l10n-id="all-feeds">' + document.webL10n.get('all-feeds') + '</my></p></a></li>' +
+            '<li><a class="open" action="open" type="feed" value="" account=""><p><button><span data-icon="forward"></span></button><my data-l10n-id="all-feeds">' + document.webL10n.get('all-feeds') + '</my></p></a></li>' +
             '</ul>' +
             '' + _htmlKeywords;
         
@@ -1621,79 +1621,6 @@
         // --- Display ---
 
         ui.echo("feeds-list", _htmlFeeds, "");
-        
-        // ===========================
-        // --- Add Events keywords ---
-        // ===========================
-        
-        // onclick delete keyword :
-
-        var _deletes = document.querySelectorAll(".deleteKeyword");
-
-        for (var i = 0; i < _deletes.length; i++) {
-            _deletes[i].onclick = function(e) {
-                ui._vibrate();
-                e.stopPropagation();
-                e.preventDefault();
-                deleteKeyword(this);
-            }
-        }
-        
-        // onclick open keyword :
-
-        var _opens = document.querySelectorAll(".openKeyword");
-
-        for (var i = 0; i < _opens.length; i++) {
-            _opens[i].onclick = function() {
-                liveValues['entries']['search']['visible'] = true;
-                ui._vibrate();
-                ui._scrollTo(0);
-                ui._onclick(nextDay, 'disable');
-                ui._onclick(previousDay, 'enable');
-                params.entries.nbDaysAgo = 0;
-                params.feeds.selectedFeed.url = "";
-                params.feeds.selectedFeed.account = "";
-                document.getElementById('inputSearchEntries').value = this.getAttribute("myKeyword");
-                dspEntries();
-            }
-        }
-
-        // ========================
-        // --- Add Events Feeds ---
-        // ========================
-
-        // onclick delete button :
-
-        var _deletes = document.querySelectorAll(".delete");
-
-        for (var i = 0; i < _deletes.length; i++) {
-            _deletes[i].onclick = function(e) {
-                ui._vibrate();
-                e.stopPropagation();
-                e.preventDefault();
-                deleteFeed(this);
-            }
-        }
-
-        // onclick open feed :
-
-        var _opens = document.querySelectorAll(".open");
-
-        for (var i = 0; i < _opens.length; i++) {
-            _opens[i].onclick = function() {
-                liveValues['entries']['search']['visible'] = false;
-                document.getElementById('inputSearchEntries').value = "";
-                ui._vibrate();
-                ui._scrollTo(0);
-                ui._onclick(nextDay, 'disable');
-                ui._onclick(previousDay, 'enable');
-                params.entries.nbDaysAgo = 0;
-                params.feeds.selectedFeed.url = this.getAttribute("feedUrl");
-                params.feeds.selectedFeed.account = this.getAttribute("account");
-                _saveParams();
-                dspEntries();
-            }
-        }
         
         // =========================
         // --- App start offline ---
@@ -2524,15 +2451,15 @@
             }
         }, 350);
 
-        // ==============
-        // --- Events ---
-        // ==============
+        // ===================
+        // --- Main Events ---
+        // ===================
 
         browser.addEventListener('mozbrowsererror', function (event) {
             console.dir("Moz Browser loading error : " + event.detail);
         });
         
-        // Click on entry
+        // Entries list: Click on entry
         
         document.getElementById("feeds-entries-content").onclick = function(e) {
             var _entry = e.target.parentNode;
@@ -2540,6 +2467,69 @@
             ui.fade(_entry);
             liveValues.screens.feedsList.opened = false;
             mainEntryOpenInBrowser(_entry.getAttribute("tsms"), ""); 
+        }
+ 
+        // Feeds list: Click on keyword or feed
+        
+        document.getElementById("feeds-list").onclick = function(e) {
+            var _this = e.target;
+            var _entry = e.target.parentNode.parentNode;
+            
+            var _account    = _entry.getAttribute('account');   // local, feedly, etc...
+            var _action     = _this.getAttribute('action') || _entry.getAttribute('action');    // open, delete
+            var _type       = _entry.getAttribute('type');      // keyword, feed
+            var _value      = _entry.getAttribute('value');
+
+            // Open keyword
+
+            if ((_action === 'open') && (_type === 'keyword') && (_value !== '')) {
+                liveValues['entries']['search']['visible'] = true;
+                ui._vibrate();
+                ui._scrollTo(0);
+                ui._onclick(nextDay, 'disable');
+                ui._onclick(previousDay, 'enable');
+                params.entries.nbDaysAgo = 0;
+                params.feeds.selectedFeed.url = "";
+                params.feeds.selectedFeed.account = "";
+                document.getElementById('inputSearchEntries').value = _value;
+                dspEntries();
+            }
+
+            // Open feed
+            
+            if ((_action === 'open') && (_type === 'feed')) {
+                liveValues['entries']['search']['visible'] = false;
+                ui._vibrate();
+                ui._scrollTo(0);
+                ui._onclick(nextDay, 'disable');
+                ui._onclick(previousDay, 'enable');
+                params.entries.nbDaysAgo = 0;
+                params.feeds.selectedFeed.url = _value;
+                params.feeds.selectedFeed.account = _account;
+                document.getElementById('inputSearchEntries').value = "";
+                _saveParams();
+                dspEntries();
+            }
+
+            // Delete keyword
+
+            if ((_action === 'delete') && (_type === 'keyword')) {
+                ui._vibrate();
+                e.stopPropagation();
+                e.preventDefault();
+                deleteKeyword(_this);
+            }
+
+            // Delete feed
+ 
+            if ((_action === 'delete') && (_type === 'feed')) {
+                ui._vibrate();
+                e.stopPropagation();
+                e.preventDefault();
+                deleteFeed(_this); 
+            }
+
+            // ---
         }
         
         // Keyboard

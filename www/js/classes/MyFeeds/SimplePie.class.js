@@ -369,8 +369,8 @@ SimplePie.prototype.addFeed = function(feed) {
         }
     }
     
-    // Nb entries in feed 
-    // (Depends of nb days ago && small news)
+    // !!! COUNT BELOW IS ONLY FROM FEED !!!
+    // This count does not consider entries already in cache.
     // @todo : Don't count news in the future (Between "now" and "23:59:59")
     //         Replace "liveValues.timestamps.max" below
     
