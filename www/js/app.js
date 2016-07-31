@@ -107,6 +107,11 @@
             "min": -1,                          // Timestamp value beyond which an entry can't be displayed (Too old). Set by function "_setTimestamps()"
             "max": -1                           // End of current day (23:59:59). Set by function "_setTimestamps()"
         },
+        "dom" : {
+            "highlights": {
+                "feed": ""                      // Store setected DOM id
+            }
+        },
         "entries": {
             "id": {
                 "min": -1,                      // Set by function "setEntriesIds"
@@ -1563,7 +1568,7 @@
                     '<count class="">'+count(_sortedKeywords[i])+'</count>' : 
                     '<button><span data-icon="'+sp.getIconPulsations(count(_sortedKeywords[i]))+'"></span></button>';
                 var _iconDelete = '<button class="deleteKeyword" action="delete" myKeyword="' + _sortedKeywords[i] + '"><span data-icon="delete"></span></button>';
-                _htmlKeywords = _htmlKeywords + '<li><a class="openKeyword" action="open" type="keyword" value="' +  _sortedKeywords[i] + '" myKeyword="' +  _sortedKeywords[i] + '"><p>' + _iconDelete + _iconPulsations + '<my>' + _sortedKeywords[i] + '</my></p></a></li>';
+                _htmlKeywords = _htmlKeywords + '<li id="' + _sortedKeywords[i] + '" action="open" type="keyword" value="' +  _sortedKeywords[i] + '" account=""><a _id_="' + _sortedKeywords[i] + '" ><p _id_="' + _sortedKeywords[i] + '">' + _iconDelete + _iconPulsations + '<my>' + _sortedKeywords[i] + '</my></p></a></li>';
             }
             
             _htmlKeywords = _htmlKeywords + '</ul>';
@@ -1594,17 +1599,17 @@
                     _class = _class + ' _proxyNotAvailable_'; // Proxy not available for "aolreader" & "feedly". Not yet implemented.
                 }
                     
-                _iconDelete = '<button class="' + _class + '" action="delete" account="' + _account + '" feedId="' + _feed.feed._myFeedId + '"><span data-icon="delete"></span></button>';
+                _iconDelete = '<button _id_="' + _feed._myDomId + '" action="delete" account="' + _account + '" feedId="' + _feed.feed._myFeedId + '"><span data-icon="delete"></span></button>';
             }
 
             var _myLastPublishedDate = (_feed._myLastTimestamp == 0) ? "No news" : _feed._myLastPublishedDate;
 
-            _html[_account] = _html[_account] + '<li><a class="open" action="open" type="feed" value="' + _feed.feedUrl + '" account="' + _account + '"><p>' + _iconDelete + _iconPulsations + _iconFeed + '<my>' + _feed.title + '</my></p><p><time>' + _myLastPublishedDate + '</time></p></a></li>';
+            _html[_account] = _html[_account] + '<li id="' + _feed._myDomId + '" action="open" type="feed" value="' + _feed.feedUrl + '" account="' + _account + '"><a _id_="' + _feed._myDomId + '"><p _id_="' + _feed._myDomId + '">' + _iconDelete + _iconPulsations + _iconFeed + '<my>' + _feed.title + '</my></p><p><time>' + _myLastPublishedDate + '</time></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds +
             '<ul>' +
-            '<li><a class="open" action="open" type="feed" value="" account=""><p><button><span data-icon="forward"></span></button><my data-l10n-id="all-feeds">' + document.webL10n.get('all-feeds') + '</my></p></a></li>' +
+            '<li id="_" action="open" type="feed" value="" account=""><a _id_="_"><p _id_="_" ><button><span data-icon="forward"></span></button><my data-l10n-id="all-feeds">' + document.webL10n.get('all-feeds') + '</my></p></a></li>' +
             '</ul>' +
             '' + _htmlKeywords;
         
@@ -1621,7 +1626,12 @@
         // --- Display ---
 
         ui.echo("feeds-list", _htmlFeeds, "");
-        
+ 
+        // --- Hightlight selected feed or keyword ---
+
+        ui.uncolorize('feeds-list');
+        ui.colorize(liveValues.dom.highlights.feed);
+                
         // =========================
         // --- App start offline ---
         // =========================
@@ -1766,9 +1776,9 @@
 
                         if (_entry._myFirstImageUrl) {
                             if (_isSmallEntry) {
-                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img src="img/loading.png" data-src="' + _entry._myFirstImageUrl + '"/></span>';
+                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img tsms="' + _entry._myTimestampInMs + '" src="img/loading.png" data-src="' + _entry._myFirstImageUrl + '"/></span>';
                             } else {
-                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img src="img/loading.png" data-src="' + _entry._myFirstImageUrl + '"/></span>';
+                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img tsms="' + _entry._myTimestampInMs + '" src="img/loading.png" data-src="' + _entry._myFirstImageUrl + '"/></span>';
                             }
                         }
 
@@ -2427,21 +2437,19 @@
         window.addEventListener('online',  updateNetworkStatus);
         window.addEventListener('offline', updateNetworkStatus);
         
-        // ======================
-        // --- Memory cleanup ---
-        // ======================
+        // =================
+        // --- Intervals ---
+        // =================
         
-        // Remove old entries
-        
+        // --- Memory cleanup (Remove old entries) ---
+
         setInterval(function() {
             var _maxNbDaysAgo = params.settings.days.last();
             var _timestampMax = liveValues['timestamps']['max'] - (86400 * _maxNbDaysAgo);
             sp.deleteOldEntries(_timestampMax);
         }, 60000);
         
-        // =============================================
-        // --- Load visibles images & localize times ---
-        // =============================================
+        // --- Load images in viewport & localize times ---
         
         setInterval(function() {
             if (!liveValues.animations.inProgress) {
@@ -2451,35 +2459,42 @@
             }
         }, 350);
 
-        // ===================
-        // --- Main Events ---
-        // ===================
+        // --- Automatic update entries every N seconds ---
 
-        browser.addEventListener('mozbrowsererror', function (event) {
-            console.dir("Moz Browser loading error : " + event.detail);
-        });
+        var _startInterval = performance.now();
         
-        // Entries list: Click on entry
-        
-        document.getElementById("feeds-entries-content").onclick = function(e) {
-            var _entry = e.target.parentNode;
-            ui._vibrate(); 
-            ui.fade(_entry);
-            liveValues.screens.feedsList.opened = false;
-            mainEntryOpenInBrowser(_entry.getAttribute("tsms"), ""); 
-        }
+        window.setInterval(function() {
+            var _nowInterval = performance.now();
+            if ((liveValues.network.status == 'online') && ((_nowInterval - _startInterval) >= (params.entries.updateEvery * 1000))) {
+                _startInterval = _nowInterval;
+                ui._onclick(sync, 'disable');
+                loadFeeds();
+            }
+        }, 59000); // 59s Less than minimal Firefox OS sleep time (60s)
+         
+        // ==========================
+        // --- Events: Feeds list ---
+        // ==========================
  
         // Feeds list: Click on keyword or feed
         
         document.getElementById("feeds-list").onclick = function(e) {
             var _this = e.target;
-            var _entry = e.target.parentNode.parentNode;
             
-            var _account    = _entry.getAttribute('account');   // local, feedly, etc...
-            var _action     = _this.getAttribute('action') || _entry.getAttribute('action');    // open, delete
-            var _type       = _entry.getAttribute('type');      // keyword, feed
-            var _value      = _entry.getAttribute('value');
+            var _domId      = _this.getAttribute('id') || _this.getAttribute('_id_') || _this.parentNode.getAttribute('_id_');
+            var _li         = document.getElementById(_domId);
 
+            var _account    = _li.getAttribute('account');   // local, feedly, etc...
+            var _action     = _this.getAttribute('action') || _li.getAttribute('action');    // delete, open
+            var _type       = _li.getAttribute('type');      // keyword, feed
+            var _value      = _li.getAttribute('value');
+
+            // Highlight selected feed
+
+            liveValues.dom.highlights.feed = _domId; 
+            ui.uncolorize('feeds-list');
+            ui.colorize(liveValues.dom.highlights.feed);
+            
             // Open keyword
 
             if ((_action === 'open') && (_type === 'keyword') && (_value !== '')) {
@@ -2531,7 +2546,28 @@
 
             // ---
         }
+
+        // ============================
+        // --- Events: Entries list ---
+        // ============================
+       
+        // Entries list: Click on entry
         
+        document.getElementById("feeds-entries-content").onclick = function(e) {
+            var _tsms = e.target.getAttribute("tsms") || e.target.parentNode.getAttribute("tsms");
+            var _entry = document.getElementById(_tsms);
+            if (_tsms) {
+                ui._vibrate(); 
+                ui.fade(_entry);
+                liveValues.screens.feedsList.opened = false;
+                mainEntryOpenInBrowser(_tsms, ""); 
+            }
+        } 
+ 
+        /* =================================== */
+        /* --- Events: Search Entries Form --- */
+        /* =================================== */
+       
         // Keyboard
         
         window.addEventListener("keydown", function (event) {
@@ -2544,7 +2580,77 @@
                 }
             }
         }, true);
+ 
+        // Search entries after "dspEntries"
+        // Display form then do a search.
         
+        document.body.addEventListener('dspEntries.done', function(event){
+            if (liveValues['entries']['search']['visible']) {
+                dom['screens']['entries']['scroll'].style.height = "calc(100% - 17.5rem)";
+                searchEntries.classList.remove('enable-fxos-white');
+                searchEntries.classList.add('enable-fxos-blue');
+                document.getElementById('formSearchEntries').classList.remove('_hide');
+                document.getElementById('formSearchEntries').classList.add('_show');
+                //_search(''); // @todo Test to display all entries
+                _search(document.getElementById('inputSearchEntries').value);
+            }
+        });
+
+        // Search on input change
+        
+        document.getElementById('inputSearchEntries').addEventListener('input', function(){
+            var _searchString = document.getElementById('inputSearchEntries').value;
+            _search(_searchString);
+        });
+        
+        // Add keyword
+        
+        addKeyword.onclick = function() {
+            ui._vibrate();
+            var _myKeyword = document.getElementById('inputSearchEntries').value;
+
+            if (_myKeyword.length > 0) {
+                var _confirm = window.confirm(document.webL10n.get('confirm-add-keyword') + "\n" + _myKeyword);
+
+                if ((_confirm) && (!keywords.contains(_myKeyword))) {
+                    keywords.push(_myKeyword);
+                    _saveKeywords();
+                    
+                    // Reload UI
+                    
+                    liveValues['entries']['search']['visible'] = true;
+
+                    if ((myFeedsSubscriptions.local.length > 0) ||
+                        (myFeedsSubscriptions.feedly.length > 0) ||
+                        (myFeedsSubscriptions.theoldreader.length > 0) || 
+                        (myFeedsSubscriptions.aolreader.length > 0) || 
+                        (myFeedsSubscriptions.tinytinyrss.length > 0)
+                    ){
+                        loadFeeds();
+                    } else {
+                        ui.echo("feeds-list", "", "");
+                        ui.echo("feeds-entries-content", "", "");
+                        ui._onclick(sync, 'disable');
+                    }
+                    
+                    // Done
+                    
+                    my.message(document.webL10n.get('keyword-was-added'));
+                } else {
+                    my.message(document.webL10n.get('keyword-was-not-added'));
+                }
+            
+            }
+        }
+       
+        /* ==================== */
+        /* --- Events: Misc --- */
+        /* ==================== */
+
+        browser.addEventListener('mozbrowsererror', function (event) {
+            console.dir("Moz Browser loading error : " + event.detail);
+        });
+ 
         // Set the 'lang' and 'dir' attributes to <html> when the page is translated
         
         window.addEventListener('localized', function() {
@@ -2552,19 +2658,10 @@
             document.documentElement.dir = document.webL10n.getDirection();
         }, false);
 
-        // Automatic update entries every N seconds :
+        /* ============================== */
+        /* --- Events: Selected entry --- */
+        /* ============================== */
 
-        var _startInterval = performance.now();
-        
-        window.setInterval(function() {
-            var _nowInterval = performance.now();
-            if ((liveValues.network.status == 'online') && ((_nowInterval - _startInterval) >= (params.entries.updateEvery * 1000))) {
-                _startInterval = _nowInterval;
-                ui._onclick(sync, 'disable');
-                loadFeeds();
-            }
-        }, 59000); // 59s Less than minimal Firefox OS sleep time (60s)
-        
         // Main entry open done...
         // Update next entry [<] & previous entry [>] buttons.
         // Update next & previous entries titles
@@ -2666,10 +2763,6 @@
             
             // Mark entry as read
             
-            /*if (!liveValues.entries.newsPreviouslyDisplayed.contains(event.detail.entryId)) {
-                liveValues.entries.newsPreviouslyDisplayed.push(event.detail.entryId);
-                ui.fade(document.getElementById(event.detail.entryId));
-            }*/
             ui.markAsRead(event.detail.entryId);
             
             // ---
@@ -2738,69 +2831,7 @@
             }
     
         };
-        
-        // Search entries after "dspEntries"
-        // Display form then do a search.
-        
-        document.body.addEventListener('dspEntries.done', function(event){
-            if (liveValues['entries']['search']['visible']) {
-                dom['screens']['entries']['scroll'].style.height = "calc(100% - 17.5rem)";
-                searchEntries.classList.remove('enable-fxos-white');
-                searchEntries.classList.add('enable-fxos-blue');
-                document.getElementById('formSearchEntries').classList.remove('_hide');
-                document.getElementById('formSearchEntries').classList.add('_show');
-                //_search(''); // @todo Test to display all entries
-                _search(document.getElementById('inputSearchEntries').value);
-            }
-        });
-        
-        // Search on input change
-        
-        document.getElementById('inputSearchEntries').addEventListener('input', function(){
-            var _searchString = document.getElementById('inputSearchEntries').value;
-            _search(_searchString);
-        });
-        
-        // Add keyword
-        
-        addKeyword.onclick = function() {
-            ui._vibrate();
-            var _myKeyword = document.getElementById('inputSearchEntries').value;
-
-            if (_myKeyword.length > 0) {
-                var _confirm = window.confirm(document.webL10n.get('confirm-add-keyword') + "\n" + _myKeyword);
-
-                if ((_confirm) && (!keywords.contains(_myKeyword))) {
-                    keywords.push(_myKeyword);
-                    _saveKeywords();
-                    
-                    // Reload UI
-                    
-                    liveValues['entries']['search']['visible'] = true;
-
-                    if ((myFeedsSubscriptions.local.length > 0) ||
-                        (myFeedsSubscriptions.feedly.length > 0) ||
-                        (myFeedsSubscriptions.theoldreader.length > 0) || 
-                        (myFeedsSubscriptions.aolreader.length > 0) || 
-                        (myFeedsSubscriptions.tinytinyrss.length > 0)
-                    ){
-                        loadFeeds();
-                    } else {
-                        ui.echo("feeds-list", "", "");
-                        ui.echo("feeds-entries-content", "", "");
-                        ui._onclick(sync, 'disable');
-                    }
-                    
-                    // Done
-                    
-                    my.message(document.webL10n.get('keyword-was-added'));
-                } else {
-                    my.message(document.webL10n.get('keyword-was-not-added'));
-                }
-            
-            }
-        }
-
+         
         /* ======================== */
         /* --- SimplePie Events --- */
         /* ======================== */

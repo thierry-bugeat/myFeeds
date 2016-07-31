@@ -66,7 +66,8 @@
     box-sizing: border-box;
     border-bottom: solid 0.1rem var(--fxos-ivory);
     color: #333;
-    margin: var(--my-spacing) 0 var(--my-spacing) 0;  
+    padding: var(--my-spacing) 0 var(--my-spacing) 0; 
+    margin: 0; 
     display: block;
     position: relative;
 }

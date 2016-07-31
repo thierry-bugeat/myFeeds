@@ -173,6 +173,10 @@ form{
 
 /* --- Enable / Disable element(s) --- */
 
+.colorize {
+    background-color: #BBC9CC !important
+}
+
 .enable-fxos-blue {
     color: var(--fxos-blue) !important;
 }

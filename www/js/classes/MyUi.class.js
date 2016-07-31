@@ -459,9 +459,37 @@ MyUi.prototype._smallEntries = function (status) {
  * @return {null}
  * */
 MyUi.prototype.fade = function (_this) {
+    _MyFeeds.log('MyUi.prototype.fade()', _this);
     _this.style.cssText = "opacity : 0.4;";
 }
 
+/**
+ * Colorize specified DOM element
+ * @param {string|object} DOM id or DOM element
+ * @return {null}
+ * */
+MyUi.prototype.colorize = function (_domElement) {
+     try {
+        _domElement.classList.add('colorize');
+    } catch (e) {
+        try {
+            document.getElementById(_domElement).classList.add('colorize');
+        } catch (e) {
+        }
+    }
+}
+
+/**
+ * Uncolorize all childs of specified DOM element
+ * @param {string} DOM ID element
+ * @return {null}
+ * */
+MyUi.prototype.uncolorize = function (_domId) {
+    var _childs = document.getElementById(_domId).querySelectorAll("*");
+    for (var i = 0; i < _childs.length; i++) {
+        _childs[i].classList.remove('colorize');
+    }
+}
 
 MyUi.prototype.selectThemeIcon = function () {
     if (params.entries.theme == 'grid') {

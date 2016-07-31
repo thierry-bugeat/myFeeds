@@ -352,7 +352,7 @@ SimplePie.prototype.addFeed = function(feed) {
     }
 
     // Add custom values.
-
+ 
     // Pulsations ?
     
     var _timestamps = [];
@@ -382,6 +382,10 @@ SimplePie.prototype.addFeed = function(feed) {
         }
     }
     
+    // DOM id
+
+    _myNewfeed['_myDomId'] = btoa(_myNewfeed.feed._myAccount + _myNewfeed.feed._myFeedId);
+
     // ---
     
     var _timestampMin = Math.min.apply(Math, _timestamps);
