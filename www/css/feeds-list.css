@@ -55,9 +55,8 @@
     overflow: auto;
     list-style: none outside none;
     margin: 0;
+    padding: 0;
     overflow: hidden;
-    padding-left: var(--my-spacing);
-    padding-right: var(--my-spacing);
     font-size:1.7rem;
 }
 
@@ -66,7 +65,7 @@
     box-sizing: border-box;
     border-bottom: solid 0.1rem var(--fxos-ivory);
     color: #333;
-    padding: var(--my-spacing) 0 var(--my-spacing) 0; 
+    padding: var(--my-spacing); 
     margin: 0; 
     display: block;
     position: relative;

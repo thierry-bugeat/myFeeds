@@ -143,12 +143,10 @@ section[role="myFooter"] > header:first-child button {color: #FFFFFF;} /* --fxos
 }
 #feeds-list > ul {
     background-color: #F4F4F4; /* --fxos-light-grey */
-    padding-left: 2.5%; /* --my-spacing */
-    padding-right: 2.5%; /* --my-spacing */
 }
 #feeds-list > ul > li {
     border-bottom: #EAEAE7; /* --fxos-ivory */
-    padding: 2.5% 0 2.5% 0; /* --my-spacing */
+    padding: 2.5%; /* --my-spacing */
 }
 #feeds-list > ul > li > a {color: #EAEAE7;} /* --fxos-ivory */
 #feeds-list button {margin-right: 2.5%;} /* --my-spacing */
