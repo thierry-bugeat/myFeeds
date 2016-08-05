@@ -383,6 +383,10 @@
     var sortedEntries = [];
     var sortedFeeds = [];
 
+    // =================
+    // --- UI events ---
+    // =================
+
     sync.onclick            = function(event) {
         if (liveValues.network.status == 'online') {
             ui._vibrate();
@@ -392,6 +396,8 @@
     }
 
     closeMainEntry.onclick  = function(event) { ui._vibrate(); ui._quickScrollTo(0); ui.echo("browser", "", ""); }
+
+    // Screen find feed
 
     findFeedsOpen.onclick   = function(event) { ui._vibrate(); ui._scrollTo(-2); }
     findFeedsClose.onclick  = function(event) { ui._vibrate(); ui._scrollTo(-1); }
@@ -410,6 +416,14 @@
     }
     
     findFeedsReset.onclick  = function(event) { ui._vibrate(); ui.echo('find-feeds', '', ''); }
+
+    // Screen feeds list
+
+    document.getElementById("shareFeedsList").onclick = function(event) {
+        my.export('opml', true);
+    }
+
+    // Themes
 
     displayGrid.onclick     = function(event) {
         if (params.entries.theme != 'grid') {
@@ -1023,11 +1037,6 @@
         '       ' + _htmlSelectUpdateEvery,
         '   </li>',
 
-        '   <li>',
-        '       <aside class="icon"><span data-icon="share"></span></aside>',
-        '       <aside class="pack-end"><button id="saveSubscriptions"><span data-l10n-id="my-subscriptions-share">' + document.webL10n.get('my-subscriptions-share') + '</span></button></aside>',
-        '       <a><p class="double"><my data-l10n-id="my-subscriptions-opml">' + document.webL10n.get('my-subscriptions-opml') + '</my></p></a>',
- 
         '</ul>',
         '</section>',
         
@@ -1315,13 +1324,7 @@
             params.entries.updateEvery = _selectUpdateEvery.options[_selectUpdateEvery.selectedIndex].value;
             _saveParams();
         }
-
-        // Share subscriptions
-
-        document.getElementById("saveSubscriptions").onclick = function(event) {
-            my.export('opml', true);
-        }
-         
+ 
         document.getElementById('toggleCountEntries').onclick = function(e) {
             params.feeds.count = !params.feeds.count;
             _saveParams();
