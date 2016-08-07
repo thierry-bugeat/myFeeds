@@ -155,6 +155,9 @@
         "animations": {
             "inProgress": false                 // Set to "true" when user click on elements with "_startAnimation_" class.
         },
+        "swipe": {
+            "inProgress": false                 // Set to "true". Permit to increase UI performances when user is doing a swipe.
+        },
         "network": {
             "status": 'NA'
         }, 
@@ -2455,7 +2458,7 @@
         // --- Load images in viewport & localize times ---
         
         setInterval(function() {
-            if (!liveValues.animations.inProgress) {
+            if (!liveValues.animations.inProgress && !liveValues.animations.swipe) {
                 ui.showEntries();
                 ui.loadImages();
                 localizeTimes();

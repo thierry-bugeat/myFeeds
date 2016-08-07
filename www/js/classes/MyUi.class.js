@@ -352,10 +352,10 @@ MyUi.prototype._loading = function(percentage) {
 /**
  * Scroll main div to specified screen.
  * @param {screenX} int
- * 0 : Search feed  (mainLeft)
- * 1 : Feeds list   (mainLeft)
- * 0 : Entries list (main)
- * 1 : Entry        (main)
+ * -2 : Search feed  (mainLeft)
+ * -1 : Feeds list   (mainLeft)
+ *  0 : Entries list (main)
+ *  1 : Entry        (main)
  * */
 MyUi.prototype._scrollTo = function(screenX) {
     if (screenX == 0) {

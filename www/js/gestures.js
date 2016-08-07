@@ -73,7 +73,8 @@ function _swipe(_element, callback) {
         // Screen entries : Sync / Open Feeds / Open Settings
         
         if (myGesture._id == 'feeds-entries-scroll') {
-                    
+                 
+            // Sync   
             if ((myGesture._scrollTop) && (myGesture._direction == "down")) {
                 if (liveValues.network.status == 'online') {
                     ui._loading(1);
@@ -86,6 +87,19 @@ function _swipe(_element, callback) {
                 sync.classList.remove("rotation");
                 myGesture._action = "";
             }
+            
+            // Open feeds list
+            // Swipe from main screen to display feeds list in background
+            if (params.settings.ui.animations) {
+                if (!liveValues.screens.feedsList.opened 
+                        && ((myGesture._mouseH == "right") || (myGesture._mouseH == "left"))
+                ) {
+                    liveValues.swipe.inProgress = true;
+                    var _dx = Math.abs(Math.max(0, (myGesture._endX - myGesture._startX))); 
+                    main.style.cssText = 'transform: translateX('+_dx+'px);';
+                }
+            }
+
         }
         
         // Logs
@@ -98,6 +112,20 @@ function _swipe(_element, callback) {
 
         my.log('gestures touchend: id = ' + myGesture._id + ' / scrollTop = ' + myGesture._scrollTop + " / direction = " + myGesture._direction + " / gesture = " + myGesture._action + " / pointerEvents = " + sync.style.pointerEvents + " / mouseH = " + myGesture._mouseH); 
         ui._loading(0);
+
+        // Resets main screen position
+        // From main screen, user did a swipe right then left to cancel feeds list opening.
+        
+        liveValues.swipe.inProgress = false;
+
+        if (params.settings.ui.animations) {
+            if (!liveValues.screens.feedsList.opened 
+                    && (myGesture._id == 'feeds-entries-scroll') 
+                    && (myGesture._mouseH == 'left')
+            ) {
+                ui._scrollTo(0);
+            }
+        }
 
         // ===============
         // --- Results ---
