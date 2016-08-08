@@ -121,7 +121,7 @@ function _swipe(_element, callback) {
         if (params.settings.ui.animations) {
             if (!liveValues.screens.feedsList.opened 
                     && (myGesture._id == 'feeds-entries-scroll') 
-                    && (myGesture._mouseH == 'left')
+                    && (myGesture._direction == '')
             ) {
                 ui._scrollTo(0);
             }
