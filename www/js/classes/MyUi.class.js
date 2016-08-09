@@ -609,7 +609,7 @@ MyUi.prototype.markAsRead = function (entryId) {
         if (!liveValues.entries.newsPreviouslyDisplayed.contains(entryId)) {
             liveValues.entries.newsPreviouslyDisplayed.push(entryId);
             try {
-                ui.fade(document.getElementById(entryId)); 
+                ui.colorize(document.getElementById(entryId)); 
             } catch(e) {
                 _MyFeeds.log('MyUi.prototype.markAsRead(' + entryId + ') Error ');
             }
@@ -617,7 +617,7 @@ MyUi.prototype.markAsRead = function (entryId) {
     } else {
         for (_tsms in liveValues.entries.newsPreviouslyDisplayed) { 
             try {
-                ui.fade(document.getElementById(liveValues.entries.newsPreviouslyDisplayed[_tsms])); 
+                ui.colorize(document.getElementById(liveValues.entries.newsPreviouslyDisplayed[_tsms])); 
             } catch (e) {
                 _MyFeeds.log('MyUi.prototype.markAsRead(' + _tsms + ') Error ');
             }

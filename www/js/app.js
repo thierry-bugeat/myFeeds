@@ -2564,7 +2564,7 @@
             var _entry = document.getElementById(_tsms);
             if (_tsms) {
                 ui._vibrate(); 
-                ui.fade(_entry);
+                ui.markAsRead(_entry);
                 liveValues.screens.feedsList.opened = false;
                 mainEntryOpenInBrowser(_tsms, ""); 
             }
