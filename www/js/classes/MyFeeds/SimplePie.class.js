@@ -37,7 +37,7 @@ var SimplePie = function() {
             {"id": 1, "name": "SimplePie @ OVH",            "url": "http://quiksiivjq.cluster002.ovh.net/simplepie/?" },
             {"id": 2, "name": "SimplePie @ Home eeepc701",  "url": "http://thierry.bugeat.com/simplepie/?" }
         ],
-        "serverId"      : 1,
+        "serverId"      : 0,
         "method"        : "GET"
     };
     
