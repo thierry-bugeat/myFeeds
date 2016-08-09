@@ -119,9 +119,11 @@ function _swipe(_element, callback) {
         liveValues.swipe.inProgress = false;
 
         if (params.settings.ui.animations) {
+            //window.alert(liveValues.screens.feedsList.opened+' / '+myGesture._id+' / '+myGesture._mouseH+' / '+myGesture._direction);
             if (!liveValues.screens.feedsList.opened 
                     && (myGesture._id == 'feeds-entries-scroll') 
-                    && (myGesture._direction == '')
+                    && (myGesture._direction != 'left') 
+                    && (myGesture._direction != 'right')
             ) {
                 ui._scrollTo(0);
             }
