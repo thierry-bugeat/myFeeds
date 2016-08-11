@@ -40,12 +40,12 @@
 }
 
 .my-list-title {
-    line-height:2rem;
+    line-height:1.25;
+    font-size:1.6rem;
     max-height: 4rem;
     width: 100%;
     text-overflow: ellipsis;
     font-weight: bold;
-    margin-top: 1.7rem;
 }
 
 .my-list-title img{
@@ -55,8 +55,8 @@
 }
 
 .my-list-feed-title {
-    font-size:1.5rem;
-    line-height:1.7rem;
+    font-size:1.6rem;
+    line-height:1.25;
     color: #5F5F5F;
     width: 60%;
     overflow: hidden;
@@ -70,8 +70,8 @@
 }
 
 .my-list-date {
-    font-size:1.5rem;
-    line-height:1.7rem;
+    font-size:1.6rem;
+    line-height:1.25;
     width: 40%;
     overflow: hidden;
     text-align:right;
@@ -87,10 +87,10 @@
 
 .my-list-snippet {
     color: #5F5F5F;
-    line-height:2rem;
+    line-height:1.25;
     width:100%;
     text-overflow: ellipsis;
-    font-size: 1.7rem;
+    font-size: 1.6rem;
     padding-left: var(--my-spacing);
 }
 
@@ -115,14 +115,6 @@
 }
 
 .my-list-footer{
-    position: absolute;
-    top: 90%;
-    left: 0%;
-    width: 100%;
-    height: 10%;
-    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
-    display: inline-block;
-    padding: 0;
 }
 
 /* --- S --- */
@@ -137,9 +129,9 @@
 .list-ratio-image-s { padding-bottom:100%; }
 .list-ratio-image-l { padding-bottom:100%; }
 
-.list-ratio-entry-s { padding-bottom: 17%; }
-.list-ratio-entry-m { padding-bottom: 34%; }
-.list-ratio-entry-l { padding-bottom: 39%; }
+.list-ratio-entry-s {padding: 0 0 8rem 0; border-width: var(--my-spacing); border-style: solid; border-color: var(--fxos-white); font-size: 0;}
+.list-ratio-entry-m {padding: 0 0 12rem 0; border-width: var(--my-spacing); border-style: solid; border-color: var(--fxos-white); font-size: 0;}
+.list-ratio-entry-l {padding: 0 0 14rem 0; border-width: var(--my-spacing); border-style: solid; border-color: var(--fxos-white); font-size: 0;}
 
 .list-ratio-16-10{
     padding-bottom:62.5%; /* 10/16*100 */
@@ -482,10 +474,10 @@
     .my-list-entry-s, .my-list-entry-l{box-sizing:border-box; position: relative; float: left; width: 20%;}
 }
 
-@media screen and (min-width: 481px) {.list-ratio-entry-s, .list-ratio-entry-l, .list-ratio-entry-m {padding-bottom: 28%;}}
-@media screen and (min-width: 601px) {.list-ratio-entry-s, .list-ratio-entry-l, .list-ratio-entry-m {padding-bottom: 23%;}}
-@media screen and (min-width: 721px) {.list-ratio-entry-s, .list-ratio-entry-l, .list-ratio-entry-m {padding-bottom: 16%;}}
-@media screen and (min-width: 1081px) {.list-ratio-entry-s, .list-ratio-entry-l, .list-ratio-entry-m {padding-bottom: 13%;}}
-@media screen and (min-width: 1441px) {.list-ratio-entry-s, .list-ratio-entry-l, .list-ratio-entry-m {padding-bottom: 10%;}}
-@media screen and (min-width: 1681px) {.list-ratio-entry-s, .list-ratio-entry-l, .list-ratio-entry-m {padding-bottom: 7%;}}
+@media screen and (min-width: 481px) {.list-ratio-entry-s, .list-ratio-entry-l, .list-ratio-entry-m {padding: 0 0 14rem 0; border-width: var(--my-spacing); border-style: solid; border-color: var(--fxos-white); font-size: 0;}}
+@media screen and (min-width: 601px) {.list-ratio-entry-s, .list-ratio-entry-l, .list-ratio-entry-m {padding: 0 0 12rem 0; border-width: var(--my-spacing); border-style: solid; border-color: var(--fxos-white); font-size: 0;}}
+@media screen and (min-width: 721px) {.list-ratio-entry-s, .list-ratio-entry-l, .list-ratio-entry-m {padding: 0 0 12rem 0; border-width: var(--my-spacing); border-style: solid; border-color: var(--fxos-white); font-size: 0;}}
+@media screen and (min-width: 1081px) {.list-ratio-entry-s, .list-ratio-entry-l, .list-ratio-entry-m {padding: 0 0 10rem 0; border-width: var(--my-spacing); border-style: solid; border-color: var(--fxos-white); font-size: 0;}}
+@media screen and (min-width: 1441px) {.list-ratio-entry-s, .list-ratio-entry-l, .list-ratio-entry-m {padding: 0 0 10rem 0; border-width: var(--my-spacing); border-style: solid; border-color: var(--fxos-white); font-size: 0;}}
+@media screen and (min-width: 1681px) {.list-ratio-entry-s, .list-ratio-entry-l, .list-ratio-entry-m {padding: 0 0 8rem 0; border-width: var(--my-spacing); border-style: solid; border-color: var(--fxos-white); font-size: 0;}}
 
