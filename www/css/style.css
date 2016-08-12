@@ -174,7 +174,8 @@ form{
 /* --- Enable / Disable element(s) --- */
 
 .colorize {
-    background-color: #BBC9CC !important
+    background-color: #BBC9CC !important;
+    border-color: #BBC9CC !important;
 }
 
 .enable-fxos-blue {
