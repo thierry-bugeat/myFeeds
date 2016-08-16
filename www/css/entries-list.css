@@ -370,7 +370,7 @@
 #feeds-entries-content{
     width:100%;
     height: 100%;
-    font-size:1.7rem;
+    font-size: 1.6rem;
 }
 
 #feeds-entries > div:first-child {
@@ -388,7 +388,7 @@
     margin: 0;
     overflow: hidden;
     padding: 0 var(--my-spacing) 0 var(--my-spacing);
-    font-size:1.7rem;
+    font-size: 1.6rem;
     font-weight:normal;
 }
 
