@@ -1605,7 +1605,7 @@
                     _class = _class + ' _proxyNotAvailable_'; // Proxy not available for "aolreader" & "feedly". Not yet implemented.
                 }
                     
-                _iconDelete = '<button _id_="' + _feed._myDomId + '" action="delete" account="' + _account + '" feedId="' + _feed.feed._myFeedId + '"><span data-icon="delete"></span></button>';
+                _iconDelete = '<button _id_="' + _feed._myDomId + '" action="delete" account="' + _account + '" feedId="' + _feed.feed._myFeedId + '"><span action="delete" data-icon="delete"></span></button>';
             }
 
             var _myLastPublishedDate = (_feed._myLastTimestamp == 0) ? "No news" : _feed._myLastPublishedDate;
