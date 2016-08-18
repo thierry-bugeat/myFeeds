@@ -2034,20 +2034,32 @@
             var _srcDoc = "";
             var _regex = new RegExp('\'', 'g');
             var _author = "";
+            var _enclosure = '';
             
+            // enclosure image
+            
+            if ((typeof _entry.enclosure !== 'undefined') && (_entry.enclosure.link != "")) {
+                _enclosure = "<div class=\"entry-enclosure\"><img src=\"" + _entry.enclosure.link + "\" /></div>";
+            } /*else if (_entry['_myFirstImageUrl'] != "") { 
+                _enclosure = "<div class=\"entry-enclosure\"><img src=\"" + _entry['_myFirstImageUrl'] + "\" /></div>";
+            }*/
+
             //my.log('mainEntryOpenInBrowser()', _entry.content);
 
             if (_entry.author !== "") {
-                _author = '<div class="entrie-author"><my data-l10n-id="by">' + document.webL10n.get('by') + '</my> ' + _entry.author + '</div>';
+                _author = '<div class="entry-author"><my data-l10n-id="by">' + document.webL10n.get('by') + '</my> ' + _entry.author + '</div>';
             }
 
             _srcDoc = _srcDoc + _srcDocCss; // Inline CSS from file "style/inline.css.js"
+            _srcDoc = _srcDoc + _enclosure;
+            _srcDoc = _srcDoc + '<div class="entry">';
+            _srcDoc = _srcDoc + '<div class="entrie-feed-title"><a href="' + _entry._myFeedInformations.link + '">' + _entry._myFeedInformations.title.replace(_regex, "&#39;") + '</a></div>';
             _srcDoc = _srcDoc + '<div class="entrie-title">' + _entry.title.replace(_regex, "&#39;") + '</div>';
             _srcDoc = _srcDoc + '<div class="entrie-date">' + new Date(_entry.publishedDate).toLocaleString(userLocale) + '</div>';
             _srcDoc = _srcDoc + _author;
-            _srcDoc = _srcDoc + '<div class="entrie-feed-title"><a href="' + _entry._myFeedInformations.link + '">' + _entry._myFeedInformations.title.replace(_regex, "&#39;") + '</a></div>';
             _srcDoc = _srcDoc + '<div class="entrie-contentSnippet">' + _entry.content.replace(_regex, "&#39;") + '</div>';
             _srcDoc = _srcDoc + '<div class="entrie-visit-website"><a href="' + _entry.link + '"><my data-l10n-id="entry-visit-website">' + document.webL10n.get('entry-visit-website') + '</my></a></div>';
+            _srcDoc = _srcDoc + '</div>';
 
             ui.echo("browser", '<iframe srcdoc=\'' + _srcDoc + '\' sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
         }
@@ -2400,7 +2412,8 @@
                     no();
                 }
             }
-            xhr.open("GET", "https://duckduckgo.com/?" + (new Date()).getTime(), true);
+            //xhr.open("GET", "https://duckduckgo.com/?" + (new Date()).getTime(), true);
+            xhr.open("GET", (sp.getServers())[sp.getServerId()].url + "LICENSE.txt?" + (new Date()).getTime(), true);
             xhr.send();
         }
 

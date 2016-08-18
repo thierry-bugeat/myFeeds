@@ -33,9 +33,9 @@ var SimplePie = function() {
         "v"             : "1.0" ,                                                   // Google API version
         "scoring"       : "h",                                                      // Include historical entries
         "servers"       : [
-            {"id": 0, "name": "SimplePie @ Amazon EC2",     "url": "http://54.229.143.103/simplepie/?" }, 
-            {"id": 1, "name": "SimplePie @ OVH",            "url": "http://quiksiivjq.cluster002.ovh.net/simplepie/?" },
-            {"id": 2, "name": "SimplePie @ Home eeepc701",  "url": "http://thierry.bugeat.com/simplepie/?" }
+            {"id": 0, "name": "SimplePie @ Amazon EC2",     "url": "http://54.229.143.103/simplepie/" }, 
+            {"id": 1, "name": "SimplePie @ OVH",            "url": "http://quiksiivjq.cluster002.ovh.net/simplepie/" },
+            {"id": 2, "name": "SimplePie @ Home eeepc701",  "url": "http://thierry.bugeat.com/simplepie/" }
         ],
         "serverId"      : 0,
         "method"        : "GET"
@@ -132,11 +132,21 @@ SimplePie.prototype._sortEntries       = function() {
     _MyFeeds.log(this.gf_sortedEntries);
 }
 
+/**
+ * Sort feeds
+ * @param {null}
+ * @returns {null}
+ */
 SimplePie.prototype._sortFeeds = function() { 
     this.sortedFeeds = this.unsortedFeeds;
     this.sortedFeeds.sort(function(a, b){ return b.title < a.title });
 }
 
+/**
+ * Set num
+ * @param {int} num - Number of entries to download
+ * @returns {null}
+ */
 SimplePie.prototype._setNum = function(num) { 
     if (num == "Infinity") {
         this.gf.num = 1;
@@ -149,6 +159,11 @@ SimplePie.prototype._setNum = function(num) {
     }
 }
 
+/**
+ * 
+ * @param {array} myFeedsSubscriptions
+ * @returns {null}
+ */
 SimplePie.prototype.setFeedsSubscriptions = function(myFeedsSubscriptions) { 
     _MyFeeds.log('SimplePie.prototype.setFeedsSubscriptions()', arguments);
     
@@ -173,8 +188,9 @@ SimplePie.prototype.setNbFeedsLoaded = function() {
  * Entries (news) are added by feed.
  * Feeds are loaded randomly.
  * Entries are added once ONE feed has been downloaded.
- * */
-
+ * @param {object} entries
+ * @return {null}
+ */
 SimplePie.prototype.addEntries = function(entries) {
     var start = performance.now();
     _MyFeeds.log('SimplePie.prototype.addEntries', arguments);
@@ -202,17 +218,19 @@ SimplePie.prototype.addEntries = function(entries) {
             
             _entry.content = _entry.content.replace(/src="\/\//g, 'src="http:\/\/');
             
-            // 1st image extraction
+            // 1st image extraction from enclosure or content
             
             _entry['_myFirstImageUrl'] = "";
         
             var _results    = [];
             var _imageUrl   = '';
-            var _regex      = /<img[^>]+src="(http(|s):\/\/[^">]+(?!gif))/g
+            var _regex      = /<img[^>]+src="(http(|s):\/\/[^">]+(?!gif))/g;
 
             _results    = _regex.exec(_entry.content);
             
-            if ((_results !== null) && (Boolean(_results[1]))) { 
+            if ((typeof _entry.enclosure !== 'undefined') && (_entry.enclosure.link)) {
+                _entry['_myFirstImageUrl'] = _entry.enclosure.link;
+            } else if ((_results !== null) && (Boolean(_results[1]))) { 
                 _entry['_myFirstImageUrl'] = _results[1];
             }
 
@@ -270,10 +288,10 @@ SimplePie.prototype.addEntries = function(entries) {
 
 /**
  * Delete entries for specified account & feed
- * @param {string} account "local", "feedly", "theoldreader"...
- * @param {string} feedId or empty value "" for all feeds
- * */
-
+ * @param {string} account - "local", "feedly", "theoldreader"...
+ * @param {string} feedId - Feed ID or empty value "" for all feeds
+ * @return {null}
+ */
 SimplePie.prototype.deleteEntries = function(account, feedId) {
     _MyFeeds.log('deleteEntries(' + account + ', ' + feedId + ')');
     
@@ -463,7 +481,7 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
 
             this._setNum(1 + Math.floor(_myFeed.pulsations * nbDaysToLoad)); // Pulsations = Estimation of news per day.
 
-            var _urlParams = 'url=' + encodeURIComponent(this.gf.q) + '&num=' + this.gf.num;
+            var _urlParams = '?url=' + encodeURIComponent(this.gf.q) + '&num=' + this.gf.num;
             var _url    = this.gf.servers[this.gf.serverId].url + _urlParams;
 
             if (params.settings.proxy.use) {
@@ -543,7 +561,7 @@ SimplePie.prototype.isValidUrl = function(url) {
     _MyFeeds.log('SimplePie.prototype.isValidUrl()', arguments);
     
     return new Promise(function(resolve, reject) {
-        var _urlParams  = 'url=' + encodeURIComponent(url) + '&num=1';
+        var _urlParams  = '?url=' + encodeURIComponent(url) + '&num=1';
         var _url        = _SimplePie.gf.servers[_SimplePie.gf.serverId].url + _urlParams;
         
         var promise = _SimplePie.get(_url, {});
@@ -667,8 +685,8 @@ SimplePie.prototype.isSmallEntry = function (entry) {
 
 /**
  * Set timestamp max from most recent news
+ * @return {null}
  * */
-
 SimplePie.prototype._setTimestampMax = function () {
     _MyFeeds.log('SimplePie.prototype._setTimestampMax()');
 
@@ -683,16 +701,17 @@ SimplePie.prototype._setTimestampMax = function () {
 
 /**
  * Get timestamp max of most recent news
- * */
- 
+ * @return {Number|_timestampMax}
+ */
 SimplePie.prototype._getTimestampMax = function () {
     return this.timestampMax;
 }
 
 /**
  * Set timestamp min. Beginning of the day.
- * */
- 
+ * @param {null}
+ * @return {null}
+ */
 SimplePie.prototype._setTimestampMin = function () {
     
     var _now    = new Date();
@@ -707,8 +726,8 @@ SimplePie.prototype._setTimestampMin = function () {
 
 /**
  * Get timestamp min. Beginning of the day.
- * */
- 
+ * @return {int}
+ */
 SimplePie.prototype._getTimestampMin = function () {
     return this.timestampMin;
 }
