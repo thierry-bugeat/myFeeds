@@ -548,6 +548,13 @@
             document.getElementById('formSearchEntries').classList.add('_show');
             document.getElementById('inputSearchEntries').focus();
             _search(document.getElementById('inputSearchEntries').value);
+            
+            // Show search form containing an existing keyword
+            try {
+                ui.colorize(document.getElementById('inputSearchEntries').value);
+            } catch (error) {
+            }
+
         } else {
             dom['screens']['entries']['scroll'].style.height = "calc(100% - 13.5rem)";
             searchEntries.classList.remove('enable-fxos-blue');
@@ -555,11 +562,18 @@
             document.getElementById('formSearchEntries').classList.remove('_show');
             document.getElementById('formSearchEntries').classList.add('_hide');
             _search('');
+
+            // Hide search form containing an existing keyword
+            try {
+                ui.uncolorize(document.getElementById('inputSearchEntries').value);
+            } catch (error) {
+            }
         }
 
     }
     
     resetSearchEntries.onclick = function() {
+        ui.uncolorize('keywords');
         ui._vibrate();
         _search('');
     }
@@ -1567,13 +1581,13 @@
         if (keywords.length > 0) {
             var _sortedKeywords = keywords.sort();
             
-            _htmlKeywords = _htmlKeywords + '<h2 data-l10n-id="search-by-keywords">' + document.webL10n.get('search-by-keywords') + '</h2><ul class="keywords">';
+            _htmlKeywords = _htmlKeywords + '<h2 data-l10n-id="search-by-keywords">' + document.webL10n.get('search-by-keywords') + '</h2><ul id="keywords" class="keywords">';
             
             for (var i = 0; i < _sortedKeywords.length; i++) {
                 var _iconPulsations = (params.feeds.count) ? 
                     '<count class="">'+count(_sortedKeywords[i])+'</count>' : 
                     '<button><span data-icon="'+sp.getIconPulsations(count(_sortedKeywords[i]))+'"></span></button>';
-                var _iconDelete = '<button class="deleteKeyword" action="delete" myKeyword="' + _sortedKeywords[i] + '"><span data-icon="delete"></span></button>';
+                var _iconDelete = '<button class="deleteKeyword" action="delete" myKeyword="' + _sortedKeywords[i] + '"><span data-icon="delete" action="delete" myKeyword="' + _sortedKeywords[i] + '"></span></button>';
                 _htmlKeywords = _htmlKeywords + '<li id="' + _sortedKeywords[i] + '" action="open" type="keyword" value="' +  _sortedKeywords[i] + '" account=""><a _id_="' + _sortedKeywords[i] + '" ><p _id_="' + _sortedKeywords[i] + '">' + _iconDelete + _iconPulsations + '<my>' + _sortedKeywords[i] + '</my></p></a></li>';
             }
             
@@ -1605,7 +1619,7 @@
                     _class = _class + ' _proxyNotAvailable_'; // Proxy not available for "aolreader" & "feedly". Not yet implemented.
                 }
                     
-                _iconDelete = '<button _id_="' + _feed._myDomId + '" action="delete" account="' + _account + '" feedId="' + _feed.feed._myFeedId + '"><span action="delete" data-icon="delete"></span></button>';
+                _iconDelete = '<button _id_="' + _feed._myDomId + '" action="delete" account="' + _account + '" feedId="' + _feed.feed._myFeedId + '"><span action="delete" account="' + _account + '" feedId="' + _feed.feed._myFeedId + '" data-icon="delete"></span></button>';
             }
 
             var _myLastPublishedDate = (_feed._myLastTimestamp == 0) ? "No news" : _feed._myLastPublishedDate;
@@ -2057,7 +2071,7 @@
             _srcDoc = _srcDoc + '<div class="entrie-title">' + _entry.title.replace(_regex, "&#39;") + '</div>';
             _srcDoc = _srcDoc + '<div class="entrie-date">' + new Date(_entry.publishedDate).toLocaleString(userLocale) + '</div>';
             _srcDoc = _srcDoc + _author;
-            _srcDoc = _srcDoc + '<div class="entrie-contentSnippet">' + _entry.content.replace(_regex, "&#39;") + '</div>';
+            _srcDoc = _srcDoc + '<div class="entry-contentSnippet">' + _entry.content.replace(_regex, "&#39;") + '</div>';
             _srcDoc = _srcDoc + '<div class="entrie-visit-website"><a href="' + _entry.link + '"><my data-l10n-id="entry-visit-website">' + document.webL10n.get('entry-visit-website') + '</my></a></div>';
             _srcDoc = _srcDoc + '</div>';
 
@@ -2500,7 +2514,7 @@
         document.getElementById("feeds-list").onclick = function(e) {
             var _this = e.target;
             
-            var _domId      = _this.getAttribute('id') || _this.getAttribute('_id_') || _this.parentNode.getAttribute('_id_');
+            var _domId      = _this.getAttribute('id') || _this.getAttribute('_id_') || _this.parentNode.getAttribute('_id_') || _this.parentNode.parentNode.getAttribute('_id_');
             var _li         = document.getElementById(_domId);
 
             var _account    = _li.getAttribute('account');   // local, feedly, etc...
@@ -2589,14 +2603,17 @@
        
         // Keyboard
         
-        window.addEventListener("keydown", function (event) {
-            if (event.keyCode == 13) {
-                if (document.activeElement.id == "inputSearchEntries") {
+        window.addEventListener("keyup", function (event) {
+            if (document.activeElement.id == "inputSearchEntries") {
+                if (event.keyCode == 13) {
                     event.stopPropagation();
                     event.preventDefault();
                     document.getElementById('inputSearchEntries').blur(); // Remove focus
                     _search(document.activeElement.value);
                 }
+                // Try to colorize an existing keyword following input value
+                ui.uncolorize('keywords');
+                try {ui.colorize(inputSearchEntries.value);} catch (error) {}
             }
         }, true);
  

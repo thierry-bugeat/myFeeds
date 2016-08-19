@@ -485,6 +485,10 @@ MyUi.prototype.colorize = function (_domElement) {
  * @return {null}
  * */
 MyUi.prototype.uncolorize = function (_domId) {
+    try {
+        document.getElementById(_domId).classList.remove('colorize');
+    } catch (error) {}
+
     var _childs = document.getElementById(_domId).querySelectorAll("*");
     for (var i = 0; i < _childs.length; i++) {
         _childs[i].classList.remove('colorize');
