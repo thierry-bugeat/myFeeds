@@ -38,6 +38,34 @@ section[role="mySubEntry"] > header span:nth-child(2) {
     text-align:right;
 }
 
+#main-entry-container{
+    display:block;
+    width:50%;
+    height:100%;
+    /*margin:0px auto;*/
+    /*position: fixed;*/
+    top:0%;
+    left:300%;
+    background: var(--fxos-ivory);
+    z-index:10;
+    box-sizing: border-box;
+}
+
+#main-entry-container > #main-entry{
+    box-sizing: border-box;
+    padding:0;
+    width:100%;
+    height: calc(100% - 13.5rem);
+    background-color: var(--fxos-white);
+    overflow:hidden;
+}
+
+#main-entry-container > #main-entry > #content {
+    max-width: 100%;
+    padding: var(--my-spacing);
+    margin:0;
+}
+
 #main-entry-container h1 {
     color: var(--fxos-white);
 }
