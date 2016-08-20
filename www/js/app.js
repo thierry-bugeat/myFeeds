@@ -629,6 +629,13 @@
 
             var _tmp = [];
 
+            // (0) If user is deleting current selected keyword
+                
+            if (_myKeyword == params.feeds.selectedKeyword.value) {
+                params.feeds.selectedKeyword.value = "";
+                params.feeds.selectedKeyword.domId = "";
+            }
+
             // (1) Delete myKeyword from array "keyword"
 
             for (var i = 0; i < keywords.length; i++) {
@@ -2671,6 +2678,9 @@
                     keywords.push(_myKeyword);
                     _saveKeywords();
                     
+                    params.feeds.selectedKeyword.value = _myKeyword;
+                    params.feeds.selectedKeyword.domId = _myKeyword;
+
                     // Reload UI
                     
                     liveValues['entries']['search']['visible'] = true;
