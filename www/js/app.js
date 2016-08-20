@@ -528,17 +528,19 @@
     
     /**
      * Open form to do a search
-     * @param {null}
+     * @param {focus} boolean Set focus hover input field.
      * @return {null}
      */
-    function _searchEntriesOpen() {
+    function _searchEntriesOpen(focus) {
         liveValues['entries']['search']['visible'] = true;
         dom['screens']['entries']['scroll'].style.height = "calc(100% - 17.5rem)";
         searchEntries.classList.remove('enable-fxos-white');
         searchEntries.classList.add('enable-fxos-blue');
-        document.getElementById('formSearchEntries').classList.remove('_hide');
-        document.getElementById('formSearchEntries').classList.add('_show');
-        document.getElementById('inputSearchEntries').focus();
+        formSearchEntries.classList.remove('_hide');
+        formSearchEntries.classList.add('_show');
+        if (focus) {
+            document.getElementById('inputSearchEntries').focus();
+        }
         _search(document.getElementById('inputSearchEntries').value);
         // Show keyword from input value
         ui.colorize(document.getElementById('inputSearchEntries').value);
@@ -573,7 +575,7 @@
         } else if (!liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_show")) {
         }
         
-        (liveValues['entries']['search']['visible']) ? _searchEntriesOpen() : _searchEntriesClose();
+        (liveValues['entries']['search']['visible']) ? _searchEntriesOpen(true) : _searchEntriesClose();
     }
     
     resetSearchEntries.onclick = function() {
@@ -2543,9 +2545,11 @@
                 params.entries.nbDaysAgo = 0;
                 params.feeds.selectedKeyword.value = _value;
                 params.feeds.selectedKeyword.domId = _domId;
-                // Perform a search on keyword
+                // Set a search on keyword after displaying entries
+                liveValues['entries']['search']['visible'] = true;
                 document.getElementById('inputSearchEntries').value = _value;
-                _searchEntriesOpen();
+                // ---
+                dspEntries();
             }
 
             // Open feed
@@ -2634,9 +2638,9 @@
         
         document.body.addEventListener('dspEntries.done', function(event){
             if (liveValues['entries']['search']['visible']) {
-                _searchEntriesOpen();
+                _searchEntriesOpen(false); // No focus
                 _search(document.getElementById('inputSearchEntries').value);
-            }
+            } 
         });
 
         // Search on input change
