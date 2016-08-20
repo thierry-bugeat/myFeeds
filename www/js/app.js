@@ -31,12 +31,17 @@
     var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': [], 'tinytinyrss': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 2.43,                        // Don't forget to increase this value if you do changes in "params" object
+        "version": 2.45,                        // Don't forget to increase this value if you do changes in "params" object
         "changelog": "https://git.framasoft.org/thierry-bugeat/myFeeds/raw/master/CHANGELOG",
         "feeds": {
             "selectedFeed": {
                 "url": "",                      // Display all feeds if empty otherwise display specified feed url
-                "account": ""
+                "account": "",                  // (See also "liveValues.sync.selectedFeed")
+                "domId": ""
+            },
+            "selectedKeyword": {
+                "value": "",
+                "domId": ""
             },                 
             "defaultPulsations": 5,             // Default feed pulsations
             "count": false                      // Display count of entries in feeds list.
@@ -107,11 +112,6 @@
             "min": -1,                          // Timestamp value beyond which an entry can't be displayed (Too old). Set by function "_setTimestamps()"
             "max": -1                           // End of current day (23:59:59). Set by function "_setTimestamps()"
         },
-        "dom" : {
-            "highlights": {
-                "feed": ""                      // Store setected DOM id
-            }
-        },
         "entries": {
             "id": {
                 "min": -1,                      // Set by function "setEntriesIds"
@@ -139,9 +139,9 @@
             "timestamps": {
                 "max": -1
             },
-            "selectedFeed": {
+            "selectedFeed": {                   // (See also "params.feeds.selectedFeed")
                 "url": "",
-                "account": ""
+                "account": ""                
             }
         },
         "screens": {
@@ -526,6 +526,41 @@
         }
     }
     
+    /**
+     * Open form to do a search
+     * @param {null}
+     * @return {null}
+     */
+    function _searchEntriesOpen() {
+        liveValues['entries']['search']['visible'] = true;
+        dom['screens']['entries']['scroll'].style.height = "calc(100% - 17.5rem)";
+        searchEntries.classList.remove('enable-fxos-white');
+        searchEntries.classList.add('enable-fxos-blue');
+        document.getElementById('formSearchEntries').classList.remove('_hide');
+        document.getElementById('formSearchEntries').classList.add('_show');
+        document.getElementById('inputSearchEntries').focus();
+        _search(document.getElementById('inputSearchEntries').value);
+        // Show keyword from input value
+        ui.colorize(document.getElementById('inputSearchEntries').value);
+    }
+
+    /**
+     * Close form to do a search
+     * @param {null}
+     * @return {null}
+     */
+    function _searchEntriesClose() {
+        liveValues['entries']['search']['visible'] = false;
+        dom['screens']['entries']['scroll'].style.height = "calc(100% - 13.5rem)";
+        searchEntries.classList.remove('enable-fxos-blue');
+        searchEntries.classList.add('enable-fxos-white');
+        document.getElementById('formSearchEntries').classList.remove('_show');
+        document.getElementById('formSearchEntries').classList.add('_hide');
+        _search('');
+        // Hide keyword from input value
+        ui.uncolorize(document.getElementById('inputSearchEntries').value);
+    }
+
     searchEntries.onclick = function(string) {
         
         ui._vibrate();
@@ -538,41 +573,12 @@
         } else if (!liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_show")) {
         }
         
-        //liveValues['entries']['search']['visible'] = !liveValues['entries']['search']['visible'];
-        
-        if (liveValues['entries']['search']['visible']) {
-            dom['screens']['entries']['scroll'].style.height = "calc(100% - 17.5rem)";
-            searchEntries.classList.remove('enable-fxos-white');
-            searchEntries.classList.add('enable-fxos-blue');
-            document.getElementById('formSearchEntries').classList.remove('_hide');
-            document.getElementById('formSearchEntries').classList.add('_show');
-            document.getElementById('inputSearchEntries').focus();
-            _search(document.getElementById('inputSearchEntries').value);
-            
-            // Show search form containing an existing keyword
-            try {
-                ui.colorize(document.getElementById('inputSearchEntries').value);
-            } catch (error) {
-            }
-
-        } else {
-            dom['screens']['entries']['scroll'].style.height = "calc(100% - 13.5rem)";
-            searchEntries.classList.remove('enable-fxos-blue');
-            searchEntries.classList.add('enable-fxos-white');
-            document.getElementById('formSearchEntries').classList.remove('_show');
-            document.getElementById('formSearchEntries').classList.add('_hide');
-            _search('');
-
-            // Hide search form containing an existing keyword
-            try {
-                ui.uncolorize(document.getElementById('inputSearchEntries').value);
-            } catch (error) {
-            }
-        }
-
+        (liveValues['entries']['search']['visible']) ? _searchEntriesOpen() : _searchEntriesClose();
     }
     
     resetSearchEntries.onclick = function() {
+        params.feeds.selectedKeyword.value = "";
+        params.feeds.selectedKeyword.domId = "";
         ui.uncolorize('keywords');
         ui._vibrate();
         _search('');
@@ -1637,7 +1643,7 @@
         
         for (var _account in _html) {
             if ((_html[_account] != "") && (_account != "undefined")) {
-                _htmlFeeds = _htmlFeeds + '<h2>' + params.accounts[_account].title + '</h2><ul class="' + _account + '">' + _html[_account] + '</ul>';
+                _htmlFeeds = _htmlFeeds + '<h2>' + params.accounts[_account].title + '</h2><ul id="' + _account + '" class="' + _account + '">' + _html[_account] + '</ul>';
             } else {
                 my.log('dspFeeds() Can\'t add account "'+ _account+'"');
             }
@@ -1650,7 +1656,8 @@
         // --- Hightlight selected feed or keyword ---
 
         ui.uncolorize('feeds-list');
-        ui.colorize(liveValues.dom.highlights.feed);
+        ui.colorize(params.feeds.selectedFeed.domId);
+        ui.colorize(params.feeds.selectedKeyword.domId);
                 
         // =========================
         // --- App start offline ---
@@ -1669,7 +1676,9 @@
      * Only "box" of entries are displayed.
      * Content of entries are displayed when entries are in viewport.
      * See function "showEntries" in class "MyUi"
-     * */
+     * After rendering a search can be processed using keyword value.
+     * @return {customEvent} "dspEntries.done"
+     */
     function dspEntries() {
 
         var entries = sp.getEntries();
@@ -2522,31 +2531,34 @@
             var _type       = _li.getAttribute('type');      // keyword, feed
             var _value      = _li.getAttribute('value');
 
-            // Highlight selected feed
-
-            liveValues.dom.highlights.feed = _domId; 
-            ui.uncolorize('feeds-list');
-            ui.colorize(liveValues.dom.highlights.feed);
-            
             // Open keyword
 
             if ((_action === 'open') && (_type === 'keyword') && (_value !== '')) {
-                liveValues['entries']['search']['visible'] = true;
+                ui.uncolorize('keywords');
+                ui.colorize(_value);
                 ui._vibrate();
                 ui._scrollTo(0);
                 ui._onclick(nextDay, 'disable');
                 ui._onclick(previousDay, 'enable');
                 params.entries.nbDaysAgo = 0;
-                params.feeds.selectedFeed.url = "";
-                params.feeds.selectedFeed.account = "";
+                params.feeds.selectedKeyword.value = _value;
+                params.feeds.selectedKeyword.domId = _domId;
+                // Perform a search on keyword
                 document.getElementById('inputSearchEntries').value = _value;
-                dspEntries();
+                _searchEntriesOpen();
             }
 
             // Open feed
             
             if ((_action === 'open') && (_type === 'feed')) {
-                liveValues['entries']['search']['visible'] = false;
+                // @todo Change these 6 lines
+                try {ui.uncolorize('_');} catch(e) {};
+                try {ui.uncolorize('local');} catch(e) {};
+                try {ui.uncolorize('aolreader');} catch(e) {};
+                try {ui.uncolorize('feedly');} catch(e) {};
+                try {ui.uncolorize('theoldreader');} catch(e) {};
+                try {ui.uncolorize('tinytinyrss');} catch(e) {};
+                ui.colorize(_domId);
                 ui._vibrate();
                 ui._scrollTo(0);
                 ui._onclick(nextDay, 'disable');
@@ -2554,7 +2566,7 @@
                 params.entries.nbDaysAgo = 0;
                 params.feeds.selectedFeed.url = _value;
                 params.feeds.selectedFeed.account = _account;
-                document.getElementById('inputSearchEntries').value = "";
+                params.feeds.selectedFeed.domId = _domId;
                 _saveParams();
                 dspEntries();
             }
@@ -2613,7 +2625,7 @@
                 }
                 // Try to colorize an existing keyword following input value
                 ui.uncolorize('keywords');
-                try {ui.colorize(inputSearchEntries.value);} catch (error) {}
+                ui.colorize(inputSearchEntries.value);
             }
         }, true);
  
@@ -2622,12 +2634,7 @@
         
         document.body.addEventListener('dspEntries.done', function(event){
             if (liveValues['entries']['search']['visible']) {
-                dom['screens']['entries']['scroll'].style.height = "calc(100% - 17.5rem)";
-                searchEntries.classList.remove('enable-fxos-white');
-                searchEntries.classList.add('enable-fxos-blue');
-                document.getElementById('formSearchEntries').classList.remove('_hide');
-                document.getElementById('formSearchEntries').classList.add('_show');
-                //_search(''); // @todo Test to display all entries
+                _searchEntriesOpen();
                 _search(document.getElementById('inputSearchEntries').value);
             }
         });
@@ -2639,6 +2646,14 @@
             _search(_searchString);
         });
         
+        // test
+        document.getElementById('inputSearchEntries').addEventListener('onchange', function(){
+            window.alert('ici');
+            var _searchString = document.getElementById('inputSearchEntries').value;
+            _search(_searchString);
+        });
+        
+
         // Add keyword
         
         addKeyword.onclick = function() {
@@ -2907,7 +2922,6 @@
                         dspEntries();
                     }
                     dspFeeds(sp.getFeeds());
-                    //dspSettings();
                     updateFeedsPulsations();
                 }
                 
