@@ -1666,8 +1666,10 @@
 
         ui.uncolorize('feeds-list');
         ui.colorize(params.feeds.selectedFeed.domId);
-        ui.colorize(params.feeds.selectedKeyword.domId);
-                
+        if (liveValues['entries']['search']['visible']) {
+            ui.colorize(params.feeds.selectedKeyword.domId);
+        }
+
         // =========================
         // --- App start offline ---
         // =========================
