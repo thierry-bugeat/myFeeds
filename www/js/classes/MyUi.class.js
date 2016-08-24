@@ -644,12 +644,49 @@ MyUi.prototype.isInViewport = function (element) {
     return rect.bottom > 0 && rect.top < windowHeight && rect.right > 0 && rect.left < windowWidth
 }
 
+/* ============== */
+/* --- Search --- */
+/* ============== */
+
+/**
+ * Open form to do a search
+ * @param {focus} boolean Set focus hover input field.
+ * @return {null}
+ */
+MyUi.prototype._searchEntriesOpen = function(focus) {
+    liveValues['entries']['search']['visible'] = true;
+    dom['screens']['entries']['scroll'].style.height = "calc(100% - 17.5rem)";
+    searchEntries.classList.remove('enable-fxos-white');
+    searchEntries.classList.add('enable-fxos-blue');
+    formSearchEntries.classList.remove('_hide');
+    formSearchEntries.classList.add('_show');
+    if (focus) {
+        document.getElementById('inputSearchEntries').focus();
+    }
+    _search(document.getElementById('inputSearchEntries').value);
+    // Show keyword from input value
+    ui.colorize(document.getElementById('inputSearchEntries').value);
+}
+
+/**
+ * Close form to do a search
+ * @param {null}
+ * @return {null}
+ */
+MyUi.prototype._searchEntriesClose = function() {
+    liveValues['entries']['search']['visible'] = false;
+    dom['screens']['entries']['scroll'].style.height = "calc(100% - 13.5rem)";
+    searchEntries.classList.remove('enable-fxos-blue');
+    searchEntries.classList.add('enable-fxos-white');
+    document.getElementById('formSearchEntries').classList.remove('_show');
+    document.getElementById('formSearchEntries').classList.add('_hide');
+    _search('');
+    _MyUi.uncolorize(document.getElementById('inputSearchEntries').value); // Hide keyword from input value
+}
+
 /* ================= */
 /* --- UI Events --- */
 /* ================= */
-
-settingsOpen.onclick    = function(event) {ui._vibrate(); ui._translate(dom['screens']['settings'], 'left');}
-settingsClose.onclick   = function(event) {ui._vibrate(); ui._translate(dom['screens']['settings'], 'right');}
 
 menu.onclick            = function(event) {
     ui._vibrate();
@@ -658,7 +695,37 @@ menu.onclick            = function(event) {
 
 closeFeedsList.onclick  = function(event) {ui._vibrate(); ui._scrollTo(0);}
 
-/* Class _startAnimation_ */
+/* --- Events Settings --- */
+
+settingsOpen.onclick    = function(event) {ui._vibrate(); ui._translate(dom['screens']['settings'], 'left');}
+settingsClose.onclick   = function(event) {ui._vibrate(); ui._translate(dom['screens']['settings'], 'right');}
+
+/* --- Events Search --- */
+
+searchEntries.onclick = function(string) {
+
+    _MyUi._vibrate();
+
+    if (liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_hide")) {
+    } else if (liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_show")) {
+        liveValues['entries']['search']['visible'] = !liveValues['entries']['search']['visible'];
+    } else if (!liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_hide")) {
+        liveValues['entries']['search']['visible'] = !liveValues['entries']['search']['visible'];
+    } else if (!liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_show")) {
+    }
+
+    (liveValues['entries']['search']['visible']) ? _MyUi._searchEntriesOpen(true) : _MyUi._searchEntriesClose();
+}
+
+resetSearchEntries.onclick = function() {
+    params.feeds.selectedKeyword.value = "";
+    params.feeds.selectedKeyword.domId = "";
+    _MyUi.uncolorize('keywords');
+    _MyUi._vibrate();
+    _search('');
+}
+
+/* --- Events Animations  --- */
 
 var _animations = document.querySelectorAll("._startAnimation_");
 
@@ -671,8 +738,6 @@ for (var i = 0; i < _animations.length; i++) {
         }
     }
 }
-
-/* Detect end of animation */
 
 document.addEventListener("transitionend", function(){liveValues.animations.inProgress = false;}, false);
 

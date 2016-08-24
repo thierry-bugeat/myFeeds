@@ -526,66 +526,6 @@
         }
     }
     
-    /**
-     * Open form to do a search
-     * @param {focus} boolean Set focus hover input field.
-     * @return {null}
-     */
-    function _searchEntriesOpen(focus) {
-        liveValues['entries']['search']['visible'] = true;
-        dom['screens']['entries']['scroll'].style.height = "calc(100% - 17.5rem)";
-        searchEntries.classList.remove('enable-fxos-white');
-        searchEntries.classList.add('enable-fxos-blue');
-        formSearchEntries.classList.remove('_hide');
-        formSearchEntries.classList.add('_show');
-        if (focus) {
-            document.getElementById('inputSearchEntries').focus();
-        }
-        _search(document.getElementById('inputSearchEntries').value);
-        // Show keyword from input value
-        ui.colorize(document.getElementById('inputSearchEntries').value);
-    }
-
-    /**
-     * Close form to do a search
-     * @param {null}
-     * @return {null}
-     */
-    function _searchEntriesClose() {
-        liveValues['entries']['search']['visible'] = false;
-        dom['screens']['entries']['scroll'].style.height = "calc(100% - 13.5rem)";
-        searchEntries.classList.remove('enable-fxos-blue');
-        searchEntries.classList.add('enable-fxos-white');
-        document.getElementById('formSearchEntries').classList.remove('_show');
-        document.getElementById('formSearchEntries').classList.add('_hide');
-        _search('');
-        // Hide keyword from input value
-        ui.uncolorize(document.getElementById('inputSearchEntries').value);
-    }
-
-    searchEntries.onclick = function(string) {
-        
-        ui._vibrate();
-        
-        if (liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_hide")) {
-        } else if (liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_show")) {
-            liveValues['entries']['search']['visible'] = !liveValues['entries']['search']['visible'];
-        } else if (!liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_hide")) {
-            liveValues['entries']['search']['visible'] = !liveValues['entries']['search']['visible'];
-        } else if (!liveValues['entries']['search']['visible'] && document.getElementById('formSearchEntries').classList.contains("_show")) {
-        }
-        
-        (liveValues['entries']['search']['visible']) ? _searchEntriesOpen(true) : _searchEntriesClose();
-    }
-    
-    resetSearchEntries.onclick = function() {
-        params.feeds.selectedKeyword.value = "";
-        params.feeds.selectedKeyword.domId = "";
-        ui.uncolorize('keywords');
-        ui._vibrate();
-        _search('');
-    }
-
     nextDay.onclick = function(event) {
         ui._vibrate();
         if (params.entries.nbDaysAgo > 0 ) {
@@ -1934,15 +1874,20 @@
                 ui.echo("feeds-entries-content", _htmlEntries, "prepend");
             } else {
                 if (params.entries.displaySmallEntries && ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) > 0)) {
-                    ui.echo("feeds-entries-content", _htmlFeedTitle + _htmlEntries, "");
+                    ui.echo("feeds-entries-top", _htmlFeedTitle, "");
+                    ui.echo("feeds-entries-content", _htmlEntries, "");
                 } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] > 0)) {
-                    ui.echo("feeds-entries-content", _htmlFeedTitle + _htmlEntries, "");
+                    ui.echo("feeds-entries-top", _htmlFeedTitle, "");
+                    ui.echo("feeds-entries-content", _htmlEntries, "");
                 } else if (!params.entries.displaySmallEntries && (_nbEntriesDisplayed['large'] == 0)) {
-                    ui.echo("feeds-entries-content", _htmlFeedTitle + '<div class="notification" data-l10n-id="no-news-today">' + document.webL10n.get('no-news-today') + '</div>', "");
+                    ui.echo("feeds-entries-top", _htmlFeedTitle, "");
+                    ui.echo("feeds-entries-content", '<div class="notification" data-l10n-id="no-news-today">' + document.webL10n.get('no-news-today') + '</div>', "");
                 } else if ((_nbEntriesDisplayed['small'] + _nbEntriesDisplayed['large']) == 0) {
-                    ui.echo("feeds-entries-content", _htmlFeedTitle + '<div class="notification" data-l10n-id="no-news-today">' + document.webL10n.get('no-news-today') + '</div>', "");
+                    ui.echo("feeds-entries-top", _htmlFeedTitle, "");
+                    ui.echo("feeds-entries-content", '<div class="notification" data-l10n-id="no-news-today">' + document.webL10n.get('no-news-today') + '</div>', "");
                 } else {
-                    ui.echo("feeds-entries-content", _htmlFeedTitle + '<div class="notification" data-l10n-id="error-no-network-connection">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
+                    ui.echo("feeds-entries-top", _htmlFeedTitle, "");
+                    ui.echo("feeds-entries-content", '<div class="notification" data-l10n-id="error-no-network-connection">' + document.webL10n.get('error-no-network-connection') + '</div>', "");
                 } 
             }
             
@@ -2647,7 +2592,7 @@
         
         document.body.addEventListener('dspEntries.done', function(event){
             if (liveValues['entries']['search']['visible']) {
-                _searchEntriesOpen(false); // No focus
+                ui._searchEntriesOpen(false); // No focus
                 _search(document.getElementById('inputSearchEntries').value);
             } 
         });

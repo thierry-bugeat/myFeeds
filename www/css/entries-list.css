@@ -363,8 +363,14 @@
 }
 
 #feeds-entries-top{
-    height: 2px;
+    height: auto;
+    min-height: 2px;
     background: var(--fxos-orange-light);
+}
+
+#feeds-entries-top > h2{
+    margin: 0;
+    padding: var(--my-spacing);
 }
 
 #feeds-entries-content{
