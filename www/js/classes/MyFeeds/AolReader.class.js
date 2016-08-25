@@ -77,6 +77,11 @@ AolReader.prototype.setToken = function(token) {
     }
 }
 
+/**
+ * Get AOL Reader token
+ * @param {null}
+ * @return {string} Token
+ */
 AolReader.prototype.getToken = function() {
     _MyFeeds.log('AolReader.prototype.getToken()');
     return this.aolreader.token;
@@ -85,8 +90,7 @@ AolReader.prototype.getToken = function() {
 /**
  * @param   {null}
  * @return  {CustomEvent} AolReader.login.done | AolReader.login.error
- * */
-
+ */
 AolReader.prototype.login = function() {
     var _url = _AolReader.aolreader.host_auth + '/auth/authorize' +
         '?client_id=' + encodeURIComponent(_AolReader.aolreader.client_id) + 
@@ -163,8 +167,7 @@ AolReader.prototype._loginCallback = function(url) {
 /**
  * @param   {null}
  * @return  {CustomEvent} AolReader.getSubscriptions.done | AolReader.getSubscriptions.error
- * */
-
+ */
 AolReader.prototype.getSubscriptions = function () {
     _MyFeeds.log('AolReader.prototype.getSubscriptions()');
     
@@ -192,8 +195,7 @@ AolReader.prototype.getSubscriptions = function () {
  * Use "refresh_token" to obtain a new "access_token"
  * @param   {null}
  * @return  {CustomEvent} AolReader.getNewToken.done | AolReader.getNewToken.error
- * */
-
+ */
 AolReader.prototype.updateToken = function() {
     _MyFeeds.log('AolReader.prototype.getNewToken()');
     
@@ -232,8 +234,7 @@ AolReader.prototype.updateToken = function() {
 /**
  * @param   {feedId} String Feed url
  * @return  {CustomEvent} AolReader.deleteSubscription.done | AolReader.deleteSubscription.error
- * */
-
+ */
 AolReader.prototype.deleteSubscription = function (feedId) {
     _MyFeeds.log('AolReader.prototype.deleteSubscription()', arguments);
     
@@ -266,8 +267,7 @@ AolReader.prototype.deleteSubscription = function (feedId) {
  * @param string url Url to load.
  * @param object myParams You can retrieve this object in response.
  * 
- * */
- 
+ */
 AolReader.prototype.get = function (url, myParams) {
     _MyFeeds.log('AolReader.prototype.get()', arguments);
     
@@ -311,8 +311,7 @@ AolReader.prototype.get = function (url, myParams) {
  * @param {string} params Url parameters.
  * @param {string} callback.
  * 
- * */
- 
+ */
 AolReader.prototype.post = function (url, params, callback) {
     _MyFeeds.log('AolReader.prototype.post()', arguments);
     

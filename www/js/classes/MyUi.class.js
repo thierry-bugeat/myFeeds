@@ -79,10 +79,10 @@ var MyUi = function() {
 }
 
 MyUi.prototype.init = function() {
-
+    
     _MyUi._onclick(dom.topups['entries'], 'disable');   // Disable "topup" button when application start
     _MyUi._onclick(dom.topups['feeds'], 'disable');     // Disable "topupFeedsList" button when application start
-    _MyUi._onclick(sync, 'disable');                // Disable "sync" button when application start
+    _MyUi._onclick(sync, 'disable');                    // Disable "sync" button when application start
     _MyUi._onclick(nextDay, 'disable');
     
     _MyUi.selectThemeIcon();
@@ -131,7 +131,7 @@ MyUi.prototype.init = function() {
         _MyUi._onclick(dom.topups['feeds'], 'disable'); 
         feeds_list.scrollTop = 0; 
     }
-        
+
     // =======================================
     // --- Button [topup] enable / disable ---
     // =======================================
@@ -176,7 +176,7 @@ MyUi.prototype.init = function() {
         _MyUi._onclick(dom.topups['entries'], 'disable'); 
         dom['screens']['entries']['scroll'].scrollTop = 0; 
     }
-    
+
     // ==============
     // --- Events ---
     // ==============
@@ -185,7 +185,6 @@ MyUi.prototype.init = function() {
 };
 
 MyUi.prototype.bind = function() {
-    
 };
 
 /**
@@ -194,7 +193,7 @@ MyUi.prototype.bind = function() {
  * @param {string} DOM ID element
  * @param {string} "enable", "disable"
  * https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events
- * */
+ */
 MyUi.prototype._onclick = function(_this, pointerEvents) {
     //console.log(_this);
     
@@ -215,7 +214,7 @@ MyUi.prototype._onclick = function(_this, pointerEvents) {
  * Return status of specified element id
  * @param {string} _this
  * @return {string} enable|disable|
- * */
+ */
 MyUi.prototype._status = function(_this) {
     var _status = "";
 
@@ -232,14 +231,14 @@ MyUi.prototype._status = function(_this) {
 
 /**
  * Enable UI elements.
- * */
+ */
 MyUi.prototype._enable = function() {
     _MyUi.toggle('enable');
 }
 
 /**
  * Disable UI elements.
- * */
+ */
 MyUi.prototype._disable = function() {
     _MyUi.toggle('disable');
 }
@@ -247,7 +246,7 @@ MyUi.prototype._disable = function() {
 /**
  * Change opacity of UI elements when network connection change.
  * @param {string} _status "enable", "disable"
- * */
+ */
 MyUi.prototype.toggle = function(_status) {
     
     // ==========================
@@ -291,7 +290,7 @@ MyUi.prototype.toggle = function(_status) {
 /**
  * Change opacity of UI elements when proxy checkbox change.
  * Affect elements with class _proxyNotAvailable_
- * */
+ */
 MyUi.prototype.toggleProxy = function() {
     
     // Enable online accounts when proxy is not used.
@@ -320,16 +319,14 @@ MyUi.prototype.toggleProxy = function() {
  * @param {string} divId    : Div id element
  * @param {string} msg      : Html string to write
  * @param {string} placement: "append", "prepend", ""
- * */
+ */
 MyUi.prototype.echo = function(divId, msg, placement) {
     var _out = document.getElementById(divId);
     if (!_out) { return; }
     
     if (placement == 'prepend') {
-        //_out.innerHTML = msg + _out.innerHTML;
         _out.insertAdjacentHTML('afterbegin', msg);
     } else if (Boolean(placement)) {
-        //_out.innerHTML = _out.innerHTML + msg;
         _out.insertAdjacentHTML('beforeend', msg);
     } else {
         _out.innerHTML = msg;
@@ -339,8 +336,9 @@ MyUi.prototype.echo = function(divId, msg, placement) {
 
 /**
  * Display loading bar.
- * param {int} percentage
- * */
+ * @param {int} percentage
+ * @return {null}
+ */
 MyUi.prototype._loading = function(percentage) {
     if (percentage >= 100) {
         loading.style.cssText = "width: 0%";
@@ -356,7 +354,7 @@ MyUi.prototype._loading = function(percentage) {
  * -1 : Feeds list   (mainLeft)
  *  0 : Entries list (main)
  *  1 : Entry        (main)
- * */
+ */
 MyUi.prototype._scrollTo = function(screenX) {
     if (screenX == 0) {
         liveValues.screens.feedsList.opened = false;
@@ -427,7 +425,7 @@ MyUi.prototype._translate = function(id, direction) {
 /**
  * Show/Hide small entries
  * @param {string} status "hide" "show"
- * */
+ */
 MyUi.prototype._smallEntries = function (status) {
     
     var _small_entries = document.querySelectorAll("._small_");
@@ -457,7 +455,7 @@ MyUi.prototype._smallEntries = function (status) {
  * Change element opacity
  * @param {string} _this DOM element
  * @return {null}
- * */
+ */
 MyUi.prototype.fade = function (_this) {
     _MyFeeds.log('MyUi.prototype.fade()', _this);
     _this.style.cssText = "opacity : 0.4;";
@@ -467,7 +465,7 @@ MyUi.prototype.fade = function (_this) {
  * Colorize specified DOM element
  * @param {string|object} DOM id or DOM element
  * @return {null}
- * */
+ */
 MyUi.prototype.colorize = function (_domElement) {
      try {
         _domElement.classList.add('colorize');
@@ -483,7 +481,7 @@ MyUi.prototype.colorize = function (_domElement) {
  * Uncolorize all childs of specified DOM element
  * @param {string} DOM ID element
  * @return {null}
- * */
+ */
 MyUi.prototype.uncolorize = function (_domId) {
     try {
         document.getElementById(_domId).classList.remove('colorize');
@@ -523,7 +521,7 @@ MyUi.prototype._vibrate = function () {
 /**
  * Load images who are visibles in viewport.
  * Use images from navigator cache if network is offline.
- * */
+ */
 MyUi.prototype.loadImages = function () {
     var images = document.getElementsByTagName('img');
     
@@ -558,9 +556,8 @@ MyUi.prototype.loadImages = function () {
 /**
  * Show entries who are in viewport.
  * Content of entry is displayed only when entry is in viewport.
- * */
+ */
 MyUi.prototype.showEntries = function () {
-    //var _divs = document.querySelectorAll("div.my-list-entry-s, div.my-list-entry-m, div.my-list-entry-l, div.my-grid-entry-s, div.my-grid-entry-m, div.my-grid-entry-l, div.my-card-entry-s, div.my-card-entry-m, div.my-card-entry-l");
     var _divs = document.querySelectorAll("div.i");
 
     // --- v1
@@ -584,20 +581,6 @@ MyUi.prototype.showEntries = function () {
     
     var j = _divs[_i].getAttribute('i');
     _divs[_i].innerHTML = liveValues['entries']['html'][j];*/
-    
-}
-
-/**
- * Change opacity of news previously displayed
- * */
-MyUi.prototype.markAsReadV1 = function () {
-    for (_tsms in liveValues.entries.newsPreviouslyDisplayed) { 
-        try {
-            ui.fade(document.getElementById(liveValues.entries.newsPreviouslyDisplayed[_tsms])); 
-        } catch (e) {
-            _MyFeeds.log('MyUi.prototype.markAsRead : Error ' + _tsms);
-        }
-    }
 }
 
 /**
@@ -605,7 +588,7 @@ MyUi.prototype.markAsReadV1 = function () {
  * Change opacity of news previously displayed.
  * @param {object} elem DOM element or not set
  * @return null
- * */
+ */
 MyUi.prototype.markAsRead = function (entryId) {
     _MyFeeds.log('MyUi.prototype.markAsRead(' + entryId + ')');
 
@@ -633,9 +616,8 @@ MyUi.prototype.markAsRead = function (entryId) {
  * Check if element is visible in viewport
  * @param {object} elem DOM element
  * @return {boolean} true / false
- * */
+ */
 MyUi.prototype.isInViewport = function (element) {
-    //var firstElementHeight = dom['screens']['entries']['content'].children[0].clientHeight;
     var rect = element.getBoundingClientRect()
     
     var windowHeight = (window.innerHeight || document.documentElement.clientHeight) * 2;
@@ -663,9 +645,9 @@ MyUi.prototype._searchEntriesOpen = function(focus) {
     if (focus) {
         document.getElementById('inputSearchEntries').focus();
     }
-    _search(document.getElementById('inputSearchEntries').value);
+    _MyUi._search(document.getElementById('inputSearchEntries').value);
     // Show keyword from input value
-    ui.colorize(document.getElementById('inputSearchEntries').value);
+    _MyUi.colorize(document.getElementById('inputSearchEntries').value);
 }
 
 /**
@@ -680,18 +662,91 @@ MyUi.prototype._searchEntriesClose = function() {
     searchEntries.classList.add('enable-fxos-white');
     document.getElementById('formSearchEntries').classList.remove('_show');
     document.getElementById('formSearchEntries').classList.add('_hide');
-    _search('');
+    _MyUi._search('');
     _MyUi.uncolorize(document.getElementById('inputSearchEntries').value); // Hide keyword from input value
 }
 
+/**
+ * Show entries matching string and hide others
+ * @param {string} string Min length 5 characters or "" to reset display
+ * @return {null}
+ */
+MyUi.prototype._search = function(string) {
+
+    if ((string.length > 2) || (string === '')) {
+        var _divs = document.querySelectorAll("div.my-list-entry-s, div.my-list-entry-m, div.my-list-entry-l, div.my-grid-entry-s, div.my-grid-entry-m, div.my-grid-entry-l, div.my-card-entry-s, div.my-card-entry-m, div.my-card-entry-l");
+
+        _nb = _divs.length;
+
+        var _o = document.createElement('div'); // v4 
+
+        for (var i = 0; i < _nb; i++) {
+            if ((_divs[i].classList.contains("_small_")) && (!params.entries.displaySmallEntries)) {
+                _divs[i].classList.remove('_show');
+                _divs[i].classList.add('_hide');
+            } else {
+                //var _text = _divs[i].textContent.toLowerCase(); // v1 Search in complete entries
+
+                // v3
+                /*
+                   var _text = (_divs[i].children)[0].textContent.toLowerCase(); // my-card-theme
+                   var _text = (_divs[i].children)[3].textContent.toLowerCase(); // my-list-theme
+                   var _text = (_divs[i].children)[0].textContent.toLowerCase(); // my-grid-theme
+                   */
+
+                // v2 Search only in entries titles
+                /*var _text = "";
+                  var childrens = _divs[i].children;
+                  for (var j = 0; j < childrens.length; j++) {
+                //console.log(i + ' / ' + j + ' / ' + childrens[j].textContent.toLowerCase());
+                if (childrens[j].className == 'my-'+params.entries.theme+'-title') {
+                _text = childrens[j].textContent.toLowerCase();
+                break;
+                }
+                }*/
+
+                // v4 Search
+
+                var _tsms = _divs[i].getAttribute('tsms');
+
+                _o.innerHTML = liveValues['entries']['html'][_tsms]; 
+
+                var _text = "";
+                var childrens = _o.children;
+
+                for (var j = 0; j < childrens.length; j++) {
+                    //console.log(i + ' / ' + j + ' / ' + childrens[j].textContent.toLowerCase());
+                    if (childrens[j].className == 'my-'+params.entries.theme+'-title') {
+                        _text = childrens[j].textContent.toLowerCase();
+                        break;
+                    }
+                }
+
+                // ---
+
+                if ((string == '') || (_text.indexOf(string.toLowerCase()) >= 0)) {
+                    _divs[i].classList.remove('_hide')
+                        _divs[i].classList.add('_show');
+                } else {
+                    _divs[i].classList.remove('_show');
+                    _divs[i].classList.add('_hide');
+                }
+            }
+        }
+        delete _o; // v4
+    }
+}
+ 
 /* ================= */
 /* --- UI Events --- */
 /* ================= */
 
-menu.onclick            = function(event) {
+menu.onclick = function(event) {
     ui._vibrate();
     (liveValues.screens.feedsList.opened) ? ui._scrollTo(0) : ui._scrollTo(-1);
 }
+
+/* --- Events feeds list --- */
 
 closeFeedsList.onclick  = function(event) {ui._vibrate(); ui._scrollTo(0);}
 
@@ -722,7 +777,7 @@ resetSearchEntries.onclick = function() {
     params.feeds.selectedKeyword.domId = "";
     _MyUi.uncolorize('keywords');
     _MyUi._vibrate();
-    _search('');
+    _MyUi._search('');
 }
 
 /* --- Events Animations  --- */

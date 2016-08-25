@@ -387,175 +387,9 @@
     var sortedFeeds = [];
 
     // =================
-    // --- UI events ---
+    // --- Functions ---
     // =================
-
-    sync.onclick            = function(event) {
-        if (liveValues.network.status == 'online') {
-            ui._vibrate();
-            ui._onclick(this, 'disable');
-            loadFeeds();
-        }
-    }
-
-    closeMainEntry.onclick  = function(event) { ui._vibrate(); ui._quickScrollTo(0); ui.echo("browser", "", ""); }
-
-    // Screen find feed
-
-    findFeedsOpen.onclick   = function(event) { ui._vibrate(); ui._scrollTo(-2); }
-    findFeedsClose.onclick  = function(event) { ui._vibrate(); ui._scrollTo(-1); }
-    
-    findFeedsSubmit.onclick = function(event) { 
-        ui._vibrate();
-        var _url = document.getElementById("findFeedsText").value; 
-        if (_url) {
-            ui.echo("find-feeds", "Loading...", ""); 
-            sp.isValidUrl(_url).then(function(results) {
-                my.log("Is a valid url OK", results);
-            }).catch(function(error) {
-                my.message(document.webL10n.get("find-feeds-error") + JSON.stringify(error));
-            });
-        }
-    }
-    
-    findFeedsReset.onclick  = function(event) { ui._vibrate(); ui.echo('find-feeds', '', ''); }
-
-    // Screen feeds list
-
-    document.getElementById("shareFeedsList").onclick = function(event) {
-        my.export('opml', true);
-    }
-
-    // Themes
-
-    displayGrid.onclick     = function(event) {
-        if (params.entries.theme != 'grid') {
-            params.entries.theme = "grid";
-            ui._vibrate();
-            ui.selectThemeIcon();
-            dspEntries();
-            _saveParams();
-        }
-    }
-    displayCard.onclick     = function(event) {
-        if (params.entries.theme != 'card') {
-            params.entries.theme = "card";
-            ui._vibrate();
-            ui.selectThemeIcon();
-            dspEntries();
-            _saveParams();
-        }
-    }
-    displayList.onclick     = function(event) {
-        if (params.entries.theme != 'list') {
-            params.entries.theme = "list";
-            ui._vibrate();
-            ui.selectThemeIcon();
-            dspEntries();
-            _saveParams();
-        }
-    }
-
-    /**
-     * Show entries matching string and hide others
-     * @param {string} string Min length 5 characters or "" to reset display
-     * */
-    var _search = function(string) {
-
-        if ((string.length > 2) || (string === '')) {
-            var _divs = document.querySelectorAll("div.my-list-entry-s, div.my-list-entry-m, div.my-list-entry-l, div.my-grid-entry-s, div.my-grid-entry-m, div.my-grid-entry-l, div.my-card-entry-s, div.my-card-entry-m, div.my-card-entry-l");
-            
-            _nb = _divs.length;
-            
-            var _o = document.createElement('div'); // v4 
-
-            for (var i = 0; i < _nb; i++) {
-                if ((_divs[i].classList.contains("_small_")) && (!params.entries.displaySmallEntries)) {
-                    _divs[i].classList.remove('_show');
-                    _divs[i].classList.add('_hide');
-                } else {
-                    //var _text = _divs[i].textContent.toLowerCase(); // v1 Search in complete entries
-                    
-                    // v3
-                    /*
-                    var _text = (_divs[i].children)[0].textContent.toLowerCase(); // my-card-theme
-                    var _text = (_divs[i].children)[3].textContent.toLowerCase(); // my-list-theme
-                    var _text = (_divs[i].children)[0].textContent.toLowerCase(); // my-grid-theme
-                    */
-
-                    // v2 Search only in entries titles
-                    /*var _text = "";
-                    var childrens = _divs[i].children;
-                    for (var j = 0; j < childrens.length; j++) {
-                        //console.log(i + ' / ' + j + ' / ' + childrens[j].textContent.toLowerCase());
-                        if (childrens[j].className == 'my-'+params.entries.theme+'-title') {
-                            _text = childrens[j].textContent.toLowerCase();
-                            break;
-                        }
-                    }*/
-
-                    // v4 Search
-                                        
-                    var _tsms = _divs[i].getAttribute('tsms');
-                    
-                    _o.innerHTML = liveValues['entries']['html'][_tsms]; 
-                    
-                    var _text = "";
-                    var childrens = _o.children;
-                    
-                    for (var j = 0; j < childrens.length; j++) {
-                        //console.log(i + ' / ' + j + ' / ' + childrens[j].textContent.toLowerCase());
-                        if (childrens[j].className == 'my-'+params.entries.theme+'-title') {
-                            _text = childrens[j].textContent.toLowerCase();
-                            break;
-                        }
-                    }
-
-                    // ---
-                    
-                    if ((string == '') || (_text.indexOf(string.toLowerCase()) >= 0)) {
-                        _divs[i].classList.remove('_hide')
-                        _divs[i].classList.add('_show');
-                    } else {
-                        _divs[i].classList.remove('_show');
-                        _divs[i].classList.add('_hide');
-                    }
-                }
-            }
-            delete _o; // v4
-        }
-    }
-    
-    nextDay.onclick = function(event) {
-        ui._vibrate();
-        if (params.entries.nbDaysAgo > 0 ) {
-            params.entries.nbDaysAgo--;
-        }
-        ui._onclick(previousDay, 'enable');
-        if (params.entries.nbDaysAgo == 0) {
-            ui._onclick(nextDay, 'disable');
-        } else {
-            ui._onclick(nextDay, 'enable');
-        }
-        dspEntries();
-        dom['screens']['entries']['scroll'].scrollTop = 0;
-    }
-
-    previousDay.onclick = function(event) {
-        ui._vibrate();
-        if (params.entries.nbDaysAgo < params.entries.dontDisplayEntriesOlderThan) {
-            params.entries.nbDaysAgo++;
-        }
-        ui._onclick(nextDay, 'enable');
-        if (params.entries.nbDaysAgo == params.entries.dontDisplayEntriesOlderThan) {
-            ui._onclick(previousDay, 'disable');
-        } else {
-            ui._onclick(previousDay, 'enable');
-        }
-        dspEntries();
-        dom['screens']['entries']['scroll'].scrollTop = 0;
-    }
-    
+   
     function deleteKeyword(_this) {
         my.log('deleteKeyword() ', arguments);
 
@@ -1946,7 +1780,7 @@
      * 
      * @param {null}
      * @return {null}
-     * */
+     */
     function setEntriesIds() {
         my.log('setEntriesIds()');
 
@@ -1998,7 +1832,7 @@
      * @param {int} entryId
      * @param {string} url
      * @return {CustomEvent} mainEntryOpen.done
-     * */
+     */
     function mainEntryOpenInBrowser(entryId, url) {
         my.log('mainEntryOpenInBrowser()', arguments);
         document.body.style.cssText = "overflow: hidden;";  // Disable scroll in entries list.
@@ -2055,7 +1889,7 @@
     /**
      * @param {null}
      * Update feeds pulsations once all feeds are loaded.
-     * */
+     */
     function updateFeedsPulsations() {
         var _tmp = [];
         var _feeds = sp.getFeeds();
@@ -2091,7 +1925,7 @@
      * Variable "liveValues['timestamps']['max']" End of day timestamp. 
      * Variable "liveValues['timestamps']['min']" Value beyond which an entry can't be displayed. (Too old)
      * @param {null}
-     * */
+     */
     function _setTimestamps() {
         var _now    = new Date();
         var _year   = _now.getFullYear();
@@ -2208,7 +2042,7 @@
     /**
      * Disable online account
      * @param {string} feedly, theoldreader, aolreader, tinytinyrss
-     * */
+     */
     function _disableAccount(_account) {
         if (_account !== 'local') {
             my.log('_disableAccount', arguments);
@@ -2224,7 +2058,7 @@
      * Add new feeds in array myFeedsSubscriptions
      * if feeds doesn't exists in array.
      * @param {_feeds} array
-     * */
+     */
     function addNewSubscriptions(_feeds) {
         var start = performance.now();
         
@@ -2262,7 +2096,7 @@
     
     /**
      * Localize times who are visibles in viewport
-     * */
+     */
     function localizeTimes() {
         var className = 'my-'+params.entries.theme+'-date';
         var elements = document.getElementsByClassName(className);
@@ -2278,7 +2112,7 @@
      * Count entries matching specified keyword
      * @param {string} keyword
      * @return {int}
-     * */
+     */
     function count(keyword){
         var out = 0;
         
@@ -2469,7 +2303,117 @@
                 loadFeeds();
             }
         }, 59000); // 59s Less than minimal Firefox OS sleep time (60s)
-         
+
+        // --- AOL Reader ---        
+        // Due to quick expiration time (1h), Aol token is 
+        // actualized every 14mn.
+
+        setInterval(function() {
+            if ((liveValues.network.status == 'online') && (params.accounts.aolreader.logged)) {
+                aolreader.updateToken();
+            }
+        }, (60000 * 14));        
+
+        // =================
+        // --- UI events ---
+        // =================
+
+        sync.onclick = function(event) {
+            if (liveValues.network.status == 'online') {
+                ui._vibrate();
+                ui._onclick(this, 'disable');
+                loadFeeds();
+            }
+        }
+
+        closeMainEntry.onclick = function(event) { ui._vibrate(); ui._quickScrollTo(0); ui.echo("browser", "", ""); }
+
+        // Screen find feed
+
+        findFeedsOpen.onclick = function(event) { ui._vibrate(); ui._scrollTo(-2); }
+        findFeedsClose.onclick = function(event) { ui._vibrate(); ui._scrollTo(-1); }
+
+        findFeedsSubmit.onclick = function(event) { 
+            ui._vibrate();
+            var _url = document.getElementById("findFeedsText").value; 
+            if (_url) {
+                ui.echo("find-feeds", "Loading...", ""); 
+                sp.isValidUrl(_url).then(function(results) {
+                    my.log("Is a valid url OK", results);
+                }).catch(function(error) {
+                    my.message(document.webL10n.get("find-feeds-error") + JSON.stringify(error));
+                });
+            }
+        }
+
+        findFeedsReset.onclick = function(event) { ui._vibrate(); ui.echo('find-feeds', '', ''); }
+
+        // Screen feeds list
+
+        document.getElementById("shareFeedsList").onclick = function(event) {
+            my.export('opml', true);
+        }
+
+        // Themes
+
+        displayGrid.onclick = function(event) {
+            if (params.entries.theme != 'grid') {
+                params.entries.theme = "grid";
+                ui._vibrate();
+                ui.selectThemeIcon();
+                dspEntries();
+                _saveParams();
+            }
+        }
+        displayCard.onclick = function(event) {
+            if (params.entries.theme != 'card') {
+                params.entries.theme = "card";
+                ui._vibrate();
+                ui.selectThemeIcon();
+                dspEntries();
+                _saveParams();
+            }
+        }
+        displayList.onclick = function(event) {
+            if (params.entries.theme != 'list') {
+                params.entries.theme = "list";
+                ui._vibrate();
+                ui.selectThemeIcon();
+                dspEntries();
+                _saveParams();
+            }
+        }
+
+        nextDay.onclick = function(event) {
+            ui._vibrate();
+            if (params.entries.nbDaysAgo > 0 ) {
+                params.entries.nbDaysAgo--;
+            }
+            ui._onclick(previousDay, 'enable');
+            if (params.entries.nbDaysAgo == 0) {
+                ui._onclick(nextDay, 'disable');
+            } else {
+                ui._onclick(nextDay, 'enable');
+            }
+            dspEntries();
+            dom['screens']['entries']['scroll'].scrollTop = 0;
+        }
+
+        previousDay.onclick = function(event) {
+            ui._vibrate();
+            if (params.entries.nbDaysAgo < params.entries.dontDisplayEntriesOlderThan) {
+                params.entries.nbDaysAgo++;
+            }
+            ui._onclick(nextDay, 'enable');
+            if (params.entries.nbDaysAgo == params.entries.dontDisplayEntriesOlderThan) {
+                ui._onclick(previousDay, 'disable');
+            } else {
+                ui._onclick(previousDay, 'enable');
+            }
+            dspEntries();
+            dom['screens']['entries']['scroll'].scrollTop = 0;
+        }
+
         // ==========================
         // --- Events: Feeds list ---
         // ==========================
@@ -2550,9 +2494,9 @@
             // ---
         }
 
-        // ============================
-        // --- Events: Entries list ---
-        // ============================
+        // ===============================
+        // --- Listeners: Entries list ---
+        // ===============================
        
         // Entries list: Click on entry
         
@@ -2566,52 +2510,21 @@
                 mainEntryOpenInBrowser(_tsms, ""); 
             }
         } 
- 
-        /* =================================== */
-        /* --- Events: Search Entries Form --- */
-        /* =================================== */
-       
-        // Keyboard
-        
-        window.addEventListener("keyup", function (event) {
-            if (document.activeElement.id == "inputSearchEntries") {
-                if (event.keyCode == 13) {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    document.getElementById('inputSearchEntries').blur(); // Remove focus
-                    _search(document.activeElement.value);
-                }
-                // Try to colorize an existing keyword following input value
-                ui.uncolorize('keywords');
-                ui.colorize(inputSearchEntries.value);
-            }
-        }, true);
- 
+  
         // Search entries after "dspEntries"
         // Display form then do a search.
         
         document.body.addEventListener('dspEntries.done', function(event){
             if (liveValues['entries']['search']['visible']) {
                 ui._searchEntriesOpen(false); // No focus
-                _search(document.getElementById('inputSearchEntries').value);
+                ui._search(document.getElementById('inputSearchEntries').value);
             } 
         });
 
-        // Search on input change
-        
-        document.getElementById('inputSearchEntries').addEventListener('input', function(){
-            var _searchString = document.getElementById('inputSearchEntries').value;
-            _search(_searchString);
-        });
-        
-        // test
-        document.getElementById('inputSearchEntries').addEventListener('onchange', function(){
-            window.alert('ici');
-            var _searchString = document.getElementById('inputSearchEntries').value;
-            _search(_searchString);
-        });
-        
-
+        /* ====================================== */
+        /* --- Listeners: Search Entries Form --- */
+        /* ====================================== */
+ 
         // Add keyword
         
         addKeyword.onclick = function() {
@@ -2654,10 +2567,40 @@
             
             }
         }
-       
-        /* ==================== */
-        /* --- Events: Misc --- */
-        /* ==================== */
+      
+        // Keyboard
+        
+        window.addEventListener("keyup", function (event) {
+            if (document.activeElement.id == "inputSearchEntries") {
+                if (event.keyCode == 13) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    document.getElementById('inputSearchEntries').blur(); // Remove focus
+                    ui._search(document.activeElement.value);
+                }
+                // Try to colorize an existing keyword following input value
+                ui.uncolorize('keywords');
+                ui.colorize(inputSearchEntries.value);
+            }
+        }, true);
+
+        // Search on input change
+        
+        document.getElementById('inputSearchEntries').addEventListener('input', function(){
+            var _searchString = document.getElementById('inputSearchEntries').value;
+            ui._search(_searchString);
+        });
+        
+        // test
+        /*document.getElementById('inputSearchEntries').addEventListener('onchange', function(){
+            window.alert('ici');
+            var _searchString = document.getElementById('inputSearchEntries').value;
+            ui._search(_searchString);
+        });*/
+        
+        /* ======================= */
+        /* --- Listeners: Misc --- */
+        /* ======================= */
 
         browser.addEventListener('mozbrowsererror', function (event) {
             console.dir("Moz Browser loading error : " + event.detail);
@@ -2670,10 +2613,75 @@
             document.documentElement.dir = document.webL10n.getDirection();
         }, false);
 
-        /* ============================== */
-        /* --- Events: Selected entry --- */
-        /* ============================== */
+        /* ================================ */
+        /* --- Listener: Selected entry --- */
+        /* ================================ */
+        
+        // Next entry
+        
+        dom['entry']['next']['button'].onclick = function() {
+            ui._vibrate();
+            mainEntryOpenInBrowser(this.getAttribute("tsms"), this.getAttribute("entry_link")); 
+        }
 
+        // Previous entry
+        
+        dom['entry']['previous']['button'].onclick = function() {
+            ui._vibrate();
+            mainEntryOpenInBrowser(this.getAttribute("tsms"), this.getAttribute("entry_link")); 
+        }
+        
+        // Share entry :
+        // https://developer.mozilla.org/fr/docs/Web/API/Web_Activities
+
+        share.onclick = function() {
+            my.log(this);
+            ui._vibrate();
+            var _entryId = 0;
+            var _mySha256_title = this.getAttribute("_mySha256_title");
+            var _mySha256_link  = this.getAttribute("_mySha256_link");
+            
+            for (var i in sortedEntries) {
+                if ((sortedEntries[i]['_mySha256_title']== _mySha256_title) ||
+                    (sortedEntries[i]['_mySha256_link'] == _mySha256_link)) {
+                    var _entryId = i;
+                    break;
+                }
+            }
+            
+            var _entry = sortedEntries[_entryId];
+            my.log(_entry);
+            
+            if (cordova.platformId === 'firefoxos') {
+                new MozActivity({
+                    name: "new",
+                    data: {
+                        type: ["websms/sms", "mail"],
+                        number: 0,
+                        url: "mailto:?subject=" + encodeURIComponent(_entry.title) + "&body=" + encodeURIComponent(_entry.link),
+                        body: _entry.title + "\n" + _entry.link
+                    }
+                });
+            }
+            
+            // Cordova share via plugin    
+            // https://www.npmjs.com/package/cordova-plugin-x-socialsharing
+            
+            else {
+                window.plugins.socialsharing.shareViaEmail(
+                    _entry.title + "\n" + _entry.link, // Message
+                    _entry.title, // Subject
+                    null, // TO: must be null or an array
+                    null, // CC: must be null or an array
+                    null, // BCC: must be null or an array
+                    null, // FILES: null, a string, or an array
+                    function(){console.log('ok');}, // Called when email was sent or canceled, no way to differentiate
+                    function(){console.log('ko');}  // Called when something unexpected happened
+                );
+            }
+    
+        };
+ 
         // Main entry open done...
         // Update next entry [<] & previous entry [>] buttons.
         // Update next & previous entries titles
@@ -2781,414 +2789,16 @@
             
         });
         
-        // ---
+        /* ================= */
+        /* --- Listeners --- */
+        /* ================= */
+
+        var _sp_            = new MyListeners_SimplePie();
+        var _aolreader_     = new MyListeners_AolReader();
+        var _feedly_        = new MyListeners_Feedly();
+        var _theoldreader_  = new MyListeners_TheOldReader();
+        var _tinytinyrss_   = new MyListeners_TinyTinyRss();
         
-        dom['entry']['next']['button'].onclick = function() {
-            ui._vibrate();
-            mainEntryOpenInBrowser(this.getAttribute("tsms"), this.getAttribute("entry_link")); 
-        }
-        
-        dom['entry']['previous']['button'].onclick = function() {
-            ui._vibrate();
-            mainEntryOpenInBrowser(this.getAttribute("tsms"), this.getAttribute("entry_link")); 
-        }
-        
-        // Share entry :
-        // https://developer.mozilla.org/fr/docs/Web/API/Web_Activities
-
-        share.onclick = function() {
-            my.log(this);
-            ui._vibrate();
-            var _entryId = 0;
-            var _mySha256_title = this.getAttribute("_mySha256_title");
-            var _mySha256_link  = this.getAttribute("_mySha256_link");
-            
-            for (var i in sortedEntries) {
-                if ((sortedEntries[i]['_mySha256_title']== _mySha256_title) ||
-                    (sortedEntries[i]['_mySha256_link'] == _mySha256_link)) {
-                    var _entryId = i;
-                    break;
-                }
-            }
-            
-            var _entry = sortedEntries[_entryId];
-            my.log(_entry);
-            
-            if (cordova.platformId === 'firefoxos') {
-                new MozActivity({
-                    name: "new",
-                    data: {
-                        type: ["websms/sms", "mail"],
-                        number: 0,
-                        url: "mailto:?subject=" + encodeURIComponent(_entry.title) + "&body=" + encodeURIComponent(_entry.link),
-                        body: _entry.title + "\n" + _entry.link
-                    }
-                });
-            }
-            
-            // Cordova share via plugin    
-            // https://www.npmjs.com/package/cordova-plugin-x-socialsharing
-            
-            else {
-                window.plugins.socialsharing.shareViaEmail(
-                    _entry.title + "\n" + _entry.link, // Message
-                    _entry.title, // Subject
-                    null, // TO: must be null or an array
-                    null, // CC: must be null or an array
-                    null, // BCC: must be null or an array
-                    null, // FILES: null, a string, or an array
-                    function(){console.log('ok');}, // Called when email was sent or canceled, no way to differentiate
-                    function(){console.log('ko');}  // Called when something unexpected happened
-                );
-            }
-    
-        };
-         
-        /* ======================== */
-        /* --- SimplePie Events --- */
-        /* ======================== */
-
-        document.body.addEventListener('SimplePie.load.done', function(event){
-            
-            liveValues.sync.nbFeedsLoaded++;
-            
-            my.log('SimplePie.load.done '+liveValues.sync.nbFeedsLoaded+'/'+liveValues.sync.nbFeedsToLoad);
-            
-            // Save feed as file
-
-            if (liveValues.network.status == 'online') {
-                my._save('cache/simplepie/feeds/' + event.detail._myParams.account + "/" + btoa(event.detail.feedUrl) + ".json", "application/json", JSON.stringify(event.detail)).then(function(results) {
-                    my.log('SimplePie.load.done > Saving feed in cache ok : ' + event.detail.feedUrl + ' (' + event.detail._myParams.account + "/" + btoa(event.detail.feedUrl) + ')');
-                }).catch(function(error) {
-                    my.error("ERROR saving feed in cache : " + event.detail.feedUrl + ' (' + event.detail._myParams.account + "/" + btoa(event.detail.feedUrl) + ') ' + error);
-                    my.alert("ERROR saving feed in cache :\n" + event.detail.feedUrl);
-                });
-            }
-
-            // Add feed entries to array "unsortedEntries"
-
-                sp.addFeed(event.detail);
-
-            // Check if all feeds were loaded
-
-
-                // Percentage of loading ?
-
-                ui._loading(Math.round((100 * liveValues.sync.nbFeedsLoaded) / liveValues.sync.nbFeedsToLoad));
-
-                // ---
-
-                if (liveValues.sync.nbFeedsLoaded == liveValues.sync.nbFeedsToLoad) {
-                    if (params.entries.nbDaysAgo == 0) {
-                        dspEntries();
-                    }
-                    dspFeeds(sp.getFeeds());
-                    updateFeedsPulsations();
-                }
-                
-                if (liveValues.sync.nbFeedsLoaded >= liveValues.sync.nbFeedsToLoad) {
-                    liveValues.sync.nbFeedsToLoad = 0;
-                    liveValues.sync.nbFeedsLoaded = 0;
-                    ui._loading(100); ui.echo("loading", "", "");
-                    if (liveValues.network.status == 'online') {
-                        ui._onclick(sync, 'enable');
-                    }
-                }
-
-            // ---
-
-        }, true);
-
-        document.body.addEventListener('SimplePie.load.error', function(event){
-            
-            liveValues.sync.nbFeedsLoaded++;
-            
-            my.error('SimplePie.load.error '+liveValues.sync.nbFeedsLoaded+'/'+liveValues.sync.nbFeedsToLoad);
-            
-            // Check if all feeds were loaded
-
-                my.error(event);
-
-                // Percentage of loading ?
-
-                ui._loading(Math.round((100 * liveValues.sync.nbFeedsLoaded) / liveValues.sync.nbFeedsToLoad));
-
-                // ---
-
-                if (liveValues.sync.nbFeedsLoaded == liveValues.sync.nbFeedsToLoad) {
-                    if (params.entries.nbDaysAgo == 0) {
-                        dspEntries();
-                    }
-                    dspFeeds(sp.getFeeds());
-                    //dspSettings();
-                    updateFeedsPulsations();
-                }
-                
-                if (liveValues.sync.nbFeedsLoaded >= liveValues.sync.nbFeedsToLoad) {
-                    liveValues.sync.nbFeedsToLoad = 0;
-                    liveValues.sync.nbFeedsLoaded = 0;
-                    ui._loading(100); ui.echo("loading", "", "");
-                    if (liveValues.network.status == 'online') {
-                        ui._onclick(sync, 'enable');
-                    }
-                }
-
-            // ---
-
-        }, true);
-
-        document.body.addEventListener('SimplePie.isValidUrl.done', findFeedsDisplayResults, true);
-
-        document.body.addEventListener('SimplePie.isValidUrl.error', function(){
-            ui.echo("find-feeds", "Invalid URL", "");
-        }, true);
-
-        /* ===================== */
-        /* --- Feedly Events --- */
-        /* ===================== */
-
-        document.body.addEventListener('Feedly.login.done', function(response){
-            liveValues['login']['inProgress']['feedly'] = true;
-            my.log(feedly.getToken());
-            params.accounts.feedly.logged = true;
-            _saveParams();
-            document.getElementById('feedlyLogin').checked = true; // Enable settings checkbox
-            feedly.getSubscriptions(); // CustomEvent Feedly.getSubscriptions.done, Feedly.getSubscriptions.error
-        });
-
-        document.body.addEventListener('Feedly.login.error', function(response){
-            my.log('CustomEvent : Feedly.login.error', arguments);
-            my.message('Feedly login error');
-        });
-
-        document.body.addEventListener('Feedly.getSubscriptions.done', function(response){
-            my.log('CustomEvent : Feedly.getSubscriptions.done');
-            var _subscriptions = response.detail;
-            var _feed = '';
-            var _newFeeds = [];
-            for (var i = 0; i < _subscriptions.length; i++) {
-                _feed = {
-                    'url': _subscriptions[i].id.substr(5, _subscriptions[i].id.length),
-                    'pulsations': params['feeds']['defaultPulsations'],
-                    'account': 'feedly',
-                    'id': _subscriptions[i].id
-                };
-                _newFeeds.push(_feed);
-            }
-            addNewSubscriptions(_newFeeds);
-            sp.setFeedsSubscriptions(myFeedsSubscriptions);
-            
-            if (liveValues['login']['inProgress']['feedly'] == true ) {
-                liveValues['login']['inProgress']['feedly'] = false;
-                loadFeeds();
-            }
-            
-            my._save("subscriptions.feedly.json", "application/json", JSON.stringify(myFeedsSubscriptions.feedly)).then(function(results) {
-                my.log("Save file subscriptions.feedly.json");
-            }).catch(function(error) {
-                my.error("ERROR saving file subscriptions.feedly.json", error);
-                my.alert("ERROR saving file subscriptions.feedly.json");
-            });
-            my._save("cache/feedly/subscriptions.json", "application/json", JSON.stringify(_subscriptions)).then(function(results) {
-                my.log("Save file cache/feedly/subscriptions.json");
-            }).catch(function(error) {
-                my.error("ERROR saving file cache/feedly/subscriptions.json", error);
-                my.alert("ERROR saving file cache/feedly/subscriptions.json");
-            });
-        });
-
-        document.body.addEventListener('Feedly.getSubscriptions.error', function(response) {
-            my.log('CustomEvent : Feedly.getSubscriptions.error', arguments);
-            my.alert(document.webL10n.get('feedly-get-subscriptions-error') + JSON.stringify(response.detail.message));
-        });
-
-        /* ============================= */
-        /* --- The Old Reader Events --- */
-        /* ============================= */
-
-        document.body.addEventListener('TheOldReader.login.done', function(response){
-            liveValues['login']['inProgress']['theoldreader'] = true;
-            my.log('TheOldReader.getToken()', theoldreader.getToken());
-            params.accounts.theoldreader.logged = true;
-            _saveParams();
-            document.getElementById('theoldreaderCheckbox').checked = true; // Enable settings checkbox
-            document.getElementById('theoldreaderForm').style.cssText = 'display: none';
-            theoldreader.getSubscriptions(); // CustomEvent TheOldReader.getSubscriptions.done, TheOldReader.getSubscriptions.error
-        });
-
-        document.body.addEventListener('TheOldReader.login.error', function(response){
-            my.log('CustomEvent : TheOldReader.login.error', arguments);
-            my.message('The Old Reader login error');
-        });
-
-        document.body.addEventListener('TheOldReader.getSubscriptions.done', function(response){
-            my.log('CustomEvent : TheOldReader.getSubscriptions.done', response);
-            var _subscriptions = response.detail.subscriptions;
-            var _feed = '';
-            var _newFeeds = [];
-            for (var i = 0; i < _subscriptions.length; i++) {
-                _feed = {
-                    'url': _subscriptions[i].url,
-                    'pulsations': params['feeds']['defaultPulsations'],
-                    'account': 'theoldreader',
-                    'id': _subscriptions[i].id
-                };
-                _newFeeds.push(_feed);
-            }
-            addNewSubscriptions(_newFeeds);
-            sp.setFeedsSubscriptions(myFeedsSubscriptions);
-            
-            if (liveValues['login']['inProgress']['theoldreader'] == true ) {
-                liveValues['login']['inProgress']['theoldreader'] = false;
-                loadFeeds();
-            }
-            
-            my._save("subscriptions.theoldreader.json", "application/json", JSON.stringify(myFeedsSubscriptions.theoldreader)).then(function(results) {
-                my.log("Save file subscriptions.theoldreader.json");
-            }).catch(function(error) {
-                my.error("ERROR saving file subscriptions.theoldreader.json", error);
-                my.alert("ERROR saving file subscriptions.theoldreader.json");
-            });
-            my._save("cache/theoldreader/subscriptions.json", "application/json", JSON.stringify(_subscriptions)).then(function(results) {
-                my.log("Save file cache/theoldreader/subscriptions.json");
-            }).catch(function(error) {
-                my.error("ERROR saving file cache/theoldreader/subscriptions.json", error);
-                my.alert("ERROR saving file cache/theoldreader/subscriptions.json");
-            });
-        });
-
-        document.body.addEventListener('TheOldReader.getSubscriptions.error', function(response) {
-            my.log('CustomEvent : TheOldReader.getSubscriptions.error', arguments);
-            my.alert(document.webL10n.get('theoldreader-get-subscriptions-error') + JSON.stringify(response.detail.message));
-        });
-        
-        /* ========================= */
-        /* --- Aol Reader Events --- */
-        /* ========================= */
-        
-        // Due to quick expiration time (1h), Aol token is 
-        // actualized every 14mn.
-        setInterval(function() {
-            if ((liveValues.network.status == 'online') && (params.accounts.aolreader.logged)) {
-                aolreader.updateToken();
-            }
-        }, (60000 * 14));
-  
-        document.body.addEventListener('AolReader.login.done', function(response){
-            liveValues['login']['inProgress']['aolreader'] = true;
-            my.log(aolreader.getToken());
-            params.accounts.aolreader.logged = true;
-            _saveParams();
-            document.getElementById('aolreaderLogin').checked = true; // Enable settings checkbox
-            aolreader.getSubscriptions(); // CustomEvent AolReader.getSubscriptions.done, AolReader.getSubscriptions.error
-        });
-
-        document.body.addEventListener('AolReader.login.error', function(response){
-            my.log('CustomEvent : AolReader.login.error', arguments);
-            my.message('Aol Reader login error');
-        });
-        
-        document.body.addEventListener('AolReader.getSubscriptions.done', function(response){
-            my.log('CustomEvent : AolReader.getSubscriptions.done');
-            var _subscriptions = response.detail.subscriptions;
-            var _feed = '';
-            var _newFeeds = [];
-            for (var i = 0; i < _subscriptions.length; i++) {
-                _feed = {
-                    'url': _subscriptions[i].url,
-                    'pulsations': params['feeds']['defaultPulsations'],
-                    'account': 'aolreader',
-                    'id': _subscriptions[i].id
-                };
-                _newFeeds.push(_feed);
-            }
-            addNewSubscriptions(_newFeeds);
-            sp.setFeedsSubscriptions(myFeedsSubscriptions);
-            
-            if (liveValues['login']['inProgress']['aolreader'] == true ) {
-                liveValues['login']['inProgress']['aolreader'] = false;
-                loadFeeds();
-            }
-
-            my._save("subscriptions.aolreader.json", "application/json", JSON.stringify(myFeedsSubscriptions.aolreader)).then(function(results) {
-                my.log("Save file subscriptions.aolreader.json");
-            }).catch(function(error) {
-                my.error("ERROR saving file subscriptions.aolreader.json", error);
-                my.alert("ERROR saving file subscriptions.aolreader.json");
-            });
-            my._save("cache/aolreader/subscriptions.json", "application/json", JSON.stringify(_subscriptions)).then(function(results) {
-                my.log("Save file cache/aolreader/subscriptions.json");
-            }).catch(function(error) {
-                my.error("ERROR saving file cache/aolreader/subscriptions.json", error);
-                my.alert("ERROR saving file cache/aolreader/subscriptions.json");
-            });
-        });
-
-        document.body.addEventListener('AolReader.getSubscriptions.error', function(response) {
-            my.log('CustomEvent : AolReader.getSubscriptions.error', arguments);
-            my.alert(document.webL10n.get('aolreader-get-subscriptions-error') + JSON.stringify(response.detail.message));
-        });
-
-        /* ============================ */
-        /* --- Tiny Tiny Rss Events --- */
-        /* ============================ */
-
-        document.body.addEventListener('TinyTinyRss.login.done', function(response){
-            liveValues['login']['inProgress']['tinytinyrss'] = true;
-            my.log('TinyTinyRss.getToken()', tinytinyrss.getToken());
-            params.accounts.tinytinyrss.logged = true;
-            _saveParams();
-            document.getElementById('tinytinyrssCheckbox').checked = true; // Enable settings checkbox
-            document.getElementById('tinytinyrssForm').style.cssText = 'display: none';
-            tinytinyrss.getSubscriptions(); // CustomEvent TinyTinyRss.getSubscriptions.done, TinyTinyRss.getSubscriptions.error
-        });
-
-        document.body.addEventListener('TinyTinyRss.login.error', function(response){
-            my.log('CustomEvent : TinyTinyRss.login.error', arguments);
-            my.message('Tiny Tiny Rss login error');
-        });
-
-        document.body.addEventListener('TinyTinyRss.getSubscriptions.done', function(response){
-            my.log('CustomEvent : TinyTinyRss.getSubscriptions.done', response);
-            var _subscriptions = response.detail.content;
-            var _feed = '';
-            var _newFeeds = [];
-            for (var i = 0; i < _subscriptions.length; i++) {
-                _feed = {
-                    'url': _subscriptions[i].feed_url,
-                    'pulsations': params['feeds']['defaultPulsations'],
-                    'account': 'tinytinyrss',
-                    'id': _subscriptions[i].id
-                };
-                _newFeeds.push(_feed);
-            }
-            addNewSubscriptions(_newFeeds);
-            sp.setFeedsSubscriptions(myFeedsSubscriptions);
-            
-            if (liveValues['login']['inProgress']['tinytinyrss'] == true ) {
-                liveValues['login']['inProgress']['tinytinyrss'] = false;
-                loadFeeds();
-            }
-            
-            my._save("subscriptions.tinytinyrss.json", "application/json", JSON.stringify(myFeedsSubscriptions.tinytinyrss)).then(function(results) {
-                my.log("Save file subscriptions.tinytinyrss.json");
-            }).catch(function(error) {
-                my.error("ERROR saving file subscriptions.tinytinyrss.json", error);
-                my.alert("ERROR saving file subscriptions.tinytinyrss.json");
-            });
-            my._save("cache/tinytinyrss/subscriptions.json", "application/json", JSON.stringify(_subscriptions)).then(function(results) {
-                my.log("Save file cache/tinytinyrss/subscriptions.json");
-            }).catch(function(error) {
-                my.error("ERROR saving file cache/tinytinyrss/subscriptions.json", error);
-                my.alert("ERROR saving file cache/tinytinyrss/subscriptions.json");
-            });
-        });
-
-        document.body.addEventListener('TinyTinyRss.getSubscriptions.error', function(response) {
-            my.log('CustomEvent : TinyTinyRss.getSubscriptions.error', arguments);
-            my.alert(document.webL10n.get('tinytinyrss-get-subscriptions-error') + JSON.stringify(response.detail.message));
-        });
-
         // ============
         // --- Main ---
         // ============
