@@ -2687,6 +2687,8 @@
         // Update next & previous entries titles
         
         document.body.addEventListener('mainEntryOpen.done', function(event){
+            
+            ui.markAsRead(event.detail.entryId); // Mark entry as read
 
             setEntriesIds(); // Set values liveValues['entries']['id']['max'] & liveValues['entries']['id']['min']
             
@@ -2780,10 +2782,6 @@
                 ui._onclick(dom.entry['previous']['button'], 'enable');
                 ui.echo("previousEntryTitle", sortedEntries[_previousTsMs].title, "");
             }
-            
-            // Mark entry as read
-            
-            ui.markAsRead(event.detail.entryId);
             
             // ---
             
