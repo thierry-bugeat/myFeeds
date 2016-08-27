@@ -1580,6 +1580,10 @@
 
                         var _imageUrl = "";
                         
+                        // Image ratio
+
+                        var _imageRatio = (_isSmallEntry) ? 's' : 'l';
+                        
                         // Try to detect broken image
                         /*var _img = new Image(); 
                         _img.src = _entry._myFirstImageUrl; 
@@ -1589,11 +1593,7 @@
                         }*/
 
                         if (_entry._myFirstImageUrl) {
-                            if (_isSmallEntry) {
-                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-s"><img tsms="' + _entry._myTimestampInMs + '" src="img/loading.png" data-src="' + _entry._myFirstImageUrl + '"/></span>';
-                            } else {
-                                _imageUrl = '<span class="my-'+_theme+'-image-container '+_theme+'-ratio-image-l"><img tsms="' + _entry._myTimestampInMs + '" src="img/loading.png" data-src="' + _entry._myFirstImageUrl + '"/></span>';
-                            }
+                            _imageUrl = '<span class="my-' + _theme + '-image-container ' + _theme + '-ratio-image-' + _imageRatio + '"><img tsms="' + _entry._myTimestampInMs + '" src="img/loading.png" data-src="' + _entry._myFirstImageUrl + '"/></span>';
                         }
 
                         // Entry class ratio ?
@@ -1670,7 +1670,8 @@
                                 '<span class="my-'+_theme+'-title">' + _accountIcone + _entry.title + '</span>',
                                 '<span class="my-'+_theme+'-feed-title">' + _entry._myFeedInformations.title + '</span>',
                                 _imageUrl,
-                                '<span class="my-'+_theme+'-date" publishedDate="' + _entry.publishedDate + '">' + _time + '</span>'
+                                '<span class="my-'+_theme+'-date" publishedDate="' + _entry.publishedDate + '">' + _time + '</span>',
+                                '<span class="my-'+_theme+'-snippet">' + _entry.contentSnippet + '</span>'
                             );
                             _content.push(
                                 '<div class="i _online_ _small_ my-'+_theme+'-entry-s ' + _ratioClass + '" id="' + i + '" tsms="' + _entry._myTimestampInMs + '" entry_link="' + _entry.link + '">',
@@ -1777,6 +1778,8 @@
      * - params.entries.dontDisplayEntriesOlderThan
      * - my.isSmallEntry()
      * - search keyword value
+     * 
+     * and liveValues['timestamps']['min'], liveValues['timestamps']['max']
      * 
      * @param {null}
      * @return {null}
@@ -2502,12 +2505,13 @@
         
         document.getElementById("feeds-entries-content").onclick = function(e) {
             var _tsms = e.target.getAttribute("tsms") || e.target.parentNode.getAttribute("tsms");
+            var _url = e.target.getAttribute("entry_link") || e.target.parentNode.getAttribute("entry_link") || "";
             var _entry = document.getElementById(_tsms);
             if (_tsms) {
                 ui._vibrate(); 
                 ui.markAsRead(_entry);
                 liveValues.screens.feedsList.opened = false;
-                mainEntryOpenInBrowser(_tsms, ""); 
+                mainEntryOpenInBrowser(_tsms, _url); 
             }
         } 
   
@@ -2683,13 +2687,12 @@
         };
  
         // Main entry open done...
-        // Update next entry [<] & previous entry [>] buttons.
+        // Update next entry [<] & previous entry [>] buttons. (Only for selected day)
         // Update next & previous entries titles
         
         document.body.addEventListener('mainEntryOpen.done', function(event){
             
             ui.markAsRead(event.detail.entryId); // Mark entry as read
-
             setEntriesIds(); // Set values liveValues['entries']['id']['max'] & liveValues['entries']['id']['min']
             
             var _mySha256_title = event.detail["_mySha256_title"];
@@ -2699,17 +2702,18 @@
             
             var _previousTsMs = 0;
             var _entryId = 0;
-            var _nextEntryId = 0;
+            var _nextTsMs = 0;
             
             var _keys = Object.keys(sortedEntries);
+            console.log(_keys);
             
             for (var k = 0; k < _keys.length; k++) {
                 if ((sortedEntries[_keys[k]]['_mySha256_title']== _mySha256_title) ||
                     (sortedEntries[_keys[k]]['_mySha256_link'] == _mySha256_link)
                 ){
                     var _entryId = _keys[k];
-                    var _previousTsMs = _keys[(k+1)];
-                    var _nextEntryId = _keys[(k-1)] || _entryId;
+                    var _previousTsMs = _keys[(k+1)] || _entryId;
+                    var _nextTsMs = _keys[(k-1)] || _entryId;
 
                     // [>] previous news ?
                     
@@ -2726,30 +2730,30 @@
                 
                     // [<] next news ?
                     
-                    var _content = (sortedEntries[_nextEntryId]._myFeedInformations.title + ' ' + sortedEntries[_nextEntryId].title + ' ' + sortedEntries[_nextEntryId].contentSnippet).toLowerCase();
+                    var _content = (sortedEntries[_nextTsMs]._myFeedInformations.title + ' ' + sortedEntries[_nextTsMs].title + ' ' + sortedEntries[_nextTsMs].contentSnippet).toLowerCase();
                     var _i = k;
-                    while ((sortedEntries[_nextEntryId]._myTimestamp > liveValues['timestamps']['max'])
-                        || (!params.entries.displaySmallEntries && my.isSmallEntry(sortedEntries[_nextEntryId]))
+                    while ((sortedEntries[_nextTsMs]._myTimestamp > liveValues['timestamps']['max'])
+                        || (!params.entries.displaySmallEntries && my.isSmallEntry(sortedEntries[_nextTsMs]))
                         || (_string !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_string.toLowerCase()) == -1))
                     ){
-                        _nextEntryId = _keys[_i];
+                        _nextTsMs = _keys[_i];
                         if (_keys[--_i] < liveValues['entries']['id']['min']) {break;}
-                        _content = (sortedEntries[_nextEntryId]._myFeedInformations.title + ' ' + sortedEntries[_nextEntryId].title + ' ' + sortedEntries[_nextEntryId].contentSnippet).toLowerCase();
+                        _content = (sortedEntries[_nextTsMs]._myFeedInformations.title + ' ' + sortedEntries[_nextTsMs].title + ' ' + sortedEntries[_nextTsMs].contentSnippet).toLowerCase();
                     }
                     
                     break;
                 }
             }
             
-            my.log(_nextEntryId+ ' [<] '+ _entryId +' [>] ' +_previousTsMs);
+            my.log(_nextTsMs+ ' [<] '+ _entryId +' [>] ' +_previousTsMs);
 
             // [<]
             
-            if (my.isSmallEntry(sortedEntries[_nextEntryId])) {
-                dom['entry']['next']['button'].setAttribute("tsms", _nextEntryId);
-                dom['entry']['next']['button'].setAttribute("entry_link", sortedEntries[_nextEntryId].link);
+            if (my.isSmallEntry(sortedEntries[_nextTsMs])) {
+                dom['entry']['next']['button'].setAttribute("tsms", _nextTsMs);
+                dom['entry']['next']['button'].setAttribute("entry_link", sortedEntries[_nextTsMs].link);
             } else {
-                dom['entry']['next']['button'].setAttribute("tsms", _nextEntryId);
+                dom['entry']['next']['button'].setAttribute("tsms", _nextTsMs);
                 dom['entry']['next']['button'].setAttribute("entry_link", "");
             }
             
@@ -2765,12 +2769,12 @@
             
             // Disable / enable button [<]
 
-            if ((_nextEntryId > liveValues['entries']['id']['max']) || (_nextEntryId == _entryId)) {
+            if ((_nextTsMs > liveValues['entries']['id']['max']) || (_nextTsMs == _entryId)) {
                 ui._onclick(dom['entry']['next']['button'], 'disable');
                 ui.echo("nextEntryTitle", "", "");
             } else {
                 ui._onclick(dom['entry']['next']['button'], 'enable');
-                ui.echo("nextEntryTitle", sortedEntries[_nextEntryId].title, "");
+                ui.echo("nextEntryTitle", sortedEntries[_nextTsMs].title, "");
             }
             
             // Disable / enable button [>]
