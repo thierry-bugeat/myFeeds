@@ -444,6 +444,8 @@
     .card-ratio-entry-l, .card-ratio-entry-m {
         padding: 0 0 28rem 0;  
     }
+    .my-card-entry-s > .my-card-feed-title{display: block;}
+    .card-ratio-image-s {padding-bottom: 14rem;}
 }
 
 @media screen and (min-width: 600px) {
