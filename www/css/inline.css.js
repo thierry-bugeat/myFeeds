@@ -37,7 +37,7 @@ var _srcDocCss = [
 '.entrie-visit-website      {display: block; background: #EAEAE7; text-align:center; padding: 0.5rem; margin-top: 1.5rem;}',
 '.entrie-visit-website > a  {background: inherit;}                                                  ',
 '.entrie-visit-website my   {background: inherit;}                                                  ',
-'.entry-enclosure           {padding-bottom: 14rem; position: relative; height: 0; overflow: hidden; display: block;}',
+'.entry-enclosure           {background-color: #EAEAE7; padding-bottom: 14rem; position: relative; height: 0; overflow: hidden; display: block;}',
 '.entry-enclosure img       {position: absolute; top: 50%; width:100%; left: 50%; transform: translate(-50%, -50%); border-bottom: 0.1rem solid #2C393B;',
 '</style>                                                                                           '
 ].join(''); 
