@@ -28,7 +28,7 @@ var SimplePie = function() {
     this.gf = {
         "output"        : "json",                                                   // Output format: json, xml, json_xml
         "num"           : 4,                                                        // Number of news to read
-        "q"             : "",                                                       // Encoded feed url
+        "url"           : "",                                                       // Encoded feed url
         "key"           : "notsupplied",                                            // Google API key
         "v"             : "1.0" ,                                                   // Google API version
         "scoring"       : "h",                                                      // Include historical entries
@@ -71,7 +71,7 @@ SimplePie.prototype.getServers         = function()        { return this.gf.serv
 SimplePie.prototype.getServerId        = function()        { return this.gf.serverId;      }
 SimplePie.prototype.setServerId        = function(serverId){ this.gf.serverId = serverId;  }
 
-SimplePie.prototype._setUrl            = function(q)       { this.gf.q = q;                }
+SimplePie.prototype._setUrl            = function(url)     { this.gf.url = url;            }
 
 SimplePie.prototype._sortEntries       = function() {
     
@@ -481,12 +481,12 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
 
             this._setNum(1 + Math.floor(_myFeed.pulsations * nbDaysToLoad)); // Pulsations = Estimation of news per day.
 
-            var _urlParams = '?url=' + encodeURIComponent(this.gf.q) + '&num=' + this.gf.num;
+            var _urlParams = '?url=' + encodeURIComponent(this.gf.url) + '&num=' + this.gf.num;
             var _url    = this.gf.servers[this.gf.serverId].url + _urlParams;
 
             if (params.settings.proxy.use) {
-                _urlParams = '&url=' + encodeURIComponent(this.gf.servers[this.gf.serverId].url);
-                _url = 'http://' + params.settings.proxy.host + '/proxy/?' + _urlParams;
+                _urlParams = '?url=' + encodeURIComponent(this.gf.servers[this.gf.serverId].url) + _urlParams;
+                _url = 'http://' + params.settings.proxy.host + '/proxy/' + _urlParams;
             }
             
             var _params = {"nbFeeds": this.myFeedsSubscriptions.length, "account": _myFeed.account, "url": _myFeed.url, "id": _myFeed.id, "pulsations": _myFeed.pulsations};
