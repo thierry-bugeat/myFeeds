@@ -2685,7 +2685,7 @@
             }
     
         };
- 
+
         // Main entry open done...
         // Update next entry [<] & previous entry [>] buttons. (Only for selected day)
         // Update next & previous entries titles
@@ -2698,54 +2698,61 @@
             var _mySha256_title = event.detail["_mySha256_title"];
             var _mySha256_link  = event.detail["_mySha256_link"];
             
-            var _string = document.getElementById('inputSearchEntries').value || "";
+            var _inputSearchEntries = document.getElementById('inputSearchEntries').value || "";
             
-            var _previousTsMs = 0;
-            var _entryId = 0;
-            var _nextTsMs = 0;
+            var _previousTsMs = null;
+            var _tsms = null;
+            var _nextTsMs = null;
             
-            var _keys = Object.keys(sortedEntries);
-            console.log(_keys);
+            var _keys = Object.keys(sortedEntries); // Example ["1471968518255", "1471961308308", "1471957680303", "1471939698318"]
             
             for (var k = 0; k < _keys.length; k++) {
                 if ((sortedEntries[_keys[k]]['_mySha256_title']== _mySha256_title) ||
                     (sortedEntries[_keys[k]]['_mySha256_link'] == _mySha256_link)
                 ){
-                    var _entryId = _keys[k];
-                    var _previousTsMs = _keys[(k+1)] || _entryId;
-                    var _nextTsMs = _keys[(k-1)] || _entryId;
-
-                    // [>] previous news ?
-                    
-                    var _content = (sortedEntries[_previousTsMs]._myFeedInformations.title + ' ' + sortedEntries[_previousTsMs].title + ' ' + sortedEntries[_previousTsMs].contentSnippet).toLowerCase();
-                    var _i = k;
-                    while ((sortedEntries[_previousTsMs]._myTimestamp < liveValues['timestamps']['min'])
-                        || (!params.entries.displaySmallEntries && my.isSmallEntry(sortedEntries[_previousTsMs]))
-                        || (_string !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_string.toLowerCase()) == -1))
-                    ){
-                        _previousTsMs = _keys[_i];
-                        if (_keys[++_i] > liveValues['entries']['id']['max']) {break;}
-                        _content = (sortedEntries[_previousTsMs]._myFeedInformations.title + ' ' + sortedEntries[_previousTsMs].title + ' ' + sortedEntries[_previousTsMs].contentSnippet).toLowerCase();
-                    }
-                
-                    // [<] next news ?
-                    
-                    var _content = (sortedEntries[_nextTsMs]._myFeedInformations.title + ' ' + sortedEntries[_nextTsMs].title + ' ' + sortedEntries[_nextTsMs].contentSnippet).toLowerCase();
-                    var _i = k;
-                    while ((sortedEntries[_nextTsMs]._myTimestamp > liveValues['timestamps']['max'])
-                        || (!params.entries.displaySmallEntries && my.isSmallEntry(sortedEntries[_nextTsMs]))
-                        || (_string !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_string.toLowerCase()) == -1))
-                    ){
-                        _nextTsMs = _keys[_i];
-                        if (_keys[--_i] < liveValues['entries']['id']['min']) {break;}
-                        _content = (sortedEntries[_nextTsMs]._myFeedInformations.title + ' ' + sortedEntries[_nextTsMs].title + ' ' + sortedEntries[_nextTsMs].contentSnippet).toLowerCase();
-                    }
-                    
+                    var _tsms = _keys[k];
+                    break;
+                }
+            }
+            // Output variables : _tsms, _k (Array id)
+            
+            // [<] [>] buttons
+            
+            // [>]
+            
+            _previousTsMs = _tsms;
+            
+            for (var _i = (k+1); _i < _keys.length; _i++) {
+                _previousTsMs = _keys[_i];
+                _content = (sortedEntries[_previousTsMs]._myFeedInformations.title + ' ' + sortedEntries[_previousTsMs].title + ' ' + sortedEntries[_previousTsMs].contentSnippet).toLowerCase();
+                if (((params.entries.displaySmallEntries == false) && (my.isSmallEntry(sortedEntries[_keys[_i]])))
+                    //|| ((params.entries.displaySmallEntries == true) && (my.isSmallEntry(sortedEntries[_keys[_i]])) && (liveValues.network.status == 'offline'))
+                    || (_inputSearchEntries !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_inputSearchEntries.toLowerCase()) == -1))
+                ){
+                    continue;
+                } else {
                     break;
                 }
             }
             
-            my.log(_nextTsMs+ ' [<] '+ _entryId +' [>] ' +_previousTsMs);
+            // [<]
+            
+            _nextTsMs = _tsms;
+            
+            for (var _j = (k-1); _j >= 0; _j--) {
+                _nextTsMs = _keys[_j];
+                _content = (sortedEntries[_nextTsMs]._myFeedInformations.title + ' ' + sortedEntries[_nextTsMs].title + ' ' + sortedEntries[_nextTsMs].contentSnippet).toLowerCase();
+                if (((params.entries.displaySmallEntries == false) && (my.isSmallEntry(sortedEntries[_keys[_j]])))
+                    //|| ((params.entries.displaySmallEntries == true) && (my.isSmallEntry(sortedEntries[_keys[_j]])) && (liveValues.network.status == 'offline'))
+                    || (_inputSearchEntries !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_inputSearchEntries.toLowerCase()) == -1))
+                ){
+                    continue;
+                } else {
+                    break;
+                }
+            }
+            
+            my.log(_nextTsMs+ ' [<] '+ _tsms +' [>] ' +_previousTsMs);
 
             // [<]
             
@@ -2769,7 +2776,7 @@
             
             // Disable / enable button [<]
 
-            if ((_nextTsMs > liveValues['entries']['id']['max']) || (_nextTsMs == _entryId)) {
+            if ((_nextTsMs > liveValues['entries']['id']['max']) || (_nextTsMs == _tsms)) {
                 ui._onclick(dom['entry']['next']['button'], 'disable');
                 ui.echo("nextEntryTitle", "", "");
             } else {
@@ -2779,7 +2786,7 @@
             
             // Disable / enable button [>]
             
-            if ((_previousTsMs < liveValues['entries']['id']['min']) || (_previousTsMs == _entryId)) {
+            if ((_previousTsMs < liveValues['entries']['id']['min']) || (_previousTsMs == _tsms)) {
                 ui._onclick(dom.entry['previous']['button'], 'disable');
                 ui.echo("previousEntryTitle", "", "");
             } else {
