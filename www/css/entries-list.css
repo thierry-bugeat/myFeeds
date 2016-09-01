@@ -417,17 +417,17 @@
 /* --- GRID --- */
 
 @media screen and (min-width: 481px) and (max-width:960px) {
-    .grid-ratio-entry-l, .grid-ratio-entry-m {padding-bottom: 25%;}
+    .grid-ratio-entry-s, .grid-ratio-entry-l, .grid-ratio-entry-m {padding-bottom: 25%;}
     .my-grid-entry-s, .my-grid-entry-l{width: 25%;}
 }
 
 @media screen and (min-width: 961px) {
-    .grid-ratio-entry-l, .grid-ratio-entry-m {padding-bottom: 20%;}
+    .grid-ratio-entry-s, .grid-ratio-entry-l, .grid-ratio-entry-m {padding-bottom: 20%;}
     .my-grid-entry-s, .my-grid-entry-l{width: 20%;}
 }
 
 @media screen and (min-width: 1200px) {
-    .grid-ratio-entry-l, .grid-ratio-entry-m {padding-bottom: 12.5%;}
+    .grid-ratio-entry-s, .grid-ratio-entry-l, .grid-ratio-entry-m {padding-bottom: 12.5%;}
     .my-grid-entry-s, .my-grid-entry-l{width: 12.5%;}
 }
 
@@ -441,7 +441,7 @@
 
 @media screen and (min-width: 481px) {
     .my-card-entry-s, .my-card-entry-l{box-sizing:border-box; position: relative; float: left; width: 49%;}
-    .card-ratio-entry-l, .card-ratio-entry-m {
+    .card-ratio-entry-s, .card-ratio-entry-l, .card-ratio-entry-m {
         padding: 0 0 28rem 0;  
     }
     .my-card-entry-s > .my-card-feed-title{display: block;}
@@ -488,6 +488,7 @@
 }
 
 @media screen and (min-width: 1680px) {
+    .my-card-entry-s, .my-card-entry-l{box-sizing:border-box; position: relative; float: left; width: 15.6%;}
     .card-ratio-entry-l, .card-ratio-entry-m {
         padding: 0 0 28rem 0; 
     }
