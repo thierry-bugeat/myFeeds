@@ -31,7 +31,7 @@
     var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': [], 'tinytinyrss': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 2.45,                        // Don't forget to increase this value if you do changes in "params" object
+        "version": 2.46,                        // Don't forget to increase this value if you do changes in "params" object
         "changelog": "https://git.framasoft.org/thierry-bugeat/myFeeds/raw/master/CHANGELOG",
         "feeds": {
             "selectedFeed": {
@@ -85,8 +85,8 @@
             "developper_menu": {
                 "visible": false,               // Display or not developper menu in settings
                 "logs": {
-                    "console": true,            // Developper logs in console
-                    "screen": true              // Developper logs on screen
+                    "console": false,            // Developper logs in console
+                    "screen": false              // Developper logs on screen
                 }
             },
             "update": {
