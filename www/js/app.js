@@ -1468,6 +1468,7 @@
      */
     function dspEntries() {
 
+        sortedEntries = sp.getEntries();
         var entries = sp.getEntries();
         var nbDaysAgo = params.entries.nbDaysAgo;
         var feedUrl = params.feeds.selectedFeed.url;
@@ -1514,7 +1515,7 @@
 
             // Get entries for specific feed or get all entries.
             
-            sortedEntries = {};
+            tmpEntries = {};
             
             if (feedUrl !== "") {
                 
@@ -1527,7 +1528,7 @@
                         && (feedAccount == entries[tsms]._myFeedInformations.feed._myAccount)
                         && (entries[tsms]._myTimestamp < _timestampMax)
                     ){
-                        sortedEntries[tsms] = entries[tsms];
+                        tmpEntries[tsms] = entries[tsms];
                     }
                     
                 }
@@ -1536,12 +1537,12 @@
                 for (var tsms in entries) {
                     if (entries[tsms]._myTimestamp < _timestampMin) {break;}
                     if (entries[tsms]._myTimestamp < _timestampMax) {
-                        sortedEntries[tsms] = entries[tsms];
+                        tmpEntries[tsms] = entries[tsms];
                     }
                 }
             }
 
-            my.log('dspEntries()', sortedEntries);
+            my.log('dspEntries()', tmpEntries);
 
             // =======================
             // --- Display entries ---
@@ -1552,9 +1553,9 @@
             var _firstEntrie = true;
             var _theme = params.entries.theme;
                 
-            for (var i in sortedEntries) {
+            for (var i in tmpEntries) {
                 
-                var _entry = sortedEntries[i];
+                var _entry = tmpEntries[i];
 
                 if ((feedUrl !== "") 
                     && (feedUrl == _entry._myFeedInformations.feedUrl)
@@ -1749,7 +1750,7 @@
             
             // Store informations about last recent entry
 
-            liveValues['entries']['last'] = sortedEntries[Object.keys(sortedEntries)[0]];            
+            liveValues['entries']['last'] = tmpEntries[Object.keys(tmpEntries)[0]];            
             
             // =========================
             // --- App start offline ---
