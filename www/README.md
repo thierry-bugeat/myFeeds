@@ -20,3 +20,4 @@ Ce projet est maintenant hébergé par Framasoft. Le dépôt Github n'est qu'un 
  
  
 ![myFeeds](http://thierry.bugeat.free.fr/myFeeds/images/myFeeds/features/myFeeds-desktop-version.png)
+![myFeeds](http://thierry.bugeat.free.fr/myFeeds/images/myFeeds/features/myFeeds-desktop-version-002.png)
