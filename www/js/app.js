@@ -1486,8 +1486,8 @@
             var start = performance.now();
             
             var _timestampMax = liveValues['timestamps']['max'] - (86400 * nbDaysAgo); // End of current day 23:59:59
-            var _partialRendering = ((liveValues.entries.currently == '') && (nbDaysAgo == 0) && (liveValues.sync.nbDaysAgo == nbDaysAgo) && (liveValues.sync.theme == params.entries.theme) && (liveValues.sync.timestamps.max == _timestampMax) && (liveValues.sync.selectedFeed.url == params.feeds.selectedFeed.url) && (liveValues.sync.selectedFeed.account = params.feeds.selectedFeed.account)) ? true : false;
-            
+            var _partialRendering = ((liveValues.entries.currentlyDisplayed == '') && (nbDaysAgo == 0) && (liveValues.sync.nbDaysAgo == nbDaysAgo) && (liveValues.sync.theme == params.entries.theme) && (liveValues.sync.timestamps.max == _timestampMax) && (liveValues.sync.selectedFeed.url == params.feeds.selectedFeed.url) && (liveValues.sync.selectedFeed.account == params.feeds.selectedFeed.account)) ? true : false;
+                        
             var _timestampMin = (_partialRendering) ? 
                 liveValues['entries']['last']['_myTimestamp'] :
                 liveValues['timestamps']['max'] - (86400 * nbDaysAgo) - 86400 + 1;
