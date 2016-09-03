@@ -2734,7 +2734,7 @@
                 _previousTsMs = _keys[_i];
                 _content = (sortedEntries[_previousTsMs]._myFeedInformations.title + ' ' + sortedEntries[_previousTsMs].title + ' ' + sortedEntries[_previousTsMs].contentSnippet).toLowerCase();
                 if (((params.entries.displaySmallEntries == false) && (my.isSmallEntry(sortedEntries[_keys[_i]])))
-                    //|| ((params.entries.displaySmallEntries == true) && (my.isSmallEntry(sortedEntries[_keys[_i]])) && (liveValues.network.status == 'offline'))
+                    || ((params.entries.displaySmallEntries == true) && (my.isSmallEntry(sortedEntries[_keys[_i]])) && (liveValues.network.status == 'offline'))
                     || (_inputSearchEntries !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_inputSearchEntries.toLowerCase()) == -1))
                 ){
                     continue;
@@ -2751,7 +2751,7 @@
                 _nextTsMs = _keys[_j];
                 _content = (sortedEntries[_nextTsMs]._myFeedInformations.title + ' ' + sortedEntries[_nextTsMs].title + ' ' + sortedEntries[_nextTsMs].contentSnippet).toLowerCase();
                 if (((params.entries.displaySmallEntries == false) && (my.isSmallEntry(sortedEntries[_keys[_j]])))
-                    //|| ((params.entries.displaySmallEntries == true) && (my.isSmallEntry(sortedEntries[_keys[_j]])) && (liveValues.network.status == 'offline'))
+                    || ((params.entries.displaySmallEntries == true) && (my.isSmallEntry(sortedEntries[_keys[_j]])) && (liveValues.network.status == 'offline'))
                     || (_inputSearchEntries !== "" && liveValues['entries']['search']['visible'] && (_content.indexOf(_inputSearchEntries.toLowerCase()) == -1))
                 ){
                     continue;
