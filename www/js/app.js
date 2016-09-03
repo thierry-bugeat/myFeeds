@@ -129,7 +129,9 @@
             "newsPreviouslyDisplayed": [],      // Store news previously displayed.
                                                 // Used to change entries opacity.
             "html": [],
-            "last": ""                          // Store last recent entry.
+            "last": "",                         // Store last recent entry.
+            "currentlyDisplayed": ""            // Store id (tsms) of news currently displayed. Required to set "partialRendering" value.
+                                                // User is reading a news.
         },
         "sync": {                               // Store informations about last synchro
             "nbFeedsLoaded": 0,                 // Used during synchro
@@ -1484,7 +1486,7 @@
             var start = performance.now();
             
             var _timestampMax = liveValues['timestamps']['max'] - (86400 * nbDaysAgo); // End of current day 23:59:59
-            var _partialRendering = ((nbDaysAgo == 0) && (liveValues.sync.nbDaysAgo == nbDaysAgo) && (liveValues.sync.theme == params.entries.theme) && (liveValues.sync.timestamps.max == _timestampMax) && (liveValues.sync.selectedFeed.url == params.feeds.selectedFeed.url) && (liveValues.sync.selectedFeed.account = params.feeds.selectedFeed.account)) ? true : false;
+            var _partialRendering = ((liveValues.entries.currently == '') && (nbDaysAgo == 0) && (liveValues.sync.nbDaysAgo == nbDaysAgo) && (liveValues.sync.theme == params.entries.theme) && (liveValues.sync.timestamps.max == _timestampMax) && (liveValues.sync.selectedFeed.url == params.feeds.selectedFeed.url) && (liveValues.sync.selectedFeed.account = params.feeds.selectedFeed.account)) ? true : false;
             
             var _timestampMin = (_partialRendering) ? 
                 liveValues['entries']['last']['_myTimestamp'] :
@@ -2329,7 +2331,12 @@
             }
         }
 
-        closeMainEntry.onclick = function(event) { ui._vibrate(); ui._quickScrollTo(0); ui.echo("browser", "", ""); }
+        closeMainEntry.onclick = function(event) { 
+            ui._vibrate(); 
+            ui._quickScrollTo(0); 
+            ui.echo("browser", "", ""); 
+            liveValues.entries.currentlyDisplayed = '';
+        }
 
         // Screen find feed
 
@@ -2693,6 +2700,7 @@
         document.body.addEventListener('mainEntryOpen.done', function(event){
             
             ui.markAsRead(event.detail.entryId); // Mark entry as read
+            liveValues.entries.currentlyDisplayed = event.detail.entryId;
             setEntriesIds(); // Set values liveValues['entries']['id']['max'] & liveValues['entries']['id']['min']
             
             var _mySha256_title = event.detail["_mySha256_title"];
