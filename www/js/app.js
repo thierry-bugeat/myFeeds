@@ -31,7 +31,7 @@
     var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': [], 'tinytinyrss': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 2.46,                        // Don't forget to increase this value if you do changes in "params" object
+        "version": 2.48,                        // Don't forget to increase this value if you do changes in "params" object
         "changelog": "https://git.framasoft.org/thierry-bugeat/myFeeds/raw/master/CHANGELOG",
         "feeds": {
             "selectedFeed": {
@@ -85,8 +85,8 @@
             "developper_menu": {
                 "visible": false,               // Display or not developper menu in settings
                 "logs": {
-                    "console": false,            // Developper logs in console
-                    "screen": false              // Developper logs on screen
+                    "console": false,           // Developper logs in console
+                    "screen": false             // Developper logs on screen
                 }
             },
             "update": {
@@ -139,7 +139,8 @@
             "nbDaysAgo": -1,
             "theme": "",
             "timestamps": {
-                "max": -1
+                "max": -1,
+                "lastUpdate": 0                 // Timestamp in seconds of last synchro
             },
             "selectedFeed": {                   // (See also "params.feeds.selectedFeed")
                 "url": "",
@@ -1334,6 +1335,9 @@
     }
 
     function loadFeeds() {
+        liveValues.sync.timestamps.lastUpdate = Math.round(Date.now()/1000);
+        ui._onclick(sync, 'disable');
+        
         try {
             var _now = new Date();
             document.getElementById('lastUpdateTime').innerHTML = _now.toLocaleTimeString(userLocale); 
@@ -1488,7 +1492,7 @@
             
             var _timestampMax = liveValues['timestamps']['max'] - (86400 * nbDaysAgo); // End of current day 23:59:59
             var _partialRendering = ((liveValues.entries.currentlyDisplayed == '') && (nbDaysAgo == 0) && (liveValues.sync.nbDaysAgo == nbDaysAgo) && (liveValues.sync.theme == params.entries.theme) && (liveValues.sync.timestamps.max == _timestampMax) && (liveValues.sync.selectedFeed.url == params.feeds.selectedFeed.url) && (liveValues.sync.selectedFeed.account == params.feeds.selectedFeed.account)) ? true : false;
-                        
+  
             var _timestampMin = (_partialRendering) ? 
                 liveValues['entries']['last']['_myTimestamp'] :
                 liveValues['timestamps']['max'] - (86400 * nbDaysAgo) - 86400 + 1;
@@ -2305,7 +2309,6 @@
             var _nowInterval = performance.now();
             if ((liveValues.network.status == 'online') && ((_nowInterval - _startInterval) >= (params.entries.updateEvery * 1000))) {
                 _startInterval = _nowInterval;
-                ui._onclick(sync, 'disable');
                 loadFeeds();
             }
         }, 59000); // 59s Less than minimal Firefox OS sleep time (60s)
@@ -2327,7 +2330,6 @@
         sync.onclick = function(event) {
             if (liveValues.network.status == 'online') {
                 ui._vibrate();
-                ui._onclick(this, 'disable');
                 loadFeeds();
             }
         }
@@ -2603,19 +2605,24 @@
             ui._search(_searchString);
         });
         
-        // test
-        /*document.getElementById('inputSearchEntries').addEventListener('onchange', function(){
-            window.alert('ici');
-            var _searchString = document.getElementById('inputSearchEntries').value;
-            ui._search(_searchString);
-        });*/
-        
         /* ======================= */
         /* --- Listeners: Misc --- */
         /* ======================= */
 
         browser.addEventListener('mozbrowsererror', function (event) {
             console.dir("Moz Browser loading error : " + event.detail);
+        });
+        
+        // The "visibilitychange" event is fired when the content 
+        // of a tab has become visible or has been hidden.
+        
+        document.addEventListener("visibilitychange", function() {
+            if (document.visibilityState == 'visible') {
+                var _now = Math.round(Date.now()/1000);
+                if ((_now - params.entries.updateEvery) > liveValues.sync.timestamps.lastUpdate) {
+                    loadFeeds();
+                }
+            }
         });
  
         // Set the 'lang' and 'dir' attributes to <html> when the page is translated
