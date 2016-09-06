@@ -62,6 +62,7 @@ var MyListeners_SimplePie = function() {
                 }
                 
                 if (liveValues.sync.nbFeedsLoaded >= liveValues.sync.nbFeedsToLoad) {
+                    liveValues.sync.inProgress = false;
                     liveValues.sync.nbFeedsToLoad = 0;
                     liveValues.sync.nbFeedsLoaded = 0;
                     ui._loading(100); ui.echo("loading", "", "");
@@ -99,6 +100,7 @@ var MyListeners_SimplePie = function() {
                 }
                 
                 if (liveValues.sync.nbFeedsLoaded >= liveValues.sync.nbFeedsToLoad) {
+                    liveValues.sync.inProgress = false;
                     liveValues.sync.nbFeedsToLoad = 0;
                     liveValues.sync.nbFeedsLoaded = 0;
                     ui._loading(100); ui.echo("loading", "", "");

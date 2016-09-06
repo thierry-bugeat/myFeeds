@@ -245,6 +245,7 @@ MyUi.prototype._disable = function() {
 
 /**
  * Change opacity of UI elements when network connection change.
+ * Specific case for "sync" button: If synchro is in progress, "sync" button must remain disabled.
  * @param {string} _status "enable", "disable"
  */
 MyUi.prototype.toggle = function(_status) {
@@ -255,7 +256,11 @@ MyUi.prototype.toggle = function(_status) {
     
     var _items = document.querySelectorAll("._online_");
     for (var i = 0; i < _items.length; i++) {
-        _MyUi._onclick(_items[i], _status);
+        if ((_items[i].id == 'sync') && liveValues.sync.inProgress) {
+            // Do nothing. Button "sync" must remain disabled.
+        } else {
+            _MyUi._onclick(_items[i], _status);
+        }
     }
     
     // Small entries :

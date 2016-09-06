@@ -134,6 +134,7 @@
                                                 // User is reading a news.
         },
         "sync": {                               // Store informations about last synchro
+            "inProgress": false,
             "nbFeedsLoaded": 0,                 // Used during synchro
             "nbFeedsToLoad": 0,                 // Used during synchro
             "nbDaysAgo": -1,
@@ -1335,6 +1336,7 @@
     }
 
     function loadFeeds() {
+        liveValues.sync.inProgress = true;
         liveValues.sync.timestamps.lastUpdate = Math.round(Date.now()/1000);
         ui._onclick(sync, 'disable');
         
