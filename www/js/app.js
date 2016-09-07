@@ -1336,6 +1336,8 @@
     }
 
     function loadFeeds() {
+        if (liveValues.sync.inProgress) {return;}
+        
         liveValues.sync.inProgress = true;
         liveValues.sync.timestamps.lastUpdate = Math.round(Date.now()/1000);
         ui._onclick(sync, 'disable');
@@ -2305,12 +2307,9 @@
 
         // --- Automatic update entries every N seconds ---
 
-        var _startInterval = performance.now();
-        
         window.setInterval(function() {
-            var _nowInterval = performance.now();
-            if ((liveValues.network.status == 'online') && ((_nowInterval - _startInterval) >= (params.entries.updateEvery * 1000))) {
-                _startInterval = _nowInterval;
+            var _nowInterval = Math.round(Date.now()/1000);
+            if ((liveValues.network.status == 'online') && ((_nowInterval - liveValues.sync.timestamps.lastUpdate) >= params.entries.updateEvery)) {
                 loadFeeds();
             }
         }, 59000); // 59s Less than minimal Firefox OS sleep time (60s)
