@@ -1,5 +1,5 @@
 --------------------------------------------------------- 
-# myFeeds 1.5.0 (2016-09-05) 
+# myFeeds 1.5.0 (2016-09-07) 
  
 ### New feature(s) 
  
@@ -14,6 +14,7 @@
     - #47 Sync gesture improvement 
     - #55 Highlight selected feed and/or keyword 
     - #59 Sync after wakeup 
+    - #60 Do only one sync after wakeup
     - Display feeds icons (if available) 
     - Update presentation of selected news (Added enclosure) 
     
@@ -28,6 +29,7 @@
 ### Misc 
  
     - #46 Cordova migration (To support futures Android & Ubuntu Touch versions) 
+    - Add developer option: Service Base 
  
 --------------------------------------------------------- 
 # myFeeds 1.4.2 (2016-03-16) 
