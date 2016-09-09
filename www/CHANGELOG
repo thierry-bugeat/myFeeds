@@ -1,5 +1,5 @@
 --------------------------------------------------------- 
-# myFeeds 1.5.0 (2016-09-07) 
+# myFeeds 1.5.0 (2016-09-09) 
  
 ### New feature(s) 
  
@@ -15,6 +15,7 @@
     - #55 Highlight selected feed and/or keyword 
     - #59 Sync after wakeup 
     - #60 Do only one sync after wakeup
+    - #61 Restore scroll position after sync
     - Display feeds icons (if available) 
     - Update presentation of selected news (Added enclosure) 
     

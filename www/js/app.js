@@ -1482,8 +1482,6 @@
         var feedUrl = params.feeds.selectedFeed.url;
         var feedAccount = params.feeds.selectedFeed.account;
         
-        var feedsEntriesScrollTop = dom['screens']['entries']['scroll'].scrollTop;
-        
         ui.echo('feedsEntriesNbDaysAgo', document.webL10n.get('loading'), '');
         
         clearTimeout(liveValues.timeouts.entries.display);
@@ -1712,6 +1710,15 @@
 
             ui.echo('feedsEntriesNbDaysAgo', _daySeparator, '');
 
+            // Store information about scroll position.
+            // Used to restore scroll position once "dspEntries" then "search" are done.
+            // "search" is executed once custom event "dspEntries.done" is fired.
+
+            if (_partialRendering) {
+                var _previousScrollTop = dom['screens']['entries']['scroll'].scrollTop;
+                var _previousScrollHeight = dom['screens']['entries']['scroll'].scrollHeight;
+            }
+
             // Display entries:
             
             var start2 = performance.now();
@@ -1744,14 +1751,10 @@
             params.entries.displaySmallEntries ?
                 ui._smallEntries('show') : ui._smallEntries('hide');
 
-            // Scroll if you stay in same day.
-            
-            if (_previousNbDaysAgo == nbDaysAgo) {
-                dom['screens']['entries']['scroll'].scrollTop = feedsEntriesScrollTop;
-            }
-            
+            //
+
             _previousNbDaysAgo = nbDaysAgo;
-            
+
             // Mark as read
             
             ui.markAsRead();
@@ -1768,7 +1771,7 @@
                 ui._disable();
             }
             
-            document.body.dispatchEvent(new CustomEvent('dspEntries.done', {"detail": ""}));
+            document.body.dispatchEvent(new CustomEvent('dspEntries.done', {"detail": {"_partialRendering": _partialRendering, "_previousScrollTop": _previousScrollTop, "_previousScrollHeight": _previousScrollHeight}}));
         
             // --- Eecution time
             
@@ -2528,11 +2531,18 @@
   
         // Search entries after "dspEntries"
         // Display form then do a search.
+        // Restore scroll position.
         
         document.body.addEventListener('dspEntries.done', function(event){
             if (liveValues['entries']['search']['visible']) {
                 ui._searchEntriesOpen(false); // No focus
                 ui._search(document.getElementById('inputSearchEntries').value);
+            } 
+            // Restore scroll position
+            if (event.detail._partialRendering) {
+                my.log('dspEntries.done', event.detail);
+                var _newScrollHeight = dom['screens']['entries']['scroll'].scrollHeight;
+                dom['screens']['entries']['scroll'].scrollTop = (event.detail._previousScrollTop + (_newScrollHeight-event.detail._previousScrollHeight));
             } 
         });
 
