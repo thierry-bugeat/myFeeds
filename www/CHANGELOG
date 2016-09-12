@@ -1,5 +1,5 @@
 --------------------------------------------------------- 
-# myFeeds 1.5.0 (2016-09-09) 
+# myFeeds 1.5.0 (2016-09-12) 
  
 ### New feature(s) 
  
@@ -26,6 +26,7 @@
     - #56 Can't mark as read last news 
     - #57 Strange behavior "back" and "next" buttons 
     - #58 Prevents access to small news in offline mode 
+    - #62 TTRSS no login error message 
     
 ### Misc 
  

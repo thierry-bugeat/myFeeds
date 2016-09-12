@@ -34,8 +34,9 @@ var MyListeners_TinyTinyRss = function() {
         });
 
         document.body.addEventListener('TinyTinyRss.login.error', function(response){
+            var _error = response.detail.message || "";
             my.log('CustomEvent : TinyTinyRss.login.error', arguments);
-            my.message('Tiny Tiny Rss login error');
+            my.message("Tiny Tiny Rss login error\n" + _error);
         });
 
         document.body.addEventListener('TinyTinyRss.getSubscriptions.done', function(response){

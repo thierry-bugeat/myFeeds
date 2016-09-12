@@ -68,7 +68,6 @@ TinyTinyRss.prototype.setToken = function(token) {
         return 1;
     } else {
         document.body.dispatchEvent(new CustomEvent('TinyTinyRss.setToken.error', {"detail": token}));
-        window.alert("Tiny Tiny Rss Error : \n" + JSON.stringify(token));
         return 0;
     }
 }
@@ -106,7 +105,7 @@ TinyTinyRss.prototype.updateToken = function() {
 TinyTinyRss.prototype.login = function(url, user, password) {
     _MyFeeds.log('TinyTinyRss.prototype.login()', arguments);
     
-    _TinyTinyRss.tinytinyrss.url = url;
+    _TinyTinyRss.tinytinyrss.url = (url.match(/^http/gi)) ? url : 'http://' + url;
     _TinyTinyRss.tinytinyrss.user = user;
     _TinyTinyRss.tinytinyrss.password = password;
     
@@ -126,6 +125,7 @@ TinyTinyRss.prototype.login = function(url, user, password) {
             _MyFeeds.log('CustomEvent : TinyTinyRss.login.error');
         }
     }).catch(function(error) {
+        document.body.dispatchEvent(new CustomEvent('TinyTinyRss.login.error', {"detail": error}));
         _MyFeeds.log('CustomEvent : TinyTinyRss.login.error');
     });
 
@@ -299,7 +299,7 @@ TinyTinyRss.prototype.post = function (_url, _params) {
                 resolve(_response);
             
             } else {
-                reject(Error(xhr.statusText));
+                reject(Error(xhr.status + ' ' + xhr.statusText));
             }
 
         };
