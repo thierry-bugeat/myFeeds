@@ -108,6 +108,7 @@
     }
     
     var liveValues = {
+        "platform": (typeof process != 'undefined' && process.platform) || (typeof cordova != 'undefined' && cordova.platformId) || "",
         "timestamps": {
             "min": -1,                          // Timestamp value beyond which an entry can't be displayed (Too old). Set by function "_setTimestamps()"
             "max": -1                           // End of current day (23:59:59). Set by function "_setTimestamps()"
@@ -1857,9 +1858,7 @@
         share.setAttribute("_mySha256_link", sortedEntries[entryId]['_mySha256_link']);
         share.setAttribute("_mySha256_title", sortedEntries[entryId]['_mySha256_title']);
 
-        if (url != "" ) {
-            ui.echo("browser", '<iframe src="' + url + '" sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
-        } else {
+        if (url == "") {
             var _entry = sortedEntries[entryId];
             var _srcDoc = "";
             var _regex = new RegExp('\'', 'g');
@@ -1891,7 +1890,20 @@
             _srcDoc = _srcDoc + '<div class="entrie-visit-website"><a href="' + _entry.link + '"><my data-l10n-id="entry-visit-website">' + document.webL10n.get('entry-visit-website') + '</my></a></div>';
             _srcDoc = _srcDoc + '</div>';
 
-            ui.echo("browser", '<iframe srcdoc=\'' + _srcDoc + '\' sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
+        }
+        
+        if (url != "") {
+            if (liveValues.platform === "linux") {
+                ui.echo("browser", '<webview id="electronView" src="' + url + '" ></webview>', "");
+            } else {
+                ui.echo("browser", '<iframe src="' + url + '" sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
+            }
+        } else {
+            if (liveValues.platform === "linux") {
+                ui.echo("browser", '<webview id="electronView" src=\'data:text/html;charset=utf-8,' + _srcDoc + '\'></webview>', "");
+            } else {
+                ui.echo("browser", '<iframe srcdoc=\'' + _srcDoc + '\' sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
+            }
         }
 
         document.getElementById("browser").style.cssText = "display: block;";

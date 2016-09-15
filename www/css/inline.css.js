@@ -12,6 +12,7 @@ var _srcDocCss = [
 '   margin: 0;                                                                                      ',
 '   padding: 0;                                                                                     ',
 '   font-family: "FiraSans";                                                                        ',
+'   font-family: FiraSans, HelveticaNeue-Light, HelveticaNeue, Helvetica, Arial, sans-serif;        ',
 '}                                                                                                  ',
 '                                                                                                   ',
 '@font-face {                                                                                       ',
@@ -40,4 +41,4 @@ var _srcDocCss = [
 '.entry-enclosure           {background-color: #EAEAE7; padding-bottom: 14rem; position: relative; height: 0; overflow: hidden; display: block;}',
 '.entry-enclosure img       {position: absolute; top: 50%; width:100%; left: 50%; transform: translate(-50%, -50%); border-bottom: 0.1rem solid #2C393B;',
 '</style>                                                                                           '
-].join(''); 
+].trim().join(''); 

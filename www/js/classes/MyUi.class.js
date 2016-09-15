@@ -49,10 +49,12 @@ var dom = {
         },
         "settings": document.getElementById('settings-container'),
         "feeds": document.getElementById('feeds-list-container'),
-        "find": document.getElementById('find-feeds-container')
+        "find": document.getElementById('find-feeds-container'),
+        "login": document.getElementById('login-view-container')
     }
 };
 var search                  = document.getElementById("search");
+var loginClose              = document.getElementById("loginClose");
 var settingsOpen            = document.getElementById("settingsOpen");
 var settingsClose           = document.getElementById("settingsClose");
 var find_feeds              = document.getElementById("find-feeds");
@@ -759,6 +761,7 @@ closeFeedsList.onclick  = function(event) {ui._vibrate(); ui._scrollTo(0);}
 
 settingsOpen.onclick    = function(event) {ui._vibrate(); ui._translate(dom['screens']['settings'], 'left');}
 settingsClose.onclick   = function(event) {ui._vibrate(); ui._translate(dom['screens']['settings'], 'right');}
+loginClose.onclick      = function(event) {ui._vibrate(); ui._translate(dom['screens']['login'], 'right');}
 
 /* --- Events Search --- */
 

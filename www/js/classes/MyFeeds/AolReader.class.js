@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Thierry BUGEAT
+ * Copyright 2015, 2016 Thierry BUGEAT
  * 
  * This file is part of myFeeds.
  * 
@@ -105,17 +105,37 @@ AolReader.prototype.login = function() {
         _url = 'http://' + params.settings.proxy.host + '/proxy/aolreader/example.php';
     }*/
     
-    var _inAppBrowser = window.open(_url, '_blank', 'location=yes');
-    
-    _inAppBrowser.addEventListener('loadstart', function(event) {
-        //_MyFeeds.log(event);
-        if (event.url.match(/^http:\/\/localhost/)) {
-            if (event.url.match(/code=([^&]+)/)) {
-                _inAppBrowser.close();
-                _AolReader._loginCallback(event.url);
+    // Electron (Desktop version)
+    // Cordova (FXOS, Android, Browser)
+
+    if (liveValues.platform === "linux") {
+        ui.echo("login-view", '<webview id="aolreaderElectronView" src="' + _url + '" ></webview>');
+        ui._vibrate(); ui._translate(dom['screens']['login'], 'left');
+        var _webView = document.getElementById("aolreaderElectronView");
+        
+        _webView.addEventListener("dom-ready", function(event) {
+            if (event.target.src.match(/^http:\/\/localhost/)) {
+                if (event.target.src.match(/code=([^&]+)/)) {
+                    loginClose.click();
+                    ui.echo("login-view", '');
+                    _AolReader._loginCallback(event.target.src);
+                }
             }
-        }
-    });
+        });
+
+    } else {
+        var _inAppBrowser = window.open(_url, '_blank', 'location=yes');
+
+        _inAppBrowser.addEventListener('loadstart', function(event) {
+            if (event.url.match(/^http:\/\/localhost/)) {
+                if (event.url.match(/code=([^&]+)/)) {
+                    _inAppBrowser.close();
+                    _AolReader._loginCallback(event.url);
+                }
+            }
+        });
+    }
+
 
     return false;
 };

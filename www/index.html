@@ -51,6 +51,7 @@
         <link href="css/feeds-list.css" type="text/css" rel="stylesheet">
         <link href="css/find-feeds.css" type="text/css" rel="stylesheet">
         <link href="css/settings.css" type="text/css" rel="stylesheet">
+        <link href="css/login-desktop.css" type="text/css" rel="stylesheet">
         <link href="css/style.css" type="text/css" rel="stylesheet">
         <link href="css/entries-list.css" type="text/css" rel="stylesheet">
         <link href="css/switches.css" type="text/css" rel="stylesheet">
@@ -233,10 +234,36 @@
 
         </div>
 
+        <!-- ============================== -->
+        <!-- Desktop version (Login screen) -->
+        <!-- ============================== -->
+
+        <div role="region" data-type="sidebar" id="login-view-container">
+
+            <section role="myHeader">
+                <header class="mySystemHeader">
+                    <h1 data-l10n-id="my-online-account">my Online Account</h1>
+                </header>
+            </section>
+
+            <div id="login-view" class="scrollable scroll"></div>
+
+            <section role="myFooter" class="">
+                <header>
+                    <button id="loginClose" class="_startAnimation_"><span data-icon="close"></span></button>
+                </header>
+            </section>
+
+        </div>
 
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
     </body>
+
+    <!-- Libs -->
+
+    <script type="text/javascript" src="js/libs/myCore.js"></script>
+
 
     <!-- Inline CSS -->
 
@@ -247,10 +274,6 @@
     <script src="js/libs/l10n.js"></script>
     <link rel="resource" type="application/l10n" href="js/locales/locales.ini" />
     <script type="text/javascript" src="js/locales/locales.js"></script>
-
-    <!-- Libs -->
-
-    <script type="text/javascript" src="js/libs/myCore.js"></script>
 
     <!-- classes -->
 

@@ -6,7 +6,9 @@
     background-color: var(--fxos-ivory);
 }
 
-#browser > iframe {
+#browser > iframe,
+#browser > webview
+{
     background-color: var(--fxos-ivory);
     border: 0px solid red;
     box-sizing: border-box;

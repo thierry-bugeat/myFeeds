@@ -135,18 +135,37 @@ Feedly.prototype.login = function() {
         _urlParams = '&url=' + encodeURIComponent(_Feedly.feedly.host + '/v3/auth/auth?client_id=' + encodeURIComponent(_Feedly.feedly.client_id) + '&redirect_uri=' + encodeURIComponent('http://localhost') + '&response_type=code' + '&scope=' + encodeURIComponent('https://cloud.feedly.com/subscriptions'));
         _url = 'http://' + params.settings.proxy.host + '/proxy/?' + _urlParams;
     }*/   
- 
-    var _inAppBrowser = window.open(_url, '_blank', 'location=yes');
     
-    _inAppBrowser.addEventListener('loadstart', function(event) {
-        //_MyFeeds.log(event);
-        if (event.url.match(/^http:\/\/localhost/)) {
-            if (event.url.match(/code=([^&]+)/)) {
-                _inAppBrowser.close();
-                _Feedly._loginCallback(event.url);
+    // Electron (Desktop version)
+    // Cordova (FXOS, Android, Browser)
+
+    if (liveValues.platform === "linux") {
+        ui.echo("login-view", '<webview id="feedlyElectronView" src="' + _url + '" ></webview>');
+        ui._vibrate(); ui._translate(dom['screens']['login'], 'left');
+        var _webView = document.getElementById("feedlyElectronView");
+        
+        _webView.addEventListener("dom-ready", function(event) {
+            if (event.target.src.match(/^http:\/\/localhost/)) {
+                if (event.target.src.match(/code=([^&]+)/)) {
+                    loginClose.click();
+                    ui.echo("login-view", '');
+                    _Feedly._loginCallback(event.target.src);
+                }
             }
-        }
-    });
+        });
+
+    } else {
+        var _inAppBrowser = window.open(_url, '_blank', 'location=yes');
+
+        _inAppBrowser.addEventListener('loadstart', function(event) {
+            if (event.url.match(/^http:\/\/localhost/)) {
+                if (event.url.match(/code=([^&]+)/)) {
+                    _inAppBrowser.close();
+                    _Feedly._loginCallback(event.url);
+                }
+            }
+        });
+    }
 
     return false;
 };

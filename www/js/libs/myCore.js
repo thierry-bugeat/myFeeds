@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Thierry BUGEAT
+ * Copyright 2015, 2016 Thierry BUGEAT
  * 
  * This file is part of myFeeds.
  * 
@@ -36,6 +36,13 @@ Array.prototype.contains = function(obj) {
 Array.prototype.last = function() {
     var i = -1 + this.length;
     return this[i];
+}
+
+Array.prototype.trim = function() {
+    for (var i = 0; i < this.length; i++) {
+        this[i] = this[i].trim();
+    }
+    return this;
 }
 
 String.prototype.htmlentities = function() {
