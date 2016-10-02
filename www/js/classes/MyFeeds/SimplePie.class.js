@@ -33,8 +33,8 @@ var SimplePie = function() {
         "v"             : "1.0" ,                                                   // Google API version
         "scoring"       : "h",                                                      // Include historical entries
         "servers"       : [
-            {"id": 0, "name": "SimplePie @ Amazon EC2",     "url": "http://54.229.143.103/simplepie/" }, 
-            {"id": 1, "name": "SimplePie @ OVH",            "url": "http://quiksiivjq.cluster002.ovh.net/simplepie/" },
+            {"id": 0, "name": "SimplePie @ OVH",            "url": "http://quiksiivjq.cluster002.ovh.net/simplepie/" },
+            {"id": 1, "name": "SimplePie @ Amazon EC2",     "url": "http://54.229.143.103/simplepie/" }, 
             {"id": 2, "name": "SimplePie @ Home eeepc701",  "url": "http://thierry.bugeat.com/simplepie/" }
         ],
         "serverId"      : 0,
