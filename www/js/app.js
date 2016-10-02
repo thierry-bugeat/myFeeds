@@ -1494,7 +1494,7 @@
             var start = performance.now();
             
             var _timestampMax = liveValues['timestamps']['max'] - (86400 * nbDaysAgo); // End of current day 23:59:59
-            var _partialRendering = ((liveValues.entries.currentlyDisplayed == '') && (nbDaysAgo == 0) && (liveValues.sync.nbDaysAgo == nbDaysAgo) && (liveValues.sync.theme == params.entries.theme) && (liveValues.sync.timestamps.max == _timestampMax) && (liveValues.sync.selectedFeed.url == params.feeds.selectedFeed.url) && (liveValues.sync.selectedFeed.account == params.feeds.selectedFeed.account)) ? true : false;
+            var _partialRendering = ((typeof liveValues['entries']['last'] != 'undefined') && (typeof liveValues['entries']['last']['_myTimestamp'] != 'undefined') && (liveValues.entries.currentlyDisplayed == '') && (nbDaysAgo == 0) && (liveValues.sync.nbDaysAgo == nbDaysAgo) && (liveValues.sync.theme == params.entries.theme) && (liveValues.sync.timestamps.max == _timestampMax) && (liveValues.sync.selectedFeed.url == params.feeds.selectedFeed.url) && (liveValues.sync.selectedFeed.account == params.feeds.selectedFeed.account)) ? true : false;
   
             var _timestampMin = (_partialRendering) ? 
                 liveValues['entries']['last']['_myTimestamp'] :
@@ -2694,7 +2694,21 @@
             var _entry = sortedEntries[_entryId];
             my.log(_entry);
             
-            if (cordova.platformId === 'firefoxos') {
+            if (liveValues.platform === 'linux') {
+                
+                if (typeof process === 'object') {
+                    var ipcRenderer = require('electron').ipcRenderer;
+
+                    ipcRenderer.send('sendEmail', encodeURIComponent(_entry.title), encodeURIComponent(_entry.link));
+
+                    ipcRenderer.on('asynchronous-reply', function(event, arg){
+                        console.log(arg);
+                    });
+
+                    ipcRenderer.send('asynchronous-message', 'ping');
+                }
+
+            } else if (cordova.platformId === 'firefoxos') {
                 new MozActivity({
                     name: "new",
                     data: {
