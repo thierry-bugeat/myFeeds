@@ -1,0 +1,44 @@
+{
+  "name": "myfeeds",
+  "version": "1.5.0",
+  "description": "RSS reader",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "~/repos/git/electron/out/D/electron .",
+    "build": "electron-packager . MyFeeds --version=1.4.0 --icon=img/logo.png --overwrite && cp img/logo.png MyFeeds-linux-x64/resources/",
+    "package": "asar pack MyFeeds-linux-x64/resources/app MyFeeds-linux-x64/resources/app.asar"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://framagit.org/thierry-bugeat/myFeeds.git"
+  },
+  "keywords": [
+    "rss",
+    "atom",
+    "reader",
+    "ttrss",
+    "old reader",
+    "feedly",
+    "aol"
+  ],
+  "author": "Thierry BUGEAT",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://framagit.org/thierry-bugeat/myFeeds/issues",
+    "email": "myfeeds@bugeat.com"
+  },
+  "homepage": "http://thierry.bugeat.com/myFeeds/",
+  "devDependencies": {
+    "asar": "^0.12.3",
+    "electron-builder": "^6.7.6",
+    "electron-packager": "^8.0.0",
+    "electron-prebuilt": "^1.4.0"
+  },
+  "webide": {
+    "prepackage": "cordova prepare",
+    "packageDir": "./platforms/firefoxos/www"
+  },
+  "dependencies": {
+    "electron-prebuilt": "^1.4.0"
+  }
+}

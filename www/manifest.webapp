@@ -1,0 +1,65 @@
+{
+    "name": "my Feeds",
+    "description": "RSS & ATOM feeds reader",
+    "version": "1.5.0",
+    "launch_path": "/index.html",
+    "icons": {
+        "60": "/img/icon-60.png",
+        "128": "/img/icon-128.png"
+    },
+    "developer": {
+        "name": "Thierry BUGEAT",
+        "url": "http://thierry.bugeat.com/myFeeds/"
+    },
+    "orientation": ["portrait-primary", "landscape-primary"],
+    "default_locale": "en",
+    "locales": {
+        "en": {
+            "name": "my Feeds",
+            "description": "RSS & ATOM Reader.",
+            "my_title": "English"
+        },
+        "es": {
+            "name": "mis Noticias",
+            "description": "Lector de RSS y ATOM.",
+            "my_title": "Español"
+        },
+        "fr": {
+            "name": "mes Fluxs",
+            "description": "Lecteur de flux RSS & ATOM.",
+            "my_title": "Français"
+        },
+        "pt": {
+            "name" : "meus Fluxs",
+            "description": "RSS e Atom Reader.",
+            "my_title": "Português"
+        },
+        "ru": {
+            "name": "my Feeds",
+            "description": "RSS & ATOM Reader.",
+            "my_title": "Pусский"
+        }
+    },
+    "type": "privileged",
+    "csp": "default-src *; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'",
+    "redirects": [
+    ],
+    "permissions": {
+        "desktop-notification": {
+            "description": "Needed for creating system notifications."
+        },
+        "browser": {
+            "description": "Needed for displaying external website in app."
+        },
+        "systemXHR": {
+            "description": "request cross domain."
+        },
+        "device-storage:sdcard":    { 
+            "access": "readwrite",
+            "description": "Required for storing and retrieving data." 
+        },
+        "storage": {
+            "description": "Required for storing and retrieving data."
+        }
+    }
+}

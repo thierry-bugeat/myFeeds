@@ -1,0 +1,38 @@
+.inAppBrowserWrap {
+    background-color: var(--fxos-light-grey);
+    color: var(--fxos-grey);
+    height: calc(100%) !important;
+}
+
+.inAppBrowserWrap menu {
+    overflow: auto;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.inAppBrowserWrap menu li {
+    font-size: 30px;
+    height: 4rem;
+    width: 4rem;
+    float: left;
+    margin:0;
+    padding:0.5rem;
+    text-align: center;
+    text-decoration: none;
+    color: var(--fxos-grey);
+    display: block;
+}
+
+.inAppBrowserWrap menu li.disabled {
+    color: #777;
+}
+
+.inAppBrowserWrap iframe{
+    top: 5rem !important;
+    height: calc(100% - 5rem) !important;
+}
+
+.inAppBrowserBack, .inAppBrowserForward {
+    display: none !important;
+}

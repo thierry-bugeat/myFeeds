@@ -1,0 +1,152 @@
+--------------------------------------------------------- 
+# myFeeds 1.5.0 (2016-10-03) 
+ 
+### New feature(s) 
+ 
+    - #41 New gestures for opening settings & feeds list screens 
+    - Option to display number of news in feeds list 
+ 
+### Improvement(s) 
+    
+    - #21 Highlight news previously seen 
+    - #43 Partial news rendering. Don't refresh entire screen. 
+    - #48 Add visual element at top of news list 
+    - #47 Sync gesture improvement 
+    - #55 Highlight selected feed and/or keyword 
+    - #59 Sync after wakeup 
+    - #60 Do only one sync after wakeup
+    - #61 Restore scroll position after sync
+    - Display feeds icons (if available) 
+    - Update presentation of selected news (Added enclosure) 
+    
+### Bug(s) 
+ 
+    - #50 Blank screen after loss of network 
+    - #53 Network detection FXOS 2.6 
+    - #56 Can't mark as read last news 
+    - #57 Strange behavior "back" and "next" buttons 
+    - #58 Prevents access to small news in offline mode 
+    - #62 TTRSS no login error message 
+    
+### Misc 
+ 
+    - #46 Cordova migration (To support futures Android & Ubuntu Touch versions) 
+    - Add developer option: Service Base 
+ 
+--------------------------------------------------------- 
+# myFeeds 1.4.2 (2016-03-16) 
+
+### Bug(s) 
+ 
+    - #52 Fix white screen on first launch  
+
+--------------------------------------------------------- 
+# myFeeds 1.4.1 (2015-12-08) 
+
+### Bug(s) 
+ 
+    - Fix network changes issues 
+    - Fix last update time 
+ 
+--------------------------------------------------------- 
+# myFeeds 1.4.0 (2015-12-04) 
+
+### Severe Bug(s) 
+ 
+    - #45 Remove usage of Google Feeds API 
+ 
+--------------------------------------------------------- 
+# Important message 2015.12.02 
+  
+Due to the usage of deprecated Google Feeds API, versions
+of myFeeds prior to 1.3.x no longer works.  
+Sorry for the inconvenience.  
+Please download version 1.4.0
+
+--------------------------------------------------------- 
+# myFeeds 1.3.1 (2015-11-24) 
+
+### Bug(s) 
+ 
+    - Bug in news display when animations are off 
+ 
+--------------------------------------------------------- 
+# myFeeds 1.3.0 (2015-11-24) 
+
+### New feature(s) 
+ 
+    - #18 Add Tiny Tiny RSS online account 
+    - #36 Add landscape orientation 
+    - #39 Add animation option 
+
+### Improvement(s) 
+    
+    - #36 Update settings screen theme
+    - #37 Update Firefox OS 1.4 theme 
+    - #38 Update Russian translations
+    - Increase UI performances 
+    
+### Misc 
+
+    - #40 Add vibration on buttons next and previous entries    
+    - #35 Add local storage for future desktop version 
+    - #34 Add proxy (The Old Reader) for future desktop version
+    
+--------------------------------------------------------- 
+# myFeeds 1.2.0 (2015-10-24) 
+
+### New feature(s): 
+
+    - #13 Add AOL Reader online account
+    - #30 Export subscriptions as OPML file
+    - #29 Add Russian language (Thanks to Пётр Жоря)
+    - #33 Display next & previous news titles at bottom of page
+    
+### Improvement(s):
+
+    - #32 Count keywords
+
+### Bug(s) 
+
+    - #31 Display previoulsy loaded images in offline mode
+ 
+ 
+--------------------------------------------------------- 
+# myFeeds 1.1.1 (2015-10-10) 
+ 
+### Improvement(s): 
+ 
+	- Update date localization in main entry screen
+
+--------------------------------------------------------- 
+# myFeeds 1.1.0 (2015-10-06) 
+ 
+### New feature(s): 
+ 
+	- #9 Add buttons next & previous news
+ 
+### Improvement(s): 
+ 
+	- #6 Update themes icones
+	- #15 Sort keywords by alphabetical order
+	- #26 Dates and times localization
+	- #25 Update subscriptions when application start
+	- #23 Add GPL licence
+	- #24 Add copyright in sources files
+	- #28 Add CHANGELOG file
+ 
+### Bug(s): 
+ 
+	- #7 Bug: Some photos are not displayed
+	- #27 Incorrect feeds last update date
+ 
+--------------------------------------------------------- 
+# myFeeds 1.0.1 
+ 
+### Improvement(s): 
+ 
+	- Keep scrolling position after synchro
+	- Load only visibles images
+
+--------------------------------------------------------- 
+ 
