@@ -1,4 +1,4 @@
-# myFeeds 1.5.0 (2016-09-12): RSS reader for Firefox OS  
+# myFeeds 1.5.0 (2016-10-03): RSS reader for Firefox OS  
 This project is now hosted by Framasoft.  
 The main GIT repository URL is now : 
 https://git.framasoft.org/thierry-bugeat/myFeeds
