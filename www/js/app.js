@@ -2363,6 +2363,8 @@
         findFeedsClose.onclick = function(event) { ui._vibrate(); ui._scrollTo(-1); }
 
         findFeedsSubmit.onclick = function(event) { 
+            event.stopPropagation();
+            event.preventDefault();
             ui._vibrate();
             var _url = document.getElementById("findFeedsText").value; 
             if (_url) {
