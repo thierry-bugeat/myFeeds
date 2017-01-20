@@ -1,4 +1,4 @@
-var DEBUG = true;
+var DEBUG = false;
 const electron = require('electron')
 
 const app = electron.app                        // Module to control application life.
@@ -77,7 +77,7 @@ function createWindow () {
 
     var _width = (DEBUG) ? 950 : 350;
 
-    mainWindow = new BrowserWindow({width: _width, height: 650, icon: __dirname+'/../img/icon-60.png', icon: __dirname+'/../img/icon-60.png'})
+    mainWindow = new BrowserWindow({width: _width, height: 650, icon: __dirname+'/icon.png'})
 
     // and load the index.html of the app.
 
