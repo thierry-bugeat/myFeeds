@@ -23,7 +23,7 @@ var _srcDocCss = [
 '       url("fonts/FiraSans/FiraSans-Regular.ttf") format("truetype");                              ',
 '  font-weight: normal; font-style: normal; }                                                       ',
 '                                                                                                   ',
-'html                       {font-size: 62.5%;}                                                     ',
+'html                       {font-size: 57%;}                                                       ',
 'body                       {padding: 0rem; font-size: 1.6rem; line-height: 1.25;}                  ',
 '.entry                     {padding: 1.5rem;}                                                      ',
 '.entrie-title              {font-weight: bold; font-size: 2rem; line-height: 1;}                   ',
