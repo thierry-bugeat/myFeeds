@@ -224,11 +224,15 @@ SimplePie.prototype.addEntries = function(entries) {
         
             var _results    = [];
             var _imageUrl   = '';
-            var _regex      = /<img[^>]+src="(http(|s):\/\/[^">]+(?!gif))/g;
+            var _regex      = /<img[^>]+src="(http(|s):\/\/[^">]+(jpg|png))/g;
 
             _results    = _regex.exec(_entry.content);
             
-            if ((typeof _entry.enclosure !== 'undefined') && (_entry.enclosure.link)) {
+            if ((typeof _entry.enclosure !== 'undefined') 
+                && (typeof _entry.enclosure.link !== 'undefined') 
+                && (_entry.enclosure.link)
+                && (_entry.enclosure.link.match('/(jpg|png)/g'))
+            ) {
                 _entry['_myFirstImageUrl'] = _entry.enclosure.link;
             } else if ((_results !== null) && (Boolean(_results[1]))) { 
                 _entry['_myFirstImageUrl'] = _results[1];
