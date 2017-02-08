@@ -2075,6 +2075,7 @@
     function _disableAccount(_account) {
         if (_account !== 'local') {
             my.log('_disableAccount', arguments);
+            my.alert('Disable account "' + _account + '"');
             params.accounts[_account].logged = false
                 myFeedsSubscriptions[_account] = [];
             sp.setFeedsSubscriptions(myFeedsSubscriptions);
@@ -2241,7 +2242,7 @@
         ui.toggle(_uiStatus);*/
 
         // Workaround :(
-        
+
         function isOnline(yes, no) {
             var xhr = new XMLHttpRequest({ mozSystem: true });
             xhr.onload = function() {
