@@ -23,7 +23,7 @@
 
 var Wallabag = function() {
     
-    //MyFeeds.call(this); /* Appel du constructeur de la classe parente */
+    //MyFeeds.call(this); /* Call parent constructor */
 
     this.wallabag = {
         "token"         : {},
@@ -36,9 +36,9 @@ var Wallabag = function() {
         "environments"  : {
             "dev" : 
             {
-                "url"           : "http://wallabag.bugeat.com",
-                "client_id"     : "1_cjcd3dyt6gowgo0gcokg4ocock4o84sg08w4o4owocwck44s0", // Must be null
-                "client_secret" : "3rle03uw7twkkgs4ws08kskg0swck8kwgks08wswgcskcwo40s", // Must be null
+                "url"           : "",
+                "client_id"     : "",
+                "client_secret" : "",
                 "username"      : "",
                 "password"      : "" 
             },
