@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
- Copyright 2015, 2016 Thierry BUGEAT
+ Copyright 2015, 2016, 2017 Thierry BUGEAT
 
  This file is part of myFeeds.
 
@@ -175,7 +175,6 @@
 
             </div>
 
-
             <!-- =============== -->
             <!-- One news screen -->
             <!-- =============== -->
@@ -205,6 +204,7 @@
                         <button id="share"><span data-icon="share"></span></button>
                         <button id="nextEntry"><span data-icon="back"></span></button>
                         <button id="previousEntry"><span data-icon="forward"></span></button>
+                        <button id="wallabagAdd" class="_online_"><h1>W</h1></button>
                     </header>
                 </section>
 
@@ -256,14 +256,18 @@
 
         </div>
 
-        <script type="text/javascript" src="cordova.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
     </body>
+    
+    <!-- ======= -->
+    <!-- Scripts -->
+    <!-- ======= -->
+    
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
 
     <!-- Libs -->
 
     <script type="text/javascript" src="js/libs/myCore.js"></script>
-
 
     <!-- Inline CSS -->
 
@@ -284,12 +288,14 @@
     <script type="text/javascript" src="js/classes/MyFeeds/TinyTinyRss.class.js"></script>
     <script type="text/javascript" src="js/classes/MyFeeds/AolReader.class.js"></script>
     <script type="text/javascript" src="js/classes/MyFeeds/SimplePie.class.js"></script>
+    <script type="text/javascript" src="js/classes/MyFeeds/Wallabag.class.js"></script>
     
     <script type="text/javascript" src="js/classes/MyListeners/SimplePie.class.js"></script>
     <script type="text/javascript" src="js/classes/MyListeners/AolReader.class.js"></script>
     <script type="text/javascript" src="js/classes/MyListeners/Feedly.class.js"></script>
     <script type="text/javascript" src="js/classes/MyListeners/TheOldReader.class.js"></script>
     <script type="text/javascript" src="js/classes/MyListeners/TinyTinyRss.class.js"></script>
+    <script type="text/javascript" src="js/classes/MyListeners/Wallabag.class.js"></script>
 
     <script type="text/javascript" src="js/gestures.js"></script>
     <script type="text/javascript" src="js/app.js"></script>

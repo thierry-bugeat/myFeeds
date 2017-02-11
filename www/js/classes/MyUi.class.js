@@ -40,6 +40,9 @@ var dom = {
         "previous": {
             "button":   document.getElementById("previousEntry"),
             "title":    document.getElementById("previousEntryTitle")
+        },
+        "wallabag": {
+            "add": document.getElementById("wallabagAdd")
         }
     },
     "screens": {

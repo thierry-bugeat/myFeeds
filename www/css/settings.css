@@ -139,6 +139,10 @@
     line-height: 2.5rem;
 }
 
+[data-type="list"] li p.text {
+    white-space: inherit;
+}
+
 [data-type="list"] li p.double{
     line-height: 5rem;
 }

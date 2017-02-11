@@ -1,5 +1,5 @@
 /**
- * Copyright 2015,2016 Thierry BUGEAT
+ * Copyright 2015,2016,2017 Thierry BUGEAT
  * 
  * This file is part of myFeeds.
  * 
@@ -25,13 +25,14 @@
     var feedly = new Feedly();
     var aolreader = new AolReader();
     var tinytinyrss = new TinyTinyRss();
+    var wallabag = new Wallabag();
 
     var sp = new SimplePie();
 
     var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': [], 'tinytinyrss': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 2.48,                        // Don't forget to increase this value if you do changes in "params" object
+        "version": 2.49,                        // Don't forget to increase this value if you do changes in "params" object
         "changelog": "https://git.framasoft.org/thierry-bugeat/myFeeds/raw/master/CHANGELOG",
         "feeds": {
             "selectedFeed": {
@@ -74,6 +75,10 @@
             "tinytinyrss": {
                 "title": "Tiny Tiny Rss",
                 "logged": false
+            },
+            "wallabag": {
+                "title": "Wallabag",
+                "logged": false
             }
         },
         "settings": {
@@ -101,7 +106,8 @@
                     "feedly": false,            // Not yet implemented
                     "theoldreader": true,
                     "aolreader": false,         // Not yet implemented
-                    "tinytinyrss": false        // Not yet implemented
+                    "tinytinyrss": false,       // Not yet implemented
+                    "wallabag": false           // Not yet implemented
                 }
             }
         }
@@ -172,7 +178,8 @@
                 "feedly": false, 
                 "theoldreader": false, 
                 "aolreader": false, 
-                "tinytinyrss": false
+                "tinytinyrss": false,
+                "wallabag": false
             }
         },
         "timeouts": {                           // Javascript timeouts
@@ -369,6 +376,52 @@
             });
 
         }
+        
+        // Get and set Wallabag parameters from cache 
+        // Get end set Wallabag token (session_id) from cache
+        // then try to update token (session_id)
+        // then try to update subscriptions
+        
+        my._load("cache/wallabag/params.json").then(function(response){
+            my.log(response);
+            wallabag.wallabag.url = response.url;
+            wallabag.wallabag.client_id = response.client_id;
+            wallabag.wallabag.client_secret = response.client_secret;
+            wallabag.wallabag.username = response.username;
+        }).catch(function(error){
+            //wallabag.wallabag.url = '';
+        }).then(function(){return my._load('cache/wallabag/access_token.json');}).then(function(_token){
+            
+            if (params.accounts.wallabag.logged) {
+                wallabag.setToken(_token);
+                
+                var _now = Math.floor(new Date().getTime() / 1000);
+                var _expires_in = _token.expires_in || 604800;
+                var _tokenIsExpired = ((_now - _token.lastModified) > _expires_in) ? true : false;
+                
+                if ((liveValues.network.status != 'online') && (_tokenIsExpired)) {
+                    _disableAccount('wallabag');
+                }
+                    
+                if (liveValues.network.status == 'online') {
+                    if (_tokenIsExpired) {
+                        wallabag.updateToken().catch(function(error) {
+                            _disableAccount('wallabag');
+                        }).then(function(){
+                            if (params.accounts.wallabag.logged) {
+                                wallabag.getSubscriptions();
+                            }
+                        });
+                    } else {
+                        wallabag.getSubscriptions();
+                    }
+                }
+            }
+            
+        }).catch(function(error) {
+            _disableAccount('wallabag');
+            my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Wallabag"}));
+        });
 
         // ---
         
@@ -724,6 +777,14 @@
         } else {
             _tinytinyrssAccount = "";
         }
+        
+        // Wallabag selector
+
+        if (params.accounts.wallabag.logged) {
+            _wallabagAccount = 'checked=""';
+        } else {
+            _wallabagAccount = "";
+        }
 
         // Use animations selector
 
@@ -927,6 +988,22 @@
         '       </div>',
         '   </li>',
         
+        '   <li class="_online_ _onlineAccount_ ' + (params.settings.proxy.availability.wallabag ? '' : '_proxyNotAvailable_') + '">',
+        '       <aside class="icon"><span data-icon="addons"></span></aside>',
+        '       <aside class="pack-end"><label class="pack-switch"><input id="wallabagCheckbox" type="checkbox"' + _wallabagAccount + '><span></span></label></aside>',
+        '       <a href="#">',
+        '           <p class="double">Wallabag</p>',
+        '       </a>',
+        '       <div id="wallabagForm">',
+        '           <p><input id="wallabagUrl" required="" placeholder="Url" name="wallabagUrl" type="text" value="' + wallabag.wallabag.url + '"></p>',
+        '           <p><input id="wallabagUser" required="" placeholder="Login" name="wallabagUser" type="text" value="' + wallabag.wallabag.username + '"></p>',
+        '           <p><input id="wallabagPasswd" required="" placeholder="Password" name="wallabagPasswd" type="password" value=""><p>',
+        '           <p><input id="wallabagClientId" required="" placeholder="API Client ID" name="wallabagClientId" type="text" value="' + wallabag.wallabag.client_id + '"></p>',
+        '           <p><input id="wallabagClientSecret" required="" placeholder="API Client Secret" name="wallabagClientSecret" type="text" value="' + wallabag.wallabag.client_secret + '"><p>',
+        '           <p class="text"><my data-l10n-id="wallabag-help">' + document.webL10n.get('wallabag-help') + '</my></p>',
+        '       </div>',
+        '   </li>',
+        
         '</ul>',
         '</section>',
         
@@ -1100,6 +1177,14 @@
         params.accounts.tinytinyrss.logged ?
             document.getElementById('tinytinyrssForm').style.cssText = 'display: none':
             document.getElementById('tinytinyrssForm').style.cssText = 'display: block';
+            
+        // =================================
+        // --- Hide / show Wallabag form ---
+        // =================================
+        
+        params.accounts.wallabag.logged ?
+            document.getElementById('wallabagForm').style.cssText = 'display: none':
+            document.getElementById('wallabagForm').style.cssText = 'display: block';
         
         // ============================
         // --- Show developper menu ---
@@ -1230,6 +1315,25 @@
                 _disableAccount('tinytinyrss');
                 loadFeeds();
                 document.getElementById('tinytinyrssForm').style.cssText = 'display: block';
+            }
+        }
+        
+        // Wallabag login checkbox
+
+        document.getElementById('wallabagCheckbox').onclick = function() {
+            if (this.checked) {
+                this.checked = false; // False until CustomEvent Wallabag.login.done
+                var _url = document.getElementById("wallabagUrl").value;
+                var _user = document.getElementById("wallabagUser").value;
+                var _passwd = document.getElementById("wallabagPasswd").value;
+                var _client_id = document.getElementById("wallabagClientId").value;
+                var _client_secret = document.getElementById("wallabagClientSecret").value;
+                wallabag.login(_url, _user, _passwd, _client_id, _client_secret);
+            } else {
+                params.accounts.wallabag.logged = false;
+                _disableAccount('wallabag');
+                //loadFeeds();
+                document.getElementById('wallabagForm').style.cssText = 'display: block';
             }
         }
         
@@ -1890,6 +1994,7 @@
             _srcDoc = _srcDoc + '<div class="entrie-visit-website"><a href="' + _entry.link + '"><my data-l10n-id="entry-visit-website">' + document.webL10n.get('entry-visit-website') + '</my></a></div>';
             _srcDoc = _srcDoc + '</div>';
 
+            dom['entry']['wallabag']['add'].setAttribute("url", _entry.link);
         }
         
         if (url != "") {
@@ -1898,6 +2003,7 @@
             } else {
                 ui.echo("browser", '<iframe src="' + url + '" sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
             }
+            dom['entry']['wallabag']['add'].setAttribute("url", url);
         } else {
             if (liveValues.platform === "linux") {
                 ui.echo("browser", '<webview id="electronView" src=\'data:text/html;charset=utf-8,' + _srcDoc + '\'></webview>', "");
@@ -2082,6 +2188,9 @@
             sp.deleteEntries(_account, '');
             _saveParams();
         }
+        
+        try {document.getElementById(_account+'Form').style.cssText = 'display: block';} catch(e) {};   // Enable form
+        try {document.getElementById(_account+'Checkbox').checked = false;} catch(e) {};                // Deselect checkbox
     }
 
     /**
@@ -2338,7 +2447,23 @@
             if ((liveValues.network.status == 'online') && (params.accounts.aolreader.logged)) {
                 aolreader.updateToken();
             }
-        }, (60000 * 14));        
+        }, (60000 * 14));
+        
+        // --- Wallabag enable/disable add button ---
+        
+        window.setInterval(function() {
+            if ((params.accounts.wallabag.logged) 
+                && (liveValues.network.status === 'online') 
+                && dom['entry']['wallabag']['add'].classList.contains("disable")
+            ){
+                ui._onclick(dom['entry']['wallabag']['add'], 'enable');
+            } else if ((liveValues.network.status === 'offline')
+                || ((params.accounts.wallabag.logged === false) && (dom['entry']['wallabag']['add'].classList.contains("enable")))
+            ){
+                ui._onclick(dom['entry']['wallabag']['add'], 'disable');
+            } else {
+            }
+        }, 500);
 
         // =================
         // --- UI events ---
@@ -2740,6 +2865,17 @@
             }
     
         };
+        
+        // Wallabag add
+        
+        dom['entry']['wallabag']['add'].onclick = function() {
+            ui._vibrate();
+            var _confirm = window.confirm(document.webL10n.get('wallabag-add-url-confirm'));
+            if (_confirm) {
+                my.log('Wallabag add' + this.getAttribute("url"));
+                wallabag.add(this.getAttribute("url"));
+            }
+        }
 
         // Main entry open done...
         // Update next entry [<] & previous entry [>] buttons. (Only for selected day)
@@ -2863,6 +2999,7 @@
         var _feedly_        = new MyListeners_Feedly();
         var _theoldreader_  = new MyListeners_TheOldReader();
         var _tinytinyrss_   = new MyListeners_TinyTinyRss();
+        var _wallabag_      = new MyListeners_Wallabag();
         
         // ============
         // --- Main ---

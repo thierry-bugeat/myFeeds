@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Thierry BUGEAT
+ * Copyright 2015, 2017 Thierry BUGEAT
  * 
  * This file is part of myFeeds.
  * 
@@ -26,28 +26,25 @@ var Wallabag = function() {
     //MyFeeds.call(this); /* Appel du constructeur de la classe parente */
 
     this.wallabag = {
-        "host_auth"     : "",
-        "host"          : "",
+        "token"         : {},
+        "url"           : "",
         "client_id"     : "",
         "client_secret" : "",
-        "method"        : "GET",
-        "code"          : "",
-        "token"         : {},
+        "username"      : "",
+        "password"      : "",
         "environment"   : "dev", // dev, prod
         "environments"  : {
             "dev" : 
             {
-                "host_auth"     : "http://v2.wallabag.org",
-                "host"          : "http://v2.wallabag.org",
-                "client_id"     : "1_3bcbxd9e24g0gk4swg0kwgcwg4o8k8g4g888kwc44gcc0gwwk4",
-                "client_secret" : "4ok2x70rlfokc8g0wws8c8kwcokw80k44sg48goc0ok4w0so0k",
-                "username"      : "nicosomb",   // or wallabag
-                "password"      : "nicolas"     // or wallabag
+                "url"           : "http://wallabag.bugeat.com",
+                "client_id"     : "1_cjcd3dyt6gowgo0gcokg4ocock4o84sg08w4o4owocwck44s0", // Must be null
+                "client_secret" : "3rle03uw7twkkgs4ws08kskg0swck8kwgks08wswgcskcwo40s", // Must be null
+                "username"      : "",
+                "password"      : "" 
             },
             "prod" : 
             {
-                "host_auth"     : "http://127.0.0.1:8000",
-                "host"          : "http://127.0.0.1:8000",
+                "url"           : "",
                 "client_id"     : "",
                 "client_secret" : "",
                 "username"      : "",
@@ -56,10 +53,11 @@ var Wallabag = function() {
         }
     };
     
-    this.wallabag.host_auth     = this.wallabag.environments[this.wallabag.environment].host_auth;
-    this.wallabag.host          = this.wallabag.environments[this.wallabag.environment].host;
+    /*this.wallabag.url           = this.wallabag.environments[this.wallabag.environment].url;
     this.wallabag.client_id     = this.wallabag.environments[this.wallabag.environment].client_id;
     this.wallabag.client_secret = this.wallabag.environments[this.wallabag.environment].client_secret;
+    this.wallabag.username      = this.wallabag.environments[this.wallabag.environment].username;
+    this.wallabag.password      = this.wallabag.environments[this.wallabag.environment].password;*/
 
     this.myFeedsSubscriptions = [];
     this.nbFeedsToLoad = 0;
@@ -88,6 +86,18 @@ Wallabag.prototype.setFeedsSubscriptions = function(myFeedsSubscriptions) {
     this.nbFeedsToLoad = this.myFeedsSubscriptions.length;
 }
 
+Wallabag.prototype.getSubscriptions = function() {
+    _MyFeeds.log('Wallabag.prototype.getSubscriptions()');
+
+    var _response = {"content": [
+        {"account": "wallabag", "id": "unread", "url": _Wallabag.wallabag.url + "/api/entries.json?", "title": "Unread"},
+        {"account": "wallabag", "id": "starred", "url": _Wallabag.wallabag.url + "/api/entries.json?star=true", "title": "Starred"},
+        {"account": "wallabag", "id": "archive", "url": _Wallabag.wallabag.url + "/api/entries.json?archive=true", "title": "Archive"}
+    ]};
+    
+    document.body.dispatchEvent(new CustomEvent('Wallabag.getSubscriptions.done', {"detail": _response}));
+}
+
 Wallabag.prototype._saveParams = function() {
     _MyFeeds._save("cache/wallabag/params.json", "application/json", _Wallabag.getParams()).then(function(results) {
         _MyFeeds.log("Save file cache/wallabag/params.json");
@@ -98,7 +108,7 @@ Wallabag.prototype._saveParams = function() {
 }
 
 Wallabag.prototype.getParams = function() {
-    return '{"url": "' + _Wallabag.wallabag.url + '", "user": "' + _Wallabag.wallabag.user + '"}';
+    return '{"url": "' + _Wallabag.wallabag.url + '", "username": "' + _Wallabag.wallabag.username + '", "client_id": "' + _Wallabag.wallabag.client_id + '", "client_secret": "' + _Wallabag.wallabag.client_secret + '"}';
 }
 
 Wallabag.prototype.setToken = function(token) {
@@ -108,7 +118,7 @@ Wallabag.prototype.setToken = function(token) {
         return 1;
     } else {
         document.body.dispatchEvent(new CustomEvent('Wallabag.setToken.error', {"detail": token}));
-        window.alert("Wallabag Error : \n" + JSON.stringify(token));
+        _MyFeeds.alert("Wallabag Error : \n" + JSON.stringify(token));
         return 0;
     }
 }
@@ -121,20 +131,11 @@ Wallabag.prototype.getToken = function() {
 /**
  * updateToken()
  * Use "refresh_token" to obtain a new "access_token"
- * @todo Not yet implemented
  * @param   {null}
  * @return  {CustomEvent} Wallabag.getNewToken.done | Wallabag.getNewToken.error
  * */
 
 Wallabag.prototype.updateToken = function() {
-    _MyFeeds.log('Wallabag.prototype.getNewToken()');
-    
-    return new Promise(function(resolve, reject) {
-        resolve('{}');
-    });
-}
-
-/*Wallabag.prototype.updateToken = function() {
     _MyFeeds.log('Wallabag.prototype.updateToken()');
     
     return new Promise(function(resolve, reject) {
@@ -151,6 +152,8 @@ Wallabag.prototype.updateToken = function() {
                 window.alert("Wallabag Error : \n" + JSON.stringify(response));
                 _MyFeeds.log('CustomEvent : Wallabag.getNewToken.error');
             } else {
+                console.log(response);
+                window.alert(JSON.stringify(response));
                 _Wallabag.wallabag.token.access_token = response.access_token;
                 _Wallabag.wallabag.token.lastModified = Math.floor(new Date().getTime() / 1000);
                 _Wallabag._save('cache/wallabag/access_token.json', 'application/json', JSON.stringify(_Wallabag.wallabag.token));
@@ -165,18 +168,6 @@ Wallabag.prototype.updateToken = function() {
         });
     
     });
-}*/
-
-Wallabag.prototype.getSubscriptions = function() {
-    _MyFeeds.log('Wallabag.prototype.getSubscriptions()');
-
-    var _response = {"content": [
-        {"account": "wallabag", "id": "unread", "url": _Wallabag.wallabag.url + "/api/entries.json?", "title": "Unread"},
-        {"account": "wallabag", "id": "starred", "url": _Wallabag.wallabag.url + "/api/entries.json?star=true", "title": "Starred"},
-        {"account": "wallabag", "id": "archive", "url": _Wallabag.wallabag.url + "/api/entries.json?archive=true", "title": "Archive"}
-    ]};
-    
-    document.body.dispatchEvent(new CustomEvent('Wallabag.getSubscriptions.done', {"detail": _response}));
 }
 
 Wallabag.prototype.getEntries = function() {
@@ -196,32 +187,67 @@ Wallabag.prototype.getEntries = function() {
 }
 
 /**
- * login(url, user, password)
+ * add(url)
  *
  * @param   {string} url
- * @param   {string} user
+ * @return  {CustomEvent} Wallabag.add.done | Wallabag.add.error
+ * */
+
+Wallabag.prototype.add = function(url) {
+    _MyFeeds.log('Wallabag.prototype.add()');
+    
+    return new Promise(function(resolve, reject) {
+        
+        var _url = _Wallabag.wallabag.url + '/api/entries.html';
+
+        var _params = 'url=' + encodeURIComponent(url);
+
+        var promise = _Wallabag.post(_url, _params);
+        
+        promise.then(function(response) {
+            document.body.dispatchEvent(new CustomEvent('Wallabag.add.done', {"detail": response}));
+            _MyFeeds.log('CustomEvent : Wallabag.add.done');
+            _MyFeeds.alert('CustomEvent : Wallabag.add.done');
+        }).catch(function(error) {
+            document.body.dispatchEvent(new CustomEvent('Wallabag.add.error', {"detail": error}));
+            _MyFeeds.error("CustomEvent : Wallabag.add.error", error);
+            reject(Error(JSON.stringify(error)));
+        });
+    
+    });
+}
+
+/**
+ * login(url, username, password)
+ *
+ * @param   {string} url
+ * @param   {string} username
  * @param   {string} password
+ * @param   {string} client_id
+ * @param   {string} client_secret
  * @return  {CustomEvent} Wallabag.login.done | Wallabag.login.error
  * */
 
-Wallabag.prototype.login = function(url, user, password) {
+Wallabag.prototype.login = function(url, username, password, client_id, client_secret) {
     _MyFeeds.log('Wallabag.prototype.login()', arguments);
     
     _Wallabag.wallabag.url = url;
-    _Wallabag.wallabag.user = user;
+    _Wallabag.wallabag.username = username;
     _Wallabag.wallabag.password = password;
+    _Wallabag.wallabag.client_id = client_id;
+    _Wallabag.wallabag.client_secret = client_secret;
     
     var _url = _Wallabag.wallabag.url + '/oauth/v2/token';
     
     var _params = 'client_id=' + encodeURIComponent(_Wallabag.wallabag.client_id) + 
         '&client_secret=' + encodeURIComponent(_Wallabag.wallabag.client_secret) + 
         '&grant_type=password' + 
-        '&username=' + user +
+        '&username=' + username +
         '&password=' + password;
 
     this.post(_url, _params).then(function(response) {
         if (_Wallabag.setToken(response)) {
-            _Wallabag._saveParams(); // Save user name & server URL
+            _Wallabag._saveParams(); // Save user name, client id, client secret, server URL
             response.lastModified = Math.floor(new Date().getTime() / 1000);
             _Wallabag._save('cache/wallabag/access_token.json', 'application/json', JSON.stringify(response));
             document.body.dispatchEvent(new CustomEvent('Wallabag.login.done', {"detail": response}));
@@ -266,7 +292,7 @@ Wallabag.prototype.loadFeeds = function(nbDaysToLoad) {
                 try {
                     var _message = JSON.parse(error.message);
                 } catch (e) {
-                    window.alert("Wallabag error loading from cache:\n" + e.message + ' / ' + JSON.stringify(error));
+                    my.alert("Wallabag error loading from cache:\n" + e.message + ' / ' + JSON.stringify(error));
                     error._myParams = _myParams;
                     error._myFeedUrl = _myFeed.url;
                     document.body.dispatchEvent(new CustomEvent('Wallabag.load.error', {"detail": error}));
