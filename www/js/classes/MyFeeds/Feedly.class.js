@@ -104,6 +104,7 @@ Feedly.prototype.updateToken = function() {
                 _MyFeeds.log('CustomEvent : Feedly.getNewToken.error');
             } else {
                 _Feedly.feedly.token.access_token = response.access_token;
+                _Feedly.feedly.token.refresh_token = response.refresh_token;
                 _Feedly.feedly.token.lastModified = Math.floor(new Date().getTime() / 1000);
                 _Feedly._save('cache/feedly/access_token.json', 'application/json', JSON.stringify(_Feedly.feedly.token));
                 _Feedly._save('cache/feedly/access_token.new.json', 'application/json', JSON.stringify(response));
