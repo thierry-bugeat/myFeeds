@@ -30,7 +30,7 @@ var Wallabag = function() {
         "url"           : "",
         "client_id"     : "",
         "client_secret" : "",
-        "username"      : "",
+        "user"          : "",
         "password"      : "",
         "environment"   : "dev", // dev, prod
         "environments"  : {
@@ -39,7 +39,7 @@ var Wallabag = function() {
                 "url"           : "",
                 "client_id"     : "",
                 "client_secret" : "",
-                "username"      : "",
+                "user"          : "",
                 "password"      : "" 
             },
             "prod" : 
@@ -47,7 +47,7 @@ var Wallabag = function() {
                 "url"           : "",
                 "client_id"     : "",
                 "client_secret" : "",
-                "username"      : "",
+                "user"          : "",
                 "password"      : ""
             }
         }
@@ -56,7 +56,7 @@ var Wallabag = function() {
     /*this.wallabag.url           = this.wallabag.environments[this.wallabag.environment].url;
     this.wallabag.client_id     = this.wallabag.environments[this.wallabag.environment].client_id;
     this.wallabag.client_secret = this.wallabag.environments[this.wallabag.environment].client_secret;
-    this.wallabag.username      = this.wallabag.environments[this.wallabag.environment].username;
+    this.wallabag.user          = this.wallabag.environments[this.wallabag.environment].user;
     this.wallabag.password      = this.wallabag.environments[this.wallabag.environment].password;*/
 
     this.myFeedsSubscriptions = [];
@@ -108,7 +108,7 @@ Wallabag.prototype._saveParams = function() {
 }
 
 Wallabag.prototype.getParams = function() {
-    return '{"url": "' + _Wallabag.wallabag.url + '", "username": "' + _Wallabag.wallabag.username + '", "client_id": "' + _Wallabag.wallabag.client_id + '", "client_secret": "' + _Wallabag.wallabag.client_secret + '"}';
+    return '{"url": "' + _Wallabag.wallabag.url + '", "user": "' + _Wallabag.wallabag.user + '", "password": "' + _Wallabag.wallabag.password + '", "client_id": "' + _Wallabag.wallabag.client_id + '", "client_secret": "' + _Wallabag.wallabag.client_secret + '"}';
 }
 
 Wallabag.prototype.setToken = function(token) {
@@ -155,6 +155,7 @@ Wallabag.prototype.updateToken = function() {
                 console.log(response);
                 window.alert(JSON.stringify(response));
                 _Wallabag.wallabag.token.access_token = response.access_token;
+                _Wallabag.wallabag.token.refresh_token = response.refresh_token;
                 _Wallabag.wallabag.token.lastModified = Math.floor(new Date().getTime() / 1000);
                 _Wallabag._save('cache/wallabag/access_token.json', 'application/json', JSON.stringify(_Wallabag.wallabag.token));
                 _Wallabag._save('cache/wallabag/access_token.new.json', 'application/json', JSON.stringify(response));
@@ -218,21 +219,21 @@ Wallabag.prototype.add = function(url) {
 }
 
 /**
- * login(url, username, password)
+ * login(url, user, password)
  *
  * @param   {string} url
- * @param   {string} username
+ * @param   {string} user
  * @param   {string} password
  * @param   {string} client_id
  * @param   {string} client_secret
  * @return  {CustomEvent} Wallabag.login.done | Wallabag.login.error
  * */
 
-Wallabag.prototype.login = function(url, username, password, client_id, client_secret) {
+Wallabag.prototype.login = function(url, user, password, client_id, client_secret) {
     _MyFeeds.log('Wallabag.prototype.login()', arguments);
     
     _Wallabag.wallabag.url = url;
-    _Wallabag.wallabag.username = username;
+    _Wallabag.wallabag.user = user;
     _Wallabag.wallabag.password = password;
     _Wallabag.wallabag.client_id = client_id;
     _Wallabag.wallabag.client_secret = client_secret;
@@ -242,7 +243,7 @@ Wallabag.prototype.login = function(url, username, password, client_id, client_s
     var _params = 'client_id=' + encodeURIComponent(_Wallabag.wallabag.client_id) + 
         '&client_secret=' + encodeURIComponent(_Wallabag.wallabag.client_secret) + 
         '&grant_type=password' + 
-        '&username=' + username +
+        '&username=' + user +
         '&password=' + password;
 
     this.post(_url, _params).then(function(response) {

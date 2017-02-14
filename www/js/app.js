@@ -32,7 +32,7 @@
     var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': [], 'tinytinyrss': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 2.49,                        // Don't forget to increase this value if you do changes in "params" object
+        "version": 2.50,                        // Don't forget to increase this value if you do changes in "params" object
         "changelog": "https://git.framasoft.org/thierry-bugeat/myFeeds/raw/master/CHANGELOG",
         "feeds": {
             "selectedFeed": {
@@ -336,16 +336,16 @@
         // Get end set Tiny Tiny Rss token (session_id) from cache
         // then try to update token (session_id)
         // then try to update subscriptions
-        
-        if (params.accounts.tinytinyrss.logged) {
-            
-            // Set server url from "cache/tinytinyrss/params.json"
 
-            my._load("cache/tinytinyrss/params.json").then(function(response){
-                tinytinyrss.tinytinyrss.url = response.url;
-            }).catch(function(error){
-                tinytinyrss.tinytinyrss.url = '';
-            }).then(function(){return my._load('cache/tinytinyrss/access_token.json');}).then(function(_token){
+        my._load("cache/tinytinyrss/params.json").then(function(response){
+            tinytinyrss.tinytinyrss.url = response.url;
+            tinytinyrss.tinytinyrss.user = response.user;
+            tinytinyrss.tinytinyrss.password = response.password;
+        }).catch(function(error){
+            tinytinyrss.tinytinyrss.url = '';
+        }).then(function(){return my._load('cache/tinytinyrss/access_token.json');}).then(function(_token){
+            
+            if (params.accounts.tinytinyrss.logged) {
                 tinytinyrss.setToken(_token);
                 
                 var _now = Math.floor(new Date().getTime() / 1000);
@@ -369,13 +369,12 @@
                         tinytinyrss.getSubscriptions();
                     }
                 }
-                
-            }).catch(function(error) {
-                _disableAccount('tinytinyrss');
-                my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Tiny Tiny Rss"}));
-            });
-
-        }
+            }
+            
+        }).catch(function(error) {
+            _disableAccount('tinytinyrss');
+            my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Tiny Tiny Rss"}));
+        });
         
         // Get and set Wallabag parameters from cache 
         // Get end set Wallabag token (session_id) from cache
@@ -387,7 +386,8 @@
             wallabag.wallabag.url = response.url;
             wallabag.wallabag.client_id = response.client_id;
             wallabag.wallabag.client_secret = response.client_secret;
-            wallabag.wallabag.username = response.username;
+            wallabag.wallabag.user = response.user;
+            wallabag.wallabag.password = response.password;
         }).catch(function(error){
             //wallabag.wallabag.url = '';
         }).then(function(){return my._load('cache/wallabag/access_token.json');}).then(function(_token){
@@ -982,11 +982,18 @@
         '           <p class="double">Tiny Tiny Rss</p>',
         '       </a>',
         '       <div id="tinytinyrssForm">',
-        '           <p><input id="tinytinyrssUrl" required="" placeholder="Url" name="tinytinyrssUrl" type="text" value=""></p>',
-        '           <p><input id="tinytinyrssUser" required="" placeholder="Login" name="tinytinyrssUser" type="text" value=""></p>',
-        '           <p><input id="tinytinyrssPasswd" required="" placeholder="Password" name="tinytinyrssPasswd" type="password" value=""><p>',
+        '           <p><input id="tinytinyrssUrl" required="" placeholder="Url" name="tinytinyrssUrl" type="text" value="' + tinytinyrss.tinytinyrss.url + '"></p>',
+        '           <p><input id="tinytinyrssUser" required="" placeholder="Login" name="tinytinyrssUser" type="text" value="' + tinytinyrss.tinytinyrss.user + '"></p>',
+        '           <p><input id="tinytinyrssPasswd" required="" placeholder="Password" name="tinytinyrssPasswd" type="password" value="' + tinytinyrss.tinytinyrss.password + '"><p>',
         '       </div>',
         '   </li>',
+        
+        '</ul>',
+        '</section>',
+   
+        '<h2 data-l10n-id="additional-services">' + document.webL10n.get('additional-services') + '</h2>',
+        '<section data-type="list">',
+        '<ul>',
         
         '   <li class="_online_ _onlineAccount_ ' + (params.settings.proxy.availability.wallabag ? '' : '_proxyNotAvailable_') + '">',
         '       <aside class="icon"><span data-icon="addons"></span></aside>',
@@ -996,8 +1003,8 @@
         '       </a>',
         '       <div id="wallabagForm">',
         '           <p><input id="wallabagUrl" required="" placeholder="Url" name="wallabagUrl" type="text" value="' + wallabag.wallabag.url + '"></p>',
-        '           <p><input id="wallabagUser" required="" placeholder="Login" name="wallabagUser" type="text" value="' + wallabag.wallabag.username + '"></p>',
-        '           <p><input id="wallabagPasswd" required="" placeholder="Password" name="wallabagPasswd" type="password" value=""><p>',
+        '           <p><input id="wallabagUser" required="" placeholder="Login" name="wallabagUser" type="text" value="' + wallabag.wallabag.user + '"></p>',
+        '           <p><input id="wallabagPasswd" required="" placeholder="Password" name="wallabagPasswd" type="password" value="' + wallabag.wallabag.password + '"><p>',
         '           <p><input id="wallabagClientId" required="" placeholder="API Client ID" name="wallabagClientId" type="text" value="' + wallabag.wallabag.client_id + '"></p>',
         '           <p><input id="wallabagClientSecret" required="" placeholder="API Client Secret" name="wallabagClientSecret" type="text" value="' + wallabag.wallabag.client_secret + '"><p>',
         '           <p class="text"><my data-l10n-id="wallabag-help">' + document.webL10n.get('wallabag-help') + '</my></p>',
@@ -1006,7 +1013,7 @@
         
         '</ul>',
         '</section>',
-        
+             
         '<h2 data-l10n-id="user-interface">' + document.webL10n.get('user-interface') + '</h2>',
         '<section data-type="list">',
         '<ul>',
