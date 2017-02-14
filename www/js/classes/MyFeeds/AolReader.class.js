@@ -236,6 +236,7 @@ AolReader.prototype.updateToken = function() {
                 _MyFeeds.log('CustomEvent : AolReader.getNewToken.error');
             } else {
                 _AolReader.aolreader.token.access_token = response.access_token;
+                _AolReader.aolreader.token.refresh_token = response.refresh_token;
                 _AolReader.aolreader.token.lastModified = Math.floor(new Date().getTime() / 1000);
                 _AolReader._save('cache/aolreader/access_token.json', 'application/json', JSON.stringify(_AolReader.aolreader.token));
                 _AolReader._save('cache/aolreader/access_token.new.json', 'application/json', JSON.stringify(response));
