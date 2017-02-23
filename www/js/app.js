@@ -32,7 +32,7 @@
     var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': [], 'tinytinyrss': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 2.50,                        // Don't forget to increase this value if you do changes in "params" object
+        "version": 2.51,                        // Don't forget to increase this value if you do changes in "params" object
         "changelog": "https://git.framasoft.org/thierry-bugeat/myFeeds/raw/master/CHANGELOG",
         "feeds": {
             "selectedFeed": {
@@ -258,13 +258,19 @@
             });
         }
         
-        // Get and set The Old Reader token from cache 
-        // then try to update token
-        // then try to update subscriptions.
-        
-        if (params.accounts.theoldreader.logged) {
-            my._load('cache/theoldreader/access_token.json').then(function(_token){
+        // Get and set The Old Reader server URL from cache 
+        // Get end set The Old Reader token (session_id) from cache
+        // then try to update token (session_id)
+        // then try to update subscriptions
+
+        my._load("cache/theoldreader/params.json").then(function(response){
+            theoldreader.theoldreader.email = response.email;
+            theoldreader.theoldreader.password = response.password;
+        }).catch(function(error){
+            //theoldreader.theoldreader.url = '';
+        }).then(function(){return my._load('cache/theoldreader/access_token.json');}).then(function(_token){
             
+            if (params.accounts.theoldreader.logged) {
                 theoldreader.setToken(_token);
                 
                 var _now = Math.floor(new Date().getTime() / 1000);
@@ -288,12 +294,12 @@
                         theoldreader.getSubscriptions();
                     }
                 }
-                
-            }).catch(function(error) {
-                _disableAccount('theoldreader');
-                my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Old Reader"}));
-            });
-        }
+            }
+            
+        }).catch(function(error) {
+            _disableAccount('theoldreader');
+            my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "The Old Reader"}));
+        });
         
         // Get and set Aol Reader token from cache
         // then try to update token
@@ -331,7 +337,7 @@
                 my.alert(document.webL10n.get("i-cant-reconnect-your-account", {"online-account": "Aol Reader"}));
             });
         }
-
+        
         // Get and set Tiny Tiny Rss server URL from cache 
         // Get end set Tiny Tiny Rss token (session_id) from cache
         // then try to update token (session_id)
@@ -970,8 +976,8 @@
         '           <p class="double">The Old Reader</p>',
         '       </a>',
         '       <div id="theoldreaderForm">',
-        '           <p><input id="theoldreaderEmail" required="" placeholder="Email" name="theoldreaderEmail" type="email" value=""></p>',
-        '           <p><input id="theoldreaderPasswd" required="" placeholder="Password" name="theoldreaderPasswd" type="password" value=""><p>',
+        '           <p><input id="theoldreaderEmail" required="" placeholder="Email" name="theoldreaderEmail" type="email" value="' + theoldreader.theoldreader.email + '"></p>',
+        '           <p><input id="theoldreaderPasswd" required="" placeholder="Password" name="theoldreaderPasswd" type="password" value="' + theoldreader.theoldreader.password + '"><p>',
         '       </div>',
         '   </li>',
  

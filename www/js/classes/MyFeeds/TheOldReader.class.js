@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Thierry BUGEAT
+ * Copyright 2015, 2016, 2017 Thierry BUGEAT
  * 
  * This file is part of myFeeds.
  * 
@@ -25,7 +25,7 @@ var TheOldReader = function() {
     
     //MyFeeds.call(this); /* Call the constructor of parent class. */
 
-    this.tor = {
+    this.theoldreader = {
         "host"          : "https://theoldreader.com",
         "method"        : "POST",
         "output"        : "json",
@@ -45,10 +45,23 @@ TheOldReader.prototype = new MyFeeds();
 /* --- Methods --- */
 /* =============== */
 
+TheOldReader.prototype._saveParams = function() {
+    _MyFeeds._save("cache/theoldreader/params.json", "application/json", _TheOldReader.getParams()).then(function(results) {
+        _MyFeeds.log("Save file cache/theoldreader/params.json");
+    }).catch(function(error) {
+        _MyFeeds.error("ERROR saving file cache/theoldreader/params.json", error);
+        _MyFeeds.alert("ERROR saving file cache/theoldreader/params.json");
+    });
+}
+
+TheOldReader.prototype.getParams = function() {
+    return '{"url": "' + _TheOldReader.theoldreader.url + '", "email": "' + _TheOldReader.theoldreader.email + '", "password": "' + _TheOldReader.theoldreader.password + '"}';
+}
+
 TheOldReader.prototype.setToken = function(token) {
     _MyFeeds.log('TheOldReader.prototype.setToken()', arguments);
     if (typeof token['Auth'] !== 'undefined') {
-        this.tor.token = token;
+        this.theoldreader.token = token;
         return 1;
     } else {
         document.body.dispatchEvent(new CustomEvent('TheOldReader.setToken.error', {"detail": token}));
@@ -59,7 +72,7 @@ TheOldReader.prototype.setToken = function(token) {
 
 TheOldReader.prototype.getToken = function() {
     _MyFeeds.log('TheOldReader.prototype.getToken()');
-    return this.tor.token;
+    return this.theoldreader.token;
 }
 
 /**
@@ -89,24 +102,25 @@ TheOldReader.prototype.updateToken = function() {
 TheOldReader.prototype.login = function(email, password) {
     _MyFeeds.log('TheOldReader.prototype.login()', arguments);
     
-    _TheOldReader.tor.email = email;
-    _TheOldReader.tor.password = password;
+    _TheOldReader.theoldreader.email = email;
+    _TheOldReader.theoldreader.password = password;
     
-    var _url = _TheOldReader.tor.host + '/accounts/ClientLogin';
+    var _url = _TheOldReader.theoldreader.host + '/accounts/ClientLogin';
     
-    var _params = 'client=' + encodeURIComponent(_TheOldReader.tor.client) + 
-        '&Email=' + encodeURIComponent(_TheOldReader.tor.email) +
-        '&Passwd=' + encodeURIComponent(_TheOldReader.tor.password) +
-        '&accountType=' + encodeURIComponent(_TheOldReader.tor.accountType) +
-        '&output=' + encodeURIComponent(_TheOldReader.tor.output);
+    var _params = 'client=' + encodeURIComponent(_TheOldReader.theoldreader.client) + 
+        '&Email=' + encodeURIComponent(_TheOldReader.theoldreader.email) +
+        '&Passwd=' + encodeURIComponent(_TheOldReader.theoldreader.password) +
+        '&accountType=' + encodeURIComponent(_TheOldReader.theoldreader.accountType) +
+        '&output=' + encodeURIComponent(_TheOldReader.theoldreader.output);
 
     if (params.settings.proxy.use) {
-        _urlParams = '&method=post&url=' + encodeURIComponent(_TheOldReader.tor.host + '/accounts/ClientLogin?client=' + encodeURIComponent(_TheOldReader.tor.client) + '&Email=' + encodeURIComponent(_TheOldReader.tor.email) + '&Passwd=' + encodeURIComponent(_TheOldReader.tor.password) + '&accountType=' + encodeURIComponent(_TheOldReader.tor.accountType) + '&output=' + encodeURIComponent(_TheOldReader.tor.output));
+        _urlParams = '&method=post&url=' + encodeURIComponent(_TheOldReader.theoldreader.host + '/accounts/ClientLogin?client=' + encodeURIComponent(_TheOldReader.theoldreader.client) + '&Email=' + encodeURIComponent(_TheOldReader.theoldreader.email) + '&Passwd=' + encodeURIComponent(_TheOldReader.theoldreader.password) + '&accountType=' + encodeURIComponent(_TheOldReader.theoldreader.accountType) + '&output=' + encodeURIComponent(_TheOldReader.theoldreader.output));
         _url = 'http://' + params.settings.proxy.host + '/proxy/theoldreader/?' + _urlParams;
     }   
  
     this.post(_url, _params, function(response) {
         if (_TheOldReader.setToken(response)) {
+            _TheOldReader._saveParams(); // Save email, password
             response.lastModified = Math.floor(new Date().getTime() / 1000);
             _TheOldReader._save('cache/theoldreader/access_token.json', 'application/json', JSON.stringify(response));
             document.body.dispatchEvent(new CustomEvent('TheOldReader.login.done', {"detail": response}));
@@ -129,16 +143,16 @@ TheOldReader.prototype.login = function(email, password) {
 TheOldReader.prototype.getSubscriptions = function () {
     _MyFeeds.log('TheOldReader.prototype.getSubscriptions()');
     
-    var _url = _TheOldReader.tor.host + '/reader/api/0/subscription/list' + 
+    var _url = _TheOldReader.theoldreader.host + '/reader/api/0/subscription/list' + 
             '?output=json';
     
     if (params.settings.proxy.use) {
-        _urlParams = '&method=get&myAuth=' + _TheOldReader.tor.token.Auth + '&url=' + encodeURIComponent(_TheOldReader.tor.host + '/reader/api/0/subscription/list' + '?output=' + encodeURIComponent(_TheOldReader.tor.output));
+        _urlParams = '&method=get&myAuth=' + _TheOldReader.theoldreader.token.Auth + '&url=' + encodeURIComponent(_TheOldReader.theoldreader.host + '/reader/api/0/subscription/list' + '?output=' + encodeURIComponent(_TheOldReader.theoldreader.output));
         _url = 'http://' + params.settings.proxy.host + '/proxy/theoldreader/?' + _urlParams;
     }   
     
     this.get(_url, '').then(function(response) {
-        _TheOldReader.tor.subscriptions = response;
+        _TheOldReader.theoldreader.subscriptions = response;
         document.body.dispatchEvent(new CustomEvent('TheOldReader.getSubscriptions.done', {"detail": response}));
         _MyFeeds.log("CustomEvent : TheOldReader.getSubscriptions.done");
     }, function(error) {
@@ -159,14 +173,14 @@ TheOldReader.prototype.deleteSubscription = function (feedId) {
     
     return new Promise(function(resolve, reject) {
         
-        var _url = _TheOldReader.tor.host + '/reader/api/0/subscription/edit';
+        var _url = _TheOldReader.theoldreader.host + '/reader/api/0/subscription/edit';
             
         var _params = 'output=json' + 
             '&ac=unsubscribe' + 
             '&s=' + encodeURIComponent(feedId);
         
         if (params.settings.proxy.use) {
-            _urlParams = '&method=post&myAuth=' + _TheOldReader.tor.token.Auth + '&url=' + encodeURIComponent(_TheOldReader.tor.host + '/reader/api/0/subscription/edit' + '?output=' + encodeURIComponent(_TheOldReader.tor.output) + '&ac=unsubscribe&s=' + encodeURIComponent(feedId));
+            _urlParams = '&method=post&myAuth=' + _TheOldReader.theoldreader.token.Auth + '&url=' + encodeURIComponent(_TheOldReader.theoldreader.host + '/reader/api/0/subscription/edit' + '?output=' + encodeURIComponent(_TheOldReader.theoldreader.output) + '&ac=unsubscribe&s=' + encodeURIComponent(feedId));
             _url = 'http://' + params.settings.proxy.host + '/proxy/theoldreader/?' + _urlParams;
         }       
         
@@ -198,8 +212,8 @@ TheOldReader.prototype.get = function (_url, myParams) {
         
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
-        if (_TheOldReader.tor.token) {
-            xhr.setRequestHeader("Authorization", "GoogleLogin auth=" + _TheOldReader.tor.token.Auth);
+        if (_TheOldReader.theoldreader.token) {
+            xhr.setRequestHeader("Authorization", "GoogleLogin auth=" + _TheOldReader.theoldreader.token.Auth);
         }
 
         xhr.onload = function() {
@@ -247,8 +261,8 @@ TheOldReader.prototype.post = function (_url, _params, callback) {
 
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
      
-        if (_TheOldReader.tor.token) {
-            xhr.setRequestHeader("Authorization", "GoogleLogin auth=" + _TheOldReader.tor.token.Auth);
+        if (_TheOldReader.theoldreader.token) {
+            xhr.setRequestHeader("Authorization", "GoogleLogin auth=" + _TheOldReader.theoldreader.token.Auth);
         }
 
         xhr.onload = function() {
@@ -281,8 +295,8 @@ TheOldReader.prototype._delete = function (url, params) {
 
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         
-        if (_TheOldReader.tor.token) {
-            xhr.setRequestHeader("Authorization", "GoogleLogin auth=" + _TheOldReader.tor.token.Auth);
+        if (_TheOldReader.theoldreader.token) {
+            xhr.setRequestHeader("Authorization", "GoogleLogin auth=" + _TheOldReader.theoldreader.token.Auth);
         }
 
         xhr.onload = function() {
