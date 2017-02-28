@@ -58,7 +58,7 @@ TinyTinyRss.prototype._saveParams = function() {
 }
 
 TinyTinyRss.prototype.getParams = function() {
-    return '{"url": "' + _TinyTinyRss.tinytinyrss.url + '", "user": "' + _TinyTinyRss.tinytinyrss.user + '"}';
+    return '{"url": "' + _TinyTinyRss.tinytinyrss.url + '", "user": "' + _TinyTinyRss.tinytinyrss.user + '", "password": "' + _TinyTinyRss.tinytinyrss.password + '"}';
 }
 
 TinyTinyRss.prototype.setToken = function(token) {
