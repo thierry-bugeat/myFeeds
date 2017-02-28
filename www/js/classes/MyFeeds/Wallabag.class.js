@@ -152,8 +152,6 @@ Wallabag.prototype.updateToken = function() {
                 window.alert("Wallabag Error : \n" + JSON.stringify(response));
                 _MyFeeds.log('CustomEvent : Wallabag.getNewToken.error');
             } else {
-                console.log(response);
-                window.alert(JSON.stringify(response));
                 _Wallabag.wallabag.token.access_token = response.access_token;
                 _Wallabag.wallabag.token.refresh_token = response.refresh_token;
                 _Wallabag.wallabag.token.lastModified = Math.floor(new Date().getTime() / 1000);
@@ -161,6 +159,8 @@ Wallabag.prototype.updateToken = function() {
                 _Wallabag._save('cache/wallabag/access_token.new.json', 'application/json', JSON.stringify(response));
                 document.body.dispatchEvent(new CustomEvent('Wallabag.getNewToken.done', {"detail": response}));
                 _MyFeeds.log('CustomEvent : Wallabag.getNewToken.done');
+                _MyFeeds.log(response);
+                resolve(response);
             }
         }).catch(function(error) {
             document.body.dispatchEvent(new CustomEvent('Wallabag.getNewToken.error', {"detail": error}));
@@ -193,8 +193,14 @@ Wallabag.prototype.getEntries = function() {
  * @param   {string} url
  * @return  {CustomEvent} Wallabag.add.done | Wallabag.add.error
  * */
-
 Wallabag.prototype.add = function(url) {
+    _Wallabag.updateToken().then(
+        function(data) { _Wallabag._add(url); },
+        function(data) { document.body.dispatchEvent(new CustomEvent('Wallabag.add.error', {"detail": ""})); }
+    );
+}
+
+Wallabag.prototype._add = function(url) {
     _MyFeeds.log('Wallabag.prototype.add()');
     
     return new Promise(function(resolve, reject) {
@@ -209,6 +215,7 @@ Wallabag.prototype.add = function(url) {
             document.body.dispatchEvent(new CustomEvent('Wallabag.add.done', {"detail": response}));
             _MyFeeds.log('CustomEvent : Wallabag.add.done');
             _MyFeeds.alert('CustomEvent : Wallabag.add.done');
+            resolve(response);
         }).catch(function(error) {
             document.body.dispatchEvent(new CustomEvent('Wallabag.add.error', {"detail": error}));
             _MyFeeds.error("CustomEvent : Wallabag.add.error", error);
