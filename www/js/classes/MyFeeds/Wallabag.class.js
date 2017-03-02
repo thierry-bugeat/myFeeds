@@ -195,8 +195,11 @@ Wallabag.prototype.getEntries = function() {
  * */
 Wallabag.prototype.add = function(url) {
     _Wallabag.updateToken().then(
-        function(data) { _Wallabag._add(url); },
+        function(data) { return _Wallabag.exists(url); },
         function(data) { document.body.dispatchEvent(new CustomEvent('Wallabag.add.error', {"detail": ""})); }
+    ).then(
+        function(data) { (data.exists == false) ? _Wallabag._add(url) : _MyFeeds.message(document.webL10n.get('wallabag-url-already-exists')); },
+        function(data) { _MyFeeds.log('la'); _MyFeeds.log(data); document.body.dispatchEvent(new CustomEvent('Wallabag.add.error', {"detail": ""})); }
     );
 }
 
@@ -224,6 +227,38 @@ Wallabag.prototype._add = function(url) {
     
     });
 }
+
+/**
+ * Check if an entry exists by url
+ * @param  {string} url
+ * @return {Object} { exists: true|false }
+ * */
+Wallabag.prototype.exists = function(url) {
+    _MyFeeds.log('Wallabag.prototype.exists()');
+    
+    return new Promise(function(resolve, reject) {
+        
+        var _url = _Wallabag.wallabag.url + '/api/entries/exists.html' + 
+            '?url=' + encodeURIComponent(url);
+
+        var _params = 'url=' + encodeURIComponent(url);
+
+        var promise = _Wallabag.get(_url, _params);
+        
+        promise.then(function(response) {
+            document.body.dispatchEvent(new CustomEvent('Wallabag.exists.done', {"detail": response}));
+            _MyFeeds.log('CustomEvent : Wallabag.exists.done', response);
+            _MyFeeds.alert('CustomEvent : Wallabag.exists.done');
+            resolve(response);
+        }).catch(function(error) {
+            document.body.dispatchEvent(new CustomEvent('Wallabag.exists.error', {"detail": error}));
+            _MyFeeds.error("CustomEvent : Wallabag.exists.error", error);
+            reject(Error(JSON.stringify(error)));
+        });
+    
+    });
+}
+
 
 /**
  * login(url, user, password)
