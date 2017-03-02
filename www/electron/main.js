@@ -75,7 +75,7 @@ function createWindow () {
 
     // Create the browser window.
 
-    var _width = (DEBUG) ? 950 : 350;
+    var _width = (DEBUG) ? 975 : 350;
 
     mainWindow = new BrowserWindow({width: _width, height: 650, icon: __dirname+'/icon.png'})
 
