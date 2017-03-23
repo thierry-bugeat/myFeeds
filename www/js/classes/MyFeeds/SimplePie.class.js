@@ -224,7 +224,8 @@ SimplePie.prototype.addEntries = function(entries) {
         
             var _results    = [];
             var _imageUrl   = '';
-            var _regex      = /<img[^>]+src="(http(|s):\/\/[^">]+(jpg|png))/g;
+            //var _regex      = /<img[^>]+src="(http(|s):\/\/[^">]+(jpg|png))/g;
+            var _regex      = /<img[^>]+src="(http(|s):\/\/[^">]+)/g; // Google news images (Without extension)
 
             _results    = _regex.exec(_entry.content);
             
@@ -329,15 +330,14 @@ SimplePie.prototype.deleteEntries = function(account, feedId) {
  * @param {int} timestamp 
  * @return {null}
  * */
- 
+
 SimplePie.prototype.deleteOldEntries = function(timestamp) {
     _MyFeeds.log('deleteOldEntries(' + timestamp + ')');
-    
+
     var date = new Date(timestamp * 1000);
     var dateTimeString = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2) + ' ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
     
     _MyFeeds.log('deleteOldEntries(' + dateTimeString + ') => ' + this.gf_unsortedEntries.length + ' entrie(s)');
-    
 
     var _tmp = [];
     var _oldEntries = 0;
