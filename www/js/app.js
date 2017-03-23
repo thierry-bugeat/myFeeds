@@ -1976,6 +1976,7 @@
         share.setAttribute("_mySha256_title", sortedEntries[entryId]['_mySha256_title']);
 
         if (url == "") {
+            my.log('mainEntryOpenInBrowser()', sortedEntries[entryId]);
             var _entry = sortedEntries[entryId];
             var _srcDoc = "";
             var _regex = new RegExp('\'', 'g');
@@ -2429,7 +2430,7 @@
 
         setInterval(function() {
             var _maxNbDaysAgo = params.settings.days.last();
-            var _timestampMax = liveValues['timestamps']['max'] - (86400 * _maxNbDaysAgo);
+            var _timestampMax = liveValues['timestamps']['max'] - (86400 * _maxNbDaysAgo); // Today 23:59:59
             sp.deleteOldEntries(_timestampMax);
         }, 60000);
         
