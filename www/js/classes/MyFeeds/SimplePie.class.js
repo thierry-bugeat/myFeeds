@@ -52,6 +52,7 @@ var SimplePie = function() {
     this.timestampMin = 0;              // Timestamp of beginning of day.
     this.firstSync = true;
     this.currentSynchroTimestamp = 0;   // Timestamp of current synchro.
+    this.timeout = 15000;               // Timeout for get method (15s)
 
     _SimplePie = this;
 }
@@ -160,7 +161,7 @@ SimplePie.prototype._setNum = function(num) {
 }
 
 /**
- * 
+ * Set Feeds Subscriptions
  * @param {array} myFeedsSubscriptions
  * @returns {null}
  */
@@ -330,7 +331,6 @@ SimplePie.prototype.deleteEntries = function(account, feedId) {
  * @param {int} timestamp 
  * @return {null}
  * */
-
 SimplePie.prototype.deleteOldEntries = function(timestamp) {
     _MyFeeds.log('deleteOldEntries(' + timestamp + ')');
 
@@ -355,8 +355,14 @@ SimplePie.prototype.deleteOldEntries = function(timestamp) {
     _MyFeeds.log('deleteOldEntries(' + timestamp + ') => ' + _oldEntries + ' old entrie(s) has been deleted');
 }
 
+/**
+ * Add feed
+ * Store feed informations in object "this.unsortedFeeds"
+ * @param {object} feed
+ * @return {null} Update "this.unsortedFeeds"
+ */
 SimplePie.prototype.addFeed = function(feed) {
-    var start = performance.now();
+
     //_MyFeeds.group('SimplePie.prototype.addFeed()', feed.title);
     _MyFeeds.log('SimplePie.prototype.addFeed()', feed);
     //_MyFeeds.log('SimplePie.prototype.addFeed()', feed.entries);
@@ -442,9 +448,6 @@ SimplePie.prototype.addFeed = function(feed) {
     this.unsortedFeeds.push(_myNewfeed);
     
     // ---
-    
-    var end = performance.now();
-    _MyFeeds.log("addFeed() " + (end - start) + " milliseconds.");
 }
 
 /**
@@ -467,10 +470,10 @@ SimplePie.prototype.getIconPulsations = function(_myPulsations) {
 /**
  * Load all feeds
  * @param {int} nbDaysToLoad Limit loading to N days.
+ * @return {customEvent} SimplePie.load.done|SimplePie.load.error
  * */
- 
 SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
-    
+
     _MyFeeds.log('SimplePie.prototype.loadFeeds()', this.myFeedsSubscriptions);
 
     this.currentSynchroTimestamp = Math.floor(Date.now() / 1000);
@@ -548,7 +551,6 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
             
         }
     }
-
 }
 
 /**
@@ -559,7 +561,6 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
  * @return {boolean}
  * 
  * */
- 
 SimplePie.prototype.isValidUrl = function(url) {
     
     _MyFeeds.log('SimplePie.prototype.isValidUrl()', arguments);
@@ -586,7 +587,6 @@ SimplePie.prototype.isValidUrl = function(url) {
  * @param {object} myParams You can retrieve this object in response.
  * 
  * */
- 
 SimplePie.prototype.get = function (url, myParams) {
     
     _MyFeeds.log('SimplePie.prototype.get()', arguments);
@@ -651,7 +651,7 @@ SimplePie.prototype.get = function (url, myParams) {
                 reject(_response);
             };
            
-            xhr.timeout = 15000; // Set timeout to 15 seconds
+            xhr.timeout = this.timeout;
             xhr.ontimeout = function(e) {
                 //_MyFeeds.error('Loading ERROR 116 ', e);
                 _SimplePie.setNbFeedsLoaded();
@@ -672,7 +672,6 @@ SimplePie.prototype.get = function (url, myParams) {
  * @param {object} entry
  * @return {boolean} true, false
  * */
- 
 SimplePie.prototype.isSmallEntry = function (entry) {
 
     var _out;
