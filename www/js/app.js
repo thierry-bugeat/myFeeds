@@ -1455,7 +1455,7 @@
 
     function loadFeeds() {
         if (liveValues.sync.inProgress) {return;}
-        
+
         liveValues.sync.inProgress = true;
         liveValues.sync.timestamps.lastUpdate = Math.round(Date.now()/1000);
         ui._onclick(sync, 'disable');
@@ -2094,6 +2094,10 @@
     function initAndLoadFeeds(subscriptions) {
         my.log('initAndLoadFeeds()', arguments);
 
+        // Load feed content from 'network' after app install (First launch) 
+        // otherwise from local 'cache' to increase startup performances.
+        (typeof localStorage.getItem('subscriptions.local.json') === 'string') ? sp.setOrigin('cache') : sp.setOrigin('network');
+
         // Add feeds from subscription(s) file(s)
         // subscriptions.local.json
         // subscriptions.feedly.json
@@ -2124,7 +2128,8 @@
             _nbFeedsSubscriptions = _nbFeedsSubscriptions + myFeedsSubscriptions[_account].length;
         }
 
-        if (_nbFeedsSubscriptions == 0) {
+        if (typeof localStorage.getItem('subscriptions.local.json') !== 'string') {
+            var _local = '';
             var _confirm = window.confirm(document.webL10n.get('confirm-use-default-feeds'));
             if (_confirm) {
                 var _populateMySubscriptions = [
@@ -2141,13 +2146,18 @@
                     _nbFeedsSubscriptions++;
                 }
 
-                my._save("subscriptions.local.json", "application/json", JSON.stringify(myFeedsSubscriptions.local)).then(function(results) {
-                    my.log('Save file subscriptions.local.json');
-                }).catch(function(error) {
-                    my.error("ERROR saving file ", error);
-                    my.alert("ERROR saving file " + error.filename);
-                });
+                _local = JSON.stringify(myFeedsSubscriptions.local);
+            } else {
+                _local = '[]';
             }
+
+            my._save("subscriptions.local.json", "application/json", _local).then(function(results) {
+                my.log('Save file subscriptions.local.json');
+            }).catch(function(error) {
+                my.error("ERROR saving file ", error);
+                my.alert("ERROR saving file " + error.filename);
+            });
+            
         }
 
         // 1st feeds loading
@@ -2160,6 +2170,8 @@
             sp.setFeedsSubscriptions(myFeedsSubscriptions);
             loadFeeds();
         }
+
+        sp.setOrigin('network');
 
         // ---
 

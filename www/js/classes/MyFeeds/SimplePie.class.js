@@ -726,3 +726,13 @@ SimplePie.prototype._setTimestampMin = function () {
 SimplePie.prototype._getTimestampMin = function () {
     return this.timestampMin;
 }
+
+/**
+ * Set feed content origin
+ * @param {string} origin cache|network
+ * 'cache'   Feed content is loaded from localStorage
+ * 'network' Feed content is loaded from network
+ */
+SimplePie.prototype.setOrigin = function(origin) {
+    this.origin = origin;
+}
