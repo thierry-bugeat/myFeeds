@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Thierry BUGEAT
+ * Copyright 2015, 2016, 2017 Thierry BUGEAT
  * 
  * This file is part of myFeeds.
  * 
@@ -23,7 +23,6 @@
 
 var MyFeeds = function() {
     _MyFeeds = this;
-    this.version = 16; // Load & Save version to use. (14: myFeeds 1.0.x to 1.4.x, 15: myFeeds 1.5, 16: myFeeds 1.6.x)
 }
 
 /* =============== */
@@ -35,23 +34,6 @@ MyFeeds.prototype.base64_decode = function(str) { return atob(str); }
 
 MyFeeds.prototype._load = function(filename, callback) {
     _MyFeeds.log("MyFeeds.prototype._load()", arguments);
-
-    switch(this.version) {
-        case 14:
-            return _MyFeeds._loadV14(filename, callback); // myFeeds 1.0.x to 1.4.x (SD card storage)
-        case 15:
-            return _MyFeeds._loadV15(filename, callback); // myFeeds 1.5 (Transition from SD card storage to local storage)
-            break;
-        default:
-            return _MyFeeds._loadV16(filename, callback); // myFeeds 1.6.X (Local storage)
-    }
-}
-
-/**
- * Load: v1.6+
- * */
-MyFeeds.prototype._loadV16 = function(filename, callback) {
-    _MyFeeds.log("MyFeeds.prototype._loadV16()", arguments);
     
     return new Promise(function(resolve, reject) {
         if (typeof localStorage.getItem(filename) === 'string') { 
@@ -60,82 +42,7 @@ MyFeeds.prototype._loadV16 = function(filename, callback) {
             resolve(results);
         } else {
             _MyFeeds.log("MyFeeds.prototype._load() ERROR Can't find '"+filename+"' in localStorage");
-            reject({});
-        }
-    });
-}
-
-/**
- * Load: v1.5 
- * Migration from v1.4 to 1.5+
- * */
-MyFeeds.prototype._loadV15 = function(filename, callback) {
-    _MyFeeds.log("MyFeeds.prototype._loadV15()", arguments);
-    
-    return new Promise(function(resolve, reject) {
-        if (typeof localStorage.getItem(filename) === 'string') { 
-            var results = JSON.parse(localStorage.getItem(filename));
-            _MyFeeds.log("MyFeeds.prototype._load() " + filename, results);
-            resolve(results);
-        } else {
-            _MyFeeds._loadV14(filename, callback).then(function(_results) {
-                resolve(_results);
-            }).catch(function(error) {
-                reject("{}");
-            });
-        }
-    });
-}
-
-/**
- * Load v1.0 to v1.4
- * Load user data from SD card
- * */
-MyFeeds.prototype._loadV14 = function(filename, callback) {
-    _MyFeeds.log("MyFeeds.prototype._loadV14()", arguments);
-    
-    return new Promise(function(resolve, reject) {
-        try {
-            var sdcard      = navigator.getDeviceStorage('sdcard');
-            var request     = sdcard.get('myFeeds/' + filename);
-            var dataType    = filename.split('.').pop();            // ".json"
-            var results     = "";
-
-            request.onsuccess = function () {
-                var file = this.result;
-                _MyFeeds.log("MyFeeds.prototype._load()", file);
-                var _fr = new FileReader();
-                
-                _fr.onloadend = function(event) {
-                    if (event.target.readyState == FileReader.DONE) {
-                        if (dataType == "json") {
-                            results = JSON.parse(event.target.result);
-                            _MyFeeds.log(JSON.parse(event.target.result));
-                        } else {
-                            results = event.target.result;
-                            _MyFeeds.log(event.target.result);
-                        }
-                        //callback(results);
-                        _MyFeeds.log("MyFeeds.prototype._load() " + filename, results);
-                        resolve(results);
-                    }
-                };
-                
-                _fr.readAsText(file);
-            }
-
-            request.onerror = function () {
-                _MyFeeds.warn("Unable to get file: " + filename, this.error);
-                reject(Error());
-            }
-        } catch (e) {
-            if (typeof localStorage.getItem(filename) === 'string') { 
-                var results = JSON.parse(localStorage.getItem(filename));
-                _MyFeeds.log("MyFeeds.prototype._load() " + filename, results);
-                resolve(results);
-            } else {
-                reject("");
-            }
+            reject({error: filename});
         }
     });
 }
@@ -167,55 +74,10 @@ MyFeeds.prototype._loadJSON = function(filename) {
  * @param {string} content
  * */
 MyFeeds.prototype._save = function(filename, mimetype, content) {
-
+    _MyFeeds.log("MyFeeds.prototype._save()", arguments);
     return new Promise(function(resolve, reject) {
         localStorage.setItem(filename, content);
         resolve("");
-    });
-
-}
-
-/**
- * @param {string} filename
- * @param {string} mimetype "text/plain" "application/json"
- * @param {string} content
- * */
-MyFeeds.prototype._save14 = function(filename, mimetype, content) {
-
-    return new Promise(function(resolve, reject) {
-        try {
-            var sdcard = navigator.getDeviceStorage("sdcard");
-            var file   = new Blob([content], {type: mimetype});
-
-            // Delete previous file
-            
-            var request = sdcard.delete("myFeeds/" + filename);
-            request.onsuccess = function() {
-                _MyFeeds.log("File deleted");
-                
-                // Save new file
-            
-                var request = sdcard.addNamed(file, "myFeeds/" + filename);
-
-                request.onsuccess = function () {
-                    resolve(this.result);
-                }
-
-                request.onerror = function (error) {
-                    var _myError = {
-                        "filename": filename,
-                        "message": "Unable to write the file",
-                        "error": error
-                    };
-                    reject(JSON.stringify(_myError));
-                }
-                
-            };
-            request.onerror = function() { reject(JSON.stringify(this.error)); };
-        } catch (e) {
-            localStorage.setItem(filename, content);
-            resolve("");
-        }
     });
 
 }
