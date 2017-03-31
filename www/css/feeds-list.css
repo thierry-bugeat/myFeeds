@@ -86,7 +86,7 @@
 
 #feeds-list > ul > li p {
     border: medium none;
-    color: #858585;
+    color: #333;
     display: block;
     font-size: 1.5rem;
     line-height: 2rem;
@@ -99,11 +99,12 @@
 
 #feeds-list > ul > li p:first-of-type {
     padding-left: 1.5rem;
-    color: #333;
     font-size: 1.8rem;
     line-height: 2.2rem;
     padding: 0;
     height: 4rem;
+    width: auto;
+    float: left;
 }
 
 #feeds-list > ul > li img {
@@ -114,12 +115,18 @@
     border-radius: 2rem;
     vertical-align: middle;
     margin-right: var(--my-spacing);
+    float: right;
+}
+
+#feeds-list > ul > li time {
+    color: #858585;
 }
 
 #feeds-list button {
     width:4rem;
     padding:0;
     margin-right: var(--my-spacing);
+    vertical-align: bottom;
 }
 
 count{
@@ -132,4 +139,18 @@ count{
     display:inline-block;
     text-align:center;
     margin-right: var(--my-spacing);
+}
+
+/* --- All Feeds --- */
+
+#feeds-list > ul:first-of-type > li p {
+    height: 4rem;
+    line-height: 4rem;
+}
+
+/* --- Keywords --- */
+
+#feeds-list > ul[class='keywords'] > li p {
+    height: 4rem;
+    line-height: 4rem;
 }

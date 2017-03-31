@@ -1505,7 +1505,7 @@
                     '<count class="">'+count(_sortedKeywords[i])+'</count>' : 
                     '<button><span data-icon="'+sp.getIconPulsations(count(_sortedKeywords[i]))+'"></span></button>';
                 var _iconDelete = '<button class="deleteKeyword" action="delete" myKeyword="' + _sortedKeywords[i] + '"><span data-icon="delete" action="delete" myKeyword="' + _sortedKeywords[i] + '"></span></button>';
-                _htmlKeywords = _htmlKeywords + '<li id="' + _sortedKeywords[i] + '" action="open" type="keyword" value="' +  _sortedKeywords[i] + '" account=""><a _id_="' + _sortedKeywords[i] + '" ><p _id_="' + _sortedKeywords[i] + '">' + _iconDelete + _iconPulsations + '<my>' + _sortedKeywords[i] + '</my></p></a></li>';
+                _htmlKeywords = _htmlKeywords + '<li id="' + _sortedKeywords[i] + '" action="open" type="keyword" value="' +  _sortedKeywords[i] + '" account=""><a _id_="' + _sortedKeywords[i] + '" ><p _id_="' + _sortedKeywords[i] + '">' + _iconDelete + _iconPulsations + '</p><p><my>' + _sortedKeywords[i] + '</my></p></a></li>';
             }
             
             _htmlKeywords = _htmlKeywords + '</ul>';
@@ -1541,12 +1541,12 @@
 
             var _myLastPublishedDate = (_feed._myLastTimestamp == 0) ? "No news" : _feed._myLastPublishedDate;
 
-            _html[_account] = _html[_account] + '<li id="' + _feed._myDomId + '" action="open" type="feed" value="' + _feed.feedUrl + '" account="' + _account + '"><a _id_="' + _feed._myDomId + '"><p _id_="' + _feed._myDomId + '">' + _iconDelete + _iconPulsations + _iconFeed + '<my>' + _feed.title + '</my></p><p><time>' + _myLastPublishedDate + '</time></p></a></li>';
+            _html[_account] = _html[_account] + '<li id="' + _feed._myDomId + '" action="open" type="feed" value="' + _feed.feedUrl + '" account="' + _account + '"><a _id_="' + _feed._myDomId + '"><p _id_="' + _feed._myDomId + '">' + _iconDelete + _iconPulsations + '</p>' + _iconFeed + '<p><my>' + _feed.title + '</my></p><p><my><time>' + _myLastPublishedDate + '</time></my></p></a></li>';
         }
 
         _htmlFeeds = _htmlFeeds +
             '<ul>' +
-            '<li id="_" action="open" type="feed" value="" account=""><a _id_="_"><p _id_="_" ><button><span data-icon="forward"></span></button><my data-l10n-id="all-feeds">' + document.webL10n.get('all-feeds') + '</my></p></a></li>' +
+            '<li id="_" action="open" type="feed" value="" account=""><a _id_="_"><p _id_="_" ><button><span data-icon="forward"></span></button></p><p><my data-l10n-id="all-feeds">' + document.webL10n.get('all-feeds') + '</my></p></a></li>' +
             '</ul>' +
             '' + _htmlKeywords;
         
@@ -2705,7 +2705,7 @@
         /* ====================================== */
  
         // Add keyword
-        
+
         addKeyword.onclick = function() {
             ui._vibrate();
             var _myKeyword = document.getElementById('inputSearchEntries').value;
