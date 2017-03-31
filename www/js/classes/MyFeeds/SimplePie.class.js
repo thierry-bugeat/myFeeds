@@ -54,6 +54,8 @@ var SimplePie = function() {
     this.currentSynchroTimestamp = 0;   // Timestamp of current synchro.
     this.timeout = 15000;               // Timeout for get method (15s)
 
+    this.origin = 'network';            // cache|network(default)
+                                        // Load feed content from cache or network. (Cache is only for debug)
     _SimplePie = this;
 }
 SimplePie.prototype = new MyFeeds();
@@ -75,7 +77,7 @@ SimplePie.prototype.setServerId        = function(serverId){ this.gf.serverId = 
 SimplePie.prototype._setUrl            = function(url)     { this.gf.url = url;            }
 
 SimplePie.prototype._sortEntries       = function() {
-    
+
     // Sort entries by "_myTimestampInMs" 
     
     // =============================================
@@ -130,7 +132,6 @@ SimplePie.prototype._sortEntries       = function() {
     }
 
     _MyFeeds.log('_sortEntries()', this.gf_sortedEntries);
-    _MyFeeds.log(this.gf_sortedEntries);
 }
 
 /**
@@ -371,10 +372,11 @@ SimplePie.prototype.addFeed = function(feed) {
     var _myNewfeed = feed;
     var _myNewEntries = feed.entries;
     var _lastUpdateTimestamp = 0;
+    var _nb = _myNewEntries.length;
     
     // Add feed informations to each entry
-    
-    for (var i = 0; i < _myNewEntries.length; i++) {
+
+    for (var i = 0; i < _nb; i++) {
         _myNewEntries[i]._myFeedInformations = feed;
         delete _myNewEntries[i]._myFeedInformations.entries;
     }
@@ -386,7 +388,7 @@ SimplePie.prototype.addFeed = function(feed) {
     var _timestamps = [];
     var _timestamp = 0;
     
-    for (var i = 0; i < _myNewEntries.length; i++) {
+    for (var i = 0; i < _nb; i++) {
         _timestamp = Math.round(new Date(_myNewEntries[i].publishedDate).getTime() / 1000);
         _timestamps.push(_timestamp);
         if ((_lastUpdateTimestamp < _timestamp)
@@ -427,10 +429,7 @@ SimplePie.prototype.addFeed = function(feed) {
 
     _myNewfeed['_myPulsationsIcone'] = this.getIconPulsations(_myPulsations);
     
-    // /!\ The 3 following values are false. Entries are not sorted by dates.
-    
     var _date = new Date(_lastUpdateTimestamp * 1000);
-    
     _myNewfeed['_myLastPublishedDate']  = _date.toLocaleString(userLocale);
     _myNewfeed['_myLastTimestamp']      = _lastUpdateTimestamp;
     _myNewfeed['_myLastTimestampInMs']  = _lastUpdateTimestamp;
@@ -484,6 +483,7 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
         for (var i = 0; i < this.myFeedsSubscriptions.length; i++) {
  
             var _myFeed = this.myFeedsSubscriptions[i];
+            
             this._setUrl(_myFeed.url);
 
             this._setNum(1 + Math.floor(_myFeed.pulsations * nbDaysToLoad)); // Pulsations = Estimation of news per day.
@@ -497,57 +497,49 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
             }
             
             var _params = {"nbFeeds": this.myFeedsSubscriptions.length, "account": _myFeed.account, "url": _myFeed.url, "id": _myFeed.id, "pulsations": _myFeed.pulsations};
-            
-            this.get(_url, _params).then(function(response) {
-                _MyFeeds.log('### Loading feed from network (0) ###');
-                response.feed = {};
-                response.feed._myAccount = response._myParams.account; // Add _myAccount value
-                response.feed._myFeedId = response._myParams.id; // Add __id value
-                _MyFeeds.log("SimplePie.prototype.loadFeeds() > get > response : ", response);
-                document.body.dispatchEvent(new CustomEvent('SimplePie.load.done', {"detail": response}));
-            }, function(error) { // Error then try to load feed from cache
 
-                var _message = error.responseData;
-
-                _MyFeeds.error('### Loading feed from cache (0) ' + _message._myParams.account + '/' + _message._myParams.url + ' ###', error);
+            if (this.origin == 'cache') {
                 
+                var _message = {};
+                _message._myParams = _params;
+
                 _MyFeeds._load('cache/simplepie/feeds/' + _message._myParams.account + '/' + btoa(_message._myParams.url) + ".json").then(function(_cacheContent){
-                    _MyFeeds.log('### Loading feed from cache DONE (2a) ###', _cacheContent);
+                    _MyFeeds.log("SimplePie.prototype.loadFeeds() (CACHE) > _load done : ", {"detail": _cacheContent});
                     document.body.dispatchEvent(new CustomEvent('SimplePie.load.done', {"detail": _cacheContent}));
-                }).catch(function() {
-                    // --- Test
-                    _MyFeeds.error('### Loading feed from cache ERROR (2b) ###');
-                    var _response = {};
-                    _response._myLastPublishedDate = "1/1/1970, 1:00:00 AM";
-                    _response._myLastTimestamp = 0;
-                    _response._myLastTimestampInMs = 0;
-                    //_response._myNbEntries = 0;
-                    _response._myParams = _message._myParams;
-                    //_response._myPulsations = _message._myParams.pulsations;
-                    //_response._myPulsationsIcone = "crashed";
-                    _response.author = "";
-                    _response.description = "";
-                    _response.feed = {};
-                    _response.feed._myAccount = _message._myParams.account; // Add _myAccount value
-                    _response.feed._myFeedId = _message._myParams.id;
-                    _response.feedUrl = _message._myParams.url;
-                    _response.link = _message._myParams.url;
-                    _response.title = _message._myParams.url;
-                    _response.type = "rss";
-                    _response.entries = [];
-                    _MyFeeds.error('### Loading feed from cache ERROR (2b) ###', _response);
-                    document.body.dispatchEvent(new CustomEvent('SimplePie.load.done', {"detail": _response}));
-                    // ---
-                    /*_MyFeeds.error('### Load feed from cache (2b) ###', error);
-                    error._myParams = _params;
-                    error._myFeedUrl = _myFeed.url;
-                    document.body.dispatchEvent(new CustomEvent('SimplePie.load.error', {"detail": error}));*/
+                }).catch(function(e){
+                    _MyFeeds.error('SimplePie.prototype.loadFeeds() (CACHE) > _load error : ', e);
+                    document.body.dispatchEvent(new CustomEvent('SimplePie.load.error', {"detail": e}));
                 });
 
-            }).catch(function(e){
-                _MyFeeds.error('### Loading (6) ###', e);
-                document.body.dispatchEvent(new CustomEvent('SimplePie.load.error', {"detail": e}));
-            });
+            } else {
+                this.get(_url, _params).then(function(response) {
+                    _MyFeeds.log('### Loading feed from network (0) ###');
+                    response.feed = {};
+                    response.feed._myAccount = response._myParams.account; // Add _myAccount value
+                    response.feed._myFeedId = response._myParams.id; // Add __id value
+                    _MyFeeds.log("SimplePie.prototype.loadFeeds() (NET) > get > response : ", response);
+                    document.body.dispatchEvent(new CustomEvent('SimplePie.load.done', {"detail": response}));
+                }, function(error) { // Error then try to load feed from cache
+
+                    var _message = error.responseData;
+
+                    _MyFeeds.error('### Loading feed from cache (0) ' + _message._myParams.account + '/' + _message._myParams.url + ' ###', error);
+                    
+                    _MyFeeds._load('cache/simplepie/feeds/' + _message._myParams.account + '/' + btoa(_message._myParams.url) + ".json").then(function(_cacheContent){
+                        _MyFeeds.log('### Loading feed from cache DONE (2a) ###', _cacheContent);
+                        document.body.dispatchEvent(new CustomEvent('SimplePie.load.done', {"detail": _cacheContent}));
+                    }).catch(function() {
+                        _MyFeeds.error('### Load feed from cache (2b) ###', error);
+                        error._myParams = _params;
+                        error._feedUrl = _myFeed.url;
+                        document.body.dispatchEvent(new CustomEvent('SimplePie.load.error', {"detail": error}));
+                    });
+
+                }).catch(function(e){
+                    _MyFeeds.error('### Loading (6) ###', e);
+                    document.body.dispatchEvent(new CustomEvent('SimplePie.load.error', {"detail": e}));
+                });
+            }
             
         }
     }

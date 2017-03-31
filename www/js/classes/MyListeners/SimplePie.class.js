@@ -31,12 +31,12 @@ var MyListeners_SimplePie = function() {
             
             // Save feed as file
 
-            if (liveValues.network.status == 'online') {
-                my._save('cache/simplepie/feeds/' + event.detail._myParams.account + "/" + btoa(event.detail.feedUrl) + ".json", "application/json", JSON.stringify(event.detail)).then(function(results) {
-                    my.log('SimplePie.load.done > Saving feed in cache ok : ' + event.detail.feedUrl + ' (' + event.detail._myParams.account + "/" + btoa(event.detail.feedUrl) + ')');
+            if ((liveValues.network.status == 'online') && (sp.origin != 'cache')) {
+                my._save('cache/simplepie/feeds/' + event.detail._myParams.account + "/" + btoa(event.detail._myParams.url) + ".json", "application/json", JSON.stringify(event.detail)).then(function(results) {
+                    my.log('SimplePie.load.done > Saving feed in cache ok : ' + event.detail._myParams.url + ' (' + event.detail._myParams.account + "/" + btoa(event.detail._myParams.url) + ')');
                 }).catch(function(error) {
-                    my.error("ERROR saving feed in cache : " + event.detail.feedUrl + ' (' + event.detail._myParams.account + "/" + btoa(event.detail.feedUrl) + ') ' + error);
-                    my.alert("ERROR saving feed in cache :\n" + event.detail.feedUrl);
+                    my.error("ERROR saving feed in cache : " + event.detail._myParams.url + ' (' + event.detail._myParams.account + "/" + btoa(event.detail._myParams.url) + ') ' + error);
+                    my.alert("ERROR saving feed in cache :\n" + event.detail._myParams.url);
                 });
             }
 
