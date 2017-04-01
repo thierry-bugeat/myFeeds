@@ -207,7 +207,12 @@ MyFeeds.prototype._file_exists_v2 = function(filename, callback) {
  * @param {string} message Message to display on screen for user.
  * */ 
 MyFeeds.prototype.message = function (message) {
-    window.alert(message);
+    if (window.Notification && (liveValues.platform === "linux")) {
+        Notification.requestPermission();
+        new Notification('myFeeds', { body: message, icon: 'img/logo.png' });
+    } else {
+        window.alert(message);
+    }
 }
 
 /**
