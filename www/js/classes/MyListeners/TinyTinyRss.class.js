@@ -27,7 +27,7 @@ var MyListeners_TinyTinyRss = function() {
             liveValues['login']['inProgress']['tinytinyrss'] = true;
             my.log('TinyTinyRss.getToken()', tinytinyrss.getToken());
             params.accounts.tinytinyrss.logged = true;
-            _saveParams();
+            _save('params');
             document.getElementById('tinytinyrssCheckbox').checked = true; // Enable settings checkbox
             document.getElementById('tinytinyrssForm').style.cssText = 'display: none';
             tinytinyrss.getSubscriptions(); // CustomEvent TinyTinyRss.getSubscriptions.done, TinyTinyRss.getSubscriptions.error

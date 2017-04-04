@@ -27,7 +27,7 @@ var MyListeners_AolReader = function() {
             liveValues['login']['inProgress']['aolreader'] = true;
             my.log(aolreader.getToken());
             params.accounts.aolreader.logged = true;
-            _saveParams();
+            _save('params');
             document.getElementById('aolreaderLogin').checked = true; // Enable settings checkbox
             aolreader.getSubscriptions(); // CustomEvent AolReader.getSubscriptions.done, AolReader.getSubscriptions.error
         });

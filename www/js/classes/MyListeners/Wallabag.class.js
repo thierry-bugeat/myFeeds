@@ -27,7 +27,7 @@ var MyListeners_Wallabag = function() {
             liveValues['login']['inProgress']['wallabag'] = true;
             my.log('Wallabag.getToken()', wallabag.getToken());
             params.accounts.wallabag.logged = true;
-            _saveParams();
+            _save('params');
             document.getElementById('wallabagCheckbox').checked = true; // Enable settings checkbox
             document.getElementById('wallabagForm').style.cssText = 'display: none';
             /////////wallabag.getSubscriptions(); // CustomEvent Wallabag.getSubscriptions.done, Wallabag.getSubscriptions.error

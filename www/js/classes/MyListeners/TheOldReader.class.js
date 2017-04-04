@@ -27,7 +27,7 @@ var MyListeners_TheOldReader = function() {
             liveValues['login']['inProgress']['theoldreader'] = true;
             my.log('TheOldReader.getToken()', theoldreader.getToken());
             params.accounts.theoldreader.logged = true;
-            _saveParams();
+            _save('params');
             document.getElementById('theoldreaderCheckbox').checked = true; // Enable settings checkbox
             document.getElementById('theoldreaderForm').style.cssText = 'display: none';
             theoldreader.getSubscriptions(); // CustomEvent TheOldReader.getSubscriptions.done, TheOldReader.getSubscriptions.error

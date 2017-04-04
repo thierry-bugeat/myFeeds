@@ -27,7 +27,7 @@ var MyListeners_Feedly = function() {
             liveValues['login']['inProgress']['feedly'] = true;
             my.log(feedly.getToken());
             params.accounts.feedly.logged = true;
-            _saveParams();
+            _save('params');
             document.getElementById('feedlyLogin').checked = true; // Enable settings checkbox
             feedly.getSubscriptions(); // CustomEvent Feedly.getSubscriptions.done, Feedly.getSubscriptions.error
         });

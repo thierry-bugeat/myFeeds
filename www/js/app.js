@@ -207,7 +207,7 @@
                 }
             }
             
-            _saveParams();
+            _save('params');
         } else {
             params = _myParams;
         }
@@ -432,7 +432,7 @@
         // ---
         
     }).catch(function(error) {
-        _saveParams();
+        _save('params');
     });
 
     // Load keywords from SDCard.
@@ -442,7 +442,7 @@
         my.log('loading keywords from file keywords.json ...', _myKeywords);
         keywords = _myKeywords;
     }).catch(function(error) {
-        _saveKeywords();
+        _save('keywords');
     });
 
     // ---
@@ -484,7 +484,7 @@
 
             keywords = _tmp.slice();
             
-            _saveKeywords();
+            _save('keywords');
 
             // (2) Reload UI
 
@@ -1207,7 +1207,7 @@
             params.settings.developper_menu.visible = !params.settings.developper_menu.visible;
             dspSettings();
             my.message('Developper menu : ' + params.settings.developper_menu.visible);
-            _saveParams();
+            _save('params');
         }
         
         // ============================
@@ -1231,12 +1231,12 @@
         var _selectUpdateEvery = document.getElementById('selectUpdateEvery');
         _selectUpdateEvery.onchange = function(e) {
             params.entries.updateEvery = _selectUpdateEvery.options[_selectUpdateEvery.selectedIndex].value;
-            _saveParams();
+            _save('params');
         }
  
         document.getElementById('toggleCountEntries').onclick = function(e) {
             params.feeds.count = !params.feeds.count;
-            _saveParams();
+            _save('params');
             dspFeeds(sp.getFeeds());
         }
 
@@ -1245,7 +1245,7 @@
         document.getElementById('toggleDisplaySmallEntries').onclick = function(e) {
             document.body.dispatchEvent(new CustomEvent('settingsSmallNews.change', {"detail": ""}));
             params.entries.displaySmallEntries = !params.entries.displaySmallEntries;
-            _saveParams();
+            _save('params');
             
             params.entries.displaySmallEntries ?
                 ui._smallEntries('show') : ui._smallEntries('hide');
@@ -1267,7 +1267,7 @@
                 ui._onclick(previousDay, 'enable');     // [>]
             }
             
-            _saveParams();
+            _save('params');
         }
  
         // --- Online accounts ---
@@ -1356,14 +1356,14 @@
 
         document.getElementById("useAnimations").onclick = function() {
             params.settings.ui.animations = !params.settings.ui.animations;
-            _saveParams();
+            _save('params');
         }
  
         // UI vibrate
 
         document.getElementById("toggleVibrate").onclick = function() {
             params.settings.ui.vibrate = !params.settings.ui.vibrate;
-            _saveParams();
+            _save('params');
         }
         
         // UI select language
@@ -1371,7 +1371,7 @@
         var _selectLanguage = document.getElementById('selectLanguage');
         _selectLanguage.onchange = function(e) {
             params.settings.ui.language = _selectLanguage.options[_selectLanguage.selectedIndex].value;
-            _saveParams();
+            _save('params');
             document.webL10n.setLanguage(params.settings.ui.language, "");
             //loadFeeds();
         }
@@ -1404,7 +1404,7 @@
 
         document.getElementById("useProxy").onclick = function() {
             params.settings.proxy.use = !params.settings.proxy.use;
-            _saveParams();
+            _save('params');
             ui.toggleProxy();
         }
        
@@ -1412,14 +1412,14 @@
 
         document.getElementById("logsConsole").onclick = function() {
             params.settings.developper_menu.logs.console = !params.settings.developper_menu.logs.console;
-            _saveParams();
+            _save('params');
         }
         
         // Logs console screen
 
         document.getElementById("logsScreen").onclick = function() {
             params.settings.developper_menu.logs.screen = !params.settings.developper_menu.logs.screen;
-            _saveParams();
+            _save('params');
         }
         
         // Service base
@@ -1468,6 +1468,7 @@
         _setTimestamps();
         setNbFeedsToLoad();
         sp.loadFeeds(params.entries.dontDisplayEntriesOlderThan);
+        _save('liveValues');
     }
 
     function dspFeeds(feeds) {
@@ -2096,6 +2097,9 @@
 
         // Load feed content from 'network' after app install (First launch) 
         // otherwise from local 'cache' to increase startup performances.
+        // @todo
+        // depuis 'network' si la dernière synchro date de la veille.
+        // liveValues['sync']['timestamps']['lastUpdate'] < liveValues['timestamps']['max'] - (86400) (début de journée)
         (typeof localStorage.getItem('subscriptions.local.json') === 'string') ? sp.setOrigin('cache') : sp.setOrigin('network');
 
         // Add feeds from subscription(s) file(s)
@@ -2178,25 +2182,20 @@
         dspSettings();
     }
 
-    function _saveParams() {
-        var _nbDaysAgo = params.entries.nbDaysAgo;
-        params.entries.nbDaysAgo = 0;   // Reset nbDaysAgo value before saving file.
-                                        // Reset affect "params" object !!!!!
-        my._save("params.json", "application/json", JSON.stringify(params)).then(function(results) {
-            my.log("Save file params.json");
-        }).catch(function(error) {
-            my.error("ERROR saving file params.json", error);
-            my.alert('ERROR saving file params.json');
-        });
-        params.entries.nbDaysAgo = _nbDaysAgo;
-    }
+    function _save(variable) {
+        var _filename = variable + '.json';
+        var _content = eval(variable);
+        var _type = "application/json";
 
-    function _saveKeywords() {
-        my._save("keywords.json", "application/json", JSON.stringify(keywords)).then(function(results) {
-            my.log("Save file keywords.json");
+        if (variable === 'params') {
+            _content.entries.nbDaysAgo = 0;  // Reset nbDaysAgo value before saving file.
+        }
+
+        my._save(_filename, _type, JSON.stringify(_content)).then(function(results) {
+            my.log("Save "+_filename);
         }).catch(function(error) {
-            my.error("ERROR saving file keywords.json", error);
-            my.alert('ERROR saving file keywords.json');
+            my.error("ERROR saving file "+_filename, error);
+            my.alert('ERROR saving file '+_filename);
         });
     }
     
@@ -2212,7 +2211,7 @@
                 myFeedsSubscriptions[_account] = [];
             sp.setFeedsSubscriptions(myFeedsSubscriptions);
             sp.deleteEntries(_account, '');
-            _saveParams();
+            _save('params');
         }
         
         try {document.getElementById(_account+'Form').style.cssText = 'display: block';} catch(e) {};   // Enable form
@@ -2339,7 +2338,7 @@
 
         for (var _account in myFeedsSubscriptions) {
             arrayPromises[i] = my._load('subscriptions.' + _account + '.json').then(function(results) {return results;}
-            ).catch(function(error) {params.accounts[_account].logged = false; _saveParams(); return {};});
+            ).catch(function(error) {params.accounts[_account].logged = false; _save('params'); return {};});
             i++;
         }
 
@@ -2545,7 +2544,7 @@
                 ui._vibrate();
                 ui.selectThemeIcon();
                 dspEntries();
-                _saveParams();
+                _save('params');
             }
         }
         displayCard.onclick = function(event) {
@@ -2554,7 +2553,7 @@
                 ui._vibrate();
                 ui.selectThemeIcon();
                 dspEntries();
-                _saveParams();
+                _save('params');
             }
         }
         displayList.onclick = function(event) {
@@ -2563,7 +2562,7 @@
                 ui._vibrate();
                 ui.selectThemeIcon();
                 dspEntries();
-                _saveParams();
+                _save('params');
             }
         }
 
@@ -2652,7 +2651,7 @@
                 params.feeds.selectedFeed.url = _value;
                 params.feeds.selectedFeed.account = _account;
                 params.feeds.selectedFeed.domId = _domId;
-                _saveParams();
+                _save('params');
                 dspEntries();
             }
 
@@ -2727,7 +2726,7 @@
 
                 if ((_confirm) && (!keywords.contains(_myKeyword))) {
                     keywords.push(_myKeyword);
-                    _saveKeywords();
+                    _save('keywords');
                     
                     params.feeds.selectedKeyword.value = _myKeyword;
                     params.feeds.selectedKeyword.domId = _myKeyword;
