@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Thierry BUGEAT
+ * Copyright 2015, 2016, 2017 Thierry BUGEAT
  * 
  * This file is part of myFeeds.
  * 
@@ -25,36 +25,31 @@ var SimplePie = function() {
     
     //MyFeeds.call(this); /* Appel du constructeur de la classe parente */
 
-    this.gf = {
-        "output"        : "json",                                                   // Output format: json, xml, json_xml
+    this.sp = {
         "num"           : 4,                                                        // Number of news to read
         "url"           : "",                                                       // Encoded feed url
-        "key"           : "notsupplied",                                            // Google API key
-        "v"             : "1.0" ,                                                   // Google API version
-        "scoring"       : "h",                                                      // Include historical entries
         "servers"       : [
             {"id": 0, "name": "SimplePie @ OVH",            "url": "http://quiksiivjq.cluster002.ovh.net/simplepie/" },
             {"id": 1, "name": "SimplePie @ Amazon EC2",     "url": "http://54.229.143.103/simplepie/" }, 
             {"id": 2, "name": "SimplePie @ Home eeepc701",  "url": "http://thierry.bugeat.com/simplepie/" }
         ],
-        "serverId"      : 0,
-        "method"        : "GET"
+        "serverId"      : 0
     };
     
     this.myFeedsSubscriptions = [];
-    this.gf_sortedEntries = [];
+    this.sortedEntries = [];
     this.sortedFeeds = [];
-    this.gf_unsortedEntries = [];
-    this.gf_mySha256 = [];              // Store sha256 sum for each news(entry), based on _entry.feedId + _entry.link
+    this.unsortedEntries = [];
     this.unsortedFeeds = [];
+    this.sha256 = [];                   // Store sha256 sum for each news(entry), based on _entry.feedId + _entry.link
     this.nbFeedsLoaded = 0;
     this.timestampMax = 0;              // Timestamp of most recent news.
     this.timestampMin = 0;              // Timestamp of beginning of day.
     this.firstSync = true;
     this.currentSynchroTimestamp = 0;   // Timestamp of current synchro.
-    this.timeout = 15000;               // Timeout for get method (15s)
+    this.timeout = 15000;               // Timeout for "get" method (15s)
 
-    this.origin = 'network';            // cache|network(default)
+    this.origin = 'network';            // Get feed content from "cache" or "network" (default)
                                         // Load feed content from cache or network. (Cache is only for debug)
     _SimplePie = this;
 }
@@ -64,17 +59,15 @@ SimplePie.prototype = new MyFeeds();
 /* --- Methodes --- */
 /* ================ */
 
-SimplePie.prototype.getVersion         = function()        { return this.gf.version;       }
-SimplePie.prototype.getOuput           = function()        { return this.gf.output;        }
-SimplePie.prototype.getNum             = function()        { return this.gf.num;           }
-SimplePie.prototype.getEntries         = function()        { this._sortEntries();  return this.gf_sortedEntries;   }
-SimplePie.prototype.getFeeds           = function()        { this._sortFeeds();    return this.sortedFeeds;        }
+SimplePie.prototype.getNum             = function()        { return this.sp.num;           }
+SimplePie.prototype.getEntries         = function()        { this._sortEntries();  return this.sortedEntries;   }
+SimplePie.prototype.getFeeds           = function()        { this._sortFeeds();    return this.sortedFeeds;     }
 SimplePie.prototype.getNbFeedsLoaded   = function()        { return this.nbFeedsLoaded;    }
-SimplePie.prototype.getServers         = function()        { return this.gf.servers;       }
-SimplePie.prototype.getServerId        = function()        { return this.gf.serverId;      }
-SimplePie.prototype.setServerId        = function(serverId){ this.gf.serverId = serverId;  }
+SimplePie.prototype.getServers         = function()        { return this.sp.servers;       }
+SimplePie.prototype.getServerId        = function()        { return this.sp.serverId;      }
+SimplePie.prototype.setServerId        = function(serverId){ this.sp.serverId = serverId;  }
 
-SimplePie.prototype._setUrl            = function(url)     { this.gf.url = url;            }
+SimplePie.prototype._setUrl            = function(url)     { this.sp.url = url;            }
 
 SimplePie.prototype._sortEntries       = function() {
 
@@ -85,23 +78,15 @@ SimplePie.prototype._sortEntries       = function() {
     // =============================================
     // Doesn't works !!!
     
-    /*this.gf_sortedEntries = this.gf_unsortedEntries;
+    /*this.sortedEntries = this.unsortedEntries;
     
-    this.gf_sortedEntries.sort(function(a, b){
+    this.sortedEntries.sort(function(a, b){
         return a._myTimestamp - b._myTimestamp
     });
     
-    this.gf_sortedEntries.reverse();
+    this.sortedEntries.reverse();
     
-    _MyFeeds.log(this.gf_sortedEntries);*/
-    
-    // ==========================================
-    // --- Sort using "underscore.js" library ---
-    // ==========================================
-    // Doesn't works.
-    
-    //this.gf_sortedEntries = (_.sortBy(this.gf_unsortedEntries, '_myTimestamp')).reverse();        // Doesn't works !!!
-    //this.gf_sortedEntries = (_.sortBy(this.gf_unsortedEntries, '_myTimestampInMs')).reverse();    // Doesn't works !!!
+    _MyFeeds.log(this.sortedEntries);*/
     
     // ===================
     // --- My own sort ---
@@ -112,26 +97,26 @@ SimplePie.prototype._sortEntries       = function() {
     // In this function for values "_myTimestampInMs" I add a random 
     // number between 0 & 500. (I add 0 to 0.5 seconde)
     
-    this.gf_sortedEntries = {};
+    this.sortedEntries = {};
     var _tmp = []; // It will contain all timestamps in ms.
     
-    for (var i = 0; i < this.gf_unsortedEntries.length; i++) {
-        _tmp.push(this.gf_unsortedEntries[i]._myTimestampInMs);
+    for (var i = 0; i < this.unsortedEntries.length; i++) {
+        _tmp.push(this.unsortedEntries[i]._myTimestampInMs);
     }
     
     _tmp.sort().reverse();
     
     for (var i = 0; i < _tmp.length; i++) {
 
-        for (var j = 0; j < this.gf_unsortedEntries.length; j++) {
-            if (_tmp[i] == this.gf_unsortedEntries[j]._myTimestampInMs) {
-                this.gf_sortedEntries[(this.gf_unsortedEntries[j]._myTimestampInMs)] = this.gf_unsortedEntries[j];
+        for (var j = 0; j < this.unsortedEntries.length; j++) {
+            if (_tmp[i] == this.unsortedEntries[j]._myTimestampInMs) {
+                this.sortedEntries[(this.unsortedEntries[j]._myTimestampInMs)] = this.unsortedEntries[j];
                 break;
             }
         }
     }
 
-    _MyFeeds.log('_sortEntries()', this.gf_sortedEntries);
+    _MyFeeds.log('_sortEntries()', this.sortedEntries);
 }
 
 /**
@@ -151,13 +136,13 @@ SimplePie.prototype._sortFeeds = function() {
  */
 SimplePie.prototype._setNum = function(num) { 
     if (num == "Infinity") {
-        this.gf.num = 1;
+        this.sp.num = 1;
         _MyFeeds.warn("_setNum : incorrect value " + num + " => Set to 1");
     } else if (isNaN(num) || !Number.isInteger(num)) {
-        this.gf.num = 20;
+        this.sp.num = 20;
         _MyFeeds.warn("_setNum : incorrect value " + num + " => Set to 20");
     } else {
-        this.gf.num = num;
+        this.sp.num = num;
     }
 }
 
@@ -206,12 +191,10 @@ SimplePie.prototype.addEntries = function(entries) {
         
         _entry['_mySha256_title']       = (_entry['_myFeedInformations']['feed']['_myFeedId'] + _entry['title']).toString().toLowerCase();
         _entry['_mySha256_link']        = (_entry['_myFeedInformations']['feed']['_myFeedId'] + _entry['link']).toString().toLowerCase();
-        //_entry['_mySha256_title']       = btoa(encodeURI(_entry['_myFeedInformations']['_myFeedId'] + _entry['title'])).toString();
-        //_entry['_mySha256_link']        = btoa(_entry['_myFeedInformations']['_myFeedId'] + _entry['link']).toString();
 
-        if (this.gf_mySha256.contains(_entry['_mySha256_link'])) {
+        if (this.sha256.contains(_entry['_mySha256_link'])) {
             // Old news same link: Do nothing.
-        } else if (this.gf_mySha256.contains(_entry['_mySha256_title'])) {
+        } else if (this.sha256.contains(_entry['_mySha256_title'])) {
             // Old news same title: Do nothing.
         } else {
             // New entry.
@@ -272,9 +255,9 @@ SimplePie.prototype.addEntries = function(entries) {
 
                 // Keep entry
 
-                this.gf_mySha256.push(_entry['_mySha256_link']);
-                this.gf_mySha256.push(_entry['_mySha256_title']);
-                this.gf_unsortedEntries.push(_entry);
+                this.sha256.push(_entry['_mySha256_link']);
+                this.sha256.push(_entry['_mySha256_title']);
+                this.unsortedEntries.push(_entry);
             }
         }
     }
@@ -286,8 +269,8 @@ SimplePie.prototype.addEntries = function(entries) {
         this._setTimestampMax(); // Store timestamp of most recent entry.
     }
     
-    _MyFeeds.log(this.gf_mySha256);
-    _MyFeeds.log('SimplePie.prototype.addEntries : ' + this.gf_unsortedEntries.length + ' entrie(s)');
+    _MyFeeds.log(this.sha256);
+    _MyFeeds.log('SimplePie.prototype.addEntries : ' + this.unsortedEntries.length + ' entrie(s)');
     
     var end = performance.now();
     _MyFeeds.log("SimplePie.prototype.addEntries() " + (end - start) + " milliseconds.");
@@ -307,21 +290,21 @@ SimplePie.prototype.deleteEntries = function(account, feedId) {
     var _tmp = [];
     var _tmpSha256 = [];
     
-    for (var i = 0; i < this.gf_unsortedEntries.length; i++) {
-        if (((this.gf_unsortedEntries[i]['_myFeedInformations']['_myAccount'] == account)
-            && (this.gf_unsortedEntries[i]['_myFeedInformations']['_myFeedId'] == feedId))
-            || ((feedId == "") && (this.gf_unsortedEntries[i]['_myFeedInformations']['_myAccount'] == account))
+    for (var i = 0; i < this.unsortedEntries.length; i++) {
+        if (((this.unsortedEntries[i]['_myFeedInformations']['_myAccount'] == account)
+            && (this.unsortedEntries[i]['_myFeedInformations']['_myFeedId'] == feedId))
+            || ((feedId == "") && (this.unsortedEntries[i]['_myFeedInformations']['_myAccount'] == account))
         ){
             // Don't keep this entry.
         } else {
-            _tmp.push(this.gf_unsortedEntries[i]);
-            _tmpSha256.push(this.gf_unsortedEntries[i]['_mySha256_link']);
-            _tmpSha256.push(this.gf_unsortedEntries[i]['_mySha256_title']);
+            _tmp.push(this.unsortedEntries[i]);
+            _tmpSha256.push(this.unsortedEntries[i]['_mySha256_link']);
+            _tmpSha256.push(this.unsortedEntries[i]['_mySha256_title']);
         }
     }
     
-    this.gf_unsortedEntries = _tmp;
-    this.gf_mySha256 = _tmpSha256;
+    this.unsortedEntries = _tmp;
+    this.sha256 = _tmpSha256;
     
     var end = performance.now();
     _MyFeeds.log("deleteEntries() " + (end - start) + " milliseconds.");
@@ -338,20 +321,20 @@ SimplePie.prototype.deleteOldEntries = function(timestamp) {
     var date = new Date(timestamp * 1000);
     var dateTimeString = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2) + ' ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
     
-    _MyFeeds.log('deleteOldEntries(' + dateTimeString + ') => ' + this.gf_unsortedEntries.length + ' entrie(s)');
+    _MyFeeds.log('deleteOldEntries(' + dateTimeString + ') => ' + this.unsortedEntries.length + ' entrie(s)');
 
     var _tmp = [];
     var _oldEntries = 0;
     
-    for (var i = 0; i < this.gf_unsortedEntries.length; i++) {
-        if (this.gf_unsortedEntries[i]['_myTimestamp'] > timestamp) {
-            _tmp.push(this.gf_unsortedEntries[i]);
+    for (var i = 0; i < this.unsortedEntries.length; i++) {
+        if (this.unsortedEntries[i]['_myTimestamp'] > timestamp) {
+            _tmp.push(this.unsortedEntries[i]);
         } else {
             _oldEntries++ ;
         }
     }
     
-    this.gf_unsortedEntries = _tmp;
+    this.unsortedEntries = _tmp;
     
     _MyFeeds.log('deleteOldEntries(' + timestamp + ') => ' + _oldEntries + ' old entrie(s) has been deleted');
 }
@@ -432,7 +415,7 @@ SimplePie.prototype.addFeed = function(feed) {
     var _date = new Date(_lastUpdateTimestamp * 1000);
     _myNewfeed['_myLastPublishedDate']  = _date.toLocaleString(userLocale);
     _myNewfeed['_myLastTimestamp']      = _lastUpdateTimestamp;
-    _myNewfeed['_myLastTimestampInMs']  = _lastUpdateTimestamp;
+    _myNewfeed['_myLastTimestampInMs']  = _lastUpdateTimestamp * 1000;
     
     // Remove values.
     
@@ -488,11 +471,11 @@ SimplePie.prototype.loadFeeds = function(nbDaysToLoad) {
 
             this._setNum(1 + Math.floor(_myFeed.pulsations * nbDaysToLoad)); // Pulsations = Estimation of news per day.
 
-            var _urlParams = '?url=' + encodeURIComponent(this.gf.url) + '&num=' + this.gf.num;
-            var _url    = this.gf.servers[this.gf.serverId].url + _urlParams;
+            var _urlParams = '?url=' + encodeURIComponent(this.sp.url) + '&num=' + this.sp.num;
+            var _url    = this.sp.servers[this.sp.serverId].url + _urlParams;
 
             if (params.settings.proxy.use) {
-                _urlParams = '?url=' + encodeURIComponent(this.gf.servers[this.gf.serverId].url) + _urlParams;
+                _urlParams = '?url=' + encodeURIComponent(this.sp.servers[this.sp.serverId].url) + _urlParams;
                 _url = 'http://' + params.settings.proxy.host + '/proxy/' + _urlParams;
             }
             
@@ -665,15 +648,10 @@ SimplePie.prototype.get = function (url, myParams) {
  * @return {boolean} true, false
  * */
 SimplePie.prototype.isSmallEntry = function (entry) {
-
     var _out;
     var _diff = entry.content.length - entry.contentSnippet.length;
     
-    if (_diff < params.entries.maxLengthForSmallEntries) {
-        _out = true;
-    } else {
-        _out = false;
-    }
+    _out = (_diff < params.entries.maxLengthForSmallEntries) ? true : false;
     
     return _out;
 }
