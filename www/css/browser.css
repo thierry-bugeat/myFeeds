@@ -3,6 +3,7 @@
     width: calc(100%);
     height: calc(100%);
     left:0;
+    background: url("../img/logo.grey.png") no-repeat center center;
     background-color: var(--fxos-ivory);
 }
 
