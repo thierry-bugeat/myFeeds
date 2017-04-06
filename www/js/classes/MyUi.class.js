@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Thierry BUGEAT
+ * Copyright 2015, 2016, 2017 Thierry BUGEAT
  * 
  * This file is part of myFeeds.
  * 
@@ -32,23 +32,26 @@ var dom = {
         "entries":  document.getElementById("topup"),
         "feeds":    document.getElementById("topupFeedsList")
     },
-    "entry": {
-        "next": {
-            "button":   document.getElementById("nextEntry"),
-            "title":    document.getElementById("nextEntryTitle")
-        },
-        "previous": {
-            "button":   document.getElementById("previousEntry"),
-            "title":    document.getElementById("previousEntryTitle")
-        },
-        "wallabag": {
-            "add": document.getElementById("wallabagAdd")
-        }
-    },
     "screens": {
+        "entry": {
+            "container": document.getElementById("main-entry-container"),
+            "close": document.getElementById("closeMainEntry"),
+            "next": {
+                "button":   document.getElementById("nextEntry"),
+                "title":    document.getElementById("nextEntryTitle")
+            },
+            "previous": {
+                "button":   document.getElementById("previousEntry"),
+                "title":    document.getElementById("previousEntryTitle")
+            },
+            "wallabag": {
+                "add": document.getElementById("wallabagAdd")
+            }
+        },
         "entries": {
-            "scroll":   document.getElementById("feeds-entries-scroll"),
-            "content":  document.getElementById("feeds-entries-content"),
+            "container": document.getElementById("feeds-entries-container"),
+            "scroll": document.getElementById("feeds-entries-scroll"),
+            "content": document.getElementById("feeds-entries-content"),
         },
         "settings": document.getElementById('settings-container'),
         "feeds": document.getElementById('feeds-list-container'),
@@ -80,6 +83,9 @@ var useAnimations           = document.getElementById("useAnimations");
 /* ============ */
    
 var MyUi = function() {
+    this.screenMode = (window.innerWidth > 900) ? 'large' : 'small'; // DESKTOP mode
+    this.previousScreenMode = (window.innerWidth < 900) ? 'large' : 'small'; // DESKTOP mode
+
     _MyUi = this;
 }
 
@@ -91,6 +97,10 @@ MyUi.prototype.init = function() {
     _MyUi._onclick(nextDay, 'disable');
     
     _MyUi.selectThemeIcon();
+
+    /* --- Resize event (See listener below) --- */
+
+    window.dispatchEvent(new Event('resize')); // DESKTOP MODE: Fire event"resize" for 'large' screen mode
     
     // ================================================
     // --- Button [topupFeedsList] enable / disable ---
@@ -380,9 +390,12 @@ MyUi.prototype._scrollTo = function(screenX) {
 }
 
 MyUi.prototype._quickScrollTo = function(screenX) {
+    _MyFeeds.log('MyUi.prototype._quickScrollTo('+screenX+')');
     window.setTimeout(function() {
         
-        if (screenX == -1) {
+        if ((this.screenMode == 'large') && ((screenX == 0) || (screenX == 1))) { /* Large screen in DESKTOP MODE */
+            // --- Do nothing
+        } else if (screenX == -1) {
             var _x = (dom['screens']['feeds'].scrollWidth + 'px').toString();   /* Screen feeds list */
             dom['screens']['feeds'].classList.remove('back');
         } else if (screenX == -2) {
@@ -807,3 +820,44 @@ for (var i = 0; i < _animations.length; i++) {
 
 document.addEventListener("transitionend", function(){liveValues.animations.inProgress = false;}, false);
 
+/* ================= */
+/* --- Listeners --- */
+/* ================= */
+
+// DESKTOP mode
+// Window resize
+// In desktop mode, we have enough space for displaying "main entries list" and
+// "main entry" in same screen.
+
+window.addEventListener('resize', function() {
+    if (liveValues.platform === 'linux') {
+        this.screenMode = (window.innerWidth > 900) ? 'large' : 'small';
+
+        // Resize from "small" to "large"
+        if ((this.screenMode == 'large') && (this.previousScreenMode == 'small')) {
+            _MyUi._scrollTo(0);
+        }
+
+        // Resize from "large" to "small"
+        if ((this.screenMode == 'small') && (this.previousScreenMode == 'large')) {
+            // Remove currently opened news
+            ui.echo("browser", "", ""); 
+            liveValues.entries.currentlyDisplayed = '';
+        }
+
+        // small and large
+        if (window.innerWidth > 900) {
+            dom['screens']['entries']['container'].style.cssText = 'width: 32%';
+            dom['screens']['entry']['container'].style.cssText = 'width: 18%';
+            dom['screens']['entry']['close'].classList.add('disable');
+            dom['screens']['entry']['close'].classList.add('_hide');
+            this.previousScreenMode = 'large';
+        } else {
+            dom['screens']['entries']['container'].style.cssText = 'width: 50%';
+            dom['screens']['entry']['container'].style.cssText = 'width: 50%';
+            dom['screens']['entry']['close'].classList.remove('disable');
+            dom['screens']['entry']['close'].classList.remove('_hide')
+            this.previousScreenMode = 'small';
+        }
+    }
+}, false);

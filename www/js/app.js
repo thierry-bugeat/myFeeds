@@ -2009,7 +2009,7 @@
             _srcDoc = _srcDoc + '<div class="entrie-visit-website"><a href="' + _entry.link + '"><my data-l10n-id="entry-visit-website">' + document.webL10n.get('entry-visit-website') + '</my></a></div>';
             _srcDoc = _srcDoc + '</div>';
 
-            dom['entry']['wallabag']['add'].setAttribute("url", _entry.link);
+            dom['screens']['entry']['wallabag']['add'].setAttribute("url", _entry.link);
         }
         
         if (url != "") {
@@ -2018,7 +2018,7 @@
             } else {
                 ui.echo("browser", '<iframe src="' + url + '" sandbox="allow-same-origin allow-scripts" mozbrowser remote></iframe>', "");
             }
-            dom['entry']['wallabag']['add'].setAttribute("url", url);
+            dom['screens']['entry']['wallabag']['add'].setAttribute("url", url);
         } else {
             if (liveValues.platform === "linux") {
                 ui.echo("browser", '<webview id="electronView" src=\'data:text/html;charset=utf-8,' + _srcDoc + '\'></webview>', "");
@@ -2181,11 +2181,25 @@
 
         dspSettings();
     }
-
+    /**
+     * Save object/variable in local storage
+     * @param string variable (params, keywords, liveValues)
+     */
     function _save(variable) {
         var _filename = variable + '.json';
-        var _content = eval(variable);
         var _type = "application/json";
+        //var _content = eval(variable); // Blocked by CSP
+
+        switch(variable) {
+            case 'params':
+                _content = params; break;
+            case 'keywords':
+                _content = keywords; break;
+            case 'liveValues':
+                _content = liveValues; break;
+            default:
+                break;
+        } 
 
         if (variable === 'params') {
             _content.entries.nbDaysAgo = 0;  // Reset nbDaysAgo value before saving file.
@@ -2479,13 +2493,13 @@
         window.setInterval(function() {
             if ((params.accounts.wallabag.logged) 
                 && (liveValues.network.status === 'online') 
-                && dom['entry']['wallabag']['add'].classList.contains("disable")
+                && dom['screens']['entry']['wallabag']['add'].classList.contains("disable")
             ){
-                ui._onclick(dom['entry']['wallabag']['add'], 'enable');
+                ui._onclick(dom['screens']['entry']['wallabag']['add'], 'enable');
             } else if ((liveValues.network.status === 'offline')
-                || ((params.accounts.wallabag.logged === false) && (dom['entry']['wallabag']['add'].classList.contains("enable")))
+                || ((params.accounts.wallabag.logged === false) && (dom['screens']['entry']['wallabag']['add'].classList.contains("enable")))
             ){
-                ui._onclick(dom['entry']['wallabag']['add'], 'disable');
+                ui._onclick(dom['screens']['entry']['wallabag']['add'], 'disable');
             } else {
             }
         }, 500);
@@ -2814,14 +2828,14 @@
         
         // Next entry
         
-        dom['entry']['next']['button'].onclick = function() {
+        dom['screens']['entry']['next']['button'].onclick = function() {
             ui._vibrate();
             mainEntryOpenInBrowser(this.getAttribute("tsms"), this.getAttribute("entry_link")); 
         }
 
         // Previous entry
         
-        dom['entry']['previous']['button'].onclick = function() {
+        dom['screens']['entry']['previous']['button'].onclick = function() {
             ui._vibrate();
             mainEntryOpenInBrowser(this.getAttribute("tsms"), this.getAttribute("entry_link")); 
         }
@@ -2893,7 +2907,7 @@
         
         // Wallabag add
         
-        dom['entry']['wallabag']['add'].onclick = function() {
+        dom['screens']['entry']['wallabag']['add'].onclick = function() {
             ui._vibrate();
             var _confirm = window.confirm(document.webL10n.get('wallabag-add-url-confirm'));
             if (_confirm) {
@@ -2974,30 +2988,30 @@
             // [<]
             
             if (my.isSmallEntry(sortedEntries[_nextTsMs])) {
-                dom['entry']['next']['button'].setAttribute("tsms", _nextTsMs);
-                dom['entry']['next']['button'].setAttribute("entry_link", sortedEntries[_nextTsMs].link);
+                dom['screens']['entry']['next']['button'].setAttribute("tsms", _nextTsMs);
+                dom['screens']['entry']['next']['button'].setAttribute("entry_link", sortedEntries[_nextTsMs].link);
             } else {
-                dom['entry']['next']['button'].setAttribute("tsms", _nextTsMs);
-                dom['entry']['next']['button'].setAttribute("entry_link", "");
+                dom['screens']['entry']['next']['button'].setAttribute("tsms", _nextTsMs);
+                dom['screens']['entry']['next']['button'].setAttribute("entry_link", "");
             }
             
             // [>]
             
             if (my.isSmallEntry(sortedEntries[_previousTsMs])) {
-                dom['entry']['previous']['button'].setAttribute("tsms", _previousTsMs);
-                dom['entry']['previous']['button'].setAttribute("entry_link", sortedEntries[_previousTsMs].link);
+                dom['screens']['entry']['previous']['button'].setAttribute("tsms", _previousTsMs);
+                dom['screens']['entry']['previous']['button'].setAttribute("entry_link", sortedEntries[_previousTsMs].link);
             } else {
-                dom['entry']['previous']['button'].setAttribute("tsms", _previousTsMs);
-                dom['entry']['previous']['button'].setAttribute("entry_link", "");
+                dom['screens']['entry']['previous']['button'].setAttribute("tsms", _previousTsMs);
+                dom['screens']['entry']['previous']['button'].setAttribute("entry_link", "");
             }
             
             // Disable / enable button [<]
 
             if ((_nextTsMs > liveValues['entries']['id']['max']) || (_nextTsMs == _tsms)) {
-                ui._onclick(dom['entry']['next']['button'], 'disable');
+                ui._onclick(dom['screens']['entry']['next']['button'], 'disable');
                 ui.echo("nextEntryTitle", "", "");
             } else {
-                ui._onclick(dom['entry']['next']['button'], 'enable');
+                ui._onclick(dom['screens']['entry']['next']['button'], 'enable');
                 ui.echo("nextEntryTitle", sortedEntries[_nextTsMs].title, "");
             }
             
