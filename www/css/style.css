@@ -166,11 +166,11 @@ form{
 }
 
 ._show{
-    display:block;
+    display:block !important;
 }
 
 ._hide{
-    display:none;
+    display:none !important;
 }
 
 .rotation {
