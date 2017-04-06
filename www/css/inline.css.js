@@ -26,7 +26,7 @@ var _srcDocCss = [
 'html                       {font-size: 57%;}                                                       ',
 'body                       {padding: 0rem; font-size: 1.6rem; line-height: 1.25;}                  ',
 '.entry                     {padding: 1.5rem;}                                                      ',
-'.entrie-title              {font-weight: bold; font-size: 2rem; line-height: 1;}                   ',
+'.entrie-title              {font-weight: bold; font-size: 2rem; line-height: 1; overflow:hidden;}  ',
 '.entrie-date               {font-size: 1.4rem; color: #FF4E00;}                                    ',
 '.entry-author              {font-size: 1.4rem; color: #EAEAEA;}                                    ',
 '.entrie-feed-title         {font-size: 1.4rem; color: #00AACC;}                                    ',
