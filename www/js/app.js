@@ -1722,6 +1722,8 @@
 
                         if (_entry._myFirstImageUrl) {
                             _imageUrl = '<span class="my-' + _theme + '-image-container ' + _theme + '-ratio-image-' + _imageRatio + '"><img tsms="' + _entry._myTimestampInMs + '" src="img/loading.png" data-src="' + _entry._myFirstImageUrl + '"/></span>';
+                        } else {
+                            _imageUrl = '<span class="my-' + _theme + '-image-container ' + _theme + '-ratio-image-' + _imageRatio + '"><img tsms="' + _entry._myTimestampInMs + '" src="img/empty.png" data-src="img/empty.png"/></span>';
                         }
 
                         // Entry class ratio ?
@@ -1769,7 +1771,7 @@
                                 '<span class="my-'+_theme+'-feed-title">' + _entry._myFeedInformations.title + '</span>',
                                 '<span class="my-'+_theme+'-date" publishedDate="' + _entry.publishedDate + '">' + _time + '</span>',
                                 '<div class="my-'+_theme+'-image-wrapper">' + _imageUrl + '</div>',
-                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entry.title + '</span>',
+                                '<span class="my-'+_theme+'-title">' + _accountIcone + _entry.title + '&nbsp;<span class="fa fa-external-link"></span></span>',
                                 '<span class="my-'+_theme+'-snippet">' + _entry.contentSnippet + '</span>',
                                 '<div class="my-'+_theme+'-footer"></div>'
                             );
