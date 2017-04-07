@@ -47,8 +47,9 @@
 }
 
 .my-list-title img{
-    height: 2rem;
-    vertical-align: bottom;
+    height: 1.6rem;
+    line-height: 1.25;
+    vertical-align: middle;
     margin-right: var(--my-spacing);
 }
 
@@ -119,7 +120,7 @@
 
 .my-list-entry-s .my-list-date,
 .my-list-entry-s .my-list-feed-title {
-    display: none;
+    /*display: none;*/
 }
 
 /* --- RATIOS --- */
@@ -175,8 +176,9 @@
 }
 
 .my-card-title img{
-    height: 1.7rem;
-    vertical-align: text-bottom;
+    height: 1.6rem;
+    line-height: 1.25;
+    vertical-align: text-middle;
     margin-right: var(--my-spacing);
 }
 
@@ -196,7 +198,7 @@
 }
 
 .my-card-entry-s > .my-card-date{
-    display: none;
+    /*display: none;*/
 }
 
 .my-card-date{
@@ -302,8 +304,9 @@
 }
 
 .my-grid-title img{
-    height: 2rem;
-    vertical-align: bottom;
+    height: 1.6rem;
+    line-height: 1.25;
+    vertical-align: middle;
     margin-right: var(--my-spacing);
 }
 
