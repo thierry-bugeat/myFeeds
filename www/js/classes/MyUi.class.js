@@ -841,7 +841,7 @@ window.addEventListener('resize', function() {
         // Resize from "large" to "small"
         if ((this.screenMode == 'small') && (this.previousScreenMode == 'large')) {
             // Remove currently opened news
-            ui.echo("browser", "", ""); 
+            ui.echo("browser", "", "");     // Main Entry Content
             liveValues.entries.currentlyDisplayed = '';
         }
 
@@ -849,14 +849,14 @@ window.addEventListener('resize', function() {
         if (window.innerWidth > 900) {
             dom['screens']['entries']['container'].style.cssText = 'width: 32%';
             dom['screens']['entry']['container'].style.cssText = 'width: 18%';
-            dom['screens']['entry']['close'].classList.add('disable');
-            dom['screens']['entry']['close'].classList.add('_hide');
+            dom['screens']['entry']['close'].classList.add('disable');      // [x] Close main entry button
+            dom['screens']['entry']['close'].classList.add('_hide');        // [x] Close main entry button
             this.previousScreenMode = 'large';
         } else {
             dom['screens']['entries']['container'].style.cssText = 'width: 50%';
             dom['screens']['entry']['container'].style.cssText = 'width: 50%';
-            dom['screens']['entry']['close'].classList.remove('disable');
-            dom['screens']['entry']['close'].classList.remove('_hide')
+            dom['screens']['entry']['close'].classList.remove('disable');   // [x] Close main entry button
+            dom['screens']['entry']['close'].classList.remove('_hide');     // [x] Close main entry button
             this.previousScreenMode = 'small';
         }
     }
