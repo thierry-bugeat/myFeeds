@@ -1,0 +1,17 @@
+/* 
+ * Firefox OS Color Palette
+ * 
+ * Documentation  : https://www.mozilla.org/en-US/styleguide/products/firefox-os/color/ 
+ * Usage examples : http://www.w3.org/TR/css-variables/
+ * 
+ * */
+
+:root {
+    --fxos-orange: #AAAAAA;
+    --fxos-orange-light: #777777;
+}
+
+.colorize {
+    background-color: #dedede !important;
+    border-color: #dedede !important;
+}

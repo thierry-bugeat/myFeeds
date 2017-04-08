@@ -33,7 +33,7 @@
     var myFeedsSubscriptions = {'local': [], 'aolreader': [], 'feedly': [], 'theoldreader': [], 'tinytinyrss': []} ; // Store informations about feeds (urls)
 
     var params = {
-        "version": 2.51,                        // Don't forget to increase this value if you do changes in "params" object
+        "version": 2.53,                        // Don't forget to increase this value if you do changes in "params" object
         "changelog": "https://git.framasoft.org/thierry-bugeat/myFeeds/raw/master/CHANGELOG",
         "feeds": {
             "selectedFeed": {
@@ -86,7 +86,11 @@
             "ui": {
                 "animations": false,            // Use transitions animations
                 "vibrate": true,                // Vibration on click
-                "language": ""                  // Language
+                "language": "",                 // Language
+                "css": {                        // Send to CSS class (Method "set")
+                    "colors": ["orange", "blue", "grey"],   // CSS Theme (Default "orange")
+                    "selected": "orange"
+                }       
             },
             "developper_menu": {
                 "visible": false,               // Display or not developper menu in settings
@@ -214,6 +218,10 @@
         }
         
         ui.selectThemeIcon();
+
+        // Set CSS colors
+
+        css.set(params.settings.ui.css);
         
         // Set language
         
@@ -895,6 +903,21 @@
 
         _htmlLanguages = _htmlLanguages + '</select>';
 
+        // Select Theme
+
+        var _htmlCss = "";
+        var _colors = css.colors(); // params.settings.ui.css.colors
+        var _selectedColor = css.selected() || ""; // params['settings']['ui']['css']['selected']
+
+        _htmlCss = _htmlCss + '<select id="selectCss">';
+
+        for (var i = 0; i < _colors.length; i++) {
+            _selected = (_selectedColor == _colors[i]) ? "selected" : "";
+            _htmlCss = _htmlCss + '<option value="' + _colors[i] + '" ' + _selected + ' >' + document.webL10n.get(_colors[i]) + '</option>';
+        }
+
+        _htmlCss = _htmlCss + '</select>';
+
         // ---
 
         var _htmlSettings = [
@@ -1039,6 +1062,14 @@
         '       <a href="#">',
         '           <p class="double"><my data-l10n-id="vibrate-on-click">' + document.webL10n.get('vibrate-on-click') + '</my></p>',
         '       </a>',
+        '   </li>',
+
+        '   <li>',
+        '       <aside class="icon"><span data-icon="themes"></span></aside>',
+        '       <a>',
+        '           <p class="double"><my data-l10n-id="settings-ui-css">' + document.webL10n.get('settings-ui-css') + '</my></p>',
+        '       </a>',
+        '       ' + _htmlCss,
         '   </li>',
 
         '   <li>',
@@ -1365,6 +1396,15 @@
         document.getElementById("toggleVibrate").onclick = function() {
             params.settings.ui.vibrate = !params.settings.ui.vibrate;
             _save('params');
+        }
+
+        // UI select css
+
+        var _selectCss = document.getElementById('selectCss');
+        _selectCss.onchange = function(e) {
+            params.settings.ui.css.selected = _selectCss.options[_selectCss.selectedIndex].value;
+            _save('params');
+            css.set(params.settings.ui.css);
         }
         
         // UI select language

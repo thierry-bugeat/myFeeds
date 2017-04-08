@@ -22,14 +22,49 @@
 /* ============= */
    
 var MyCss = function() {
+    this.params = "";
     _MyCss = this;
+}
+
+/**
+ * Set and apply CSS color theme
+ * @param {object} _params
+ */
+MyCss.prototype.set = function(_params) {
+    _MyCss.params = _params;
+    _MyCss._remove('blue');
+    _MyCss._remove('grey');
+    if (_params.selected === 'orange') {
+        document.getElementById('theme-color').content = '#CD6723';
+    } else {
+        _MyCss._add(_params.selected);
+        document.getElementById('theme-color').content = '#005E71';
+    }
+}
+
+/**
+ * Get CSS colors themes availables
+ * @param {null}
+ * @return {array}
+ */
+MyCss.prototype.colors = function() {
+    return _MyCss.params.colors;
+}
+
+/**
+ * Get CSS colors themes availables
+ * @param {null}
+ * @return {string}
+ */
+MyCss.prototype.selected = function() {
+    return _MyCss.params.selected;
 }
 
 /**
  * Overwrite default theme colors ("orange")
  * @param {string} theme "blue"
  */
-MyCss.prototype.add = function(theme) {
+MyCss.prototype._add = function(theme) {
     var _head = document.getElementsByTagName("head")[0];
     var _cssNode = document.createElement('link');
     _cssNode.type = 'text/css';
@@ -40,6 +75,10 @@ MyCss.prototype.add = function(theme) {
     _head.appendChild(_cssNode);
 }
 
-MyCss.prototype.remove = function(theme) {
-    document.getElementById(theme).outerHTML = "";
+MyCss.prototype._remove = function(theme) {
+    try{
+        document.getElementById(theme).outerHTML = "";
+    } catch(error) {
+        // ---
+    }
 }
