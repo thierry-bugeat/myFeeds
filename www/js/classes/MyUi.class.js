@@ -759,25 +759,6 @@ MyUi.prototype._search = function(string) {
         delete _o; // v4
     }
 }
-
-/**
- * Overwrite default theme colors ("orange")
- * @param {string} theme "blue"
- */
-MyUi.prototype.addCssTheme = function(theme) {
-    var _head = document.getElementsByTagName("head")[0];
-    var _cssNode = document.createElement('link');
-    _cssNode.type = 'text/css';
-    _cssNode.rel = 'stylesheet';
-    _cssNode.href = 'css/themes/'+theme+'.css';
-    _cssNode.media = 'screen'; 
-    _cssNode.id = theme;
-    _head.appendChild(_cssNode);
-}
-
-MyUi.prototype.removeCssTheme = function(theme) {
-    document.getElementById(theme).outerHTML = "";
-}
  
 /* ================= */
 /* --- UI Events --- */

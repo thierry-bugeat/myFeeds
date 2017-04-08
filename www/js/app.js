@@ -19,6 +19,7 @@
     
     var my = new MyFeeds();
     var ui = new MyUi();
+    var css = new MyCss();    
     var myManifest = my._loadJSON('manifest.webapp');
 
     var theoldreader = new TheOldReader();
