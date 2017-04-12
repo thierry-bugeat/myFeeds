@@ -74,6 +74,19 @@ label.pack-radio.danger input ~ span:after {
   background-image: url(switches/images/radio/danger.png);
 }
 
+/* 'Orange', 'Blue', 'Grey' switches */
+
+label.pack-radio.orange input ~ span:after {
+  background-image: url(switches/images/radio/orange.png);
+}
+
+label.pack-radio.blue input ~ span:after {
+  background-image: url(switches/images/radio/blue.png);
+}
+
+label.pack-radio.grey input ~ span:after {
+  background-image: url(switches/images/radio/grey.png);
+}
 
 /* ----------------------------------
  * ON/OFF SWITCHES

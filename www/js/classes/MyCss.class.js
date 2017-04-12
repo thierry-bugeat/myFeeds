@@ -23,6 +23,11 @@
    
 var MyCss = function() {
     this.params = "";
+    this.meta = { // Top header FFOS
+        'orange': '#CD6723',
+        'blue': '#004769',
+        'grey': '#444444'
+    };
     _MyCss = this;
 }
 
@@ -32,13 +37,14 @@ var MyCss = function() {
  */
 MyCss.prototype.set = function(_params) {
     _MyCss.params = _params;
-    _MyCss._remove('blue');
-    _MyCss._remove('grey');
-    if (_params.selected === 'orange') {
-        document.getElementById('theme-color').content = '#CD6723';
-    } else {
+
+    _MyCss._remove('blue'); // @todo Use array _params['colors']
+    _MyCss._remove('grey'); // @todo Use array _params['colors']
+
+    document.getElementById('theme-color').content = this.meta[_params.selected]; // Top header FFOS
+
+    if (_params.selected !== 'orange') {
         _MyCss._add(_params.selected);
-        document.getElementById('theme-color').content = '#005E71';
     }
 }
 

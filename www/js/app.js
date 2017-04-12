@@ -903,20 +903,18 @@
 
         _htmlLanguages = _htmlLanguages + '</select>';
 
-        // Select Theme
+        // Select CSS color (orange, blue, grey)
 
         var _htmlCss = "";
         var _colors = css.colors(); // params.settings.ui.css.colors
         var _selectedColor = css.selected() || ""; // params['settings']['ui']['css']['selected']
 
-        _htmlCss = _htmlCss + '<select id="selectCss">';
-
+        _htmlCss = _htmlCss + '<div>';
         for (var i = 0; i < _colors.length; i++) {
-            _selected = (_selectedColor == _colors[i]) ? "selected" : "";
-            _htmlCss = _htmlCss + '<option value="' + _colors[i] + '" ' + _selected + ' >' + document.webL10n.get(_colors[i]) + '</option>';
+            _checked = (_selectedColor == _colors[i]) ? "checked" : "";
+            _htmlCss = _htmlCss + '<label class="pack-radio '+_colors[i]+'"><input name="radioCss" type="radio" value="'+_colors[i]+'" ' + _checked + '><span></span></label>';
         }
-
-        _htmlCss = _htmlCss + '</select>';
+        _htmlCss = _htmlCss + '</div>';
 
         // ---
 
@@ -1066,18 +1064,18 @@
 
         '   <li>',
         '       <aside class="icon"><span data-icon="themes"></span></aside>',
+        '       <aside class="pack-end">' + _htmlCss + '</aside>',
         '       <a>',
         '           <p class="double"><my data-l10n-id="settings-ui-css">' + document.webL10n.get('settings-ui-css') + '</my></p>',
         '       </a>',
-        '       ' + _htmlCss,
         '   </li>',
 
         '   <li>',
         '       <aside class="icon"><span data-icon="languages"></span></aside>',
+        '       <aside class="pack-end">' + _htmlLanguages + '</aside>',
         '       <a>',
         '           <p class="double"><my data-l10n-id="settings-ui-language">' + document.webL10n.get('settings-ui-language') + '</my></p>',
         '       </a>',
-        '       ' + _htmlLanguages,
         '   </li>',
         
         '</ul>',
@@ -1400,11 +1398,15 @@
 
         // UI select css
 
-        var _selectCss = document.getElementById('selectCss');
-        _selectCss.onchange = function(e) {
-            params.settings.ui.css.selected = _selectCss.options[_selectCss.selectedIndex].value;
-            _save('params');
-            css.set(params.settings.ui.css);
+        var _radios = document.getElementsByName('radioCss');
+        for (var i = 0; i < _radios.length; i++) {
+            _radios[i].onclick = function() {
+                if (params.settings.ui.css.selected != this.value) {
+                    params.settings.ui.css.selected = this.value;
+                    _save('params');
+                    css.set(params.settings.ui.css);
+                }
+            }
         }
         
         // UI select language
@@ -2021,6 +2023,7 @@
 
         if (url == "") {
             my.log('mainEntryOpenInBrowser()', sortedEntries[entryId]);
+            my.log('mainEntryOpenInBrowser()', sp.getEntry(entryId));
             var _entry = sortedEntries[entryId];
             var _srcDoc = "";
             var _regex = new RegExp('\'', 'g');
