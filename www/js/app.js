@@ -931,10 +931,10 @@
 
         '   <li class="_online_">',
         '       <aside class="icon"><span data-icon="sync"></span></aside>',
+        '       <aside class="pack-end">' + _htmlSelectUpdateEvery + '</aside>',
         '       <a>',
         '           <p class="double"><my data-l10n-id="settings-update-every">' + document.webL10n.get('settings-update-every') + '</my></p>',
         '       </a>',
-        '       ' + _htmlSelectUpdateEvery,
         '   </li>',
 
         '</ul>',
@@ -962,10 +962,10 @@
 
         '   <li>',
         '       <aside class="icon"><span data-icon="time"></span></aside>',
+        '       <aside class="pack-end">' + _htmlMaxNbDays + '</aside>',
         '       <a>',
         '           <p class="double"><my data-l10n-id="settings-number-of-days">' + document.webL10n.get('settings-number-of-days') + '</my></p>',
         '       </a>',
-        '       ' + _htmlMaxNbDays,
         '   </li>',
         
         '</ul>',

@@ -67,6 +67,21 @@ SimplePie.prototype.getServers         = function()        { return this.sp.serv
 SimplePie.prototype.getServerId        = function()        { return this.sp.serverId;      }
 SimplePie.prototype.setServerId        = function(serverId){ this.sp.serverId = serverId;  }
 
+/**
+ * Display entry in console log
+ * @param {tsms} int Timestamp in ms
+ * @return {object} Return object entry
+ */
+SimplePie.prototype.getEntry = function(tsms) { 
+    //this._sortEntries();  
+    for (i in this.sortedEntries) {
+        if (i == tsms) {
+            return this.sortedEntries[i];
+            break;
+        }
+    }  
+}
+
 SimplePie.prototype._setUrl            = function(url)     { this.sp.url = url;            }
 
 SimplePie.prototype._sortEntries       = function() {
@@ -217,7 +232,9 @@ SimplePie.prototype.addEntries = function(entries) {
             if ((typeof _entry.enclosure !== 'undefined') 
                 && (typeof _entry.enclosure.link !== 'undefined') 
                 && (_entry.enclosure.link)
-                && (_entry.enclosure.link.match('/(jpg|png)/g'))
+                //&& (_entry.enclosure.link.match('/(jpg|png)/g'))
+                //&& (_entry.enclosure.link.match('/^(?!.*[.](pdf|tar)$).*$/g')) // Disallow ".pdf" & ".tar" files in enclosure
+                //&& (_entry.enclosure.link.match('/^(?!.*[.]pdf$)(.*)$/g')) // nextinpact vs frandroid BUG
             ) {
                 _entry['_myFirstImageUrl'] = _entry.enclosure.link;
             } else if ((_results !== null) && (Boolean(_results[1]))) { 

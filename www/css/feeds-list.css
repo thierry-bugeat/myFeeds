@@ -125,7 +125,7 @@
 #feeds-list button {
     width:4rem;
     padding:0;
-    padding-right: var(--my-spacing);
+    margin-right: var(--my-spacing);
     vertical-align: bottom;
 }
 
@@ -138,7 +138,7 @@ count{
     border-radius:2rem;
     display:inline-block;
     text-align:center;
-    padding-right: var(--my-spacing);
+    margin-right: var(--my-spacing);
 }
 
 /* --- All Feeds --- */

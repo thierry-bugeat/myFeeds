@@ -3,7 +3,8 @@ html, body {
   overflow-x: hidden;
 }
 body {
-  position: relative
+  position: relative;
+  cursor: default;
 }
 
 html, body {
@@ -142,7 +143,8 @@ form{
 
 /* --- Enable / Disable element(s) --- */
 
-.colorize {
+.colorize,
+.i:hover {
     background-color: #BBC9CC !important;
     border-color: #BBC9CC !important;
 }
@@ -185,4 +187,8 @@ form{
 select {
     -webkit-appearance: none;
     -moz-appearance: none;
+}
+
+button:hover {
+    color: var(--fxos-blue) !important;
 }

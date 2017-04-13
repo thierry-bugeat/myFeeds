@@ -188,3 +188,8 @@ aside {
     top: 0.5rem;
     height: 4rem;
 }
+
+#selectUpdateEvery,
+#selectMaxNbDays {
+        width: 55px !important;
+}
