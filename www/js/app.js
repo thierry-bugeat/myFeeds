@@ -3064,10 +3064,10 @@
             // Disable / enable button [>]
             
             if ((_previousTsMs < liveValues['entries']['id']['min']) || (_previousTsMs == _tsms)) {
-                ui._onclick(dom.entry['previous']['button'], 'disable');
+                ui._onclick(dom['screens']['entry']['previous']['button'], 'disable');
                 ui.echo("previousEntryTitle", "", "");
             } else {
-                ui._onclick(dom.entry['previous']['button'], 'enable');
+                ui._onclick(dom['screens']['entry']['previous']['button'], 'enable');
                 ui.echo("previousEntryTitle", sortedEntries[_previousTsMs].title, "");
             }
             
