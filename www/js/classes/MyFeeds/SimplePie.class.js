@@ -232,13 +232,13 @@ SimplePie.prototype.addEntries = function(entries) {
             if ((typeof _entry.enclosure !== 'undefined') 
                 && (typeof _entry.enclosure.link !== 'undefined') 
                 && (_entry.enclosure.link)
-                //&& (_entry.enclosure.link.match('/(jpg|png)/g'))
-                //&& (_entry.enclosure.link.match('/^(?!.*[.](pdf|tar)$).*$/g')) // Disallow ".pdf" & ".tar" files in enclosure
-                //&& (_entry.enclosure.link.match('/^(?!.*[.]pdf$)(.*)$/g')) // nextinpact vs frandroid BUG
+                && (_entry.enclosure.link.match(/((.*)\/(.*)(.jpg|.png))|((.*)\/([^.\n]*)$)/g)) // ".jpg" ".png" or without extension
             ) {
                 _entry['_myFirstImageUrl'] = _entry.enclosure.link;
             } else if ((_results !== null) && (Boolean(_results[1]))) { 
                 _entry['_myFirstImageUrl'] = _results[1];
+            } else {
+               _entry['_myFirstImageUrl'] = "img/logo.grey.png"; // NEVER COME HERE 
             }
 
             // Add custom values
