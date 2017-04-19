@@ -1720,17 +1720,25 @@
             var _htmlFeedTitle = "";
             var _firstEntrie = true;
             var _theme = params.entries.theme;
+
+            _htmlFeedTitle = (params.feeds.selectedFeed.url) ? '<h2>' + params.feeds.selectedFeed.url + '</h2>' : ''; // :( Specific feed title
                 
             for (var i in tmpEntries) {
                 
                 var _entry = tmpEntries[i];
 
+                // @todo : Change code for feed title (variable _htmlFeedTitle).
+                // Extracting feed title from news is not the right way. Feed can be empty (no news) so title can't be extracted.
+                // Maybe feed title can be stored in "params.feed.selectedFeed" and/or in "liveValues.sync.selectedFeed"
+                // Be careful: 
+                // When application is starting up, selected feed can be in a disconnected account so all feeds must be displayed
+                // instead of selected feed.
                 if ((feedUrl !== "") 
                     && (feedUrl == _entry._myFeedInformations.feedUrl)
                     && (feedAccount == _entry._myFeedInformations.feed._myAccount)
                 ){
                     if (_firstEntrie) {
-                        _htmlFeedTitle = _htmlFeedTitle + '<h2>' + _entry._myFeedInformations.title + '</h2>'; // Specific feed title
+                        _htmlFeedTitle = '<h2>' + _entry._myFeedInformations.title + '</h2>'; // Specific feed title
                         _firstEntrie = false;
                     }
                 }
@@ -2238,11 +2246,11 @@
 
         switch(variable) {
             case 'params':
-                _content = params; break;
+                _content = JSON.parse(JSON.stringify(params)); break;
             case 'keywords':
-                _content = keywords; break;
+                _content = JSON.parse(JSON.stringify(keywords)); break;
             case 'liveValues':
-                _content = liveValues; break;
+                _content = JSON.parse(JSON.stringify(liveValues)); break;
             default:
                 break;
         } 
